@@ -81,5 +81,5 @@ HTML documentation can be built in the ``build/sphinx/html`` directory
 License
 -------
 
-This package is distributed with a BSD license; see the
-``LICENSE.txt`` file for details.
+This package is distributed with a BSD license; see the ``LICENSE``
+file for details.
