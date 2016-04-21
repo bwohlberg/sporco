@@ -6,6 +6,8 @@ nodist
 venv
 .hg
 .hgignore
+*.bak
+sporco/data/*.png
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

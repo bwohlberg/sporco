@@ -70,12 +70,23 @@ from the root directory of the package.
 Documentation
 -------------
 
-HTML documentation can be built in the ``build/sphinx/html`` directory
-(the top-level document is ``index.html``) by the command
+If the source has been obtained from a source distribution package
+then HTML documentation can be built in the ``build/sphinx/html``
+directory (the top-level document is ``index.html``) by the command
 
 ::
 
    python setup.py build_sphinx
+
+
+If the source has been cloned from the project github, it is necessary
+to first issue the command
+
+::
+
+   sphinx-apidoc --separate -d 2 -o source ../sporco modules.rst
+
+within the ``docs`` directory.
 
 
 License
