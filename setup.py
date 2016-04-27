@@ -75,8 +75,6 @@ dd = os.path.join(docdirbase,'examples')
 pp = os.path.join('examples')
 data.append((dd, glob(os.path.join(pp ,"*.py"))))
 
-install_requires = ['pyfftw']
-
 longdesc = read('README.rst')
 longdesc = longdesc[longdesc.index('==\n\n')+4:]
 
@@ -85,6 +83,7 @@ setup(
     version          = version,
     description      = 'Sparse Optimisation Research Code',
     long_description = longdesc,
+    platforms        = 'Any',
     license          = 'BSD',
     url              = 'http://math.lanl.gov/~brendt/Software/SPORCO/',
     author           = 'Brendt Wohlberg',
@@ -95,7 +94,7 @@ setup(
     include_package_data = True,
     setup_requires   = ['pytest-runner'],
     tests_require    = ['pytest'],
-    install_requires = install_requires,
+    install_requires = ['pyfftw'],
     cmdclass = {
         'build': build
     },
@@ -106,8 +105,10 @@ setup(
     'Intended Audience :: Science/Research',
     'License :: OSI Approved :: BSD License',
     'Operating System :: OS Independent',
+    'Programming Language :: Python :: 2 :: Only',
     'Topic :: Scientific/Engineering :: Information Analysis',
     'Topic :: Scientific/Engineering :: Mathematics',
+    'Topic :: Software Development :: Libraries :: Python Modules'
     ],
     zip_safe = False
 )
