@@ -1,6 +1,7 @@
 include MANIFEST.in
 include setup.py
 include setup.cfg
+include pytest.ini
 include README.rst
 include LICENSE
 
@@ -10,8 +11,5 @@ recursive-include docs Makefile *.py *.rst *.bib *.css
 include sporco/data/*.npz
 include sporco/tests/*.py
 include sporco/admm/tests/*.py
-
-#global-exclude .*~
-#global-exclude *.pyc
 
 prune docs/build
