@@ -6,6 +6,9 @@ python:
 addons:
   apt:
     packages:
+    - python-numpy
+    - python-scipy
+    - python-matplotlib
     - libfftw3-dev
 
 # command to install dependencies
