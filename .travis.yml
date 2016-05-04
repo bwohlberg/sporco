@@ -12,6 +12,7 @@ addons:
     packages:
     - python-numpy
     - python-scipy
+    - python-tk
     - python-matplotlib
     - libfftw3-dev
 
