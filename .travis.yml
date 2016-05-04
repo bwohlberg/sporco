@@ -12,9 +12,8 @@ addons:
     - libfftw3-dev
 
 # command to install dependencies
-install: 
+install:
     - pip install pyfftw
-    - pip install .
 
 # command to run tests
 script:
