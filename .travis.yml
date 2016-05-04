@@ -1,8 +1,16 @@
 language: python
+
 python:
   - "2.7"
+
+addons:
+  apt:
+    packages:
+    - libfftw3-dev
+
 # command to install dependencies
 install: "pip install pyfftw"
+
 # command to run tests
 script: py.test
 
