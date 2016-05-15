@@ -246,7 +246,7 @@ class ConvBPDN(admm.ADMMEqual):
         # Set default lambda value if not specified
         if lmbda is None:
             Df = sl.rfftn(self.D, self.Nv, self.axisN)
-            b = np.multiply(np.conj(Df), self.Sf)
+            b = np.conj(Df) * self.Sf
             self.lmbda = 0.1*abs(b).max()
         else:
             self.lmbda = lmbda
@@ -299,8 +299,8 @@ class ConvBPDN(admm.ADMMEqual):
             self.D = D
         self.Df = sl.rfftn(self.D, self.Nv, self.axisN)
         # Compute D^H S
-        self.DSf = np.sum(np.multiply(np.conj(self.Df), self.Sf),
-                          axis=self.axisC, keepdims=True)
+        self.DSf = np.sum(np.conj(self.Df) * self.Sf, axis=self.axisC,
+                          keepdims=True)
         if self.opt['HighMemSolve'] and self.C == 1:
             self.c = sl.solvedbi_sm_c(self.Df, np.conj(self.Df), self.rho,
                                       self.axisM)
@@ -327,10 +327,9 @@ class ConvBPDN(admm.ADMMEqual):
         self.X = sl.irfftn(self.Xf, None, self.axisN)
 
         if self.opt['LinSolveCheck']:
-            Dop = lambda x: np.sum(np.multiply(self.Df, x),
-                                axis=self.axisM, keepdims=True)
-            DHop = lambda x: np.sum(np.multiply(np.conj(self.Df), x),
-                                    axis=self.axisC, keepdims=True)
+            Dop = lambda x: np.sum(self.Df * x, axis=self.axisM, keepdims=True)
+            DHop = lambda x: np.sum(np.conj(self.Df) * x, axis=self.axisC,
+                                    keepdims=True)
             ax = DHop(Dop(self.Xf)) + self.rho*self.Xf
             self.xrrs = sl.rrs(ax, b)
         else:
@@ -362,7 +361,7 @@ class ConvBPDN(admm.ADMMEqual):
         :math:`\sum_m \| \mathbf{x}_m \|_1`.
         """
 
-        Ef = np.sum(np.multiply(self.Df, self.obfn_fvarf()), axis=self.axisM,
+        Ef = np.sum(self.Df * self.obfn_fvarf(), axis=self.axisM,
                     keepdims=True) - self.Sf
         dfd = sl.rfl2norm2(Ef, self.S.shape, axis=tuple(range(self.dimN)))/2.0
         reg = linalg.norm((self.opt['L1Weight'] * self.obfn_gvar()).ravel(), 1)
@@ -377,10 +376,8 @@ class ConvBPDN(admm.ADMMEqual):
         """Updated cached c array when rho changes."""
 
         if self.opt['HighMemSolve']:
-            self.c = np.divide(self.Df, np.sum(np.multiply(self.Df,
-                                                           np.conj(self.Df)),
-                                               axis=self.axisM,
-                                               keepdims=True) + self.rho)
+            self.c = self.Df / (np.sum(self.Df * np.conj(self.Df),
+                     axis=self.axisM, keepdims=True) + self.rho)
 
 
 
@@ -390,7 +387,7 @@ class ConvBPDN(admm.ADMMEqual):
         if X is None:
             X = self.Y
         Xf = sl.rfftn(X, None, self.axisN)
-        Sf = np.sum(np.multiply(self.Df, Xf), axis=self.axisM, keepdims=True)
+        Sf = np.sum(self.Df * Xf, axis=self.axisM, keepdims=True)
         return sl.irfftn(Sf, None, self.axisN)
 
 
@@ -492,8 +489,8 @@ class ConvElasticNet(ConvBPDN):
             self.D = D
         self.Df = sl.rfftn(self.D, self.Nv, self.axisN)
         # Compute D^H S
-        self.DSf = np.sum(np.multiply(np.conj(self.Df), self.Sf),
-                          axis=self.axisC, keepdims=True)
+        self.DSf = np.sum(np.conj(self.Df) * self.Sf, axis=self.axisC,
+                          keepdims=True)
         if self.opt['HighMemSolve'] and self.C == 1:
             self.c = sl.solvedbi_sm_c(self.Df, np.conj(self.Df),
                                       self.mu + self.rho, self.axisM)
@@ -519,10 +516,9 @@ class ConvElasticNet(ConvBPDN):
         self.X = sl.irfftn(self.Xf, None, self.axisN)
 
         if self.opt['LinSolveCheck']:
-            Dop = lambda x: np.sum(np.multiply(self.Df, x),
-                                axis=self.axisM, keepdims=True)
-            DHop = lambda x: np.sum(np.multiply(np.conj(self.Df), x),
-                                    axis=self.axisC, keepdims=True)
+            Dop = lambda x: np.sum(self.Df * x, axis=self.axisM, keepdims=True)
+            DHop = lambda x: np.sum(np.conj(self.Df) * x, axis=self.axisC,
+                                    keepdims=True)
             ax = DHop(Dop(self.Xf)) + (self.mu + self.rho)*self.Xf
             self.xrrs = sl.rrs(ax, b)
         else:
@@ -539,7 +535,7 @@ class ConvElasticNet(ConvBPDN):
         :math:`(1/2) \sum_m \| \mathbf{x}_m \|_2^2`
         """
 
-        Ef = np.sum(np.multiply(self.Df, self.obfn_fvarf()), axis=self.axisM,
+        Ef = np.sum(self.Df * self.obfn_fvarf(), axis=self.axisM,
                     keepdims=True) - self.Sf
         dfd = sl.rfl2norm2(Ef, self.S.shape, axis=tuple(range(self.dimN)))/2.0
         rl1 = linalg.norm((self.opt['L1Weight'] * self.obfn_gvar()).ravel(), 1)

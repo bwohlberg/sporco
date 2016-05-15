@@ -330,20 +330,19 @@ def solvemdbi_ism(ah, rho, b, axisM, axisK):
 
         slck = slcnc + (slice(k, k+1),)
         gamma[slck] = alpha
-        delta[slck] = 1.0 + np.sum(np.multiply(ah[slck], gamma[slck]),
-                                axisM, keepdims=True)
+        delta[slck] = 1.0 + np.sum(ah[slck] * gamma[slck], axisM, keepdims=True)
 
-        c = np.sum(np.multiply(ah[slck], beta), axisM, keepdims=True)
-        d = np.multiply(c, gamma[slck])
-        beta = beta - np.divide(d, delta[slck])
+        c = np.sum(ah[slck] * beta, axisM, keepdims=True)
+        d = c * gamma[slck]
+        beta = beta - (d / delta[slck])
 
         if k < K-1:
             alpha = a[slcnc + (slice(k+1, k+2),)]/rho
             for l in range(0, k+1):
                 slcl = slcnc + (slice(l, l+1),)
                 c = np.sum(ah[slcl] * alpha, axisM, keepdims=True)
-                d = np.multiply(c, gamma[slcl])
-                alpha = alpha - np.divide(d, delta[slcl])
+                d = c * gamma[slcl]
+                alpha = alpha - (d / delta[slcl])
 
     return beta
 
@@ -467,8 +466,8 @@ def solvemdbi_cg(ah, rho, b, axisM, axisK, tol=1e-5, mit=1000, isn=None):
     a = np.conj(ah)
     if isn is not None:
         isn = isn.ravel()
-    Aop = lambda x: np.sum(np.multiply(ah, x), axis=axisM, keepdims=True)
-    AHop = lambda x: np.sum(np.multiply(a, x), axis=axisK, keepdims=True)
+    Aop = lambda x: np.sum(ah * x, axis=axisM, keepdims=True)
+    AHop = lambda x: np.sum(a * x, axis=axisK, keepdims=True)
     AHAop = lambda x: AHop(Aop(x))
     vAHAoprI = lambda x: AHAop(x.reshape(b.shape)).ravel() + rho*x.ravel()
     lop = LinearOperator((b.size, b.size), matvec=vAHAoprI, dtype=b.dtype)

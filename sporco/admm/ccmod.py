@@ -325,8 +325,7 @@ class ConvCnstrMOD(admm.ADMMEqual):
         self.A = A
         self.Af = sl.rfftn(self.A, self.Nv, self.axisN)
         # Compute D^H S
-        self.ASf = np.sum(np.multiply(np.conj(self.Af), self.Sf),
-                        self.axisK, keepdims=True)
+        self.ASf = np.sum(np.conj(self.Af) * self.Sf, self.axisK, keepdims=True)
         self.runtime += self.timer.elapsed()
 
 
@@ -351,10 +350,9 @@ class ConvCnstrMOD(admm.ADMMEqual):
         self.X = sl.irfftn(self.Xf, None, self.axisN)
 
         if self.opt['LinSolveCheck']:
-            Aop = lambda x: np.sum(np.multiply(self.Af, x),
-                                axis=self.axisM, keepdims=True)
-            AHop = lambda x: np.sum(np.multiply(np.conj(self.Af), x),
-                                    axis=self.axisK, keepdims=True)
+            Aop = lambda x: np.sum(self.Af * x, axis=self.axisM, keepdims=True)
+            AHop = lambda x: np.sum(np.conj(self.Af) * x, axis=self.axisK,
+                                    keepdims=True)
             ax = AHop(Aop(self.Xf)) + self.rho*self.Xf
             self.xrrs = sl.rrs(ax, b)
 
@@ -384,7 +382,7 @@ class ConvCnstrMOD(admm.ADMMEqual):
         :math:`\| P(\mathbf{y}) -  \mathbf{y}\|_2`.
         """
 
-        Ef = np.sum(np.multiply(self.Af, self.obfn_fvarf()), axis=self.axisM,
+        Ef = np.sum(self.Af * self.obfn_fvarf(), axis=self.axisM,
                     keepdims=True) - self.Sf
         dfd = sl.rfl2norm2(Ef, self.S.shape, axis=tuple(range(self.dimN)))/2.0
         cns = linalg.norm((self.Pcn(self.obfn_gvar()) - self.obfn_gvar()))
@@ -426,7 +424,7 @@ def normalise(v, axisN=(0,1,2)):
 
     vn = np.sqrt(np.sum(v**2, axisN, keepdims=True))
     vn[vn == 0] = 1.0
-    return np.divide(v, vn)
+    return v / vn
 
 
 def zpad(v, Nv):

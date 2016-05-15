@@ -255,7 +255,7 @@ def normalise(v):
 
     vn = np.sqrt(np.sum(v**2, 0))
     vn[vn == 0] = 1.0
-    return np.divide(v, vn)
+    return v / vn
 
 
 def factorise(A, rho):

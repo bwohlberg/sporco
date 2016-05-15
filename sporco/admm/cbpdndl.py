@@ -214,8 +214,8 @@ class ConvBPDNDictLearn(object):
             self.cbpdn.setdict(self.ccmod.Y)
 
             # Compute functional value etc.
-            Ef = np.sum(np.multiply(self.cbpdn.Df, self.ccmod.Af),
-                        axis=self.cbpdn.axisM, keepdims=True) - self.cbpdn.Sf
+            Ef = np.sum(self.cbpdn.Df * self.ccmod.Af, axis=self.cbpdn.axisM,
+                        keepdims=True) - self.cbpdn.Sf
             dfd = 0.5*(linalg.norm(Ef)**2)/self.cbpdn.N
             l1n = linalg.norm(self.cbpdn.Y.ravel(), 1)
             obj = dfd + self.cbpdn.lmbda*l1n
