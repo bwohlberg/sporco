@@ -1,6 +1,8 @@
-import pytest
+from builtins import object
 
+import pytest
 import numpy as np
+
 from sporco.admm import ccmod
 import sporco.linalg as sl
 

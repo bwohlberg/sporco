@@ -8,11 +8,13 @@
 
 """Basic tvl1.TVL1Denoise usage example"""
 
-__author__ = """Brendt Wohlberg <brendt@ieee.org>"""
-
+from __future__ import print_function
+from builtins import input
+from builtins import range
 
 import numpy as np
 import matplotlib.pyplot as plt
+
 from sporco import util
 from sporco.admm import tvl1
 
@@ -30,7 +32,7 @@ opt = tvl1.TVL1Denoise.Options({'Verbose' : True, 'MaxMainIter' : 200,
 # Initialise and run TVL1Denoise object
 b = tvl1.TVL1Denoise(imgn, lmbda, opt)
 b.solve()
-print "TV solve time: %.2fs" % b.runtime, "\n"
+print("TV solve time: %.2fs" % b.runtime, "\n")
 
 
 # Display input and result image
@@ -75,4 +77,4 @@ plt.xlabel('Iterations')
 plt.ylabel('Gauss-Seidel Relative Residual')
 fig3.show()
 
-raw_input()
+input()

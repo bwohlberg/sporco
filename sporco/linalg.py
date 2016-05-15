@@ -7,8 +7,8 @@
 
 """Linear algebra functions"""
 
-__author__ = """Brendt Wohlberg <brendt@ieee.org>"""
-
+from __future__ import division
+from builtins import range
 
 import numpy as np
 from scipy import linalg
@@ -17,7 +17,6 @@ from scipy.sparse.linalg import LinearOperator
 from scipy.sparse.linalg import cg
 import multiprocessing
 import pyfftw
-
 try:
     import numexpr as ne
 except ImportError:
@@ -25,10 +24,11 @@ except ImportError:
 else:
     have_numexpr = True
 
+__author__ = """Brendt Wohlberg <brendt@ieee.org>"""
+
 
 pyfftw.interfaces.cache.enable()
 pyfftw.interfaces.cache.set_keepalive_time(300)
-
 
 
 def fftn(a, s=None, axes=None):
@@ -166,7 +166,7 @@ def dctii(x, axes=None):
     """
 
     if axes is None:
-        axes = range(x.ndim)
+        axes = list(range(x.ndim))
     for ax in axes:
         x = fftpack.dct(x, type=2, axis=ax, norm='ortho')
     return x
@@ -195,7 +195,7 @@ def idctii(x, axes=None):
     """
 
     if axes is None:
-        axes = range(x.ndim)
+        axes = list(range(x.ndim))
     for ax in axes[::-1]:
         x = fftpack.idct(x, type=2, axis=ax, norm='ortho')
     return x
@@ -322,8 +322,8 @@ def solvemdbi_ism(ah, rho, b, axisM, axisK):
     gamma = np.zeros(a.shape, a.dtype)
     delta = np.zeros(a.shape[0:axisM] + (1,), a.dtype)
     slcnc = (slice(None),)*axisK
-    alpha = a[slcnc + (slice(0, 1),)]/rho
-    beta = b/rho
+    alpha = a[slcnc + (slice(0, 1),)] / rho
+    beta = b / rho
 
     del b
     for k in range(0, K):
@@ -337,7 +337,7 @@ def solvemdbi_ism(ah, rho, b, axisM, axisK):
         beta = beta - (d / delta[slck])
 
         if k < K-1:
-            alpha = a[slcnc + (slice(k+1, k+2),)]/rho
+            alpha = a[slcnc + (slice(k+1, k+2),)] / rho
             for l in range(0, k+1):
                 slcl = slcnc + (slice(l, l+1),)
                 c = np.sum(ah[slcl] * alpha, axisM, keepdims=True)
@@ -398,7 +398,7 @@ def solvemdbi_rsm(ah, rho, b, axisK, dimN=2):
     K = ah.shape[axisK]
     a = np.conj(ah)
     Ainv = np.ones(ah.shape[0:dimN] + (1,)*4) * \
-        np.reshape(np.eye(M,M)/rho, (1,)*(dimN+2) + (M, M))
+        np.reshape(np.eye(M,M) / rho, (1,)*(dimN+2) + (M, M))
 
     for k in range(0, K):
         slck = slcnc + (slice(k, k+1),) + (slice(None), np.newaxis,)
@@ -605,7 +605,7 @@ def zquotient(x, y):
     zm = y == 0.0
     x[zm] = 0.0
     y[zm] = 1.0
-    return x/y
+    return x / y
 
 
 
@@ -723,7 +723,7 @@ def rfl2norm2(xf, xs, axis=(0,1)):
     """
 
     xfs = xf.shape
-    scl = 1.0/np.prod(np.array([xs[k] for k in axis]))
+    scl = 1.0 / np.prod(np.array([xs[k] for k in axis]))
     slc0 = (slice(None),)*axis[-1]
     nrm0 = linalg.norm(xf[slc0 + (0,)])
     idx1 = (xs[axis[-1]]+1)//2
@@ -756,7 +756,7 @@ def rrs(ax, b):
       Relative residual
     """
 
-    return linalg.norm((ax - b).ravel())/linalg.norm(b.ravel())
+    return linalg.norm((ax - b).ravel()) / linalg.norm(b.ravel())
 
 
 
@@ -805,7 +805,7 @@ def snr(vref, vcmp):
     c = vcmp.ravel()
     mse = np.mean((r - c)**2)
     dv = np.var(r)
-    return 10.0*np.log10(dv/mse)
+    return 10.0*np.log10(dv / mse)
 
 
 
@@ -836,4 +836,4 @@ def psnr(vref, vcmp):
     c = vcmp.ravel()
     mse = np.mean((r - c)**2)
     dv = (r.max() - r.min())**2
-    return 10.0*np.log10(dv/mse)
+    return 10.0*np.log10(dv / mse)

@@ -8,12 +8,14 @@
 
 """Basic cmod.CnstrMOD usage example"""
 
-__author__ = """Brendt Wohlberg <brendt@ieee.org>"""
-
+from __future__ import print_function
+from builtins import input
+from builtins import range
 
 import numpy as np
 from scipy.ndimage.interpolation import zoom
 import matplotlib.pyplot as plt
+
 from sporco.admm import bpdn
 from sporco.admm import cmod
 from sporco import util
@@ -53,7 +55,7 @@ opt = bpdn.BPDN.Options({'Verbose' : True,
                          'MaxMainIter' : 200, 'RelStopTol' : 1e-3})
 b = bpdn.BPDN(D0, S, lmbda, opt)
 b.solve()
-print "BPDN solve time: %.2fs" % b.runtime, "\n"
+print("BPDN solve time: %.2fs" % b.runtime, "\n")
 
 
 # Update dictionary for training set S
@@ -61,7 +63,7 @@ opt = cmod.CnstrMOD.Options({'Verbose' : True,
                              'MaxMainIter' : 500, 'RelStopTol' : 1e-5})
 c = cmod.CnstrMOD(b.Y, S, None, opt)
 c.solve()
-print "CMOD solve time: %.2fs" % c.runtime, "\n"
+print("CMOD solve time: %.2fs" % c.runtime, "\n")
 
 
 # Display dictionaries
@@ -97,4 +99,4 @@ plt.xlabel('Iterations')
 plt.ylabel('Penalty Parameter')
 fig2.show()
 
-raw_input()
+input()

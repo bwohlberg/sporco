@@ -7,18 +7,19 @@
 
 """Classes for ADMM algorithms for :math:`\ell^1` spline optimisation"""
 
-__author__ = """Brendt Wohlberg <brendt@ieee.org>"""
-
+from __future__ import division
+from __future__ import absolute_import
 
 import numpy as np
 from scipy import linalg
 import copy
 import collections
 
-import admm
+from sporco.admm import admm
 import sporco.util as su
 import sporco.linalg as sl
 
+__author__ = """Brendt Wohlberg <brendt@ieee.org>"""
 
 
 class SplineL1(admm.ADMM):
@@ -177,7 +178,7 @@ class SplineL1(admm.ADMM):
                 # If Y0 is given, but not U0, then choose the initial
                 # U so that the relevant dual optimality criterion
                 # (see (3.10) in boyd-2010-distributed) is satisfied.
-                self.U = (self.Wdf/self.rho)*np.sign(self.Y)
+                self.U = (self.Wdf / self.rho)*np.sign(self.Y)
         else:
             self.U = self.opt['U0']
 
@@ -190,7 +191,7 @@ class SplineL1(admm.ADMM):
             ashp[ax] = S.shape[ax]
             axn = np.arange(0,ashp[ax]).reshape(ashp)
             self.Alpha += -2.0 + 2.0*np.cos(axn*np.pi/float(ashp[ax]))
-        self.Gamma = 1.0/(1.0 + (self.lmbda/self.rho)*(self.Alpha**2))
+        self.Gamma = 1.0 / (1.0 + (self.lmbda/self.rho)*(self.Alpha**2))
 
         self.runtime += self.timer.elapsed()
 
@@ -214,13 +215,13 @@ class SplineL1(admm.ADMM):
     def ystep(self):
         """Minimise Augmented Lagrangian with respect to y."""
 
-        self.Y = sl.shrink1(self.AX - self.S + self.U, self.Wdf/self.rho)
+        self.Y = sl.shrink1(self.AX - self.S + self.U, self.Wdf / self.rho)
 
 
     def rhochange(self):
         """Action to be taken when rho parameter is changed."""
 
-        self.Gamma = 1.0/(1.0 + (self.lmbda/self.rho)*(self.Alpha**2))
+        self.Gamma = 1.0 / (1.0 + (self.lmbda/self.rho)*(self.Alpha**2))
         
 
 

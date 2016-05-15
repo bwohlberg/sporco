@@ -7,16 +7,17 @@
 
 """ADMM algorithm for the CMOD problem"""
 
-__author__ = """Brendt Wohlberg <brendt@ieee.org>"""
-
+from __future__ import division
+from __future__ import absolute_import
 
 import numpy as np
 from scipy import linalg
 import copy
 import collections
 
-import admm
+from sporco.admm import admm
 
+__author__ = """Brendt Wohlberg <brendt@ieee.org>"""
 
 
 class CnstrMOD(admm.ADMMEqual):
@@ -102,7 +103,7 @@ class CnstrMOD(admm.ADMMEqual):
             """Set parameters depending on K value"""
 
             if override or self['rho'] is None:
-                self['rho'] = K/500.0
+                self['rho'] = K / 500.0
 
 
 
@@ -278,7 +279,7 @@ def linsolve(A, rho, lu, piv, b):
 
     N, M = A.shape
     if N >= M:
-        x = (b - linalg.lu_solve((lu, piv), b.dot(A).T).T.dot(A.T))/rho
+        x = (b - linalg.lu_solve((lu, piv), b.dot(A).T).T.dot(A.T)) / rho
     else:
         x = linalg.lu_solve((lu, piv), b.T).T
     return x

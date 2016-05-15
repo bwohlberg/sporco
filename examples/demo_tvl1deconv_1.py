@@ -8,11 +8,13 @@
 
 """Basic tvl1.TVL1Deconv usage example"""
 
-__author__ = """Brendt Wohlberg <brendt@ieee.org>"""
-
+from __future__ import print_function
+from builtins import input
+from builtins import range
 
 import numpy as np
 import matplotlib.pyplot as plt
+
 from sporco import util
 from sporco.admm import tvl1
 
@@ -30,7 +32,7 @@ opt = tvl1.TVL1Deconv.Options({'Verbose' : True, 'MaxMainIter' : 200,
 # Initialise and run TVDeconv object
 b = tvl1.TVL1Deconv(np.ones((1,1)), imgn, lmbda, opt)
 b.solve()
-print "TV solve time: %.2fs" % b.runtime, "\n"
+print("TV solve time: %.2fs" % b.runtime, "\n")
 
 
 # Display input and result image
@@ -63,4 +65,4 @@ plt.ylabel('Penalty Parameter')
 fig2.show()
 
 
-raw_input()
+input()

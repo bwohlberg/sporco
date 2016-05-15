@@ -8,17 +8,19 @@
 """Classes for ADMM algorithms for Total Variation (TV) optimisation with
 an :math:`\ell^1` data fidelity term"""
 
-__author__ = """Brendt Wohlberg <brendt@ieee.org>"""
-
+from __future__ import division
+from __future__ import absolute_import
+from builtins import range
 
 import numpy as np
 from scipy import linalg
 import copy
 import collections
 
-import admm
+from sporco.admm import admm
 import sporco.linalg as sl
 
+__author__ = """Brendt Wohlberg <brendt@ieee.org>"""
 
 
 class TVL1Denoise(admm.ADMM):
@@ -182,7 +184,7 @@ class TVL1Denoise(admm.ADMM):
                 Yss = np.sqrt(np.sum(self.Y[...,0:-1]**2, axis=S.ndim, 
                                      keepdims=True))
                 U0 = (self.lmbda/self.rho)*sl.zquotient(self.Y[...,0:-1], Yss)
-                U1 = (1.0/self.rho)*np.sign(self.Y[...,-1])
+                U1 = (1.0 / self.rho)*np.sign(self.Y[...,-1])
                 self.U = np.concatenate(U0, U1, axis=X.ndim)
         else:
             self.U = self.opt['U0']
@@ -232,7 +234,7 @@ class TVL1Denoise(admm.ADMM):
         self.Y[...,0:-1] = sl.shrink2(self.AX[...,0:-1] + self.U[...,0:-1],
                                       (self.lmbda/self.rho)*self.Wtvna)
         self.Y[...,-1] = sl.shrink1(self.AX[...,-1] + self.U[...,-1] - self.S,
-                                (1.0/self.rho)*self.Wdf)
+                                (1.0 / self.rho)*self.Wdf)
 
 
 
@@ -505,7 +507,7 @@ class TVL1Deconv(admm.ADMM):
                 Yss = np.sqrt(np.sum(self.Y[...,0:-1]**2, axis=S.ndim, 
                                      keepdims=True))
                 U0 = (self.lmbda/self.rho)*sl.zquotient(self.Y[...,0:-1], Yss)
-                U1 = (1.0/self.rho)*np.sign(self.Y[...,-1])
+                U1 = (1.0 / self.rho)*np.sign(self.Y[...,-1])
                 self.U = np.concatenate(U0, U1, axis=X.ndim)
         else:
             self.U = self.opt['U0']
@@ -559,7 +561,7 @@ class TVL1Deconv(admm.ADMM):
         self.Y[...,0:-1] = sl.shrink2(self.AX[...,0:-1] + self.U[...,0:-1],
                                       (self.lmbda/self.rho) * self.Wtvna)
         self.Y[...,-1] = sl.shrink1(self.AX[...,-1] + self.U[...,-1] - self.S,
-                                (1.0/self.rho))
+                                (1.0 / self.rho))
 
 
 

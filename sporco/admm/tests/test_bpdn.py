@@ -1,7 +1,11 @@
-import pytest
+from __future__ import division
+from builtins import range
+from builtins import object
 
+import pytest
 import numpy as np
 from scipy import linalg
+
 from sporco.admm import bpdn
 import sporco.linalg as sl
 
@@ -20,7 +24,7 @@ class TestSet01(object):
         D = np.random.randn(N, M)
         X = np.random.randn(M, K)
         S = D.dot(X)
-        Z = (D.T.dot(D).dot(X) + rho*X - D.T.dot(S))/rho
+        Z = (D.T.dot(D).dot(X) + rho*X - D.T.dot(S)) / rho
         lu, piv = bpdn.factorise(D, rho)
         Xslv = bpdn.linsolve(D, rho, lu, piv, D.T.dot(S) + rho*Z)
         assert(sl.rrs(D.T.dot(D).dot(Xslv) + rho*Xslv,
@@ -35,7 +39,7 @@ class TestSet01(object):
         D = np.random.randn(N, M)
         X = np.random.randn(M, K)
         S = D.dot(X)
-        Z = (D.T.dot(D).dot(X) + rho*X - D.T.dot(S))/rho
+        Z = (D.T.dot(D).dot(X) + rho*X - D.T.dot(S)) / rho
         lu, piv = bpdn.factorise(D, rho)
         Xslv = bpdn.linsolve(D, rho, lu, piv, D.T.dot(S) + rho*Z)
         assert(sl.rrs(D.T.dot(D).dot(Xslv) + rho*Xslv,
@@ -50,7 +54,7 @@ class TestSet01(object):
         np.random.seed(12345)
         D = np.random.randn(N, M)
         x0 = np.zeros((M, 1))
-        si = np.random.permutation(range(0, M-1))
+        si = np.random.permutation(list(range(0, M-1)))
         x0[si[0:L]] = np.random.randn(L, 1)
         s0 = D.dot(x0)
         lmbda = 5e-3

@@ -8,12 +8,14 @@
 
 """Basic cbpdn.ConvElasticNet usage example"""
 
-__author__ = """Brendt Wohlberg <brendt@ieee.org>"""
-
+from __future__ import print_function
+from builtins import input
+from builtins import range
 
 import numpy as np
 from scipy.ndimage.interpolation import zoom
 import matplotlib.pyplot as plt
+
 from sporco import util
 from sporco.admm import cbpdn
 from sporco.admm import ccmod
@@ -45,7 +47,7 @@ opt = cbpdn.ConvElasticNet.Options({'Verbose' : True, 'MaxMainIter' : 100,
 # Initialise and run ConvBPDN object
 b = cbpdn.ConvElasticNet(D, sh, lmbda, mu, opt)
 x = b.solve()
-print "ConvElasticNet solve time: %.2fs" % b.runtime, "\n"
+print("ConvElasticNet solve time: %.2fs" % b.runtime, "\n")
 
 # Reconstruct representation
 Srec = np.squeeze(b.reconstruct())
@@ -81,4 +83,4 @@ plt.xlabel('Iterations')
 plt.ylabel('Penalty Parameter')
 fig2.show()
 
-raw_input()
+input()

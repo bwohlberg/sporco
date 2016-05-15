@@ -8,12 +8,14 @@
 
 """Basic ccmod.ConvCnstrMOD usage example"""
 
-__author__ = """Brendt Wohlberg <brendt@ieee.org>"""
-
+from __future__ import print_function
+from builtins import input
+from builtins import range
 
 import numpy as np
 from scipy.ndimage.interpolation import zoom
 import matplotlib.pyplot as plt
+
 from sporco.admm import cbpdn
 from sporco.admm import ccmod
 from sporco import util
@@ -49,7 +51,7 @@ opt = ccmod.ConvCnstrMOD.Options({'Verbose' : True,
                                   'MaxMainIter' : 100, 'rho' : 5.0})
 c = ccmod.ConvCnstrMOD(b.Y, sh, D0.shape[0:2]+(D0.shape[3],), opt)
 d = c.solve()
-print "CCMOD solve time: %.2fs" % c.runtime, "\n"
+print("CCMOD solve time: %.2fs" % c.runtime, "\n")
 D1 = ccmod.bcrop(c.Y, D0.shape).squeeze()
 
 
@@ -83,4 +85,4 @@ plt.xlabel('Iterations')
 plt.ylabel('Penalty Parameter')
 fig2.show()
 
-raw_input()
+input()

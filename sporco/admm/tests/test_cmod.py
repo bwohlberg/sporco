@@ -1,6 +1,9 @@
-import pytest
+from __future__ import division
+from builtins import object
 
+import pytest
 import numpy as np
+
 from sporco.admm import cmod
 import sporco.linalg as sl
 
@@ -21,7 +24,7 @@ class TestSet01(object):
         D = np.random.randn(N, M)
         X = np.random.randn(M, K)
         S = D.dot(X)
-        Z = (D.dot(X).dot(X.T) + rho*D - S.dot(X.T))/rho
+        Z = (D.dot(X).dot(X.T) + rho*D - S.dot(X.T)) / rho
         lu, piv = cmod.factorise(X, rho)
         Dslv = cmod.linsolve(X, rho, lu, piv, S.dot(X.T) + rho*Z)
         assert(sl.rrs(Dslv.dot(X).dot(X.T) + rho*Dslv,
@@ -36,7 +39,7 @@ class TestSet01(object):
         D = np.random.randn(N, M)
         X = np.random.randn(M, K)
         S = D.dot(X)
-        Z = (D.dot(X).dot(X.T) + rho*D - S.dot(X.T))/rho
+        Z = (D.dot(X).dot(X.T) + rho*D - S.dot(X.T)) / rho
         lu, piv = cmod.factorise(X, rho)
         Dslv = cmod.linsolve(X, rho, lu, piv, S.dot(X.T) + rho*Z)
         assert(sl.rrs(Dslv.dot(X).dot(X.T) + rho*Dslv,

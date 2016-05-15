@@ -7,18 +7,19 @@
 
 """Classes for ADMM algorithms for Robust PCA optimisation"""
 
-__author__ = """Brendt Wohlberg <brendt@ieee.org>"""
-
+from __future__ import division
+from __future__ import absolute_import
 
 import numpy as np
 from scipy import linalg
 import copy
 import collections
 
-import admm
+from sporco.admm import admm
 import sporco.util as su
 import sporco.linalg as sl
 
+__author__ = """Brendt Wohlberg <brendt@ieee.org>"""
 
 
 class RobustPCA(admm.ADMM):
@@ -135,7 +136,7 @@ class RobustPCA(admm.ADMM):
 
         # Set default lambda value if not specified
         if lmbda is None:
-            self.lmbda = 1.0/np.sqrt(S.shape[0])
+            self.lmbda = 1.0 / np.sqrt(S.shape[0])
         else:
             self.lmbda = lmbda
 
@@ -183,7 +184,7 @@ class RobustPCA(admm.ADMM):
     def xstep(self):
         """Minimise Augmented Lagrangian with respect to x."""
 
-        self.X, self.ss = shrinksv(self.S - self.Y - self.U, 1.0/self.rho)
+        self.X, self.ss = shrinksv(self.S - self.Y - self.U, 1.0 / self.rho)
 
 
 

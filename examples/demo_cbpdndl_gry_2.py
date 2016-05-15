@@ -8,12 +8,14 @@
 
 """Basic cbpdndl.ConvBPDNDictLearn usage example"""
 
-__author__ = """Brendt Wohlberg <brendt@ieee.org>"""
-
+from __future__ import print_function
+from builtins import input
+from builtins import range
 
 import numpy as np
 from scipy.ndimage.interpolation import zoom
 import matplotlib.pyplot as plt
+
 from sporco.admm import cbpdndl
 from sporco.admm import ccmod
 from sporco import util
@@ -59,7 +61,7 @@ opt = cbpdndl.ConvBPDNDictLearn.Options({'Verbose' : True, 'MaxMainIter' : 100,
 # Run optimisation
 d = cbpdndl.ConvBPDNDictLearn(D0, sh, lmbda, opt)
 d.solve()
-print "ConvBPDNDictLearn solve time: %.2fs" % d.runtime, "\n"
+print("ConvBPDNDictLearn solve time: %.2fs" % d.runtime, "\n")
 
 
 # Display dictionaries
@@ -98,4 +100,4 @@ plt.ylabel('Penalty Parameter')
 plt.legend(['Rho', 'Sigma'])
 fig2.show()
 
-raw_input()
+input()

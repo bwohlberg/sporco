@@ -8,12 +8,14 @@
 
 """Basic cbpdn.ConvBPDN usage example"""
 
-__author__ = """Brendt Wohlberg <brendt@ieee.org>"""
-
+from __future__ import print_function
+from builtins import input
+from builtins import range
 
 import numpy as np
 from scipy.ndimage.interpolation import zoom
 import matplotlib.pyplot as plt
+
 from sporco import util
 from sporco.admm import cbpdn
 from sporco.admm import ccmod
@@ -43,7 +45,7 @@ opt = cbpdn.ConvBPDN.Options({'Verbose' : True, 'MaxMainIter' : 200,
 # Initialise and run ConvBPDN object
 b = cbpdn.ConvBPDN(D, sh, lmbda, opt)
 x = b.solve()
-print "CBPDN solve time: %.2fs" % b.runtime, "\n"
+print("CBPDN solve time: %.2fs" % b.runtime, "\n")
 
 # Reconstruct representation
 Srec = np.squeeze(b.reconstruct())
@@ -79,4 +81,4 @@ plt.xlabel('Iterations')
 plt.ylabel('Penalty Parameter')
 fig2.show()
 
-raw_input()
+input()

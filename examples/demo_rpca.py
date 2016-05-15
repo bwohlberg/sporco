@@ -8,12 +8,14 @@
 
 """Basic rpca.RobustPCA usage example"""
 
-__author__ = """Brendt Wohlberg <brendt@ieee.org>"""
-
+from __future__ import print_function
+from builtins import input
+from builtins import range
 
 import numpy as np
 from scipy.ndimage.filters import gaussian_filter
 import matplotlib.pyplot as plt
+
 from sporco import util
 from sporco.admm import rpca
 
@@ -33,9 +35,9 @@ opt = rpca.RobustPCA.Options({'Verbose' : True, 'gEvalY' : False,
                               'AutoRho' : {'Enabled' : True}})
 b = rpca.RobustPCA(S1, None, opt)
 X, Y = b.solve()
-print "RobustPCA solve time: %.2fs" % b.runtime, "\n"
+print("RobustPCA solve time: %.2fs" % b.runtime, "\n")
 
-print np.linalg.norm(S0 - X)
+print(np.linalg.norm(S0 - X))
 
 
 # Display S0 and X image
@@ -70,5 +72,5 @@ plt.xlabel('Iterations')
 plt.ylabel('Penalty Parameter')
 fig2.show()
 
-raw_input()
+input()
 

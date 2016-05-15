@@ -7,8 +7,9 @@
 
 """Classes for ADMM algorithm for the Convolutional BPDN problem"""
 
-__author__ = """Brendt Wohlberg <brendt@ieee.org>"""
-
+from __future__ import division
+from __future__ import absolute_import
+from builtins import range
 
 import numpy as np
 from scipy import linalg
@@ -17,9 +18,10 @@ import pyfftw
 import copy
 import collections
 
-import admm
+from sporco.admm import admm
 import sporco.linalg as sl
 
+__author__ = """Brendt Wohlberg <brendt@ieee.org>"""
 
 
 class ConvBPDN(admm.ADMMEqual):

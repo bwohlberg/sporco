@@ -1,3 +1,6 @@
+from __future__ import division
+from builtins import object
+
 import pytest
 
 import numpy as np
@@ -24,7 +27,7 @@ class TestSet01(object):
             np.random.randn(N, N, 1, K, M).astype('complex') * 1.0j
         S = np.sum(D*X, axis=4, keepdims=True)
         Z = (D.conj()*np.sum(D*X, axis=4, keepdims=True) + \
-             rho*X - D.conj()*S)/rho
+             rho*X - D.conj()*S) / rho
         Xslv = linalg.solvedbi_sm(D, rho, D.conj()*S + rho*Z)
         assert(linalg.rrs(D.conj()*np.sum(D*Xslv, axis=4, keepdims=True) +
                         rho*Xslv, D.conj()*S + rho*Z) < 1e-11)
@@ -44,7 +47,7 @@ class TestSet01(object):
 
         Xop = lambda x: np.sum(X * x, axis=4, keepdims=True)
         XHop = lambda x: np.sum(np.conj(X) * x, axis=3, keepdims=True)
-        Z = (XHop(Xop(D)) + rho*D - XHop(S))/rho
+        Z = (XHop(Xop(D)) + rho*D - XHop(S)) / rho
         Dslv = linalg.solvemdbi_ism(X, rho,  XHop(S) + rho*Z, 4, 3)
 
         assert(linalg.rrs(XHop(Xop(Dslv)) + rho*Dslv, XHop(S) + rho*Z) < 1e-11)
@@ -65,7 +68,7 @@ class TestSet01(object):
 
         Xop = lambda x: np.sum(X * x, axis=4, keepdims=True)
         XHop = lambda x: np.sum(np.conj(X)* x, axis=3, keepdims=True)
-        Z = (XHop(Xop(D)) + rho*D - XHop(S))/rho
+        Z = (XHop(Xop(D)) + rho*D - XHop(S)) / rho
         Dslv = linalg.solvemdbi_ism(X, rho,  XHop(S) + rho*Z, 4, 3)
 
         assert(linalg.rrs(XHop(Xop(Dslv)) + rho*Dslv, XHop(S) + rho*Z) < 1e-11)
@@ -85,7 +88,7 @@ class TestSet01(object):
 
         Xop = lambda x: np.sum(X * x, axis=4, keepdims=True)
         XHop = lambda x: np.sum(np.conj(X) * x, axis=3, keepdims=True)
-        Z = (XHop(Xop(D)) + rho*D - XHop(S))/rho
+        Z = (XHop(Xop(D)) + rho*D - XHop(S)) / rho
         Dslv = linalg.solvemdbi_rsm(X, rho,  XHop(S) + rho*Z, 3)
 
         assert(linalg.rrs(XHop(Xop(Dslv)) + rho*Dslv, XHop(S) + rho*Z) < 1e-11)
@@ -106,7 +109,7 @@ class TestSet01(object):
 
         Xop = lambda x: np.sum(X * x, axis=4, keepdims=True)
         XHop = lambda x: np.sum(np.conj(X) * x, axis=3, keepdims=True)
-        Z = (XHop(Xop(D)) + rho*D - XHop(S))/rho
+        Z = (XHop(Xop(D)) + rho*D - XHop(S)) / rho
         Dslv = linalg.solvemdbi_rsm(X, rho,  XHop(S) + rho*Z, 3)
 
         assert(linalg.rrs(XHop(Xop(Dslv)) + rho*Dslv, XHop(S) + rho*Z) < 1e-11)
@@ -126,7 +129,7 @@ class TestSet01(object):
 
         Xop = lambda x: np.sum(X * x, axis=4, keepdims=True)
         XHop = lambda x: np.sum(np.conj(X) * x, axis=3, keepdims=True)
-        Z = (XHop(Xop(D)) + rho*D - XHop(S))/rho
+        Z = (XHop(Xop(D)) + rho*D - XHop(S)) / rho
         Dslv, cgit = linalg.solvemdbi_cg(X, rho, XHop(S)+rho*Z, 4, 3, tol=1e-6)
 
         assert(linalg.rrs(XHop(Xop(Dslv)) + rho*Dslv, XHop(S) + rho*Z) <= 1e-6)
@@ -147,7 +150,7 @@ class TestSet01(object):
 
         Xop = lambda x: np.sum(X * x, axis=4, keepdims=True)
         XHop = lambda x: np.sum(np.conj(X) * x, axis=3, keepdims=True)
-        Z = (XHop(Xop(D)) + rho*D - XHop(S))/rho
+        Z = (XHop(Xop(D)) + rho*D - XHop(S)) / rho
         Dslv, cgit = linalg.solvemdbi_cg(X, rho, XHop(S)+rho*Z, 4, 3, tol=1e-6)
 
         assert(linalg.rrs(XHop(Xop(Dslv)) + rho*Dslv, XHop(S) + rho*Z) <= 1e-6)

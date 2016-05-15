@@ -8,11 +8,13 @@
 
 """Basic bpdn.ElasticNet usage example"""
 
-__author__ = """Brendt Wohlberg <brendt@ieee.org>"""
-
+from __future__ import print_function
+from builtins import input
+from builtins import range
 
 import numpy as np
 import matplotlib.pyplot as plt
+
 from sporco.admm import bpdn
 
 
@@ -28,7 +30,7 @@ sigma = 0.5
 np.random.seed(12345)
 D = np.random.randn(N, M)
 x0 = np.zeros((M, 1))
-si = np.random.permutation(range(0, M-1))
+si = np.random.permutation(list(range(0, M-1)))
 x0[si[0:L]] = np.random.randn(L, 1)
 # Construct reference and noisy signal
 s0 = D.dot(x0)
@@ -44,7 +46,7 @@ opt = bpdn.ElasticNet.Options({'Verbose' : True, 'MaxMainIter' : 500,
 # Initialise and run BPDN object
 b = bpdn.ElasticNet(D, s, lmbda, mu, opt)
 b.solve()
-print "Solve time: %.3fs" % b.runtime
+print("Solve time: %.3fs" % b.runtime)
 
 
 # Plot results
@@ -72,4 +74,4 @@ plt.xlabel('Iterations')
 plt.ylabel('Penalty Parameter')
 fig2.show()
 
-raw_input()
+input()

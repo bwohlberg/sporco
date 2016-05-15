@@ -8,12 +8,16 @@
 
 """Basic bpdndl.BPDNDictLearn usage example"""
 
-__author__ = """Brendt Wohlberg <brendt@ieee.org>"""
-
+from __future__ import division
+from __future__ import print_function
+from builtins import input
+from builtins import range
+from past.utils import old_div
 
 import numpy as np
 from scipy.ndimage.interpolation import zoom
 import matplotlib.pyplot as plt
+
 from sporco.admm import bpdndl
 from sporco import util
 
@@ -50,12 +54,12 @@ D0 = np.random.randn(S.shape[0], 128)
 lmbda = 0.1
 opt = bpdndl.BPDNDictLearn.Options({'Verbose' : True, 'MaxMainIter' : 1000,
                       'BPDN' : {'rho' : 50.0*lmbda + 0.5},
-                      'CMOD' : {'rho' : S.shape[1]/200.0}})
+                      'CMOD' : {'rho' : old_div(S.shape[1],200.0)}})
 
 # Run optimisation
 d = bpdndl.BPDNDictLearn(D0, S, lmbda, opt)
 d.solve()
-print "BPDNDictLearn solve time: %.2fs" % d.runtime, "\n"
+print("BPDNDictLearn solve time: %.2fs" % d.runtime, "\n")
 
 
 # Display dictionaries
@@ -95,4 +99,4 @@ plt.ylabel('Penalty Parameter')
 plt.legend(['Rho', 'Sigma'])
 fig2.show()
 
-raw_input()
+input()

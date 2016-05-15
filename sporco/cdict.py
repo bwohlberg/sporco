@@ -7,10 +7,11 @@
  
 """Constrained dictionary class"""
 
-__author__ = """Brendt Wohlberg <brendt@ieee.org>"""
-
+from builtins import str
 
 import pprint
+
+__author__ = """Brendt Wohlberg <brendt@ieee.org>"""
 
 
 class UnknownKeyError(KeyError):
@@ -115,7 +116,7 @@ class ConstrainedDict(dict):
         """
 
         # Call __setitem__ for all keys in d
-        for key in d.keys():
+        for key in list(d.keys()):
             self.__setitem__(key, d[key])
 
 
@@ -302,9 +303,9 @@ class ConstrainedDict(dict):
         corresponding value in a is a dict, an InvalidValueError
         exception is raised."""
 
-        akey = a.keys()
+        akey = list(a.keys())
         # Iterate over all keys in b
-        for key in b.keys():
+        for key in list(b.keys()):
             # If a key is encountered that is not in a, raise an
             # UnknownKeyError exception.
             if key not in akey:

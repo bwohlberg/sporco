@@ -1,12 +1,15 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+from __future__ import print_function
+from future import standard_library
+standard_library.install_aliases()
 import os
 from glob import glob
 from setuptools import setup
 from distutils.command import build as build_module
-import urllib2
-import StringIO
+import urllib.request, urllib.error, urllib.parse
+import io
 import os.path
 import numpy as np
 import scipy.misc
@@ -21,13 +24,13 @@ def geturlimage(url, timeout=10):
     ntry = 0
     while ntry < 3:
         try:
-            rspns = urllib2.urlopen(url, timeout=timeout)
+            rspns = urllib.request.urlopen(url, timeout=timeout)
             cntnt = rspns.read()
-            img = scipy.misc.imread(StringIO.StringIO(cntnt))
+            img = scipy.misc.imread(io.BytesIO(cntnt))
             break
-        except urllib2.URLError as e:
+        except urllib.error.URLError as e:
             ntry += 1
-            print type(e)
+            print(type(e))
     return img
 
 
@@ -51,11 +54,11 @@ class build(build_module.build):
                 'kiel.grey.bmp' :
                 'http://www.hlevkin.com/TestImages/kiel.bmp'}
 
-      for key in urllst.keys():
+      for key in list(urllst.keys()):
           fnm = os.path.splitext(key)[0]
           dst = os.path.join(path, fnm) + '.png'
           if not os.path.isfile(dst):
-              print 'Getting %s' % key
+              print('Getting %s' % key)
               img = geturlimage(urllst[key])
               if img is not None:
                   scipy.misc.imsave(dst, img)

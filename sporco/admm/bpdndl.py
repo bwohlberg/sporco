@@ -7,8 +7,10 @@
 
 """Dictionary learning based on BPDN sparse coding"""
 
-__author__ = """Brendt Wohlberg <brendt@ieee.org>"""
-
+from __future__ import print_function
+from __future__ import absolute_import
+from builtins import range
+from builtins import object
 
 import numpy as np
 from scipy import linalg
@@ -17,10 +19,11 @@ import copy
 
 from sporco import cdict
 from sporco import util
-import admm
-import bpdn
-import cmod
+from sporco.admm import admm
+from sporco.admm import bpdn
+from sporco.admm import cmod
 
+__author__ = """Brendt Wohlberg <brendt@ieee.org>"""
 
 
 class BPDNDictLearn(object):
@@ -162,13 +165,13 @@ class BPDNDictLearn(object):
                                         type(self).fwiter, type(self).fpothr)
             # Print header and seperator strings
             if self.opt['StatusHeader']:
-                print hdrstr
-                print "-" * nsep
+                print(hdrstr)
+                print("-" * nsep)
 
         # Reset timer
         self.timer.start()
 
-        for j in xrange(0, self.opt['MaxMainIter']):
+        for j in range(0, self.opt['MaxMainIter']):
 
             # X update
             self.bpdn.solve()
@@ -203,7 +206,7 @@ class BPDNDictLearn(object):
             if self.opt['Verbose']:
                 itdsp = (j, obj, dfd, l1n, cns, rX, sX, rD, sD,
                          self.bpdn.rho, self.cmod.rho)
-                print fmtstr % itdsp
+                print(fmtstr % itdsp)
 
 
 
@@ -215,4 +218,4 @@ class BPDNDictLearn(object):
 
         # Print final seperator string if Verbose option enabled
         if self.opt['Verbose'] and self.opt['StatusHeader']:
-            print "-" * nsep
+            print("-" * nsep)

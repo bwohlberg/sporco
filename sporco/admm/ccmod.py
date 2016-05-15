@@ -7,8 +7,9 @@
 
 """ADMM algorithm for the CCMOD problem"""
 
-__author__ = """Brendt Wohlberg <brendt@ieee.org>"""
-
+from __future__ import division
+from __future__ import absolute_import
+from builtins import range
 
 import numpy as np
 from scipy import linalg
@@ -17,9 +18,10 @@ import pyfftw
 import copy
 import collections
 
-import admm
+from sporco.admm import admm
 import sporco.linalg as sl
 
+__author__ = """Brendt Wohlberg <brendt@ieee.org>"""
 
 
 class ConvCnstrMOD(admm.ADMMEqual):
@@ -384,7 +386,7 @@ class ConvCnstrMOD(admm.ADMMEqual):
 
         Ef = np.sum(self.Af * self.obfn_fvarf(), axis=self.axisM,
                     keepdims=True) - self.Sf
-        dfd = sl.rfl2norm2(Ef, self.S.shape, axis=tuple(range(self.dimN)))/2.0
+        dfd = sl.rfl2norm2(Ef, self.S.shape, axis=tuple(range(self.dimN))) / 2.0
         cns = linalg.norm((self.Pcn(self.obfn_gvar()) - self.obfn_gvar()))
         itst = type(self).IterationStats(k, dfd, cns, r, s, epri, edua,
                                          self.rho, self.xrrs, self.cgit, tk)

@@ -8,17 +8,19 @@
 """Classes for ADMM algorithms for Total Variation (TV) optimisation with
 an :math:`\ell^2` data fidelity term"""
 
-__author__ = """Brendt Wohlberg <brendt@ieee.org>"""
-
+from __future__ import division
+from __future__ import absolute_import
+from builtins import range
 
 import numpy as np
 from scipy import linalg
 import copy
 import collections
 
-import admm
+from sporco.admm import admm
 import sporco.linalg as sl
 
+__author__ = """Brendt Wohlberg <brendt@ieee.org>"""
 
 
 class TVL2Denoise(admm.ADMM):
@@ -547,7 +549,7 @@ class TVL2Deconv(admm.ADMM):
         """
 
         Ef = self.Af * self.Xf - self.Sf
-        dfd = sl.rfl2norm2(Ef, self.S.shape, axis=self.axes)/2.0
+        dfd = sl.rfl2norm2(Ef, self.S.shape, axis=self.axes) / 2.0
         reg = np.sum(self.Wtv * np.sqrt(np.sum(self.obfn_gvar()**2,
                      axis=self.Y.ndim-1)))
         obj = dfd + self.lmbda*reg

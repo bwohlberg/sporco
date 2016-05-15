@@ -1,7 +1,11 @@
-import pytest
+from __future__ import division
+from builtins import object
+from past.utils import old_div
 
+import pytest
 import numpy as np
 from scipy import linalg
+
 from sporco.admm import tvl2
 import sporco.linalg as sl
 
@@ -12,7 +16,7 @@ class TestSet01(object):
         np.random.seed(12345)
         N = 64
         self.U = np.ones((N,N))
-        self.U[:, 0:(N/2)] = -1
+        self.U[:, 0:(old_div(N,2))] = -1
         self.V = 1e-1 * np.random.randn(N, N)
         self.D = self.U + self.V
 
@@ -45,7 +49,7 @@ class TestSet02(object):
         np.random.seed(12345)
         N = 32
         self.U = np.ones((N,N,N))
-        self.U[:, 0:(N/2), :] = -1
+        self.U[:, 0:(old_div(N,2)), :] = -1
         self.V = 1e-1 * np.random.randn(N,N,N)
         self.D = self.U + self.V
 
@@ -78,7 +82,7 @@ class TestSet03(object):
         np.random.seed(12345)
         N = 32
         self.U = np.ones((N,N,N))
-        self.U[:, 0:(N/2), :] = -1
+        self.U[:, 0:(old_div(N,2)), :] = -1
         self.V = 1e-1 * np.random.randn(N,N,N)
         self.D = self.U + self.V
 

@@ -1,3 +1,5 @@
+from builtins import object
+
 import pytest
 
 from sporco import cdict

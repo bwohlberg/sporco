@@ -7,8 +7,10 @@
 
 """Base classes for ADMM algorithms"""
 
-__author__ = """Brendt Wohlberg <brendt@ieee.org>"""
-
+from __future__ import division
+from __future__ import print_function
+from builtins import range
+from builtins import object
 
 from scipy import linalg
 import scipy
@@ -18,6 +20,7 @@ import collections
 from sporco import cdict
 from sporco import util
 
+__author__ = """Brendt Wohlberg <brendt@ieee.org>"""
 
 
 class ADMM(object):
@@ -228,7 +231,7 @@ class ADMM(object):
         self.timer.start()
 
         # Main optimisation iterations
-        for k in xrange(self.k, self.k + self.opt['MaxMainIter']):
+        for k in range(self.k, self.k + self.opt['MaxMainIter']):
 
             # X update
             self.xstep()
@@ -336,8 +339,8 @@ class ADMM(object):
         else:
             rn = self.rsdl_rn(self.AX, self.Y)
             sn = self.rsdl_sn(self.U)
-            r = linalg.norm(self.rsdl_r(self.AX, self.Y))/rn
-            s = linalg.norm(self.rsdl_s(self.Yprev, self.Y))/sn
+            r = linalg.norm(self.rsdl_r(self.AX, self.Y)) / rn
+            s = linalg.norm(self.rsdl_s(self.Yprev, self.Y)) / sn
             epri = scipy.sqrt(self.Nc)*self.opt['AbsStopTol']/rn + \
                 self.opt['RelStopTol']
             edua = scipy.sqrt(self.Nx)*self.opt['AbsStopTol']/sn + \
@@ -404,8 +407,8 @@ class ADMM(object):
                                 type(self).fwiter, type(self).fpothr)
             # Print header and seperator strings
             if self.opt['StatusHeader']:
-                print hdrstr
-                print "-" * nsep
+                print(hdrstr)
+                print("-" * nsep)
         else:
             fmtstr, nsep = '', 0
 
@@ -424,7 +427,7 @@ class ADMM(object):
             if not self.opt['AutoRho','Enabled']:
                 itdsp = itdsp[0:-1]
 
-            print fmtstr % itdsp
+            print(fmtstr % itdsp)
 
 
 
@@ -432,7 +435,7 @@ class ADMM(object):
         """Terminate status display if option selected."""
 
         if self.opt['Verbose'] and self.opt['StatusHeader']:
-            print "-" * nsep
+            print("-" * nsep)
 
 
 

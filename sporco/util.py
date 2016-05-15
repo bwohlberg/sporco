@@ -7,8 +7,9 @@
 
 """Utility functions"""
 
-__author__ = """Brendt Wohlberg <brendt@ieee.org>"""
-
+from __future__ import division
+from builtins import range
+from builtins import object
 
 import numpy as np
 from scipy import linalg
@@ -20,6 +21,8 @@ import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 
 import sporco.linalg as sla
+
+__author__ = """Brendt Wohlberg <brendt@ieee.org>"""
 
 
 def plot(dat, title=None, xlbl=None, ylbl=None, lgnd=None, lglc=None,
@@ -218,8 +221,8 @@ def tiledict(D, sz=None):
     else:
         im = np.ones((Vr*mxsz[0] + Vr-1, Vc*mxsz[1] + Vc-1))
     k = 0
-    for l in xrange(0, Vr):
-        for m in xrange(0, Vc):
+    for l in range(0, Vr):
+        for m in range(0, Vc):
             r = mxsz[0]*l + l
             c = mxsz[1]*m + m
             if D.ndim == 4:
@@ -378,7 +381,7 @@ def convdicts():
     pth = os.path.join(os.path.dirname(__file__), 'data', 'convdict.npz')
     npz = np.load(pth)
     cdd = {}
-    for k in npz.keys():
+    for k in list(npz.keys()):
         cdd[k] = npz[k]
     return cdd
 

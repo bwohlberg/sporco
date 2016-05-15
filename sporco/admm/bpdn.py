@@ -7,16 +7,18 @@
 
 """Classes for ADMM algorithm for the BPDN problem"""
 
-__author__ = """Brendt Wohlberg <brendt@ieee.org>"""
-
+from __future__ import division
+from __future__ import absolute_import
 
 import numpy as np
 from scipy import linalg
 import copy
 import collections
 
-import admm
+from sporco.admm import admm
 import sporco.linalg as sl
+
+__author__ = """Brendt Wohlberg <brendt@ieee.org>"""
 
 
 class BPDN(admm.ADMMEqual):
@@ -263,7 +265,7 @@ def linsolve(D, rho, lu, piv, b):
     if N >= M:
         x = linalg.lu_solve((lu, piv), b)
     else:
-        x = (b - D.T.dot(linalg.lu_solve((lu, piv), D.dot(b), 1)))/rho
+        x = (b - D.T.dot(linalg.lu_solve((lu, piv), D.dot(b), 1))) / rho
     return x
 
 

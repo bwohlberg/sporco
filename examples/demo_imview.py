@@ -8,11 +8,9 @@
 
 """Basic util.imview usage example"""
 
-__author__ = """Brendt Wohlberg <brendt@ieee.org>"""
-
-
 import numpy as np
 from scipy import misc
+
 from sporco import util
 
 

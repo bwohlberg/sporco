@@ -7,8 +7,10 @@
 
 """Dictionary learning based on CBPDN sparse coding"""
 
-__author__ = """Brendt Wohlberg <brendt@ieee.org>"""
-
+from __future__ import print_function
+from __future__ import absolute_import
+from builtins import range
+from builtins import object
 
 import numpy as np
 from scipy import linalg
@@ -17,10 +19,11 @@ import copy
 
 from sporco import util
 from sporco import cdict
-import admm
-import cbpdn
-import ccmod
+from sporco.admm import admm
+from sporco.admm import cbpdn
+from sporco.admm import ccmod
 
+__author__ = """Brendt Wohlberg <brendt@ieee.org>"""
 
 
 class ConvBPDNDictLearn(object):
@@ -197,13 +200,13 @@ class ConvBPDNDictLearn(object):
                                         type(self).fwiter, type(self).fpothr)
             # Print header and seperator strings
             if self.opt['StatusHeader']:
-                print hdrstr
-                print "-" * nsep
+                print(hdrstr)
+                print("-" * nsep)
 
         # Start timer
         self.timer.start()
 
-        for j in xrange(self.j, self.j + self.opt['MaxMainIter']):
+        for j in range(self.j, self.j + self.opt['MaxMainIter']):
 
             # X update
             self.cbpdn.solve()
@@ -238,7 +241,7 @@ class ConvBPDNDictLearn(object):
             if self.opt['Verbose']:
                 itdsp = (j, obj, dfd, l1n, cns, rX, sX, rD, sD,
                          self.cbpdn.rho, self.ccmod.rho)
-                print fmtstr % itdsp
+                print(fmtstr % itdsp)
 
 
 
@@ -250,4 +253,4 @@ class ConvBPDNDictLearn(object):
 
         # Print final seperator string if Verbose option enabled
         if self.opt['Verbose'] and self.opt['StatusHeader']:
-            print "-" * nsep
+            print("-" * nsep)

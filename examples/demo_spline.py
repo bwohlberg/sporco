@@ -8,11 +8,13 @@
 
 """Basic spline. usage example"""
 
-__author__ = """Brendt Wohlberg <brendt@ieee.org>"""
-
+from __future__ import print_function
+from builtins import input
+from builtins import range
 
 import numpy as np
 import matplotlib.pyplot as plt
+
 from sporco import util
 from sporco.admm import spline
 
@@ -29,7 +31,7 @@ opt = spline.SplineL1.Options({'Verbose' : True, 'gEvalY' : False})
 # Initialise and run SplineL1 object
 b = spline.SplineL1(imgn, lmbda, opt)
 b.solve()
-print "SplineL1 solve time: %.2fs" % b.runtime, "\n"
+print("SplineL1 solve time: %.2fs" % b.runtime, "\n")
 
 
 # Display input and result image
@@ -61,5 +63,5 @@ plt.xlabel('Iterations')
 plt.ylabel('Penalty Parameter')
 fig2.show()
 
-raw_input()
+input()
 
