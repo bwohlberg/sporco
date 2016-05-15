@@ -53,8 +53,8 @@ class TestSet01(object):
 
     def test_03(self):
         rho = 1e-1
-        N = 64
-        M = 32
+        N = 32
+        M = 16
         C = 3
         K = 8
         D = np.random.randn(N, N, C, 1, M).astype('complex') + \
@@ -74,8 +74,8 @@ class TestSet01(object):
 
     def test_04(self):
         rho = 1e-1
-        N = 64
-        M = 32
+        N = 32
+        M = 16
         K = 8
         D = np.random.randn(N, N, 1, 1, M).astype('complex') + \
             np.random.randn(N, N, 1, 1, M).astype('complex') * 1.0j
@@ -115,8 +115,8 @@ class TestSet01(object):
 
     def test_06(self):
         rho = 1e-1
-        N = 64
-        M = 32
+        N = 32
+        M = 16
         K = 8
         D = np.random.randn(N, N, 1, 1, M).astype('complex') + \
             np.random.randn(N, N, 1, 1, M).astype('complex') * 1.0j
