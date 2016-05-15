@@ -9,7 +9,7 @@ from sporco import util
 class TestSet01(object):
 
     def setup_method(self, method):
-        pass
+        np.random.seed(12345)
 
 
 
@@ -42,9 +42,8 @@ class TestSet01(object):
             np.random.randn(N, N, 1, K, M).astype('complex') * 1.0j
         S = np.sum(D*X, axis=4, keepdims=True)
 
-        Xop = lambda x: np.sum(np.multiply(X, x), axis=4, keepdims=True)
-        XHop = lambda x: np.sum(np.multiply(np.conj(X), x),
-                                axis=3, keepdims=True)
+        Xop = lambda x: np.sum(X * x, axis=4, keepdims=True)
+        XHop = lambda x: np.sum(np.conj(X) * x, axis=3, keepdims=True)
         Z = (XHop(Xop(D)) + rho*D - XHop(S))/rho
         Dslv = linalg.solvemdbi_ism(X, rho,  XHop(S) + rho*Z, 4, 3)
 
@@ -64,9 +63,8 @@ class TestSet01(object):
             np.random.randn(N, N, 1, K, M).astype('complex') * 1.0j
         S = np.sum(D*X, axis=4, keepdims=True)
 
-        Xop = lambda x: np.sum(np.multiply(X, x), axis=4, keepdims=True)
-        XHop = lambda x: np.sum(np.multiply(np.conj(X), x),
-                                axis=3, keepdims=True)
+        Xop = lambda x: np.sum(X * x, axis=4, keepdims=True)
+        XHop = lambda x: np.sum(np.conj(X)* x, axis=3, keepdims=True)
         Z = (XHop(Xop(D)) + rho*D - XHop(S))/rho
         Dslv = linalg.solvemdbi_ism(X, rho,  XHop(S) + rho*Z, 4, 3)
 
@@ -85,9 +83,8 @@ class TestSet01(object):
             np.random.randn(N, N, 1, K, M).astype('complex') * 1.0j
         S = np.sum(D*X, axis=4, keepdims=True)
 
-        Xop = lambda x: np.sum(np.multiply(X, x), axis=4, keepdims=True)
-        XHop = lambda x: np.sum(np.multiply(np.conj(X), x),
-                                axis=3, keepdims=True)
+        Xop = lambda x: np.sum(X * x, axis=4, keepdims=True)
+        XHop = lambda x: np.sum(np.conj(X) * x, axis=3, keepdims=True)
         Z = (XHop(Xop(D)) + rho*D - XHop(S))/rho
         Dslv = linalg.solvemdbi_rsm(X, rho,  XHop(S) + rho*Z, 3)
 
@@ -107,9 +104,8 @@ class TestSet01(object):
             np.random.randn(N, N, 1, K, M).astype('complex') * 1.0j
         S = np.sum(D*X, axis=4, keepdims=True)
 
-        Xop = lambda x: np.sum(np.multiply(X, x), axis=4, keepdims=True)
-        XHop = lambda x: np.sum(np.multiply(np.conj(X), x),
-                                axis=3, keepdims=True)
+        Xop = lambda x: np.sum(X * x, axis=4, keepdims=True)
+        XHop = lambda x: np.sum(np.conj(X) * x, axis=3, keepdims=True)
         Z = (XHop(Xop(D)) + rho*D - XHop(S))/rho
         Dslv = linalg.solvemdbi_rsm(X, rho,  XHop(S) + rho*Z, 3)
 
@@ -128,12 +124,10 @@ class TestSet01(object):
             np.random.randn(N, N, 1, K, M).astype('complex') * 1.0j
         S = np.sum(D*X, axis=4, keepdims=True)
 
-        Xop = lambda x: np.sum(np.multiply(X, x), axis=4, keepdims=True)
-        XHop = lambda x: np.sum(np.multiply(np.conj(X), x),
-                                axis=3, keepdims=True)
+        Xop = lambda x: np.sum(X * x, axis=4, keepdims=True)
+        XHop = lambda x: np.sum(np.conj(X) * x, axis=3, keepdims=True)
         Z = (XHop(Xop(D)) + rho*D - XHop(S))/rho
-        Dslv, cgit = linalg.solvemdbi_cg(X, rho, XHop(S) + rho*Z, 4,
-                                         3, tol=1e-6)
+        Dslv, cgit = linalg.solvemdbi_cg(X, rho, XHop(S)+rho*Z, 4, 3, tol=1e-6)
 
         assert(linalg.rrs(XHop(Xop(Dslv)) + rho*Dslv, XHop(S) + rho*Z) <= 1e-6)
 
@@ -151,11 +145,9 @@ class TestSet01(object):
             np.random.randn(N, N, 1, K, M).astype('complex') * 1.0j
         S = np.sum(D*X, axis=4, keepdims=True)
 
-        Xop = lambda x: np.sum(np.multiply(X, x), axis=4, keepdims=True)
-        XHop = lambda x: np.sum(np.multiply(np.conj(X), x),
-                                axis=3, keepdims=True)
+        Xop = lambda x: np.sum(X * x, axis=4, keepdims=True)
+        XHop = lambda x: np.sum(np.conj(X) * x, axis=3, keepdims=True)
         Z = (XHop(Xop(D)) + rho*D - XHop(S))/rho
-        Dslv, cgit = linalg.solvemdbi_cg(X, rho, XHop(S) + rho*Z, 4,
-                                         3, tol=1e-6)
+        Dslv, cgit = linalg.solvemdbi_cg(X, rho, XHop(S)+rho*Z, 4, 3, tol=1e-6)
 
         assert(linalg.rrs(XHop(Xop(Dslv)) + rho*Dslv, XHop(S) + rho*Z) <= 1e-6)
