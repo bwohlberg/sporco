@@ -14,7 +14,7 @@ Requirements
 ------------
 
 The primary requirements are Python itself (SPORCO has only been
-tested on version 2.7), and modules scipy, numpy, pyfftw, and
+tested on version 2.7), and modules scipy, numpy, future, pyfftw, and
 matplotlib. Module numexpr is not required, but some functions will be
 faster if it is installed.
 
@@ -28,6 +28,7 @@ version of Ubuntu Linux, the following commands should be sufficient:
    sudo apt-get install python-matplotlib
    sudo apt-get install python-pip
    sudo apt-get install libfftw3-dev
+   sudo pip install future
    sudo pip install pyfftw
 
 

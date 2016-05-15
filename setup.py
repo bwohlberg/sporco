@@ -67,7 +67,7 @@ class build(build_module.build):
 
 
 name = 'sporco'
-version = '0.0.1'
+version = '0.0.2dev'
 
 packages = ['sporco', 'sporco.admm']
 
@@ -97,7 +97,7 @@ setup(
     include_package_data = True,
     setup_requires   = ['pytest-runner'],
     tests_require    = ['pytest'],
-    install_requires = ['pyfftw'],
+    install_requires = ['future', 'pyfftw'],
     cmdclass = {
         'build': build
     },
