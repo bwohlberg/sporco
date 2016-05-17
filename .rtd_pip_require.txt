@@ -1,8 +1,5 @@
 future
 sphinx
 sphinxcontrib-bibtex
-pytest-runner
+numpydoc
 scipy
-numpy
-pyfftw
-matplotlib
