@@ -1,6 +1,11 @@
 SParse Optimization Research COde (SPORCO)
 ==========================================
 
+.. image:: https://travis-ci.org/bwohlberg/sporco.svg
+    :target: https://travis-ci.org/bwohlberg/sporco
+.. image:: https://badge.fury.io/py/sporco.svg
+    :target: https://badge.fury.io/py/sporco
+
 SPORCO is a Python package for solving optimisation problems with
 sparsity-inducing regularisation. These consist primarily of sparse
 coding and dictionary learning problems, including convolutional
@@ -13,23 +18,43 @@ based on the Alternating Direction Method of Multipliers (ADMM).
 Requirements
 ------------
 
-The primary requirements are Python itself (SPORCO has only been
-tested on version 2.7), and modules scipy, numpy, future, pyfftw, and
-matplotlib. Module numexpr is not required, but some functions will be
-faster if it is installed.
+The primary requirements are Python itself, and modules scipy, numpy,
+future, pyfftw, and matplotlib. Module numexpr is not required, but
+some functions will be faster if it is installed.
 
 Installation of these requirements is system dependent. Under a recent
-version of Ubuntu Linux, the following commands should be sufficient:
+version of Ubuntu Linux, the following commands should be sufficient
+for Python 2
 
 ::
 
    sudo apt-get install python-numpy
    sudo apt-get install python-scipy
+   sudo apt-get install python-numexpr
    sudo apt-get install python-matplotlib
+   sudo apt-get install python-pytest
+   sudo apt-get install python-numpydoc
    sudo apt-get install python-pip
    sudo apt-get install libfftw3-dev
    sudo pip install future
    sudo pip install pyfftw
+   sudo pip install sphinxcontrib-bibtex
+
+or Python 3
+
+::
+
+   sudo apt-get install python3-numpy
+   sudo apt-get install python3-scipy
+   sudo apt-get install python3-numexpr
+   sudo apt-get install python3-matplotlib
+   sudo apt-get install python3-pytest
+   sudo apt-get install python3-pip
+   sudo apt-get install libfftw3-dev
+   sudo pip3 install future
+   sudo pip3 install pytest-runner
+   sudo pip3 install pyfftw
+
 
 
 Installation
@@ -95,3 +120,10 @@ License
 
 This package is distributed with a BSD license; see the ``LICENSE``
 file for details.
+
+
+Acknowledgments
+---------------
+
+Thanks for Aric Hagberg for valuable advice on python packaging and
+related issues.
