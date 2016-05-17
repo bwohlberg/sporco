@@ -303,6 +303,7 @@ def run_apidoc(_):
     module = 'sporco'
     cpath = os.path.abspath(os.path.dirname(__file__))
     opath = cpath
+    print("Running sphinx-apidoc with output path " + opath)
     main(['-e', '-o', opath, module])
 
 
