@@ -307,7 +307,7 @@ def run_apidoc(_):
     sys.stdout.flush()
     print(os.listdir('.'))
     print('\n')
-    print(os.listdir('..'))
+    print(os.listdir('../..'))
     main(['-e', '-o', opath, module])
 
 
