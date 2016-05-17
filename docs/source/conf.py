@@ -298,6 +298,23 @@ texinfo_documents = [
 
 on_rtd = os.environ.get('READTHEDOCS') == 'True'
 
+if on_rtd:
+    if sys.version[0] == '3':
+        from unittest.mock import MagicMock
+    elif sys.version[0] == '2':
+        from mock import Mock as MagicMock
+    else:
+        raise ImportError("Can't determine how to import MagicMock.")
+
+    class Mock(MagicMock):
+        @classmethod
+        def __getattr__(cls, name):
+            return Mock()
+
+    MOCK_MODULES = ['pyfftw']
+    sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
+
+
 # See https://github.com/rtfd/readthedocs.org/issues/1139
 def run_apidoc(_):
     from sphinx.apidoc import main
