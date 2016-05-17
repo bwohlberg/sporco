@@ -296,18 +296,19 @@ texinfo_documents = [
 #texinfo_no_detailmenu = False
 
 
-# See https://github.com/rtfd/readthedocs.org/issues/1139
+on_rtd = os.environ.get('READTHEDOCS') == 'True'
 
+# See https://github.com/rtfd/readthedocs.org/issues/1139
 def run_apidoc(_):
     from sphinx.apidoc import main
-    module = 'sporco'
+    module = '../../sporco' if on_rtd else 'sporco'
     cpath = os.path.abspath(os.path.dirname(__file__))
     opath = cpath
     print("Running sphinx-apidoc with output path " + opath)
     sys.stdout.flush()
-    print(os.listdir('.'))
-    print('\n')
-    print(os.listdir('../..'))
+    #print(os.listdir('.'))
+    #print('\n')
+    #print(os.listdir('../..'))
     main(['-e', '-o', opath, module])
 
 
