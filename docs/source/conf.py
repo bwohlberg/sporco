@@ -304,6 +304,10 @@ def run_apidoc(_):
     cpath = os.path.abspath(os.path.dirname(__file__))
     opath = cpath
     print("Running sphinx-apidoc with output path " + opath)
+    sys.stdout.flush()
+    print(print(os.listdir('.')))
+    print('\n')
+    print(print(os.listdir('..')))
     main(['-e', '-o', opath, module])
 
 
