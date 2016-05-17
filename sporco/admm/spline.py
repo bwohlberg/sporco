@@ -30,7 +30,8 @@ class SplineL1(admm.ADMM):
 
     .. math::
        \mathrm{argmin}_\mathbf{x} \;
-        \| W(\mathbf{x} - \mathbf{s}) \|_1 + \lambda \| D \mathbf{x} \|_2^2
+        \| W(\mathbf{x} - \mathbf{s}) \|_1 + \\frac{\lambda}{2} \;
+        \| D \mathbf{x} \|_2^2
 
     where :math:`D = \\left( \\begin{array}{ccc} -1 & 1 & & & \\\\ 
     1 & -2 & 1 & & \\\\ & \\ddots & \\ddots & \ddots &  \\\\ 
@@ -48,7 +49,7 @@ class SplineL1(admm.ADMM):
        :math:`\| W (\mathbf{x} - \mathbf{s}) \|_1`
 
        ``Reg`` : Value of regularisation term \
-       :math:`\| D \mathbf{x} \|_2^2`
+       :math:`\\frac{1}{2} \| D \mathbf{x} \|_2^2`
 
        ``PrimalRsdl`` : Norm of primal residual
 
