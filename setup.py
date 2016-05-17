@@ -95,9 +95,9 @@ setup(
     package_data     = {'sporco': ['data/*.png']},
     data_files       = data,
     include_package_data = True,
-    setup_requires   = ['future', 'pytest-runner'],
+    setup_requires   = ['pytest-runner'],
     tests_require    = ['pytest'],
-    install_requires = ['future', 'pyfftw'],
+    install_requires = ['future', 'numpy', 'scipy', 'pyfftw'],
     cmdclass = {
         'build': build
     },
