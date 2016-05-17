@@ -296,6 +296,18 @@ texinfo_documents = [
 #texinfo_no_detailmenu = False
 
 
+# See https://github.com/rtfd/readthedocs.org/issues/1139
+
+def run_apidoc(_):
+    from sphinx.apidoc import main
+    modules = ['sporco']
+    for module in modules:
+        cur_dir = os.path.abspath(os.path.dirname(__file__))
+        #output_path = os.path.join(cur_dir, module, 'doc')
+        output_path = cur_dir
+        #print("cur_dir " + cur_dir + " output_path " + output_path)
+        main(['-e', '-o', output_path, module])
+
 
 # See https://developer.ridgerun.com/wiki/index.php/How_to_generate_sphinx_documentation_for_python_code_running_in_an_embedded_system
 
@@ -329,6 +341,7 @@ def process_signature(app, what, name, obj, options, signature,
 
 def setup(app):
     app.connect("autodoc-skip-member", skip_member)
+    app.connect('builder-inited', run_apidoc)
     #app.connect('autodoc-process-docstring', process_docstring)
     #app.connect('autodoc-process-signature', process_signature)
 
