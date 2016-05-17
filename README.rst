@@ -3,8 +3,13 @@ SParse Optimization Research COde (SPORCO)
 
 .. image:: https://travis-ci.org/bwohlberg/sporco.svg
     :target: https://travis-ci.org/bwohlberg/sporco
+    :alt: Build Status
+.. image:: https://readthedocs.org/projects/sporco/badge/?version=latest
+    :target: http://sporco.readthedocs.io/en/latest/?badge=latest
+    :alt: Documentation Status
 .. image:: https://badge.fury.io/py/sporco.svg
     :target: https://badge.fury.io/py/sporco
+    :alt: PyPi Release
 
 SPORCO is a Python package for solving optimisation problems with
 sparsity-inducing regularisation. These consist primarily of sparse
