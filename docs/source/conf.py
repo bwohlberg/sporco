@@ -300,13 +300,10 @@ texinfo_documents = [
 
 def run_apidoc(_):
     from sphinx.apidoc import main
-    modules = ['sporco']
-    for module in modules:
-        cur_dir = os.path.abspath(os.path.dirname(__file__))
-        #output_path = os.path.join(cur_dir, module, 'doc')
-        output_path = cur_dir
-        #print("cur_dir " + cur_dir + " output_path " + output_path)
-        main(['-e', '-o', output_path, module])
+    module = 'sporco'
+    cpath = os.path.abspath(os.path.dirname(__file__))
+    opath = cpath
+    main(['-e', '-o', opath, module])
 
 
 # See https://developer.ridgerun.com/wiki/index.php/How_to_generate_sphinx_documentation_for_python_code_running_in_an_embedded_system
