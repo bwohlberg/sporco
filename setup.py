@@ -81,6 +81,14 @@ data.append((dd, glob(os.path.join(pp ,"*.py"))))
 longdesc = read('README.rst')
 longdesc = longdesc[longdesc.index('==\n\n')+4:]
 
+on_rtd = os.environ.get('READTHEDOCS') == 'True'
+if on_rtd:
+    print("Building on ReadTheDocs")
+    install_requires = ['future', 'numpy', 'scipy']
+else:
+    install_requires = ['future', 'numpy', 'scipy', 'pyfftw']
+
+
 setup(
     name             = name,
     version          = version,
@@ -97,7 +105,7 @@ setup(
     include_package_data = True,
     setup_requires   = ['pytest-runner'],
     tests_require    = ['pytest'],
-    install_requires = ['future', 'numpy', 'scipy', 'pyfftw'],
+    install_requires = install_requires,
     cmdclass = {
         'build': build
     },
