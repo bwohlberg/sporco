@@ -1,0 +1,8 @@
+future
+sphinx
+sphinxcontrib-bibtex
+pytest-runner
+scipy
+numpy
+pyfftw
+matplotlib
