@@ -13,7 +13,6 @@ from builtins import range
 
 import numpy as np
 from scipy import linalg
-import multiprocessing
 import pyfftw
 import copy
 import collections

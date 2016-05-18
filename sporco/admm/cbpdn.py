@@ -13,7 +13,6 @@ from builtins import range
 
 import numpy as np
 from scipy import linalg
-import multiprocessing
 import pyfftw
 import copy
 import collections
@@ -342,7 +341,8 @@ class ConvBPDN(admm.ADMMEqual):
     def ystep(self):
         """Minimise Augmented Lagrangian with respect to y."""
 
-        self.Y = sl.shrink1(self.AX + self.U, self.lmbda/self.rho)
+        self.Y = sl.shrink1(self.AX + self.U,
+                            (self.lmbda/self.rho)*self.opt['L1Weight'])
 
 
 
