@@ -65,6 +65,9 @@ coverage.xml
 
 # Sphinx documentation
 docs/_build/
+docs/source/sporco.rst
+docs/source/sporco.*.rst
+docs/Makefile
 
 # PyBuilder
 target/
