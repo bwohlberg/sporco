@@ -79,11 +79,13 @@ class BPDN(admm.ADMMEqual):
         \mathbf{w} \odot \mathbf{x} \|_1` where :math:`\mathbf{w}`
         denotes the weighting array.
 
+        ``NonNegCoef`` : If ``True``, force solution to be non-negative.
         """
 
         defaults = copy.deepcopy(admm.ADMMEqual.Options.defaults)
         defaults.update({'AuxVarObj' : True, 'ReturnX' : False,
-                        'RelaxParam' : 1.8, 'L1Weight' : 1.0})
+                        'RelaxParam' : 1.8, 'L1Weight' : 1.0,
+                        'NonNegCoef' : False})
         defaults['AutoRho'].update({'Enabled' : True, 'Period' : 10,
                                     'AutoScaling' : True, 'Scaling' : 1000.0,
                                     'RsdlRatio' : 1.2})
@@ -216,6 +218,8 @@ class BPDN(admm.ADMMEqual):
 
         self.Y = sl.shrink1(self.AX + self.U,
                             (self.lmbda/self.rho)*self.opt['L1Weight'])
+        if self.opt['NonNegCoef']:
+            self.Y[self.Y < 0.0] = 0.0
 
 
 

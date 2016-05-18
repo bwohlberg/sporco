@@ -91,12 +91,14 @@ class ConvBPDN(admm.ADMMEqual):
         \| \mathbf{w}_m \odot \mathbf{x}_m \|_1` where :math:`\mathbf{w}_m`
         denotes slices of the weighting array on the filter index axis.
 
+        ``NonNegCoef`` : If ``True``, force solution to be non-negative.
         """
 
         defaults = copy.deepcopy(admm.ADMMEqual.Options.defaults)
         defaults.update({'AuxVarObj' : False,  'ReturnX' : False,
-                        'HighMemSolve' : False, 'LinSolveCheck' : False,
-                        'RelaxParam' : 1.8, 'L1Weight' : 1.0})
+                         'HighMemSolve' : False, 'LinSolveCheck' : False,
+                         'RelaxParam' : 1.8, 'L1Weight' : 1.0,
+                         'NonNegCoef' : False})
         defaults['AutoRho'].update({'Enabled' : True, 'Period' : 1,
                                     'AutoScaling' : True, 'Scaling' : 1000.0,
                                     'RsdlRatio' : 1.2})
@@ -343,6 +345,8 @@ class ConvBPDN(admm.ADMMEqual):
 
         self.Y = sl.shrink1(self.AX + self.U,
                             (self.lmbda/self.rho)*self.opt['L1Weight'])
+        if self.opt['NonNegCoef']:
+            self.Y[self.Y < 0.0] = 0.0
 
 
 
