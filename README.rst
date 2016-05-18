@@ -1,6 +1,7 @@
 SParse Optimization Research COde (SPORCO)
 ==========================================
 
+
 .. image:: https://travis-ci.org/bwohlberg/sporco.svg
     :target: https://travis-ci.org/bwohlberg/sporco
     :alt: Build Status
@@ -10,6 +11,8 @@ SParse Optimization Research COde (SPORCO)
 .. image:: https://badge.fury.io/py/sporco.svg
     :target: https://badge.fury.io/py/sporco
     :alt: PyPi Release
+
+
 
 SPORCO is a Python package for solving optimisation problems with
 sparsity-inducing regularisation. These consist primarily of sparse
@@ -65,8 +68,26 @@ or Python 3
 Installation
 ------------
 
+To install the most recent release of SPORCO from
+`PyPI <https://pypi.python.org/pypi/sporco/>`_ do
+
 ::
 
+    pip install sporco
+
+
+To install the development version from
+`GitHub <https://github.com/bwohlberg/sporco>`_ do
+
+::
+
+    git clone git://github.com/bwohlberg/sporco.git
+
+followed by
+
+::
+
+   cd sporco
    python setup.py build
    python setup.py install
 
@@ -77,8 +98,8 @@ Usage
 -----
 
 Scripts illustrating usage of the package can be found in the
-``examples`` directory. These examples can be run from the root
-directory of the package by, for example
+``examples`` directory of the source distribution. These examples can
+be run from the root directory of the package by, for example
 
 ::
 
@@ -101,23 +122,17 @@ from the root directory of the package.
 Documentation
 -------------
 
-If the source has been obtained from a source distribution package
-then HTML documentation can be built in the ``build/sphinx/html``
-directory (the top-level document is ``index.html``) by the command
+Documentation is available online at
+`Read the Docs <http://sporco.rtfd.io/>`_, or can be built from the
+root directory of the source distribution by the command
 
 ::
 
    python setup.py build_sphinx
 
-
-If the source has been cloned from the project github, it is necessary
-to first issue the command
-
-::
-
-   sphinx-apidoc --separate -d 2 -o source ../sporco modules.rst
-
-within the ``docs`` directory.
+in which case the HTML documentation can be found in the
+``build/sphinx/html`` directory (the top-level document is
+``index.html``).
 
 
 License
@@ -130,5 +145,5 @@ file for details.
 Acknowledgments
 ---------------
 
-Thanks for Aric Hagberg for valuable advice on python packaging and
-related issues.
+Thanks for Aric Hagberg for valuable advice on python packaging,
+documentation, and related issues.
