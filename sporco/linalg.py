@@ -55,7 +55,7 @@ def fftn(a, s=None, axes=None):
     """
 
     return pyfftw.interfaces.numpy_fft.fftn(a, s, axes, False,
-                        'FFTW_MEASURE', multiprocessing.cpu_count())
+                    'FFTW_MEASURE', multiprocessing.cpu_count())
 
 
 
@@ -83,7 +83,7 @@ def ifftn(a, s=None, axes=None):
     """
 
     return pyfftw.interfaces.numpy_fft.ifftn(a, s, axes, False,
-                        'FFTW_MEASURE', multiprocessing.cpu_count())
+                    'FFTW_MEASURE', multiprocessing.cpu_count())
 
 
 
@@ -111,7 +111,7 @@ def rfftn(a, s=None, axes=None):
     """
 
     return pyfftw.interfaces.numpy_fft.rfftn(a, s, axes, False,
-                        'FFTW_MEASURE', multiprocessing.cpu_count())
+                    'FFTW_MEASURE', multiprocessing.cpu_count())
 
 
 
@@ -140,7 +140,7 @@ def irfftn(a, s=None, axes=None):
     """
 
     return pyfftw.interfaces.numpy_fft.irfftn(a, s, axes, False,
-                        'FFTW_MEASURE', multiprocessing.cpu_count())
+                    'FFTW_MEASURE', multiprocessing.cpu_count())
 
 
 
