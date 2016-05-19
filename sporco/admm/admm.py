@@ -188,7 +188,7 @@ class ADMM(object):
         """
 
         if opt is None:
-            opt = Options()
+            opt = ADMM.Options()
         if not isinstance(opt, ADMM.Options):
             raise TypeError("Parameter opt must be an instance of ADMM.Options")
         self.runtime = 0.0

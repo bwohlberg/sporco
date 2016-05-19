@@ -138,7 +138,7 @@ class BPDNDictLearn(object):
         self.timer = util.Timer()
 
         if opt is None:
-            opt = Options()
+            opt = BPDNDictLearn.Options()
         self.opt = opt
         Nc = D0.shape[1]
         Nm = S.shape[1]

@@ -149,7 +149,7 @@ class ConvBPDNDictLearn(object):
         self.timer = util.Timer()
 
         if opt is None:
-            opt = Options()
+            opt = ConvBPDNDictLearn.Options()
         self.opt = opt
 
         # Number of channels in S
