@@ -67,7 +67,7 @@ class build(build_module.build):
 
 
 name = 'sporco'
-version = '0.0.2dev'
+version = '0.0.2.dev0'
 
 packages = ['sporco', 'sporco.admm']
 

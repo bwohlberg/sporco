@@ -28,6 +28,7 @@ install:
     - pip install pyfftw
     - if [[ "${TRAVIS_PYTHON_VERSION}" != "2.7" ]]; then
         travis_wait pip install scipy;
+	travis_wait pip install matplotlib;
       fi
 
 # command to run tests
