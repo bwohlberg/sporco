@@ -5,6 +5,9 @@ SParse Optimization Research COde (SPORCO)
 .. image:: https://travis-ci.org/bwohlberg/sporco.svg
     :target: https://travis-ci.org/bwohlberg/sporco
     :alt: Build Status
+.. image:: https://landscape.io/github/bwohlberg/sporco/master/landscape.svg?style=flat
+   :target: https://landscape.io/github/bwohlberg/sporco/master
+   :alt: Code Health
 .. image:: https://readthedocs.org/projects/sporco/badge/?version=latest
     :target: http://sporco.readthedocs.io/en/latest/?badge=latest
     :alt: Documentation Status
