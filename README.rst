@@ -60,11 +60,13 @@ or Python 3
    sudo apt-get install python3-numexpr
    sudo apt-get install python3-matplotlib
    sudo apt-get install python3-pytest
+   sudo apt-get install python3-numpydoc
    sudo apt-get install python3-pip
    sudo apt-get install libfftw3-dev
    sudo pip3 install future
    sudo pip3 install pytest-runner
    sudo pip3 install pyfftw
+   sudo pip3 install sphinxcontrib-bibtex
 
 
 
