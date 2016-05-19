@@ -19,7 +19,7 @@ install:
     - pip install future
     - pip install pyfftw
     - if [[ "${TRAVIS_PYTHON_VERSION}" != "2.7" ]]; then
-        pip install scipy
+        pip install scipy;
       fi
 
 # command to run tests
