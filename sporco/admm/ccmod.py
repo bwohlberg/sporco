@@ -13,7 +13,6 @@ from builtins import range
 
 import numpy as np
 from scipy import linalg
-import pyfftw
 import copy
 import collections
 
@@ -269,8 +268,7 @@ class ConvCnstrMOD(admm.ADMMEqual):
         # form)
         self.S = S.reshape(self.Nv + (self.C,) + (self.K,) + (1,))
 
-        # Compute coefficient maps A (X) and signal S in DFT domain
-        self.simd_n = pyfftw.simd_alignment
+        # Compute signal S in DFT domain
         self.Sf = sl.rfftn(self.S, None, self.axisN)
 
         # Create constraint set projection function
@@ -306,11 +304,10 @@ class ConvCnstrMOD(admm.ADMMEqual):
             self.U = self.opt['U0']
 
         # Create byte aligned arrays for FFT calls
-        self.YU = pyfftw.empty_aligned(self.Y.shape, dtype=dtype, n=self.simd_n)
+        self.YU = sl.pyfftw_empty_aligned(self.Y.shape, dtype=dtype)
         xfshp = list(self.Y.shape)
         xfshp[dimN-1] = xfshp[dimN-1]//2 + 1
-        self.Xf = pyfftw.empty_aligned(xfshp, dtype=sl.complex_dtype(dtype),
-                                       n=self.simd_n)
+        self.Xf = sl.pyfftw_empty_aligned(xfshp, dtype=sl.complex_dtype(dtype))
 
         self.runtime += self.timer.elapsed()
 

@@ -48,14 +48,36 @@ def complex_dtype(dtype):
     """
 
     return (np.zeros(1, dtype)+1j).dtype
-    
-    
+
+
+
+def pyfftw_empty_aligned(shape, dtype, order='C', n=None):
+    """Construct an empty byte-aligned array for efficient use by
+    pyfftw. This function is a wrapper for :func:`pyfftw.empty_aligned`
+
+    Parameters
+    ----------
+    shape : sequence of ints
+      Output array shape
+    dtype : dtype
+      Output array dtype
+    n : int, optional
+      Output array should be aligned to n-byte boundary
+
+    Returns
+    -------
+    a :  ndarray
+      Empty array with required byte-alignment
+    """
+
+    return pyfftw.empty_aligned(shape, dtype, order, n)
+
 
 
 def fftn(a, s=None, axes=None):
     """
     Compute the multi-dimensional discrete Fourier transform. This function
-    is a wrapper for :func:`pyfftw.interfaces.numpy_fft.fftn`, 
+    is a wrapper for :func:`pyfftw.interfaces.numpy_fft.fftn`,
     with an interface similar to that of :func:`numpy.fft.fftn`.
 
 
@@ -67,7 +89,7 @@ def fftn(a, s=None, axes=None):
       Shape of the output along each axis (input is cropped or zero-padded
       to match).
     axes : sequence of ints, optional
-      Axes over which to compute the DFT. 
+      Axes over which to compute the DFT.
 
     Returns
     -------
@@ -82,7 +104,7 @@ def fftn(a, s=None, axes=None):
 
 def ifftn(a, s=None, axes=None):
     """
-    Compute the multi-dimensional inverse discrete Fourier transform. 
+    Compute the multi-dimensional inverse discrete Fourier transform.
     This function is a wrapper for :func:`pyfftw.interfaces.numpy_fft.ifftn`,
     with an interface similar to that of :func:`numpy.fft.ifftn`.
 
@@ -95,7 +117,7 @@ def ifftn(a, s=None, axes=None):
       Shape of the output along each axis (input is cropped or zero-padded
       to match).
     axes : sequence of ints, optional
-      Axes over which to compute the inverse DFT. 
+      Axes over which to compute the inverse DFT.
 
     Returns
     -------
@@ -110,7 +132,7 @@ def ifftn(a, s=None, axes=None):
 
 def rfftn(a, s=None, axes=None):
     """
-    Compute the multi-dimensional discrete Fourier transform for real input. 
+    Compute the multi-dimensional discrete Fourier transform for real input.
     This function is a wrapper for :func:`pyfftw.interfaces.numpy_fft.rfftn`,
     with an interface similar to that of :func:`numpy.fft.rfftn`.
 
@@ -123,7 +145,7 @@ def rfftn(a, s=None, axes=None):
       Shape of the output along each axis (input is cropped or zero-padded
       to match).
     axes : sequence of ints, optional
-      Axes over which to compute the DFT. 
+      Axes over which to compute the DFT.
 
     Returns
     -------
@@ -138,8 +160,8 @@ def rfftn(a, s=None, axes=None):
 
 def irfftn(a, s=None, axes=None):
     """
-    Compute the inverse of the multi-dimensional discrete Fourier transform 
-    for real input. This function is a wrapper for 
+    Compute the inverse of the multi-dimensional discrete Fourier transform
+    for real input. This function is a wrapper for
     :func:`pyfftw.interfaces.numpy_fft.irfftn`, with an interface similar to
     that of :func:`numpy.fft.irfftn`.
 
@@ -152,7 +174,7 @@ def irfftn(a, s=None, axes=None):
       Shape of the output along each axis (input is cropped or zero-padded
       to match).
     axes : sequence of ints, optional
-      Axes over which to compute the inverse DFT. 
+      Axes over which to compute the inverse DFT.
 
     Returns
     -------
@@ -178,7 +200,7 @@ def dctii(x, axes=None):
     a : array_like
       Input array
     axes : sequence of ints, optional
-      Axes over which to compute the DCT-II. 
+      Axes over which to compute the DCT-II.
 
     Returns
     -------
@@ -197,7 +219,7 @@ def dctii(x, axes=None):
 def idctii(x, axes=None):
     """
     Compute a multi-dimensional inverse DCT-II over specified array axes.
-    This function is implemented by calling the one-dimensional inverse 
+    This function is implemented by calling the one-dimensional inverse
     DCT-II :func:`scipy.fftpack.idct` with normalization mode 'ortho'
     for each of the specified axes.
 
@@ -207,7 +229,7 @@ def idctii(x, axes=None):
     a : array_like
       Input array
     axes : sequence of ints, optional
-      Axes over which to compute the inverse DCT-II. 
+      Axes over which to compute the inverse DCT-II.
 
     Returns
     -------
@@ -268,7 +290,7 @@ def solvedbi_sm(ah, rho, b, c=None, axis=4):
         return ne.evaluate('(b - (a * cb)) / rho')
     else:
         return (b - (a * np.sum(c * b, axis=axis, keepdims=True))) / rho
-    
+
 
 
 
@@ -309,13 +331,13 @@ def solvemdbi_ism(ah, rho, b, axisM, axisK):
     systems of the form (see :cite:`wohlberg-2016-efficient`)
 
     .. math::
-      (\\rho I + \mathbf{a}_0 \mathbf{a}_0^H + \mathbf{a}_1 \mathbf{a}_1^H + 
-       \; \ldots \; + \mathbf{a}_{K-1} \mathbf{a}_{K-1}^H) \; \mathbf{x} = 
+      (\\rho I + \mathbf{a}_0 \mathbf{a}_0^H + \mathbf{a}_1 \mathbf{a}_1^H +
+       \; \ldots \; + \mathbf{a}_{K-1} \mathbf{a}_{K-1}^H) \; \mathbf{x} =
        \mathbf{b}
 
     where each :math:`\mathbf{a}_k` is an :math:`M`-vector.
-    The sums, inner products, and matrix products in this equation are taken 
-    along the M and K axes of the corresponding multi-dimensional arrays; 
+    The sums, inner products, and matrix products in this equation are taken
+    along the M and K axes of the corresponding multi-dimensional arrays;
     the solutions are independent over the other axes.
 
 
@@ -382,13 +404,13 @@ def solvemdbi_rsm(ah, rho, b, axisK, dimN=2):
     systems of the form (see :cite:`wohlberg-2016-efficient`)
 
     .. math::
-      (\\rho I + \mathbf{a}_0 \mathbf{a}_0^H + \mathbf{a}_1 \mathbf{a}_1^H + 
-       \; \ldots \; + \mathbf{a}_{K-1} \mathbf{a}_{K-1}^H) \; \mathbf{x} = 
+      (\\rho I + \mathbf{a}_0 \mathbf{a}_0^H + \mathbf{a}_1 \mathbf{a}_1^H +
+       \; \ldots \; + \mathbf{a}_{K-1} \mathbf{a}_{K-1}^H) \; \mathbf{x} =
        \mathbf{b}
 
     where each :math:`\mathbf{a}_k` is an :math:`M`-vector.
-    The sums, inner products, and matrix products in this equation are taken 
-    along the M and K axes of the corresponding multi-dimensional arrays; 
+    The sums, inner products, and matrix products in this equation are taken
+    along the M and K axes of the corresponding multi-dimensional arrays;
     the solutions are independent over the other axes.
 
 
@@ -445,13 +467,13 @@ def solvemdbi_cg(ah, rho, b, axisM, axisK, tol=1e-5, mit=1000, isn=None):
     systems of the form (see :cite:`wohlberg-2016-efficient`)
 
      .. math::
-      (\\rho I + \mathbf{a}_0 \mathbf{a}_0^H + \mathbf{a}_1 \mathbf{a}_1^H + 
-       \; \ldots \; + \mathbf{a}_{K-1} \mathbf{a}_{K-1}^H) \; \mathbf{x} = 
+      (\\rho I + \mathbf{a}_0 \mathbf{a}_0^H + \mathbf{a}_1 \mathbf{a}_1^H +
+       \; \ldots \; + \mathbf{a}_{K-1} \mathbf{a}_{K-1}^H) \; \mathbf{x} =
        \mathbf{b}
 
     where each :math:`\mathbf{a}_k` is an :math:`M`-vector.
-    The inner products and matrix products in this equation are taken 
-    along the M and K axes of the corresponding multi-dimensional arrays; 
+    The inner products and matrix products in this equation are taken
+    along the M and K axes of the corresponding multi-dimensional arrays;
     the solutions are independent over the other axes.
 
 
@@ -509,7 +531,7 @@ def zpad(x, pd, ax):
       Sequence of two ints (leading,trailing) specifying number of zeros
       for padding
     ax : int
-      Axis to be padded 
+      Axis to be padded
 
     Returns
     -------
@@ -575,7 +597,7 @@ def shrink1(x, alpha):
     Shrinkage/soft thresholding function
 
      .. math::
-      \mathcal{S}_{1,\\alpha}(\mathbf{x}) = 
+      \mathcal{S}_{1,\\alpha}(\mathbf{x}) =
       \mathrm{sign}(\mathbf{x}) \odot \max(0, |\mathbf{x}| - \\alpha)
 
 
@@ -632,7 +654,7 @@ def shrink2(x, alpha):
     """Vector shrinkage/soft thresholding function
 
      .. math::
-      \mathcal{S}_{2,\\alpha}(\mathbf{x}) = 
+      \mathcal{S}_{2,\\alpha}(\mathbf{x}) =
       \\frac{\mathbf{x}}{\|\mathbf{x}\|_2} \max(0, \|\mathbf{x}\|_2 - \\alpha)
 
     The :math:`\ell^2` norm is applied over the last axis of a
@@ -706,7 +728,7 @@ def fl2norm2(xf, axis=(0,1)):
     -------
     x : float
       :math:`\|\mathbf{x}\|_2^2` where the input array is the result of
-      applying :func:`fftn` to the specified axes of multi-dimensional 
+      applying :func:`fftn` to the specified axes of multi-dimensional
       array :math:`\mathbf{x}`
     """
 
@@ -728,7 +750,7 @@ def rfl2norm2(xf, xs, axis=(0,1)):
     xf : array_like
       Input array
     xs : sequence of ints
-      Shape of original array to which :func:`rfftn` was applied to 
+      Shape of original array to which :func:`rfftn` was applied to
       obtain the input array
     axis : sequence of ints, optional
       Axes on which the input is in the frequency domain
@@ -737,7 +759,7 @@ def rfl2norm2(xf, xs, axis=(0,1)):
     -------
     x : float
       :math:`\|\mathbf{x}\|_2^2` where the input array is the result of
-      applying :func:`rfftn` to the specified axes of multi-dimensional 
+      applying :func:`rfftn` to the specified axes of multi-dimensional
       array :math:`\mathbf{x}`
     """
 
