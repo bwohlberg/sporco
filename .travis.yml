@@ -7,9 +7,6 @@ python:
 
 virtualenv:
     system_site_packages: true
-      - "2.7_with_system_site_packages"
-      - "3.4_with_system_site_packages"
-      - "3.5_with_system_site_packages"
 
 addons:
   apt:
