@@ -1,10 +1,8 @@
 from __future__ import division
-from builtins import range
 from builtins import object
 
 import pytest
 import numpy as np
-from scipy import linalg
 
 from sporco.admm import bpdndl
 

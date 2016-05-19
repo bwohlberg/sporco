@@ -5,7 +5,6 @@ import pytest
 
 import numpy as np
 from sporco import linalg
-from sporco import util
 
 
 

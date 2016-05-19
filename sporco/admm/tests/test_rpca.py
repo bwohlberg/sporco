@@ -2,7 +2,6 @@ from builtins import object
 
 import pytest
 import numpy as np
-from scipy import linalg
 
 from sporco.admm import rpca
 import sporco.linalg as sl

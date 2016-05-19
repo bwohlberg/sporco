@@ -4,7 +4,6 @@ from past.utils import old_div
 
 import pytest
 import numpy as np
-from scipy import linalg
 
 from sporco.admm import tvl1
 import sporco.linalg as sl

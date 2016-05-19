@@ -1,10 +1,8 @@
 from __future__ import division
 from builtins import object
-from past.utils import old_div
 
 import pytest
 import numpy as np
-import scipy.linalg
 
 from sporco.admm import cbpdndl
 
