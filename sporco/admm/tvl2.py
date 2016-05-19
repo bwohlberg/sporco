@@ -150,7 +150,7 @@ class TVL2Denoise(admm.ADMM):
         """
 
         if opt is None:
-            opt = Options()
+            opt = TVL2Denoise.Options()
         Nx = S.size
         Nc = len(axes)*Nx
         super(TVL2Denoise, self).__init__(Nx, Nc, opt)
@@ -445,7 +445,7 @@ class TVL2Deconv(admm.ADMM):
         """
 
         if opt is None:
-            opt = Options()
+            opt = TVL2Deconv.Options()
         Nx = S.size
         Nc = len(axes)*Nx
         super(TVL2Deconv, self).__init__(Nx, Nc, opt)

@@ -223,7 +223,7 @@ class ConvCnstrMOD(admm.ADMMEqual):
         """
 
         if opt is None:
-            opt = Options()
+            opt = ConvCnstrMOD.Options()
 
         self.dsz = dsz
 

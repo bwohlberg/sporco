@@ -59,3 +59,32 @@ class TestSet01(object):
         b.solve()
         X1 = b.Y.squeeze()
         assert(sl.rrs(X0,X1) < 5e-5) 
+
+
+    def test_03(self):
+        N = 16
+        Nd = 5
+        M = 4
+        D = np.random.randn(Nd, Nd, M)
+        s = np.random.randn(N, N)
+        lmbda = 1e-1
+        try:
+            b = cbpdn.ConvBPDN(D, s, lmbda)
+            b.solve()
+        except Exception as e:
+            print(e)
+            assert(0)
+
+
+    def test_04(self):
+        N = 16
+        Nd = 5
+        M = 4
+        D = np.random.randn(Nd, Nd, M)
+        s = np.random.randn(N, N)
+        try:
+            b = cbpdn.ConvBPDN(D, s)
+            b.solve()
+        except Exception as e:
+            print(e)
+            assert(0)

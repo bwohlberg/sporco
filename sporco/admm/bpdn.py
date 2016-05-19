@@ -149,7 +149,7 @@ class BPDN(admm.ADMMEqual):
         Nm = S.shape[1]
         Nx = Nc*Nm
         if opt is None:
-            opt = Options()
+            opt = BPDN.Options()
         super(BPDN, self).__init__(Nx, opt)
 
         # Set default lambda value if not specified

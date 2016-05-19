@@ -144,7 +144,7 @@ class SplineL1(admm.ADMM):
         """
 
         if opt is None:
-            opt = Options()
+            opt = SplineL1.Options()
         Nx = S.size
         Nc = Nx
         super(SplineL1, self).__init__(Nx, Nc, opt)

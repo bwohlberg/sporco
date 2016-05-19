@@ -15,7 +15,6 @@ class TestSet01(object):
         pass
 
 
-
     def test_01(self):
         rho = 1e-1
         N = 64
@@ -44,3 +43,31 @@ class TestSet01(object):
         Dslv = cmod.linsolve(X, rho, lu, piv, S.dot(X.T) + rho*Z)
         assert(sl.rrs(Dslv.dot(X).dot(X.T) + rho*Dslv,
                         S.dot(X.T) + rho*Z) < 1e-11)
+
+
+    def test_03(self):
+        N = 16
+        M = 4
+        K = 8
+        X = np.random.randn(M, K)
+        S = np.random.randn(N, K)
+        try:
+            b = cmod.CnstrMOD(X, S, (N, M))
+            b.solve()
+        except Exception as e:
+            print(e)
+            assert(0)
+
+
+    def test_04(self):
+        N = 16
+        M = 4
+        K = 8
+        X = np.random.randn(M, K)
+        S = np.random.randn(N, K)
+        try:
+            b = cmod.CnstrMOD(X, S)
+            b.solve()
+        except Exception as e:
+            print(e)
+            assert(0)

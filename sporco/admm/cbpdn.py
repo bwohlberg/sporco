@@ -206,7 +206,7 @@ class ConvBPDN(admm.ADMMEqual):
         # X(N0,  N1,   1,   K,   M)
 
         if opt is None:
-            opt = Options()
+            opt = ConvBPDN.Options()
 
         # These need to be calculated since inputs D and S do not
         # already have the standard data layout above, i.e. singleton

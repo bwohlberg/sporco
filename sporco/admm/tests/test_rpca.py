@@ -32,3 +32,14 @@ class TestSet01(object):
         assert(np.abs(b.itstat[-1].ObjFun - 321.6189484339) < 1e-6)
         assert(sl.mse(U,X) < 2e-6)
         assert(sl.mse(V,Y) < 1e-8)
+
+
+    def test_02(self):
+        N = 8
+        D = np.random.randn(N, N)
+        try:
+            b = rpca.RobustPCA(D)
+            b.solve()
+        except Exception as e:
+            print(e)
+            assert(0)

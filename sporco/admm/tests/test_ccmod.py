@@ -36,3 +36,17 @@ class TestSet01(object):
         c.solve()
         D1 = ccmod.bcrop(c.Y, D0.shape).squeeze()
         assert(sl.rrs(D0,D1) < 1e-5) 
+
+
+    def test_02(self):
+        N = 16
+        M = 4
+        Nd = 8
+        X = np.random.randn(N, N, 1, 1, M)
+        S = np.random.randn(N, N, 1)
+        try:
+            c = ccmod.ConvCnstrMOD(X, S, (Nd, Nd, M))
+            c.solve()
+        except Exception as e:
+            print(e)
+            assert(0)

@@ -127,7 +127,7 @@ class RobustPCA(admm.ADMM):
         """
 
         if opt is None:
-            opt = Options()
+            opt = RobustPCA.Options()
         Nx = S.size
         Nc = Nx
         super(RobustPCA, self).__init__(Nx, Nc, opt)

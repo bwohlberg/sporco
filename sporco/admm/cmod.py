@@ -137,7 +137,7 @@ class CnstrMOD(admm.ADMMEqual):
         """
 
         if opt is None:
-            opt = Options()
+            opt = CnstrMOD.Options()
 
         Nc = S.shape[0]
         # If A not specified, get dictionary size from dsz

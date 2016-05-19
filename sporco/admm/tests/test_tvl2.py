@@ -14,6 +14,36 @@ class TestSet01(object):
 
     def setup_method(self, method):
         np.random.seed(12345)
+        N = 16
+        self.D = np.random.randn(N,N)
+
+
+    def test_01(self):
+        lmbda = 3
+        try:
+            b = tvl2.TVL2Denoise(self.D, lmbda)
+            b.solve()
+        except Exception as e:
+            print(e)
+            assert(0)
+
+
+    def test_02(self):
+        lmbda = 3
+        try:
+            b = tvl2.TVL2Deconv(np.ones((1,1)), self.D, lmbda)
+            b.solve()
+        except Exception as e:
+            print(e)
+            assert(0)
+
+
+
+
+class TestSet02(object):
+
+    def setup_method(self, method):
+        np.random.seed(12345)
         N = 64
         self.U = np.ones((N,N))
         self.U[:, 0:(old_div(N,2))] = -1
@@ -43,7 +73,7 @@ class TestSet01(object):
 
 
 
-class TestSet02(object):
+class TestSet03(object):
 
     def setup_method(self, method):
         np.random.seed(12345)
@@ -76,7 +106,7 @@ class TestSet02(object):
 
 
 
-class TestSet03(object):
+class TestSet04(object):
 
     def setup_method(self, method):
         np.random.seed(12345)

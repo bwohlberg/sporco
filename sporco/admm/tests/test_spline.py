@@ -24,7 +24,7 @@ class TestSet01(object):
         t = np.sort(np.abs(V).ravel())[V.size-L]
         V[np.abs(V) < t] = 0
         D = U + V
-        lmbda  = 0.1
+        lmbda = 0.1
         opt = spline.SplineL1.Options({'Verbose' : False, 'gEvalY' : False,
                               'MaxMainIter' : 250,
                               'DFidWeight' : V == 0, 
@@ -33,3 +33,15 @@ class TestSet01(object):
         X = b.solve()
         assert(np.abs(b.itstat[-1].ObjFun - 0.38397223518) < 1e-6)
         assert(sl.mse(U,X) < 1e-6)
+
+
+    def test_02(self):
+        N = 8
+        D = np.random.randn(N, N)
+        lmbda = 0.1
+        try:
+            b = spline.SplineL1(D, lmbda)
+            b.solve()
+        except Exception as e:
+            print(e)
+            assert(0)
