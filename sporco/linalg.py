@@ -31,6 +31,27 @@ pyfftw.interfaces.cache.enable()
 pyfftw.interfaces.cache.set_keepalive_time(300)
 
 
+
+def complex_dtype(dtype):
+    """Construct the corresponding complex dtype for a given real dtype,
+    e.g. the complex dtype corresponding to np.float32 is np.complex64.
+
+    Parameters
+    ----------
+    dtype : dtype
+      A real dtype, e.g. np.float32, np.float64
+
+    Returns
+    -------
+    cdtype : dtype
+      The complex dtype corresponding to the input dtype
+    """
+
+    return (np.zeros(1, dtype)+1j).dtype
+    
+    
+
+
 def fftn(a, s=None, axes=None):
     """
     Compute the multi-dimensional discrete Fourier transform. This function

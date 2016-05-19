@@ -23,9 +23,73 @@ import sporco.linalg as sl
 __author__ = """Brendt Wohlberg <brendt@ieee.org>"""
 
 
+class ConvRepIndexing(object):
+    """Manage the inference of problem dimensions and the roles of ndarray
+    indices for convolutional representations as in ConvBPDN and related
+    classes."""
+
+    def __init__(self, D, S, dimN=2):
+        """Initialise a ConvRepIndexing object, inferring the problem
+        dimensions from input dictionary and signal arrays D and S
+        respectively.
+
+        The internal data layout for S, D, and X is:
+        ::
+
+          dim<0> - dim<Nds-1> : Spatial dimensions, product of N0,N1,... is N
+          dim<Nds>            : C number of channels in S and D
+          dim<Nds+1>          : K number of signals in S
+          dim<Nds+2>          : M number of filters in D
+
+            sptl.      chn  sig  flt
+          S(N0,  N1,   C,   K,   1)
+          D(N0,  N1,   C,   1,   M)
+          X(N0,  N1,   1,   K,   M)
+        """
+
+        # Numbers of spatial, channel, and signal dimensions in
+        # external D and S. These need to be calculated since inputs D
+        # and S do not already have the standard data layout above,
+        # i.e. singleton dimensions will not be present
+        self.dimN = dimN                  # Number of spatial dimensions
+        self.dimC = D.ndim-dimN-1         # Number of channel dimensions in D
+        self.dimK = S.ndim-dimN-self.dimC # Number of signal dimensions in S
+
+        # Number of channels in external D and S
+        if self.dimC == 1:
+            self.C = D.shape[dimN]
+        else:
+            self.C = 1
+
+        # Number of signals in external S
+        if self.dimK == 1:
+            self.K = S.shape[self.dimN+self.dimC]
+        else:
+            self.K = 1
+
+        # Number of filters
+        self.M = D.shape[self.dimN+self.dimC]
+        # Shape of spatial indices and number of spatial samples
+        self.Nv = S[(slice(None),)*dimN + (1,)*(self.dimC+self.dimK)].shape
+        self.N = np.prod(np.array(self.Nv))
+
+        # Axis indices for each component of X and internal S and D
+        self.axisN = tuple(range(0, dimN))
+        self.axisC = dimN
+        self.axisK = dimN + 1
+        self.axisM = dimN + 2
+
+        # Shapes of internal S, D, and X
+        self.shpD = D.shape[0:dimN] + (self.C,) + (1,) + (self.M,)
+        self.shpS = self.Nv + (self.C,) + (self.K,) + (1,)
+        self.shpX = self.Nv + (1,) + (self.K,) + (self.M,)
+
+
+
 class ConvBPDN(admm.ADMMEqual):
+
     """ADMM algorithm for the Convolutional BPDN (CBPDN)
-    :cite:`wohlberg-2014-efficient` :cite:`wohlberg-2016-efficient` 
+    :cite:`wohlberg-2014-efficient` :cite:`wohlberg-2016-efficient`
     :cite:`wohlberg-2016-convolutional` problem
 
     Solve the optimisation problem
@@ -190,62 +254,25 @@ class ConvBPDN(admm.ADMMEqual):
           Algorithm options
         dimN : int, optional (default 2)
           Number of spatial dimensions
-
-
         """
 
-        # Data layout for X, S, and D
-        # dim<0>-dim<Nds-1>: Spatial dimensions, product of N0,N1,... is N
-        # dim<Nds>         : C number of channels in S and D
-        # dim<Nds+1>       : K number of signals in S
-        # dim<Nds+2>       : M number of filters in D
-        #
-        #   sptl.      chn  sig  flt
-        # S(N0,  N1,   C,   K,   1)
-        # D(N0,  N1,   C,   1,   M)
-        # X(N0,  N1,   1,   K,   M)
-
+        # Set default options if none specified
         if opt is None:
             opt = ConvBPDN.Options()
 
-        # These need to be calculated since inputs D and S do not
-        # already have the standard data layout above, i.e. singleton
-        # dimensions will not be present
-        self.dimN = dimN                  # Number of spatial dimensions
-        self.dimC = D.ndim-dimN-1         # Number of channel dimensions in D
-        self.dimK = S.ndim-dimN-self.dimC # Number of signal dimensions in S
-
-        # Number of channels in D and S
-        if self.dimC == 1:
-            self.C = D.shape[dimN]
-        else:
-            self.C = 1
-
-        # Number of signals in S
-        if self.dimK == 1:
-            self.K = S.shape[self.dimN+self.dimC]
-        else:
-            self.K = 1
-
-        # Number of filters
-        self.M = D.shape[self.dimN+self.dimC]
-        # Number of spatial samples
-        self.Nv = S[(slice(None),)*dimN + (1,)*(self.dimC+self.dimK)].shape
-        self.N = np.prod(np.array(self.Nv))
+        # Infer problem dimensions and set relevant attributes of self
+        cri = ConvRepIndexing(D, S, dimN)
+        for attr in ['dimN', 'dimC', 'dimK', 'C', 'K', 'M', 'Nv', 'N',
+                     'axisN', 'axisC', 'axisK', 'axisM']:
+            setattr(self, attr, getattr(cri, attr))
 
         # Call parent class __init__
         Nx = self.M*self.N
         super(ConvBPDN, self).__init__(Nx, opt)
 
-        # Axis indices for each component of X and reshaped S, D
-        self.axisN = tuple(range(0, dimN))
-        self.axisC = dimN
-        self.axisK = dimN + 1
-        self.axisM = dimN + 2
-
         # Reshape D and S to standard layout
-        self.D = D.reshape(D.shape[0:dimN] + (self.C,) + (1,) + (self.M,))
-        self.S = S.reshape(self.Nv + (self.C,) + (self.K,) + (1,))
+        self.D = D.reshape(cri.shpD)
+        self.S = S.reshape(cri.shpS)
 
         # Compute filters and signal in DFT domain
         self.simd_n = pyfftw.simd_alignment
@@ -269,7 +296,7 @@ class ConvBPDN(admm.ADMMEqual):
 
         # Initial values for Y
         if self.opt['Y0'] is None:
-            self.Y = np.zeros(self.Nv + (1,) + (self.K,) + (self.M,), dtype)
+            self.Y = np.zeros(cri.shpX, dtype)
         else:
             self.Y = self.opt['Y0']
         self.Yprev = self.Y
@@ -277,7 +304,7 @@ class ConvBPDN(admm.ADMMEqual):
         # Initial value for U
         if self.opt['U0'] is None:
             if self.opt['Y0'] is None:
-                self.U = np.zeros(self.Nv + (1,) + (self.K,) + (self.M,), dtype)
+                self.U = np.zeros(cri.shpX, dtype)
             else:
                 # If Y0 is given, but not U0, then choose the initial
                 # U so that the relevant dual optimality criterion
@@ -290,8 +317,8 @@ class ConvBPDN(admm.ADMMEqual):
         self.YU = pyfftw.empty_aligned(self.Y.shape, dtype=dtype, n=self.simd_n)
         xfshp = list(self.Y.shape)
         xfshp[dimN-1] = xfshp[dimN-1]//2 + 1
-        self.Xf = pyfftw.empty_aligned(xfshp,
-                        dtype=(np.zeros(1, dtype)+1j).dtype, n=self.simd_n)
+        self.Xf = pyfftw.empty_aligned(xfshp, dtype=sl.complex_dtype(dtype),
+                                       n=self.simd_n)
 
         self.runtime += self.timer.elapsed()
 

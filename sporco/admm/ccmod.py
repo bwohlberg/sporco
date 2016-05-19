@@ -309,8 +309,8 @@ class ConvCnstrMOD(admm.ADMMEqual):
         self.YU = pyfftw.empty_aligned(self.Y.shape, dtype=dtype, n=self.simd_n)
         xfshp = list(self.Y.shape)
         xfshp[dimN-1] = xfshp[dimN-1]//2 + 1
-        self.Xf = pyfftw.empty_aligned(xfshp,
-                        dtype=(np.zeros(1, dtype)+1j).dtype, n=self.simd_n)
+        self.Xf = pyfftw.empty_aligned(xfshp, dtype=sl.complex_dtype(dtype),
+                                       n=self.simd_n)
 
         self.runtime += self.timer.elapsed()
 
