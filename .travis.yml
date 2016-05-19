@@ -5,9 +5,6 @@ python:
   - "3.4"
   - "3.5"
 
-#virtualenv:
-#    system_site_packages: true
-
 addons:
   apt:
     packages:
@@ -21,6 +18,9 @@ addons:
 install:
     - pip install future
     - pip install pyfftw
+    - if [[ "${TRAVIS_PYTHON_VERSION}" != "2.7" ]]; then
+        pip install scipy
+      fi
 
 # command to run tests
 script:
