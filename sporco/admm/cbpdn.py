@@ -74,15 +74,15 @@ class ConvBPDN(admm.ADMMEqual):
         :class:`sporco.admm.admm.ADMMEqual.Options`, together with
         additional options:
 
-        ``AuxVarObj`` : Flag indicating whether the objective function \
-        should be evaluated using variable X  (``False``) or Y (``True``) \
-        as its argument
+        ``AuxVarObj`` : Flag indicating whether the objective function
+        should be evaluated using variable X  (``False``) or Y (``True``)
+        as its argument.
 
-        ``LinSolveCheck`` : If ``True``, compute relative residual of
-        X step solver
+        ``LinSolveCheck`` : Flag indicating whether to compute
+        relative residual of X step solver.
 
-        ``HighMemSolve`` : Use a slighltly faster algorithm at the
-        expense of higher memory usage
+        ``HighMemSolve`` : Flag indicating whether to use a slightly
+        faster algorithm at the expense of higher memory usage.
 
         ``L1Weight`` : An array of weights for the :math:`\ell^1`
         norm. The array shape must be such that the array is
@@ -91,14 +91,19 @@ class ConvBPDN(admm.ADMMEqual):
         \| \mathbf{w}_m \odot \mathbf{x}_m \|_1` where :math:`\mathbf{w}_m`
         denotes slices of the weighting array on the filter index axis.
 
-        ``NonNegCoef`` : If ``True``, force solution to be non-negative.
+        ``NonNegCoef`` : Flag indicating whether to force solution to
+        be non-negative.
+
+        ``NoBndryCross`` : Flag indicating whether all solution
+        coefficients corresponding to filters crossing the image
+        boundary should be forced to zero.
         """
 
         defaults = copy.deepcopy(admm.ADMMEqual.Options.defaults)
         defaults.update({'AuxVarObj' : False,  'ReturnX' : False,
                          'HighMemSolve' : False, 'LinSolveCheck' : False,
                          'RelaxParam' : 1.8, 'L1Weight' : 1.0,
-                         'NonNegCoef' : False})
+                         'NonNegCoef' : False, 'NoBndryCross' : False})
         defaults['AutoRho'].update({'Enabled' : True, 'Period' : 1,
                                     'AutoScaling' : True, 'Scaling' : 1000.0,
                                     'RsdlRatio' : 1.2})
@@ -327,7 +332,7 @@ class ConvBPDN(admm.ADMMEqual):
             self.Xf[:] = sl.solvemdbi_ism(self.Df, self.rho, b, self.axisM,
                                           self.axisC)
 
-        self.X = sl.irfftn(self.Xf, None, self.axisN)
+        self.X = sl.irfftn(self.Xf, self.Nv, self.axisN)
 
         if self.opt['LinSolveCheck']:
             Dop = lambda x: np.sum(self.Df * x, axis=self.axisM, keepdims=True)
@@ -347,6 +352,9 @@ class ConvBPDN(admm.ADMMEqual):
                             (self.lmbda/self.rho)*self.opt['L1Weight'])
         if self.opt['NonNegCoef']:
             self.Y[self.Y < 0.0] = 0.0
+        if self.opt['NoBndryCross']:
+            for n in range(0, self.dimN):
+                self.Y[(slice(None),)*n +(slice(1-self.D.shape[n],None),)] = 0.0
 
 
 
