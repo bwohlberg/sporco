@@ -150,5 +150,5 @@ file for details.
 Acknowledgments
 ---------------
 
-Thanks for Aric Hagberg for valuable advice on python packaging,
+Thanks to Aric Hagberg for valuable advice on python packaging,
 documentation, and related issues.
