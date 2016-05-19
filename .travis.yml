@@ -16,6 +16,8 @@ addons:
     - libatlas-dev
     - libatlas-base-dev
     - liblapack-dev
+    - libblas-dev
+    - gfortran
 
 # command to install dependencies
 install:
