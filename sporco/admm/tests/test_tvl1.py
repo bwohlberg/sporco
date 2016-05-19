@@ -38,6 +38,34 @@ class TestSet01(object):
             assert(0)
 
 
+    def test_03(self):
+        lmbda = 3
+        opt = tvl1.TVL1Denoise.Options({'MaxMainIter' : 20})
+        b = tvl1.TVL1Denoise(self.D, lmbda, opt)
+        b.solve()
+        opt['Y0'] = b.Y
+        try:
+            c = tvl1.TVL1Denoise(self.D, lmbda, opt)
+            c.solve()
+        except Exception as e:
+            print(e)
+            assert(0)
+
+
+    def test_04(self):
+        lmbda = 3
+        opt = tvl1.TVL1Deconv.Options({'MaxMainIter' : 20})
+        b = tvl1.TVL1Deconv(np.ones((1,1)), self.D, lmbda, opt)
+        b.solve()
+        opt['Y0'] = b.Y
+        try:
+            c = tvl1.TVL1Deconv(np.ones((1,1)), self.D, lmbda, opt)
+            c.solve()
+        except Exception as e:
+            print(e)
+            assert(0)
+
+
 
 
 class TestSet02(object):

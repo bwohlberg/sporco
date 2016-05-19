@@ -184,8 +184,8 @@ class TVL1Denoise(admm.ADMM):
                 Yss = np.sqrt(np.sum(self.Y[...,0:-1]**2, axis=S.ndim, 
                                      keepdims=True))
                 U0 = (self.lmbda/self.rho)*sl.zquotient(self.Y[...,0:-1], Yss)
-                U1 = (1.0 / self.rho)*np.sign(self.Y[...,-1])
-                self.U = np.concatenate(U0, U1, axis=X.ndim)
+                U1 = (1.0 / self.rho)*np.sign(self.Y[...,-1:])
+                self.U = np.concatenate((U0, U1), axis=S.ndim)
         else:
             self.U = self.opt['U0']
 
@@ -507,8 +507,8 @@ class TVL1Deconv(admm.ADMM):
                 Yss = np.sqrt(np.sum(self.Y[...,0:-1]**2, axis=S.ndim, 
                                      keepdims=True))
                 U0 = (self.lmbda/self.rho)*sl.zquotient(self.Y[...,0:-1], Yss)
-                U1 = (1.0 / self.rho)*np.sign(self.Y[...,-1])
-                self.U = np.concatenate(U0, U1, axis=X.ndim)
+                U1 = (1.0 / self.rho)*np.sign(self.Y[...,-1:])
+                self.U = np.concatenate((U0, U1), axis=S.ndim)
         else:
             self.U = self.opt['U0']
 
