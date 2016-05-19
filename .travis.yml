@@ -13,6 +13,9 @@ addons:
     - python-tk
     - python-matplotlib
     - libfftw3-dev
+    - libatlas-dev
+    - libatlas-base-dev
+    - liblapack-dev
 
 # command to install dependencies
 install:
