@@ -461,8 +461,6 @@ def solvemdbi_cg(ah, rho, b, axisM, axisK, tol=1e-5, mit=1000, isn=None):
       Number of CG iterations
     """
 
-    K = ah.shape[axisK]
-    M = ah.shape[axisM]
     a = np.conj(ah)
     if isn is not None:
         isn = isn.ravel()
@@ -722,7 +720,6 @@ def rfl2norm2(xf, xs, axis=(0,1)):
       array :math:`\mathbf{x}`
     """
 
-    xfs = xf.shape
     scl = 1.0 / np.prod(np.array([xs[k] for k in axis]))
     slc0 = (slice(None),)*axis[-1]
     nrm0 = linalg.norm(xf[slc0 + (0,)])
