@@ -34,7 +34,9 @@ class TestSet01(object):
         b = cbpdn.ConvBPDN(D, S, lmbda, opt)
         b.solve()
         X1 = b.Y.squeeze()
-        assert(sl.rrs(X0,X1) < 5e-5) 
+        assert(sl.rrs(X0,X1) < 5e-5)
+        Sr = b.reconstruct().squeeze()
+        assert(sl.rrs(S,Sr) < 1e-4)
 
 
     def test_02(self):
@@ -57,6 +59,8 @@ class TestSet01(object):
         b.solve()
         X1 = b.Y.squeeze()
         assert(sl.rrs(X0,X1) < 5e-5) 
+        Sr = b.reconstruct().squeeze()
+        assert(sl.rrs(S,Sr) < 1e-4)
 
 
     def test_03(self):

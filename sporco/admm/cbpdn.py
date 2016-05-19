@@ -401,8 +401,8 @@ class ConvBPDN(admm.ADMMEqual):
         if X is None:
             X = self.Y
         Xf = sl.rfftn(X, None, self.axisN)
-        Sf = np.sum(self.Df * Xf, axis=self.axisM, keepdims=True)
-        return sl.irfftn(Sf, None, self.axisN)
+        Sf = np.sum(self.Df * Xf, axis=self.axisM)
+        return sl.irfftn(Sf, self.Nv, self.axisN)
 
 
 
