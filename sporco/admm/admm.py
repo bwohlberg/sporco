@@ -12,6 +12,7 @@ from __future__ import print_function
 from builtins import range
 from builtins import object
 
+import numpy as np
 from scipy import linalg
 import scipy
 import copy

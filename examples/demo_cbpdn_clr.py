@@ -18,7 +18,6 @@ import matplotlib.pyplot as plt
 
 from sporco import util
 from sporco.admm import cbpdn
-from sporco.admm import ccmod
 
 
 # Load demo image

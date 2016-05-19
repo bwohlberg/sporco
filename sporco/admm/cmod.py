@@ -151,7 +151,7 @@ class CnstrMOD(admm.ADMMEqual):
         # Create constraint set projection function
         self.Pcn = getPcn(opt)
 
-         # Set rho value (computed from K if not specified)
+        # Set rho value (computed from K if not specified)
         self.opt.set_K(S.shape[1])
         self.rho = self.opt['rho']
 

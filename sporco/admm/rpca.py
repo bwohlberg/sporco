@@ -11,12 +11,10 @@ from __future__ import division
 from __future__ import absolute_import
 
 import numpy as np
-from scipy import linalg
 import copy
 import collections
 
 from sporco.admm import admm
-import sporco.util as su
 import sporco.linalg as sl
 
 __author__ = """Brendt Wohlberg <brendt@ieee.org>"""

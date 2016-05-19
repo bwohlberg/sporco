@@ -12,7 +12,6 @@ from builtins import range
 from builtins import object
 
 import numpy as np
-from scipy import linalg
 from scipy import misc
 from timeit import default_timer as timer
 import os
@@ -68,13 +67,13 @@ def plot(dat, title=None, xlbl=None, ylbl=None, lgnd=None, lglc=None,
         plttyp[ptyp](dat)
     else:
         raise ValueError("Invalid plot type '%s'" % ptyp)
-    if not title is None:
+    if title is not None:
         plt.title(title)
-    if not xlbl is None:
+    if xlbl is not None:
         plt.xlabel(xlbl)
-    if not ylbl is None:
+    if ylbl is not None:
         plt.ylabel(ylbl)
-    if not lgnd is None:
+    if lgnd is not None:
         plt.legend(lgnd, loc=lglc)
     plt.show(block=block)
 
@@ -137,7 +136,7 @@ def imview(img, title=None, block=False, cmap=None, fgnm=None, fgsz=(12, 12),
 
     plt.imshow(imgd, cmap=cmap, interpolation="nearest",
                vmin=imgd.min(), vmax=imgd.max())
-    if not title is None:
+    if title is not None:
         plt.title(title)
     if cbar:
         orient = 'vertical' if img.shape[0] >= img.shape[1] else 'horizontal'

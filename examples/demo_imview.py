@@ -8,9 +8,6 @@
 
 """Basic util.imview usage example"""
 
-import numpy as np
-from scipy import misc
-
 from sporco import util
 
 

@@ -16,7 +16,6 @@ import copy
 import collections
 
 from sporco.admm import admm
-import sporco.util as su
 import sporco.linalg as sl
 
 __author__ = """Brendt Wohlberg <brendt@ieee.org>"""
@@ -248,7 +247,7 @@ class SplineL1(admm.ADMM):
         dfd = np.sum(np.abs(self.Wdf * gvr))
         reg = 0.5*linalg.norm(sl.idctii(
             self.Alpha*sl.dctii(self.X, axes=self.axes),
-                                     axes=self.axes))**2
+            axes=self.axes))**2
         obj = dfd + self.lmbda*reg
         itst = type(self).IterationStats(k, obj, dfd, reg, r, s, epri,
                                 edua, self.rho, self.xrrs, tk)

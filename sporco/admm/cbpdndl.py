@@ -19,7 +19,6 @@ import copy
 
 from sporco import util
 from sporco import cdict
-from sporco.admm import admm
 from sporco.admm import cbpdn
 from sporco.admm import ccmod
 

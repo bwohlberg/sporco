@@ -148,7 +148,7 @@ class ConstrainedDict(dict):
         # class __setitem__. Otherwise the value is itself a dict that
         # must be processed recursively via the update method.
         if not isinstance(value, dict) or \
-          isinstance(value, ConstrainedDict) or not kc in sd:
+          isinstance(value, ConstrainedDict) or kc not in sd:
             vc = value
             # If value is a dict but not a ConstrainedDict (if it is a
             # ConstrainedDict instance, it has already been
@@ -261,7 +261,7 @@ class ConstrainedDict(dict):
         for key in pth[:-1]:
             if not isinstance(c, dict):
                 raise InvalidValueError(c)
-            elif not key in c:
+            elif key not in c:
                 raise UnknownKeyError(pth)
             else:
                 c = c.__getitem__(key)
@@ -285,7 +285,7 @@ class ConstrainedDict(dict):
         for key in pth:
             if not isinstance(c, dict):
                 raise InvalidValueError(c)
-            elif not key in c:
+            elif key not in c:
                 raise UnknownKeyError(pth)
             else:
                 c = c.__getitem__(key)

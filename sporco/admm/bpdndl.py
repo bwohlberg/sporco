@@ -19,7 +19,6 @@ import copy
 
 from sporco import cdict
 from sporco import util
-from sporco.admm import admm
 from sporco.admm import bpdn
 from sporco.admm import cmod
 
@@ -160,7 +159,7 @@ class BPDNDictLearn(object):
 
         if self.opt['Verbose']:
             hdrtxt = type(self).hdrtxt
-             # Call utility function to construct status display formatting
+            # Call utility function to construct status display formatting
             hdrstr, fmtstr, nsep = util.solve_status_str(hdrtxt,
                                         type(self).fwiter, type(self).fpothr)
             # Print header and seperator strings
