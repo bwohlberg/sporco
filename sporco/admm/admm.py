@@ -647,7 +647,7 @@ class ADMMEqual(ADMM):
         """
 
         if opt is None:
-            opt = Options()
+            opt = ADMMEqual.Options()
         super(ADMMEqual, self).__init__(Nx, Nx, opt)
 
 
