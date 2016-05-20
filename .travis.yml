@@ -26,7 +26,9 @@ before_install:
     - conda update --yes conda
 
 install:
-    - conda install --yes python=$TRAVIS_PYTHON_VERSION future numpy pyfftw scipy matplotlib
+    - conda install --yes python=$TRAVIS_PYTHON_VERSION
+    - conda install --yes -c https://conda.binstar.org/richli pyfftw
+    - conda install --yes python=$TRAVIS_PYTHON_VERSION future numpy scipy matplotlib
     - python setup.py install
 
 script:
