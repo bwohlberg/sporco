@@ -1,30 +1,22 @@
 language: python
 
-
 python:
   - "2.7"
   - "3.4"
   - "3.5"
 
-
 notifications:
   email: false
-
 
 addons:
   apt:
     packages:
-    - python-numpy
-    - python-scipy
-    - python-tk
-    - python-matplotlib
     - libfftw3-dev
     - libatlas-dev
     - libatlas-base-dev
     - liblapack-dev
     - libblas-dev
     - gfortran
-
 
 before_install:
     - wget http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O miniconda.sh
@@ -33,13 +25,9 @@ before_install:
     - export PATH=/home/travis/miniconda2/bin:$PATH
     - conda update --yes conda
 
-
 install:
-    - conda install --yes python=$TRAVIS_PYTHON_VERSION numpy scipy matplotlib
-    - pip install future
-    - pip install pyfftw
+    - conda install --yes python=$TRAVIS_PYTHON_VERSION future numpy pyfftw scipy matplotlib
     - python setup.py install
-
 
 script:
     - python setup.py test
