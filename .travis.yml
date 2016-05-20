@@ -1,12 +1,15 @@
 language: python
 
+
 python:
-  - "2.7_with_system_site_packages"
+  - "2.7"
   - "3.4"
   - "3.5"
 
+
 notifications:
   email: false
+
 
 addons:
   apt:
@@ -22,22 +25,21 @@ addons:
     - libblas-dev
     - gfortran
 
+
 before_install:
-    - if [[ "${TRAVIS_PYTHON_VERSION}" != "2.7" ]]; then
-        wget http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O miniconda.sh;
-        chmod +x miniconda.sh;
-        ./miniconda.sh -b;
-        export PATH=/home/travis/miniconda2/bin:$PATH;
-        conda update --yes conda;
-      fi
+    - wget http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O miniconda.sh
+    - chmod +x miniconda.sh
+    - ./miniconda.sh -b
+    - export PATH=/home/travis/miniconda2/bin:$PATH
+    - conda update --yes conda
+
 
 install:
+    - conda install --yes python=$TRAVIS_PYTHON_VERSION atlas numpy scipy matplotlib
     - pip install future
     - pip install pyfftw
-    - if [[ "${TRAVIS_PYTHON_VERSION}" != "2.7" ]]; then
-        conda install --yes python=$TRAVIS_PYTHON_VERSION atlas numpy scipy matplotlib;
-        python setup.py install;
-      fi
+    - python setup.py install
+
 
 script:
     - python setup.py test
