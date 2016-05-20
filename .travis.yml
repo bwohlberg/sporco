@@ -29,7 +29,7 @@ install:
     - conda install --yes nomkl
     - conda install --yes python=$TRAVIS_PYTHON_VERSION
     - conda install --yes future numpy scipy matplotlib pytest
-    - conda install --yes -c https://conda.binstar.org/richli pyfftw
+    - pip install pyfftw
     - python setup.py install
 
 script:
