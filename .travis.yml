@@ -35,7 +35,7 @@ before_install:
 
 
 install:
-    - conda install --yes python=$TRAVIS_PYTHON_VERSION atlas numpy scipy matplotlib
+    - conda install --yes python=$TRAVIS_PYTHON_VERSION numpy scipy matplotlib
     - pip install future
     - pip install pyfftw
     - python setup.py install
