@@ -5,6 +5,7 @@ SPORCO Documentation
    :maxdepth: 1
 
    overview
+   install
    algorithms
    modules
    zreferences
