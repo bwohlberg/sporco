@@ -354,16 +354,16 @@ def process_signature(app, what, name, obj, options, signature,
 
 
 # See http://stackoverflow.com/questions/4427542
-def rmheader(filename, pattern):
+def rmsection(filename, pattern):
 
     pattern_compiled = re.compile(pattern)
     with tempfile.NamedTemporaryFile(mode='w', delete=False) as tmp_file:
         with open(filename) as src_file:
             for line in src_file:
                 (sline, nsub) = pattern_compiled.subn('', line)
-                if nsub > 0:
-                    next(src_file)
                 tmp_file.write(sline)
+                if nsub > 0:
+                    break
     shutil.copystat(filename, tmp_file.name)
     shutil.move(tmp_file.name, filename)
 
@@ -380,10 +380,10 @@ def run_apidoc(_):
     sphinx.apidoc.main(['sphinx-apidoc', '-e', '-d', '2', '-o', opath, module])
     rst = os.path.join(cpath, 'sporco.rst')
     if os.path.exists(rst):
-        rmheader(rst, r'^Module contents')
+        rmsection(rst, r'^Module contents')
     rst = os.path.join(cpath, 'sporco.admm.rst')
     if os.path.exists(rst):
-        rmheader(rst, r'^Module contents')
+        rmsection(rst, r'^Module contents')
 
 
 
