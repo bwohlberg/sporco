@@ -321,17 +321,6 @@ if on_rtd:
     sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
 
 
-# See https://github.com/rtfd/readthedocs.org/issues/1139
-def run_apidoc(_):
-    from sphinx.apidoc import main
-    module = '../../sporco' if on_rtd else 'sporco'
-    cpath = os.path.abspath(os.path.dirname(__file__))
-    opath = cpath
-    print("Running sphinx-apidoc with output path " + opath)
-    sys.stdout.flush()
-    main(['-e', '-o', opath, module])
-
-
 # See https://developer.ridgerun.com/wiki/index.php/How_to_generate_sphinx_documentation_for_python_code_running_in_an_embedded_system
 
 # Sort members by type
@@ -360,6 +349,18 @@ def process_signature(app, what, name, obj, options, signature,
                       return_annotation):
     if "IterationStats." in name:
         print("%s : %s, %s" % (name, signature, return_annotation))
+
+
+# See https://github.com/rtfd/readthedocs.org/issues/1139
+def run_apidoc(_):
+    import sphinx.apidoc
+    module = '../../sporco' if on_rtd else 'sporco'
+    cpath = os.path.abspath(os.path.dirname(__file__))
+    opath = cpath
+    print("Running sphinx-apidoc with output path " + opath)
+    sys.stdout.flush()
+    sphinx.apidoc.main(['sphinx-apidoc', '-e', '-d', '2', '-o', opath, module])
+
 
 
 def setup(app):
