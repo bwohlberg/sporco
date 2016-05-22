@@ -1,10 +1,26 @@
 rpca
 ====
 
-This module includes the ``RobustPCA`` class.
+This module includes the :class:`.RobustPCA` class for solving the
+problem
 
-``RobustPCA`` usage example:
+    .. math::
+       \mathrm{argmin}_{X, Y} \;
+        \| X \|_* + \lambda \| Y \|_1 \quad \text{ such that }
+	\quad X + Y = S
 
-.. literalinclude:: ../../../examples/demo_rpca.py
-   :language: python
-   :lines: 14-
+
+
+
+Usage Examples
+--------------
+
+.. container:: toggle
+
+    .. container:: header
+
+        :class:`.RobustPCA` usage
+
+    .. literalinclude:: ../../../examples/demo_rpca.py
+       :language: python
+       :lines: 14-

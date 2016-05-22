@@ -30,8 +30,8 @@ class ConvCnstrMOD(admm.ADMMEqual):
 
     .. math::
        \mathrm{argmin}_\mathbf{d} \;
-       (1/2) \|  \sum_m \mathbf{d}_m * \mathbf{x}_m - \mathbf{s} \|_2^2
-       \\text{ s.t } \|\mathbf{d}_m\|_2 = 1
+       (1/2) \sum_k \|  \sum_m \mathbf{d}_m * \mathbf{x}_{k,m} - 
+       \mathbf{s}_k \|_2^2 \quad \\text{ s.t } \quad  \|\mathbf{d}_m\|_2 = 1
 
     After termination of the :meth:`solve` method, attribute :attr:`itstat` is
     a list of tuples representing statistics of each iteration. The
@@ -40,7 +40,8 @@ class ConvCnstrMOD(admm.ADMMEqual):
        ``Iter`` : Iteration number
 
        ``DFid`` :  Value of data fidelity term \
-       :math:`(1/2) \|  \sum_m \mathbf{d}_m * \mathbf{x}_m - \mathbf{s} \|_2^2`
+       :math:`(1/2) \sum_k \|  \sum_m \mathbf{d}_m * \mathbf{x}_{k,m} -
+       \mathbf{s}_k \|_2^2`
 
        ``Cnstr`` : Constraint violation measure
 

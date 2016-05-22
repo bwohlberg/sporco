@@ -28,8 +28,8 @@ class CnstrMOD(admm.ADMMEqual):
     Solve the optimisation problem
 
     .. math::
-       \mathrm{argmin}_D \| D X - S \|_2^2 \\text{ s.t }
-       \|\mathbf{d}_m\|_2 = 1
+       \mathrm{argmin}_D \| D X - S \|_2^2 \quad \\text{ s.t }
+       \quad \|\mathbf{d}_m\|_2 = 1
 
     After termination of the :meth:`solve` method, attribute :attr:`itstat` is
     a list of tuples representing statistics of each iteration. The

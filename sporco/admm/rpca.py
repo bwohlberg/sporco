@@ -28,7 +28,8 @@ class RobustPCA(admm.ADMM):
 
     .. math::
        \mathrm{argmin}_{X, Y} \;
-        \| X \|_* + \lambda \| Y \|_1 \\text{ such that } X + Y = S
+        \| X \|_* + \lambda \| Y \|_1 \quad \\text{ such that }
+        \quad X + Y = S
 
     After termination of the :meth:`solve` method, attribute :attr:`itstat` is
     a list of tuples representing statistics of each iteration. The

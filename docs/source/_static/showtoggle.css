@@ -1,0 +1,16 @@
+/* show/hide sections: see http://stackoverflow.com/questions/2454577 */
+
+.toggle .header {
+    display: block;
+    clear: both;
+    margin-bottom: -4em;
+}
+
+.toggle .header:after {
+    content: " ▼";
+}
+
+.toggle .header.open:after {
+    content: " ▲";
+
+}

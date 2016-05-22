@@ -32,8 +32,8 @@ class BPDNDictLearn(object):
 
     .. math::
        \mathrm{argmin}_{D, X} \;
-       (1/2) \| D X - S \|_F^2 + \lambda \| X \|_1 \\text{ s.t }
-       \|\mathbf{d}_m\|_2 = 1
+       (1/2) \| D X - S \|_F^2 + \lambda \| X \|_1 \quad \\text{ s.t }
+       \quad \|\mathbf{d}_m\|_2 = 1
 
     After termination of the :meth:`solve` method, attribute :attr:`itstat` is
     a list of tuples representing statistics of each iteration. The

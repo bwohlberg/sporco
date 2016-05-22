@@ -33,9 +33,9 @@ class ConvBPDNDictLearn(object):
 
     .. math::
        \mathrm{argmin}_{\mathbf{d}, \mathbf{x}} \;
-       (1/2) \|  \sum_m \mathbf{d}_m * \mathbf{x}_m - \mathbf{s} \|_2^2 +
-       \lambda \sum_m \| \mathbf{x}_m \|_1 \\text{ s.t }
-       \|\mathbf{d}_m\|_2 = 1
+       (1/2) \sum_k \|  \sum_m \mathbf{d}_m * \mathbf{x}_{k,m} -
+       \mathbf{s}_k \|_2^2 + \lambda \sum_k \sum_m \| \mathbf{x}_{k,m} \|_1
+       \quad \\text{ s.t } \quad \|\mathbf{d}_m\|_2 = 1
 
     After termination of the :meth:`solve` method, attribute :attr:`itstat` is
     a list of tuples representing statistics of each iteration. The
@@ -46,10 +46,11 @@ class ConvBPDNDictLearn(object):
        ``ObjFun`` : Objective function value
 
        ``DFid`` :  Value of data fidelity term \
-       :math:`(1/2) \|  \sum_m \mathbf{d}_m * \mathbf{x}_m - \mathbf{s} \|_2^2`
+       :math:`(1/2) \sum_k \|  \sum_m \mathbf{d}_m * \mathbf{x}_{k,m} -
+       \mathbf{s}_k \|_2^2`
 
        ``Reg`` : Value of regularisation term \
-       :math:`\sum_m \| \mathbf{x}_m \|_1`
+       :math:`\sum_k \sum_m \| \mathbf{x}_{k,m} \|_1`
 
        ``XPrRsdl`` : Norm of X primal residual
 

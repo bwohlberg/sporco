@@ -2,7 +2,7 @@ Algorithms
 ==========
 
 SPORCO provides algorithms for solving optimisation problems within
-the following categories.
+the following categories:
 
 
 Standard Sparse Representations
