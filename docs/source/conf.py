@@ -14,7 +14,8 @@
 
 import sys
 import os
-from itertools import ifilter
+from builtins import next
+from builtins import filter
 from ast import parse
 
 # If extensions (or modules to document with autodoc) are in another directory,
@@ -68,7 +69,7 @@ copyright = u'2015-2016, Brendt Wohlberg'
 #
 # The short X.Y version.
 with open(os.path.join('../../sporco', '__init__.py')) as f:
-    version = parse(next(ifilter(
+    version = parse(next(filter(
         lambda line: line.startswith('__version__'),
         f))).body[0].value.s
 # The full version, including alpha/beta/rc tags.
@@ -328,9 +329,6 @@ def run_apidoc(_):
     opath = cpath
     print("Running sphinx-apidoc with output path " + opath)
     sys.stdout.flush()
-    #print(os.listdir('.'))
-    #print('\n')
-    #print(os.listdir('../..'))
     main(['-e', '-o', opath, module])
 
 
@@ -351,9 +349,9 @@ def skip_member(app, what, name, obj, skip, options):
 
 def process_docstring(app, what, name, obj, options, lines):
     if "IterationStats." in name:
-        print "------> %s" % name
+        print("------> %s" % name)
         for n in xrange(len(lines)):
-            print lines[n]
+            print(lines[n])
         #for n in xrange(len(lines)):
         #    lines[n] = ''
 
@@ -361,7 +359,7 @@ def process_docstring(app, what, name, obj, options, lines):
 def process_signature(app, what, name, obj, options, signature,
                       return_annotation):
     if "IterationStats." in name:
-        print "%s : %s, %s" % (name, signature, return_annotation)
+        print("%s : %s, %s" % (name, signature, return_annotation))
 
 
 def setup(app):
