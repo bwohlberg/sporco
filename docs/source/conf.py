@@ -17,6 +17,8 @@ import os
 from builtins import next
 from builtins import filter
 from ast import parse
+import re, shutil, tempfile
+
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -351,6 +353,22 @@ def process_signature(app, what, name, obj, options, signature,
         print("%s : %s, %s" % (name, signature, return_annotation))
 
 
+# See http://stackoverflow.com/questions/4427542
+def rmheader(filename, pattern):
+
+    pattern_compiled = re.compile(pattern)
+    with tempfile.NamedTemporaryFile(mode='w', delete=False) as tmp_file:
+        with open(filename) as src_file:
+            for line in src_file:
+                (sline, nsub) = pattern_compiled.subn('', line)
+                if nsub > 0:
+                    next(src_file)
+                tmp_file.write(sline)
+    shutil.copystat(filename, tmp_file.name)
+    shutil.move(tmp_file.name, filename)
+
+
+
 # See https://github.com/rtfd/readthedocs.org/issues/1139
 def run_apidoc(_):
     import sphinx.apidoc
@@ -360,6 +378,12 @@ def run_apidoc(_):
     print("Running sphinx-apidoc with output path " + opath)
     sys.stdout.flush()
     sphinx.apidoc.main(['sphinx-apidoc', '-e', '-d', '2', '-o', opath, module])
+    rst = os.path.join(cpath, 'sporco.rst')
+    if os.path.exists(rst):
+        rmheader(rst, r'^Module contents')
+    rst = os.path.join(cpath, 'sporco.admm.rst')
+    if os.path.exists(rst):
+        rmheader(rst, r'^Module contents')
 
 
 
