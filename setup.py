@@ -11,6 +11,8 @@ from distutils.command import build as build_module
 import urllib.request, urllib.error, urllib.parse
 import io
 import os.path
+from itertools import ifilter
+from ast import parse
 import numpy as np
 import scipy.misc
 
@@ -67,7 +69,11 @@ class build(build_module.build):
 
 
 name = 'sporco'
-version = '0.0.2.dev0'
+# See http://stackoverflow.com/questions/2058802
+with open(os.path.join(name, '__init__.py')) as f:
+    version = parse(next(ifilter(
+        lambda line: line.startswith('__version__'),
+        f))).body[0].value.s
 
 packages = ['sporco', 'sporco.admm']
 
