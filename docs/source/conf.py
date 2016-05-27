@@ -307,6 +307,12 @@ texinfo_documents = [
 on_rtd = os.environ.get('READTHEDOCS') == 'True'
 
 if on_rtd:
+    print('Building on ReadTheDocs')
+    print
+    print("Current working directory: {}" . format(os.path.abspath(os.curdir)))
+    print("Python: {}" . format(sys.executable))
+
+if on_rtd:
     if sys.version[0] == '3':
         from unittest.mock import MagicMock
     elif sys.version[0] == '2':
@@ -378,12 +384,12 @@ def run_apidoc(_):
     print("Running sphinx-apidoc with output path " + opath)
     sys.stdout.flush()
     sphinx.apidoc.main(['sphinx-apidoc', '-e', '-d', '2', '-o', opath, module])
-    rst = os.path.join(cpath, 'sporco.rst')
-    if os.path.exists(rst):
-        rmsection(rst, r'^Module contents')
-    rst = os.path.join(cpath, 'sporco.admm.rst')
-    if os.path.exists(rst):
-        rmsection(rst, r'^Module contents')
+    #rst = os.path.join(cpath, 'sporco.rst')
+    #if os.path.exists(rst):
+    #    rmsection(rst, r'^Module contents')
+    #rst = os.path.join(cpath, 'sporco.admm.rst')
+    #if os.path.exists(rst):
+    #    rmsection(rst, r'^Module contents')
 
 
 
