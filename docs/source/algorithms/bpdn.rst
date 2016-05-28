@@ -10,7 +10,7 @@ classes, solving the following problems:
        \mathrm{argmin}_\mathbf{x} \;
        (1/2) \| D \mathbf{x} - \mathbf{s} \|_2^2 + \lambda \| \mathbf{x} \|_1
 
-or
+    or
 
     .. math::
        \mathrm{argmin}_X \;
@@ -23,7 +23,7 @@ or
        (1/2) \| D \mathbf{x} - \mathbf{s} \|_2^2 + \lambda \| \mathbf{x} \|_1
                                                  + (\mu/2) \| \mathbf{x} \|_2^2
 
-or
+    or
 
     .. math::
        \mathrm{argmin}_X \;

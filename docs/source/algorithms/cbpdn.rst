@@ -11,7 +11,7 @@ classes, solving the following problems:
        (1/2) \|  \sum_m \mathbf{d}_m * \mathbf{x}_m - \mathbf{s} \|_2^2 +
        \lambda \sum_m \| \mathbf{x}_m \|_1
 
-or
+    or
 
     .. math::
        \mathrm{argmin}_\mathbf{x} \;
@@ -27,13 +27,13 @@ or
        \lambda \sum_m \| \mathbf{x}_m \|_1 +
        (\mu/2) \sum_m \| \mathbf{x}_m \|_2^2
 
-or
+   or
 
-    .. math::
-       \mathrm{argmin}_\mathbf{x} \;
-       (1/2) \sum_k \| \sum_m \mathbf{d}_m * \mathbf{x}_{k,m} -
-       \mathbf{s}_k \|_2^2 + \lambda \sum_k \sum_m \| \mathbf{x}_{k,m} \|_1
-       + (\mu/2) \sum_k \sum_m \| \mathbf{x}_{k,m} \|_2^2
+   .. math::
+      \mathrm{argmin}_\mathbf{x} \;
+      (1/2) \sum_k \| \sum_m \mathbf{d}_m * \mathbf{x}_{k,m} -
+      \mathbf{s}_k \|_2^2 + \lambda \sum_k \sum_m \| \mathbf{x}_{k,m} \|_1
+      + (\mu/2) \sum_k \sum_m \| \mathbf{x}_{k,m} \|_2^2
 
 
 
