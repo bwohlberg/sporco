@@ -2,7 +2,7 @@ SParse Optimization Research COde (SPORCO)
 ==========================================
 
 
-.. image:: https://travis-ci.org/bwohlberg/sporco.svg
+.. image:: https://travis-ci.org/bwohlberg/sporco.svg?branch=master
     :target: https://travis-ci.org/bwohlberg/sporco
     :alt: Build Status
 .. image:: https://landscape.io/github/bwohlberg/sporco/master/landscape.svg?style=flat
