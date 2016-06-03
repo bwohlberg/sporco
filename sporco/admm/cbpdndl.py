@@ -17,6 +17,7 @@ from scipy import linalg
 import collections
 import copy
 
+import sporco.linalg as sl
 from sporco import util
 from sporco import cdict
 from sporco.admm import cbpdn
@@ -177,11 +178,11 @@ class ConvBPDNDictLearn(object):
         D0 = ccmod.normalise(ccmod.bcrop(D0, dsz, dimN), axisN)
 
         # Initialise ConvBPDN and ConvCnstrMOD objects
-        self.cbpdn = cbpdn.ConvBPDN(D0, S, lmbda, opt['CBPDN'])
+        self.cbpdn = cbpdn.ConvBPDN(D0, S, lmbda, opt['CBPDN'], dimN)
         opt['CCMOD'].update({'Y0' : ccmod.zpad(
             ccmod.stdformD(D0, C, M, dimN), Nv),
                              'U0' : np.zeros(Nv + (C,) + (1,) + (M,))})
-        self.ccmod = ccmod.ConvCnstrMOD(None, S, dsz, opt['CCMOD'])
+        self.ccmod = ccmod.ConvCnstrMOD(None, S, dsz, opt['CCMOD'], dimN, dimK)
 
         self.itstat = []
         self.j = 0
@@ -219,7 +220,8 @@ class ConvBPDNDictLearn(object):
             # Compute functional value etc.
             Ef = np.sum(self.cbpdn.Df * self.ccmod.Af, axis=self.cbpdn.axisM,
                         keepdims=True) - self.cbpdn.Sf
-            dfd = 0.5*(linalg.norm(Ef)**2)/self.cbpdn.N
+            dfd = sl.rfl2norm2(Ef, self.cbpdn.S.shape,
+                               axis=tuple(range(self.cbpdn.dimN)))/2.0
             l1n = linalg.norm(self.cbpdn.Y.ravel(), 1)
             obj = dfd + self.cbpdn.lmbda*l1n
             cns = linalg.norm((self.ccmod.Pcn(self.ccmod.X) - self.ccmod.X))
