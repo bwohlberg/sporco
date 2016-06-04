@@ -45,11 +45,11 @@ class build(build_module.build):
       urllst = {'lena.png' :
                 'http://sipi.usc.edu/database/misc/4.2.04.tiff',
                 'lena.grey.png' :
-                'https://web.archive.org/web/20070328214632/http://decsai.ugr.es/~javier/denoise/lena.png',
+                'http://web.archive.org/web/20070328214632/http://decsai.ugr.es/~javier/denoise/lena.png',
                 'barbara.png' :
                 'http://www.hlevkin.com/TestImages/barbara.bmp',
                 'barbara.grey.png' :
-                'https://web.archive.org/web/20070209141039/http://decsai.ugr.es/~javier/denoise/barbara.png',
+                'http://web.archive.org/web/20070209141039/http://decsai.ugr.es/~javier/denoise/barbara.png',
                 'mandrill.tif' :
                 'http://sipi.usc.edu/database/misc/4.2.03.tiff',
                 'man.grey.tif' :
