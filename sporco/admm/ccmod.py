@@ -346,7 +346,7 @@ class ConvCnstrMOD(admm.ADMMEqual):
                                 self.opt['CG', 'MaxIter'], self.Xf)
             self.cgit = cgit
 
-        self.X = sl.irfftn(self.Xf, None, self.axisN)
+        self.X = sl.irfftn(self.Xf, self.Nv, self.axisN)
 
         if self.opt['LinSolveCheck']:
             Aop = lambda x: np.sum(self.Af * x, axis=self.axisM, keepdims=True)
