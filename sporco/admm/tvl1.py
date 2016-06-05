@@ -25,7 +25,7 @@ __author__ = """Brendt Wohlberg <brendt@ieee.org>"""
 
 class TVL1Denoise(admm.ADMM):
     """ADMM algorithm for :math:`\ell^1`-TV denoising problem
-    :cite:`alliney-1992-digital` :cite:`esser-2010-primal` (Sec. 2.4.4)
+    :cite:`alliney-1992-digital` :cite:`esser-2010-primal` (Sec. 2.4.4).
 
     Solve the optimisation problem
 
@@ -366,7 +366,7 @@ class TVL1Denoise(admm.ADMM):
 
 
 class TVL1Deconv(admm.ADMM):
-    """ADMM algorithm for :math:`\ell^1`-TV deconvolution problem
+    """ADMM algorithm for :math:`\ell^1`-TV deconvolution problem.
 
     Solve the optimisation problem
 

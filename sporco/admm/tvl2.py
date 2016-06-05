@@ -337,7 +337,7 @@ class TVL2Denoise(admm.ADMM):
 
 
 class TVL2Deconv(admm.ADMM):
-    """ADMM algorithm for :math:`\ell^2`-TV deconvolution problem
+    """ADMM algorithm for :math:`\ell^2`-TV deconvolution problem.
 
     Solve the optimisation problem
 
