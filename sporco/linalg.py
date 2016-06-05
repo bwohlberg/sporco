@@ -97,8 +97,9 @@ def fftn(a, s=None, axes=None):
       DFT of input array
     """
 
-    return pyfftw.interfaces.numpy_fft.fftn(a, s, axes, False,
-                    'FFTW_MEASURE', multiprocessing.cpu_count())
+    return pyfftw.interfaces.numpy_fft.fftn(a, s=s, axes=axes, 
+                    overwrite_input=False, planner_effort='FFTW_MEASURE',
+                    threads=multiprocessing.cpu_count())
 
 
 
@@ -125,8 +126,9 @@ def ifftn(a, s=None, axes=None):
       Inverse DFT of input array
     """
 
-    return pyfftw.interfaces.numpy_fft.ifftn(a, s, axes, False,
-                    'FFTW_MEASURE', multiprocessing.cpu_count())
+    return pyfftw.interfaces.numpy_fft.ifftn(a, s=s, axes=axes,
+                    overwrite_input=False, planner_effort='FFTW_MEASURE',
+                    threads=multiprocessing.cpu_count())
 
 
 
@@ -153,8 +155,9 @@ def rfftn(a, s=None, axes=None):
       DFT of input array
     """
 
-    return pyfftw.interfaces.numpy_fft.rfftn(a, s, axes, False,
-                    'FFTW_MEASURE', multiprocessing.cpu_count())
+    return pyfftw.interfaces.numpy_fft.rfftn(a, s=s, axes=axes,
+                    overwrite_input=False, planner_effort='FFTW_MEASURE',
+                    threads=multiprocessing.cpu_count())
 
 
 
@@ -182,8 +185,9 @@ def irfftn(a, s=None, axes=None):
       Inverse DFT of input array
     """
 
-    return pyfftw.interfaces.numpy_fft.irfftn(a, s, axes, False,
-                    'FFTW_MEASURE', multiprocessing.cpu_count())
+    return pyfftw.interfaces.numpy_fft.irfftn(a, s=s, axes=axes,
+                    overwrite_input=False, planner_effort='FFTW_MEASURE',
+                    threads=multiprocessing.cpu_count())
 
 
 

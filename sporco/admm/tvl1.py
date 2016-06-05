@@ -363,8 +363,6 @@ class TVL1Denoise(admm.ADMM):
 
 
 
-
-
 class TVL1Deconv(admm.ADMM):
     """ADMM algorithm for :math:`\ell^1`-TV deconvolution problem.
 

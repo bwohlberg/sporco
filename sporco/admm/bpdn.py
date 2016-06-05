@@ -23,7 +23,7 @@ __author__ = """Brendt Wohlberg <brendt@ieee.org>"""
 
 class BPDN(admm.ADMMEqual):
     """ADMM algorithm for the Basis Pursuit DeNoising (BPDN)
-    :cite:`chen-1998-atomic` problem
+    :cite:`chen-1998-atomic` problem.
 
     Solve the optimisation problem
 
