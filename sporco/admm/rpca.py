@@ -22,14 +22,17 @@ __author__ = """Brendt Wohlberg <brendt@ieee.org>"""
 
 class RobustPCA(admm.ADMM):
     """ADMM algorithm for Robust PCA problem :cite:`candes-2011-robust`
-    :cite:`cai-2010-singular`
+    :cite:`cai-2010-singular`.
    
-    Solve the Robust PCA provlem
+    Solve the optimisation problem
 
     .. math::
        \mathrm{argmin}_{X, Y} \;
-        \| X \|_* + \lambda \| Y \|_1 \quad \\text{ such that }
-        \quad X + Y = S
+        \| X \|_* + \lambda \| Y \|_1 \quad \\text{such that}
+        \quad X + Y = S \;\;.
+
+    This problem is unusual in that it is already in ADMM form without
+    the need for any variable splitting.
 
     After termination of the :meth:`solve` method, attribute :attr:`itstat` is
     a list of tuples representing statistics of each iteration. The
@@ -58,6 +61,7 @@ class RobustPCA(admm.ADMM):
        ``Rho`` : Penalty parameter
 
        ``Time`` : Cumulative run time
+
     """
 
 

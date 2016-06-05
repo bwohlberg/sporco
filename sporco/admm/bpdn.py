@@ -31,6 +31,13 @@ class BPDN(admm.ADMMEqual):
        \mathrm{argmin}_\mathbf{x} \;
        (1/2) \| D \mathbf{x} - \mathbf{s} \|_2^2 + \lambda \| \mathbf{x} \|_1
 
+    via the ADMM problem
+
+    .. math::
+       \mathrm{argmin}_\mathbf{x} \;
+       (1/2) \| D \mathbf{x} - \mathbf{s} \|_2^2 + \lambda \| \mathbf{y} \|_1
+       \quad \\text{such that} \quad \mathbf{x} = \mathbf{y} \;\;.
+
     After termination of the :meth:`solve` method, attribute :attr:`itstat` is
     a list of tuples representing statistics of each iteration. The
     fields of the named tuple ``IterationStats`` are:
@@ -277,14 +284,22 @@ def linsolve(D, rho, lu, piv, b):
 
 class ElasticNet(BPDN):
     """ADMM algorithm for the elastic net :cite:`zou-2005-regularization`
-    problem
+    problem.
 
     Solve the optimisation problem
 
     .. math::
        \mathrm{argmin}_\mathbf{x} \;
        (1/2) \| D \mathbf{x} - \mathbf{s} \|_2^2 + \lambda \| \mathbf{x} \|_1
-                                                 + (\mu/2) \| \mathbf{x} \|_2^2
+       + (\mu/2) \| \mathbf{x} \|_2^2
+
+    via the ADMM problem
+
+    .. math::
+       \mathrm{argmin}_\mathbf{x} \;
+       (1/2) \| D \mathbf{x} - \mathbf{s} \|_2^2 + \lambda \| \mathbf{y} \|_1
+       + (\mu/2) \| \mathbf{x} \|_2^2 \quad \\text{such that} \quad 
+       \mathbf{x} = \mathbf{y} \;\;.
 
     After termination of the :meth:`solve` method, attribute :attr:`itstat` is
     a list of tuples representing statistics of each iteration. The

@@ -26,14 +26,14 @@ __author__ = """Brendt Wohlberg <brendt@ieee.org>"""
 
 class ADMM(object):
     """Base class for Alternating Direction Method of Multipliers (ADMM)
-    algorithms :cite:`boyd-2010-distributed`
+    algorithms :cite:`boyd-2010-distributed`.
 
     Solve an optimisation problems of the form
 
     .. math::
        \mathrm{argmin}_{\mathbf{x},\mathbf{y}} \;
        f(\mathbf{x}) + g(\mathbf{y}) \;\mathrm{such\;that}\;
-       A\mathbf{x} + B\mathbf{y} = \mathbf{c}
+       A\mathbf{x} + B\mathbf{y} = \mathbf{c} \;\;.
 
     This class is intended to be a base class of other classes that
     specialise to specific optimisation problems.
@@ -588,14 +588,14 @@ class ADMM(object):
 
 
 class ADMMEqual(ADMM):
-    """Base class for ADMM algorithms with a simple equality constraint
+    """Base class for ADMM algorithms with a simple equality constraint.
 
     Solve optimisation problems of the form
 
     .. math::
        \mathrm{argmin}_{\mathbf{x},\mathbf{y}} \;
        f(\mathbf{x}) + g(\mathbf{y}) \;\mathrm{such\;that}\;
-       \mathbf{x} = \mathbf{y}
+       \mathbf{x} = \mathbf{y} \;\;.
 
     This class specialises class ADMM, but remains a base class for
     other classes that specialise to specific optimisation problems.

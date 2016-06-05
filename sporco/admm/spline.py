@@ -22,19 +22,28 @@ __author__ = """Brendt Wohlberg <brendt@ieee.org>"""
 
 
 class SplineL1(admm.ADMM):
-    """ADMM algorithm for :math:`\ell^1`-spline fitting problem
-    :cite:`garcia-2010-robust`, :cite:`tepper-2013-fast`
+    """ADMM algorithm for the :math:`\ell^1`-spline problem
+    for equi-spaced samples :cite:`garcia-2010-robust`,
+    :cite:`tepper-2013-fast`.
    
-    Solve the :math:`\ell^1`-spline problem for equi-spaced samples
+    Solve the optimisation problem
 
     .. math::
        \mathrm{argmin}_\mathbf{x} \;
         \| W(\mathbf{x} - \mathbf{s}) \|_1 + \\frac{\lambda}{2} \;
-        \| D \mathbf{x} \|_2^2
+        \| D \mathbf{x} \|_2^2 \;\;,
 
     where :math:`D = \\left( \\begin{array}{ccc} -1 & 1 & & & \\\\ 
     1 & -2 & 1 & & \\\\ & \\ddots & \\ddots & \ddots &  \\\\ 
-    & & 1 & -2 & 1 \\\\ & & & 1 & -1 \\end{array} \\right)`
+    & & 1 & -2 & 1 \\\\ & & & 1 & -1 \\end{array} \\right)`,
+
+    via the ADMM problem
+
+    .. math::
+       \mathrm{argmin}_{\mathbf{x}, \mathbf{y}} \;
+        \| W \mathbf{y} \|_1 + \\frac{\lambda}{2} \;
+        \| D \mathbf{x} \|_2^2  \;\; \\text{such that} \;\; 
+        \mathbf{x} - \mathbf{y} = \mathbf{s} \;\;.
 
     After termination of the :meth:`solve` method, attribute :attr:`itstat` is
     a list of tuples representing statistics of each iteration. The

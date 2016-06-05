@@ -32,8 +32,11 @@ class BPDNDictLearn(object):
 
     .. math::
        \mathrm{argmin}_{D, X} \;
-       (1/2) \| D X - S \|_F^2 + \lambda \| X \|_1 \quad \\text{ s.t }
+       (1/2) \| D X - S \|_F^2 + \lambda \| X \|_1 \quad \\text{such that}
        \quad \|\mathbf{d}_m\|_2 = 1
+
+    via interleaved alternation between the ADMM steps of the
+    :class:`.BPDN` and :class:`.CnstrMOD` problems.
 
     After termination of the :meth:`solve` method, attribute :attr:`itstat` is
     a list of tuples representing statistics of each iteration. The

@@ -23,13 +23,23 @@ __author__ = """Brendt Wohlberg <brendt@ieee.org>"""
 class CnstrMOD(admm.ADMMEqual):
     """ADMM algorithm for a constrained variant of the Method of Optimal
     Directions (MOD) :cite:`engan-1999-method` problem, referred to here
-    as Constrained MOD (CMOD)
+    as Constrained MOD (CMOD).
 
     Solve the optimisation problem
 
     .. math::
-       \mathrm{argmin}_D \| D X - S \|_2^2 \quad \\text{ s.t }
-       \quad \|\mathbf{d}_m\|_2 = 1
+       \mathrm{argmin}_D \| D X - S \|_2^2 \quad \\text{such that}
+       \quad \| \mathbf{d}_m \|_2 = 1 \;\;,
+
+    where :math:`\mathbf{d}_m` is column :math:`m` of matrix :math:`D`,
+    via the ADMM problem
+
+    .. math::
+       \mathrm{argmin}_D \| D X - S \|_2^2 + \iota_C(G) \quad
+       \\text{such that} \quad D = G \;\;,
+
+    where :math:`\iota_C(\cdot)` is the indicator function of feasible
+    set :math:`C` consisting of matrices with unit-norm columns.
 
     After termination of the :meth:`solve` method, attribute :attr:`itstat` is
     a list of tuples representing statistics of each iteration. The

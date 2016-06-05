@@ -28,15 +28,19 @@ __author__ = """Brendt Wohlberg <brendt@ieee.org>"""
 
 class ConvBPDNDictLearn(object):
     """Dictionary learning based on CBPDN and CCMOD
-    :cite:`wohlberg-2016-efficient`
+    :cite:`wohlberg-2016-efficient`.
 
     Solve the optimisation problem
 
     .. math::
        \mathrm{argmin}_{\mathbf{d}, \mathbf{x}} \;
-       (1/2) \sum_k \|  \sum_m \mathbf{d}_m * \mathbf{x}_{k,m} -
-       \mathbf{s}_k \|_2^2 + \lambda \sum_k \sum_m \| \mathbf{x}_{k,m} \|_1
-       \quad \\text{ s.t } \quad \|\mathbf{d}_m\|_2 = 1
+       (1/2) \sum_k \\left \|  \sum_m \mathbf{d}_m * \mathbf{x}_{k,m} -
+       \mathbf{s}_k \\right \|_2^2 + \lambda \sum_k \sum_m
+       \| \mathbf{x}_{k,m} \|_1 \quad \\text{such that}
+       \quad \|\mathbf{d}_m\|_2 = 1
+
+    via interleaved alternation between the ADMM steps of the
+    :class:`.ConvBPDN` and :class:`.ConvCnstrMOD` problems.
 
     After termination of the :meth:`solve` method, attribute :attr:`itstat` is
     a list of tuples representing statistics of each iteration. The

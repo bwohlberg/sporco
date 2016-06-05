@@ -27,13 +27,26 @@ class TVL1Denoise(admm.ADMM):
     """ADMM algorithm for :math:`\ell^1`-TV denoising problem
     :cite:`alliney-1992-digital` :cite:`esser-2010-primal` (Sec. 2.4.4)
 
-    Solve the problem
+    Solve the optimisation problem
 
     .. math::
        \mathrm{argmin}_\mathbf{x} \;
         \| W_{\mathrm{df}}  (\mathbf{x} - \mathbf{s}) \|_1 +
-             \lambda \| W_{\mathrm{tv}} \sqrt{(G_r \mathbf{x})^2 + 
-             (G_c \mathbf{x})^2}\|_1
+             \lambda \\left\| W_{\mathrm{tv}} \sqrt{(G_r \mathbf{x})^2 + 
+             (G_c \mathbf{x})^2} \\right\|_1
+
+    via the ADMM problem
+
+    .. math::
+       \mathrm{argmin}_{\mathbf{x},\mathbf{y}_d,\mathbf{y}_r,\mathbf{y}_c} \;
+       (1/2) \| W_{\mathrm{df}} \mathbf{y}_d \|_1 +
+             \lambda \\left\| W_{\mathrm{tv}} \sqrt{(\mathbf{y}_r)^2 + 
+             (\mathbf{y}_c)^2} \\right\|_1 \;\\text{such that}\;
+       \\left( \\begin{array}{c} G_r \\\\ G_c \\\\ I \\end{array} \\right)
+       \mathbf{x}  - \\left( \\begin{array}{c} \mathbf{y}_r \\\\
+       \mathbf{y}_c \\\\ \mathbf{y}_d \\end{array}
+       \\right) = \\left( \\begin{array}{c} \mathbf{0} \\\\ \mathbf{0} \\\\
+       \mathbf{s} \\end{array} \\right) \;\;.
 
     After termination of the :meth:`solve` method, attribute :attr:`itstat` is
     a list of tuples representing statistics of each iteration. The
@@ -359,9 +372,23 @@ class TVL1Deconv(admm.ADMM):
 
     .. math::
        \mathrm{argmin}_\mathbf{x} \;
-       \| A * \mathbf{x} - \mathbf{s} \|_1 +
-       \lambda \| W_{\mathrm{tv}} \sqrt{(G_r \mathbf{x})^2 +
-       (G_c \mathbf{x})^2} \|_1
+       \| A \mathbf{x} - \mathbf{s} \|_1 +
+       \lambda \\left\| W_{\mathrm{tv}} \sqrt{(G_r \mathbf{x})^2 +
+       (G_c \mathbf{x})^2} \\right\|_1 \;\;,
+
+    where :math:`A` denotes the linear operator corresponding to a
+    convolution, via the ADMM problem
+
+    .. math::
+       \mathrm{argmin}_{\mathbf{x},\mathbf{y}_d,\mathbf{y}_r,\mathbf{y}_c} \;
+       (1/2) \| \mathbf{y}_d \|_1 +
+             \lambda \\left\| W_{\mathrm{tv}} \sqrt{(\mathbf{y}_r)^2 + 
+             (\mathbf{y}_c)^2} \\right\|_1 \;\\text{such that}\;
+       \\left( \\begin{array}{c} G_r \\\\ G_c \\\\ A \\end{array} \\right)
+       \mathbf{x}  - \\left( \\begin{array}{c} \mathbf{y}_r \\\\
+       \mathbf{y}_c \\\\ \mathbf{y}_d \\end{array}
+       \\right) = \\left( \\begin{array}{c} \mathbf{0} \\\\ \mathbf{0} \\\\
+       \mathbf{s} \\end{array} \\right) \;\;.
 
     After termination of the :meth:`solve` method, attribute :attr:`itstat` is
     a list of tuples representing statistics of each iteration. The
@@ -393,6 +420,7 @@ class TVL1Deconv(admm.ADMM):
        ``XSlvRelRes`` : Relative residual of X step solver
 
        ``Time`` : Cumulative run time
+
     """
 
 

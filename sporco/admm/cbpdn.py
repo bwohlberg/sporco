@@ -24,8 +24,9 @@ __author__ = """Brendt Wohlberg <brendt@ieee.org>"""
 
 class ConvRepIndexing(object):
     """Manage the inference of problem dimensions and the roles of ndarray
-    indices for convolutional representations as in ConvBPDN and related
-    classes."""
+    indices for convolutional representations as in :class:`.ConvBPDN`
+    and related classes.
+    """
 
     def __init__(self, D, S, dimN=2):
         """Initialise a ConvRepIndexing object, inferring the problem
@@ -89,14 +90,23 @@ class ConvBPDN(admm.ADMMEqual):
 
     """ADMM algorithm for the Convolutional BPDN (CBPDN)
     :cite:`wohlberg-2014-efficient` :cite:`wohlberg-2016-efficient`
-    :cite:`wohlberg-2016-convolutional` problem
+    :cite:`wohlberg-2016-convolutional` problem.
 
     Solve the optimisation problem
 
     .. math::
        \mathrm{argmin}_\mathbf{x} \;
-       (1/2) \|  \sum_m \mathbf{d}_m * \mathbf{x}_m - \mathbf{s} \|_2^2 +
-       \lambda \sum_m \| \mathbf{x}_m \|_1
+       (1/2) \\left\| \sum_m \mathbf{d}_m * \mathbf{x}_m -
+       \mathbf{s} \\right\|_2^2 + \lambda \sum_m \| \mathbf{x}_m \|_1
+
+    via the ADMM problem
+
+    .. math::
+       \mathrm{argmin}_{\mathbf{x}, \mathbf{y}} \;
+       (1/2) \\left\| \sum_m \mathbf{d}_m * \mathbf{x}_m -
+       \mathbf{s} \\right\|_2^2 + \lambda \sum_m \| \mathbf{y}_m \|_1
+       \quad \\text{such that} \quad \mathbf{x}_m = \mathbf{y}_m \;\;.
+
 
     After termination of the :meth:`solve` method, attribute :attr:`itstat` is
     a list of tuples representing statistics of each iteration. The
@@ -107,7 +117,7 @@ class ConvBPDN(admm.ADMMEqual):
        ``ObjFun`` : Objective function value
 
        ``DFid`` :  Value of data fidelity term \
-       :math:`(1/2) \|  \sum_m \mathbf{d}_m * \mathbf{x}_m - \mathbf{s} \|_2^2`
+       :math:`(1/2) \| \sum_m \mathbf{d}_m * \mathbf{x}_m - \mathbf{s} \|_2^2`
 
        ``RegL1`` : Value of regularisation term \
        :math:`\sum_m \| \mathbf{x}_m \|_1`
@@ -432,15 +442,25 @@ class ConvBPDN(admm.ADMMEqual):
 
 
 class ConvElasticNet(ConvBPDN):
-    """ADMM algorithm for the convolutional elastic net problem
+    """ADMM algorithm for a convolutional form of the elastic net problem
+    :cite:`zou-2005-regularization`.
 
     Solve the optimisation problem
 
     .. math::
        \mathrm{argmin}_\mathbf{x} \;
-       (1/2) \|  \sum_m \mathbf{d}_m * \mathbf{x}_m - \mathbf{s} \|_2^2 +
-       \lambda \sum_m \| \mathbf{x}_m \|_1 +
+       (1/2) \\left\| \sum_m \mathbf{d}_m * \mathbf{x}_m - \mathbf{s}
+       \\right\|_2^2 + \lambda \sum_m \| \mathbf{x}_m \|_1 +
        (\mu/2) \sum_m \| \mathbf{x}_m \|_2^2
+
+    via the ADMM problem
+
+    .. math::
+       \mathrm{argmin}_{\mathbf{x}, \mathbf{y}} \;
+       (1/2) \\left\| \sum_m \mathbf{d}_m * \mathbf{x}_m -
+       \mathbf{s} \\right\|_2^2 + \lambda \sum_m \| \mathbf{y}_m \|_1
+       + (\mu/2) \sum_m \| \mathbf{x}_m \|_2^2
+       \quad \\text{such that} \quad \mathbf{x}_m = \mathbf{y}_m \;\;.
 
     After termination of the :meth:`solve` method, attribute :attr:`itstat` is
     a list of tuples representing statistics of each iteration. The

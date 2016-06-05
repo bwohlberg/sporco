@@ -25,15 +25,27 @@ __author__ = """Brendt Wohlberg <brendt@ieee.org>"""
 
 class TVL2Denoise(admm.ADMM):
     """ADMM algorithm for :math:`\ell^2`-TV denoising problem
-    :cite:`rudin-1992-nonlinear`, :cite:`goldstein-2009-split`
+    :cite:`rudin-1992-nonlinear`, :cite:`goldstein-2009-split`.
 
-    Solve the problem
+    Solve the optimisation problem
 
     .. math::
        \mathrm{argmin}_\mathbf{x} \;
        (1/2) \| W_{\mathrm{df}}(\mathbf{x} - \mathbf{s}) \|_2^2 +
-             \lambda \| W_{\mathrm{tv}} \sqrt{(G_r \mathbf{x})^2 + 
-             (G_c \mathbf{x})^2}\|_1
+             \lambda \\left\| W_{\mathrm{tv}} \sqrt{(G_r \mathbf{x})^2 + 
+             (G_c \mathbf{x})^2} \\right\|_1
+
+    via the ADMM problem
+
+    .. math::
+       \mathrm{argmin}_{\mathbf{x},\mathbf{y}_r,\mathbf{y}_c} \;
+       (1/2) \| W_{\mathrm{df}}(\mathbf{x} - \mathbf{s}) \|_2^2 +
+             \lambda \\left\| W_{\mathrm{tv}} \sqrt{(\mathbf{y}_r)^2 + 
+             (\mathbf{y}_c)^2} \\right\|_1 \;\\text{such that}\;
+       \\left( \\begin{array}{c} G_r \\\\ G_c \\end{array} \\right) \mathbf{x}
+       - \\left( \\begin{array}{c} \mathbf{y}_r \\\\ \mathbf{y}_c \\end{array}
+       \\right) = \\left( \\begin{array}{c} \mathbf{0} \\\\
+       \mathbf{0} \\end{array} \\right) \;\;.
 
     After termination of the :meth:`solve` method, attribute :attr:`itstat` is
     a list of tuples representing statistics of each iteration. The
@@ -332,8 +344,20 @@ class TVL2Deconv(admm.ADMM):
     .. math::
        \mathrm{argmin}_\mathbf{x} \;
        (1/2) \| A * \mathbf{x} - \mathbf{s} \|_2^2 +
-             \lambda \| W_{\mathrm{tv}} \sqrt{(G_r \mathbf{x})^2 +
-             (G_c \mathbf{x})^2} \|_1
+             \lambda \\left\| W_{\mathrm{tv}} \sqrt{(G_r \mathbf{x})^2 +
+             (G_c \mathbf{x})^2} \\right\|_1
+
+    via the ADMM problem
+
+    .. math::
+       \mathrm{argmin}_{\mathbf{x},\mathbf{y}_r,\mathbf{y}_c} \;
+       (1/2) \| A * \mathbf{x} - \mathbf{s} \|_2^2 +
+             \lambda \\left\| W_{\mathrm{tv}} \sqrt{(\mathbf{y}_r)^2 + 
+             (\mathbf{y}_c)^2} \\right\|_1 \;\\text{such that}\;
+       \\left( \\begin{array}{c} G_r \\\\ G_c \\end{array} \\right) \mathbf{x}
+       - \\left( \\begin{array}{c} \mathbf{y}_r \\\\ \mathbf{y}_c \\end{array}
+       \\right) = \\left( \\begin{array}{c} \mathbf{0} \\\\
+       \mathbf{0} \\end{array} \\right) \;\;.
 
     After termination of the :meth:`solve` method, attribute :attr:`itstat` is
     a list of tuples representing statistics of each iteration. The

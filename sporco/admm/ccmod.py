@@ -24,14 +24,26 @@ __author__ = """Brendt Wohlberg <brendt@ieee.org>"""
 
 class ConvCnstrMOD(admm.ADMMEqual):
     """ADMM algorithm for Convolutional Constrained MOD problem
-    :cite:`wohlberg-2016-efficient` :cite:`wohlberg-2016-convolutional`
+    :cite:`wohlberg-2016-efficient` :cite:`wohlberg-2016-convolutional`.
 
-    Solve the problem
+    Solve the optimisation problem
 
     .. math::
        \mathrm{argmin}_\mathbf{d} \;
-       (1/2) \sum_k \|  \sum_m \mathbf{d}_m * \mathbf{x}_{k,m} - 
-       \mathbf{s}_k \|_2^2 \quad \\text{ s.t } \quad  \|\mathbf{d}_m\|_2 = 1
+       (1/2) \sum_k \\left\| \sum_m \mathbf{d}_m * \mathbf{x}_{k,m} -
+       \mathbf{s}_k \\right\|_2^2 \quad \\text{such that} \quad
+       \|\mathbf{d}_m\|_2 = 1
+
+    via the ADMM problem
+
+    .. math::
+       \mathrm{argmin}_\mathbf{d} \;
+       (1/2) \sum_k \\left\| \sum_m \mathbf{d}_m * \mathbf{x}_{k,m} -
+       \mathbf{s}_k \\right\|_2^2 + \sum_m \iota_C(\mathbf{g}_m) \quad
+       \\text{such that} \quad \mathbf{d}_m = \mathbf{g}_m \;\;,
+
+    where :math:`\iota_C(\cdot)` is the indicator function of feasible
+    set :math:`C` consisting of unit-norm filters.
 
     After termination of the :meth:`solve` method, attribute :attr:`itstat` is
     a list of tuples representing statistics of each iteration. The
