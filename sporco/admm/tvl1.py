@@ -372,11 +372,11 @@ class TVL1Deconv(admm.ADMM):
 
     .. math::
        \mathrm{argmin}_\mathbf{x} \;
-       \| A \mathbf{x} - \mathbf{s} \|_1 +
+       \| H \mathbf{x} - \mathbf{s} \|_1 +
        \lambda \\left\| W_{\mathrm{tv}} \sqrt{(G_r \mathbf{x})^2 +
        (G_c \mathbf{x})^2} \\right\|_1 \;\;,
 
-    where :math:`A` denotes the linear operator corresponding to a
+    where :math:`H` denotes the linear operator corresponding to a
     convolution, via the ADMM problem
 
     .. math::
@@ -384,7 +384,7 @@ class TVL1Deconv(admm.ADMM):
        (1/2) \| \mathbf{y}_d \|_1 +
              \lambda \\left\| W_{\mathrm{tv}} \sqrt{(\mathbf{y}_r)^2 + 
              (\mathbf{y}_c)^2} \\right\|_1 \;\\text{such that}\;
-       \\left( \\begin{array}{c} G_r \\\\ G_c \\\\ A \\end{array} \\right)
+       \\left( \\begin{array}{c} G_r \\\\ G_c \\\\ H \\end{array} \\right)
        \mathbf{x}  - \\left( \\begin{array}{c} \mathbf{y}_r \\\\
        \mathbf{y}_c \\\\ \mathbf{y}_d \\end{array}
        \\right) = \\left( \\begin{array}{c} \mathbf{0} \\\\ \mathbf{0} \\\\
@@ -399,7 +399,7 @@ class TVL1Deconv(admm.ADMM):
        ``ObjFun`` : Objective function value
 
        ``DFid`` :  Value of data fidelity term \
-       :math:`\| A * \mathbf{x} - \mathbf{s} \|_1`
+       :math:`\| H \mathbf{x} - \mathbf{s} \|_1`
 
        ``RegTV`` : Value of regularisation term \
        :math:`\| W_{\mathrm{tv}} \sqrt{(G_r \mathbf{x})^2 +
@@ -489,7 +489,7 @@ class TVL1Deconv(admm.ADMM):
         Parameters
         ----------
         A : array_like
-          Filter kernel
+          Filter kernel corresponding to operator :math:`H` above
         S : array_like
           Signal vector or matrix
         lmbda : float
@@ -607,7 +607,7 @@ class TVL1Deconv(admm.ADMM):
     def iteration_stats(self, k, r, s, epri, edua, tk):
         """
         Construct iteration stats record tuple. Data fidelity term is
-        :math:`(1/2) \| A * \mathbf{x} - \mathbf{s} \|_2^2` and
+        :math:`(1/2) \| H \mathbf{x} - \mathbf{s} \|_2^2` and
         regularisation term is :math:`\| W_{\mathrm{tv}}
         \sqrt{(G_r \mathbf{x})^2 + (G_c \mathbf{x})^2}\|_1`.
         """
@@ -625,7 +625,7 @@ class TVL1Deconv(admm.ADMM):
 
     def cnst_A(self, X, Xf=None):
         """Compute :math:`A \mathbf{x}` component of ADMM problem constraint.
-        In this case :math:`A \mathbf{x} = (G_r^T \;\; G_c^T \;\; A)^T
+        In this case :math:`A \mathbf{x} = (G_r^T \;\; G_c^T \;\; H)^T
         \mathbf{x}`.
         """
 
@@ -638,7 +638,7 @@ class TVL1Deconv(admm.ADMM):
     def cnst_AT(self, X):
         """Compute :math:`A^T \mathbf{x}` where :math:`A \mathbf{x}` is
         a component of ADMM problem constraint. In this case
-        :math:`A^T \mathbf{x} = (G_r^T \;\; G_c^T \;\; A^T) \mathbf{x}`."""
+        :math:`A^T \mathbf{x} = (G_r^T \;\; G_c^T \;\; H^T) \mathbf{x}`."""
 
         Xf = sl.rfftn(X, axes=self.axes)
         return np.sum(sl.irfftn(np.conj(self.GAf)*Xf, None, axes=self.axes),

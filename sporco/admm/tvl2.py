@@ -343,7 +343,7 @@ class TVL2Deconv(admm.ADMM):
 
     .. math::
        \mathrm{argmin}_\mathbf{x} \;
-       (1/2) \| A * \mathbf{x} - \mathbf{s} \|_2^2 +
+       (1/2) \| \mathbf{h} * \mathbf{x} - \mathbf{s} \|_2^2 +
              \lambda \\left\| W_{\mathrm{tv}} \sqrt{(G_r \mathbf{x})^2 +
              (G_c \mathbf{x})^2} \\right\|_1
 
@@ -351,7 +351,7 @@ class TVL2Deconv(admm.ADMM):
 
     .. math::
        \mathrm{argmin}_{\mathbf{x},\mathbf{y}_r,\mathbf{y}_c} \;
-       (1/2) \| A * \mathbf{x} - \mathbf{s} \|_2^2 +
+       (1/2) \| \mathbf{h} * \mathbf{x} - \mathbf{s} \|_2^2 +
              \lambda \\left\| W_{\mathrm{tv}} \sqrt{(\mathbf{y}_r)^2 + 
              (\mathbf{y}_c)^2} \\right\|_1 \;\\text{such that}\;
        \\left( \\begin{array}{c} G_r \\\\ G_c \\end{array} \\right) \mathbf{x}
@@ -368,7 +368,7 @@ class TVL2Deconv(admm.ADMM):
        ``ObjFun`` : Objective function value
 
        ``DFid`` :  Value of data fidelity term \
-       :math:`(1/2) \| A * \mathbf{x} - \mathbf{s} \|_2^2`
+       :math:`(1/2) \| \mathbf{h} * \mathbf{x} - \mathbf{s} \|_2^2`
 
        ``RegTV`` : Value of regularisation term \
        :math:`\| W_{\mathrm{tv}} \sqrt{(G_r \mathbf{x})^2 +
@@ -457,7 +457,7 @@ class TVL2Deconv(admm.ADMM):
         Parameters
         ----------
         A : array_like
-          Filter kernel
+          Filter kernel (see :math:`\mathbf{h}` above)
         S : array_like
           Signal vector or matrix
         lmbda : float
@@ -567,7 +567,7 @@ class TVL2Deconv(admm.ADMM):
     def iteration_stats(self, k, r, s, epri, edua, tk):
         """
         Construct iteration stats record tuple. Data fidelity term is
-        :math:`(1/2) \| A * \mathbf{x} - \mathbf{s} \|_2^2` and
+        :math:`(1/2) \| \mathbf{h} * \mathbf{x} - \mathbf{s} \|_2^2` and
         regularisation term is :math:`\| W_{\mathrm{tv}}
         \sqrt{(G_r \mathbf{x})^2 + (G_c \mathbf{x})^2}\|_1`.
         """
