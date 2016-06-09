@@ -30,7 +30,7 @@ S1 = S0.copy()
 S1[s1 > 0.75] = 0.0
 
 opt = rpca.RobustPCA.Options({'Verbose' : True, 'gEvalY' : False,
-                              'MaxMainIter' : 200,
+                              'MaxMainIter' : 200, 'RelStopTol' : 5e-4,
                               'AutoRho' : {'Enabled' : True}})
 b = rpca.RobustPCA(S1, None, opt)
 X, Y = b.solve()

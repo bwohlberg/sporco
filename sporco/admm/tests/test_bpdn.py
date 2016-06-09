@@ -58,13 +58,13 @@ class TestSet01(object):
         s0 = D.dot(x0)
         lmbda = 5e-3
         opt = bpdn.BPDN.Options({'Verbose' : False, 'MaxMainIter' : 500,
-                    'RelStopTol' : 1e-3})
+                                 'RelStopTol' : 5e-4})
         b = bpdn.BPDN(D, s0, lmbda, opt)
         b.solve()
         x1 = b.Y
-        assert(np.abs(b.itstat[-1].ObjFun - 1.2016e-2) < 1e-5)
-        assert(np.abs(b.itstat[-1].DFid - 1.0025e-5) < 1e-5)
-        assert(np.abs(b.itstat[-1].RegL1 - 2.40116) < 1e-5)
+        assert(np.abs(b.itstat[-1].ObjFun - 0.012009) < 1e-5)
+        assert(np.abs(b.itstat[-1].DFid - 1.9636082e-06) < 1e-5)
+        assert(np.abs(b.itstat[-1].RegL1 - 2.401446) < 1e-5)
         assert(linalg.norm(x1-x0) < 1e-3)
 
 

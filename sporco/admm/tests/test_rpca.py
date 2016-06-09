@@ -28,8 +28,8 @@ class TestSet01(object):
                               'AutoRho' : {'Enabled' : True}})
         b = rpca.RobustPCA(D, None, opt)
         X, Y = b.solve()
-        assert(np.abs(b.itstat[-1].ObjFun - 321.6189484339) < 1e-6)
-        assert(sl.mse(U,X) < 2e-6)
+        assert(np.abs(b.itstat[-1].ObjFun - 321.493968419) < 1e-6)
+        assert(sl.mse(U,X) < 5e-6)
         assert(sl.mse(V,Y) < 1e-8)
 
 

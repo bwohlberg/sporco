@@ -66,7 +66,7 @@ class TestSet02(object):
                                        'MaxMainIter' : 250})
         b = tvl2.TVL2Deconv(np.ones((1)), self.D, lmbda, opt)
         X = b.solve()
-        assert(np.abs(b.itstat[-1].ObjFun - 45.441537456677) < 1e-3)
+        assert(np.abs(b.itstat[-1].ObjFun - 45.45958573088) < 1e-3)
         assert(sl.mse(self.U,X) < 1e-3)
 
 
@@ -89,7 +89,7 @@ class TestSet03(object):
                                         'MaxMainIter' : 250, 'rho' : 10*lmbda})
         b = tvl2.TVL2Denoise(self.D, lmbda, opt, axes=(0,1))
         X = b.solve()
-        assert(np.abs(b.itstat[-1].ObjFun - 363.03797264834986) < 1e-3)
+        assert(np.abs(b.itstat[-1].ObjFun - 363.0802047) < 1e-3)
         assert(sl.mse(self.U,X) < 1e-3)
 
 
@@ -99,7 +99,7 @@ class TestSet03(object):
                                        'MaxMainIter' : 250})
         b = tvl2.TVL2Deconv(np.ones((1)), self.D, lmbda, opt, axes=(0,1))
         X = b.solve()
-        assert(np.abs(b.itstat[-1].ObjFun - 563.96797296313059) < 1e-3)
+        assert(np.abs(b.itstat[-1].ObjFun - 564.1586542) < 1e-3)
         assert(sl.mse(self.U,X) < 1e-3)
 
 
@@ -132,5 +132,5 @@ class TestSet04(object):
                                        'MaxMainIter' : 250})
         b = tvl2.TVL2Deconv(np.ones((1)), self.D, lmbda, opt, axes=(0,1,2))
         X = b.solve()
-        assert(np.abs(b.itstat[-1].ObjFun - 567.49092052210574) < 1e-3)
+        assert(np.abs(b.itstat[-1].ObjFun - 567.72425227) < 1e-3)
         assert(sl.mse(self.U,X) < 1e-3)

@@ -315,14 +315,16 @@ class ADMM(object):
     def relax_AX(self):
         """Implement relaxation if option ``RelaxParam`` != 1.0."""
 
+        # We need to keep the non-relaxed version of AX since it is
+        # required for computation of primal residual r
+        self.AXnr = self.cnst_A(self.X)
         if self.opt['RelaxParam'] == 1.0:
-            self.AX = self.cnst_A(self.X)
+            self.AX = self.AXnr
         else:
             if not hasattr(self, 'c'):
                 self.c = self.cnst_c()
             alpha = self.opt['RelaxParam']
-            self.AX = alpha*self.cnst_A(self.X) - \
-                (1-alpha)*(self.cnst_B(self.Y) - self.c)
+            self.AX = alpha*self.AXnr - (1-alpha)*(self.cnst_B(self.Y) - self.c)
 
 
 
@@ -331,16 +333,16 @@ class ADMM(object):
         """Compute residuals and stopping thresholds."""
 
         if self.opt['AutoRho', 'StdResiduals']:
-            r = linalg.norm(self.rsdl_r(self.AX, self.Y))
+            r = linalg.norm(self.rsdl_r(self.AXnr, self.Y))
             s = linalg.norm(self.rsdl_s(self.Yprev, self.Y))
             epri = scipy.sqrt(self.Nc)*self.opt['AbsStopTol'] + \
-                self.rsdl_rn(self.AX, self.Y)*self.opt['RelStopTol']
+                self.rsdl_rn(self.AXnr, self.Y)*self.opt['RelStopTol']
             edua = scipy.sqrt(self.Nx)*self.opt['AbsStopTol'] + \
                 self.rsdl_sn(self.U)*self.opt['RelStopTol']
         else:
-            rn = self.rsdl_rn(self.AX, self.Y)
+            rn = self.rsdl_rn(self.AXnr, self.Y)
             sn = self.rsdl_sn(self.U)
-            r = linalg.norm(self.rsdl_r(self.AX, self.Y)) / rn
+            r = linalg.norm(self.rsdl_r(self.AXnr, self.Y)) / rn
             s = linalg.norm(self.rsdl_s(self.Yprev, self.Y)) / sn
             epri = scipy.sqrt(self.Nc)*self.opt['AbsStopTol']/rn + \
                 self.opt['RelStopTol']
@@ -389,8 +391,6 @@ class ADMM(object):
                 self.U = self.U/rsf
                 if rsf != 1.0:
                     self.rhochange()
-
-
 
 
 
@@ -586,7 +586,6 @@ class ADMM(object):
 
 
 
-
 class ADMMEqual(ADMM):
     """Base class for ADMM algorithms with a simple equality constraint.
 
@@ -666,6 +665,7 @@ class ADMMEqual(ADMM):
     def relax_AX(self):
         """Implement relaxation if option ``RelaxParam`` != 1.0."""
 
+        self.AXnr = self.X
         if self.opt['RelaxParam'] == 1.0:
             self.AX = self.X
         else:

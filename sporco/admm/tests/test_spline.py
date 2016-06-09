@@ -25,12 +25,12 @@ class TestSet01(object):
         D = U + V
         lmbda = 0.1
         opt = spline.SplineL1.Options({'Verbose' : False, 'gEvalY' : False,
-                              'MaxMainIter' : 250,
+                              'MaxMainIter' : 250, 'RelStopTol' : 5e-4,
                               'DFidWeight' : V == 0, 
                               'AutoRho' : {'Enabled' : True}})
         b = spline.SplineL1(D, lmbda, opt)
         X = b.solve()
-        assert(np.abs(b.itstat[-1].ObjFun - 0.38397223518) < 1e-6)
+        assert(np.abs(b.itstat[-1].ObjFun - 0.333606246) < 1e-6)
         assert(sl.mse(U,X) < 1e-6)
 
 
