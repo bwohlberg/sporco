@@ -40,7 +40,7 @@ def geturlimage(url, timeout=10):
 
 class build(build_module.build):
   def run(self):
-    
+
       path = 'sporco/data'
       urllst = {'lena.png' :
                 'http://sipi.usc.edu/database/misc/4.2.04.tiff',
@@ -66,7 +66,7 @@ class build(build_module.build):
               if img is not None:
                   scipy.misc.imsave(dst, img)
       build_module.build.run(self)
-                  
+
 
 
 name = 'sporco'
@@ -113,6 +113,10 @@ setup(
     setup_requires   = ['pytest-runner'],
     tests_require    = ['pytest'],
     install_requires = install_requires,
+    extras_require = {
+        'numexpr':  ['numexpr'],
+        'datacursor': ['mpldatacursor'],
+    },
     cmdclass = {
         'build': build
     },

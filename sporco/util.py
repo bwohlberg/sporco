@@ -18,22 +18,30 @@ import os
 import glob
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
+try:
+    import mpldatacursor as mpldc
+except ImportError:
+    have_mpldc = False
+else:
+    have_mpldc = True
 
 import sporco.linalg as sla
 
 __author__ = """Brendt Wohlberg <brendt@ieee.org>"""
 
 
-def plot(dat, title=None, xlbl=None, ylbl=None, lgnd=None, lglc=None,
-         ptyp='plot', block=False, fgnm=None, fgsz=(12, 12)):
+def plot(dat, x=None, title=None, xlbl=None, ylbl=None, lgnd=None, lglc=None,
+         ptyp='plot', block=False, fgrf=None, fgnm=None, fgsz=(12, 12)):
     """Plot columns of array.
 
     Parameters
     ----------
     dat : array_like
         Data to plot. Each column is plotted as a separate curve.
+    x : array_like, optional (default=None)
+        Values for x-axis of the plot
     title : string, optional (default=None)
-        Figure title.
+        Figure title
     xlbl : string, optional (default=None)
         Label for x-axis
     ylbl : string, optional (default=None)
@@ -46,7 +54,9 @@ def plot(dat, title=None, xlbl=None, ylbl=None, lgnd=None, lglc=None,
         Plot type specification (options are 'plot', 'semilogx', 'semilogy',
         and 'loglog')
     block : boolean, optional (default=False)
-        If True, the function only returns when the figure is closed.
+        If True, the function only returns when the figure is closed
+    fgrf : figure object reference, optional (default=None)
+        Draw in specified figure instead of creating one
     fgnm : integer, optional (default=None)
         Figure number of figure
     fgsz : tuple (width,height), optional (default=(12,12))
@@ -60,13 +70,22 @@ def plot(dat, title=None, xlbl=None, ylbl=None, lgnd=None, lglc=None,
       Figure object for this figure.
     """
 
+    if fgrf is None:
+        fig = plt.figure(num=fgnm, figsize=fgsz)
+        fig.clf()
+    else:
+        fig = fgrf
+
     plttyp = {'plot' : plt.plot, 'semilogx' : plt.semilogx,
               'semilogy' : plt.semilogy, 'loglog' : plt.loglog}
-    fig = plt.figure(num=fgnm, figsize=fgsz)
     if ptyp in plttyp:
-        plttyp[ptyp](dat)
+        if x is None:
+            pltln = plttyp[ptyp](dat)
+        else:
+            pltln = plttyp[ptyp](x, dat)
     else:
         raise ValueError("Invalid plot type '%s'" % ptyp)
+
     if title is not None:
         plt.title(title)
     if xlbl is not None:
@@ -75,30 +94,45 @@ def plot(dat, title=None, xlbl=None, ylbl=None, lgnd=None, lglc=None,
         plt.ylabel(ylbl)
     if lgnd is not None:
         plt.legend(lgnd, loc=lglc)
-    plt.show(block=block)
+
+    def press(event):
+        if event.key == 'q':
+            plt.close(fig)
+
+    fig.canvas.mpl_connect('key_press_event', press)
+
+    if have_mpldc:
+        mpldc.datacursor(pltln)
+
+    if fgrf is None:
+        plt.show(block=block)
 
     return fig
 
 
 
-def imview(img, title=None, block=False, cmap=None, fgnm=None, fgsz=(12, 12),
-           cbar=False, axes=None):
+def imview(img, title=None, block=False, cmap=None, fgrf=None, fgnm=None,
+           fgsz=(12, 12), cbar=False, axes=None):
     """Display an image.
 
-    Pixel values are displayed when the pointer is over valid image data.
-    The figure is closed on key entry 'q'.
+    Pixel values are displayed when the pointer is over valid image
+    data.  If a figure object is specified then the image is drawn in
+    that figure, and plt.show() is not called.  The figure is closed
+    on key entry 'q'.
 
     Parameters
     ----------
     img : array_like, shape (Nr, Nc) or (Nr, Nc, 3) or (Nr, Nc, 4)
         Image to display.
     title : string, optional (default=None)
-        Figure title.
+        Figure title
     block : boolean, optional (default=False)
-        If True, the function only returns when the figure is closed.
+        If True, the function only returns when the figure is closed
     cmap : matplotlib.cm colormap, optional (default=None)
         Colour map for image. If none specifed, defaults to cm.Greys_r
         for monochrome image
+    fgrf : figure object reference, optional (default=None)
+        Draw in specified figure instead of creating one
     fgnm : integer, optional (default=None)
         Figure number of figure
     fgsz : tuple (width,height), optional (default=(12,12))
@@ -126,8 +160,11 @@ def imview(img, title=None, block=False, cmap=None, fgnm=None, fgsz=(12, 12),
     if img.dtype.type == np.uint16 or img.dtype.type == np.int16:
         imgd = np.float16(imgd)
 
-    fig = plt.figure(num=fgnm, figsize=fgsz)
-    fig.clf()
+    if fgrf is None:
+        fig = plt.figure(num=fgnm, figsize=fgsz)
+        fig.clf()
+    else:
+        fig = fgrf
 
     if axes is not None:
         ax = plt.subplot(sharex=axes, sharey=axes)
@@ -166,7 +203,10 @@ def imview(img, title=None, block=False, cmap=None, fgnm=None, fgsz=(12, 12),
     plt.axis('off')
     ax = plt.gca()
     ax.format_coord = format_coord
-    plt.show(block=block)
+
+    if fgrf is None:
+        plt.show(block=block)
+
     return fig, ax
 
 
@@ -325,8 +365,6 @@ def tikhonov_filter(s, lmbda, npd=16):
 
 
 
-
-
 def solve_status_str(hdrtxt, fwiter=4, fpothr=2):
     """Construct header and format details for status display of an iterative
     solver
@@ -407,19 +445,19 @@ class ExampleImages(object):
         return self.nlist
 
 
-    
+
     def image(self, name, scaled=None):
         """Get named image"""
 
         if scaled is None:
             scaled = self.scaled
         pth = os.path.join(self.bpth, name) + '.png'
-        
+
         try:
             img = misc.imread(pth)
         except IOError:
             raise IOError('Could not access image with name ' + name)
-        
+
 
         if scaled:
             img = np.float32(img) / 255.0
