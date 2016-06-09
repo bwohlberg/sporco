@@ -70,7 +70,7 @@ class ConvRepIndexing(object):
         # Number of filters
         self.M = D.shape[self.dimN+self.dimC]
         # Shape of spatial indices and number of spatial samples
-        self.Nv = S[(slice(None),)*dimN + (0,)*(self.dimC+self.dimK)].shape
+        self.Nv = S.shape[0:dimN]
         self.N = np.prod(np.array(self.Nv))
 
         # Axis indices for each component of X and internal S and D
