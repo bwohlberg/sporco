@@ -148,7 +148,6 @@ class ConvBPDNDictLearn(object):
           Number of spatial/time dimensions
         dimK : integer
           Number of signal dimensions
-
         """
 
         self.runtime = 0.0

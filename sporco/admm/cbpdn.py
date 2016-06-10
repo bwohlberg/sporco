@@ -393,7 +393,8 @@ class ConvBPDN(admm.ADMMEqual):
 
     def obfn_fvarf(self):
         """Variable to be evaluated in computing data fidelity term,
-        depending on ``fEvalX`` option value."""
+        depending on ``fEvalX`` option value.
+        """
 
         return self.Xf if self.opt['fEvalX'] else \
             sl.rfftn(self.Y, None, self.axisN)
@@ -589,7 +590,7 @@ class ConvElasticNet(ConvBPDN):
         :math:`(1/2) \|  \sum_m \mathbf{d}_m * \mathbf{x}_m -
         \mathbf{s} \|_2^2` and regularisation terms are
         :math:`\sum_m \| \mathbf{x}_m \|_1` and
-        :math:`(1/2) \sum_m \| \mathbf{x}_m \|_2^2`
+        :math:`(1/2) \sum_m \| \mathbf{x}_m \|_2^2`.
         """
 
         Ef = np.sum(self.Df * self.obfn_fvarf(), axis=self.axisM,

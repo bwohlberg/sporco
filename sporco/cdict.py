@@ -55,7 +55,8 @@ class ConstrainedDict(dict):
     keys, including those of nested dicts, and also initialises the
     dict with default content on instantiation. The default content is
     specified by the defaults class attribute, and the allowed keys are
-    determined from the same attribute."""
+    determined from the same attribute.
+    """
 
 
     defaults = {}

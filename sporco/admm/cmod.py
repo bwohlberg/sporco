@@ -81,7 +81,6 @@ class CnstrMOD(admm.ADMMEqual):
 
         ``ZeroMean`` : Flag indicating whether the solution dictionary \
         :math:`D` should have zero-mean components
-
         """
 
         defaults = copy.deepcopy(admm.ADMMEqual.Options.defaults)
@@ -271,7 +270,8 @@ def normalise(v):
 
 def factorise(A, rho):
     """Compute factorisation of either :math:`A^T A + \\rho I`
-    or :math:`A A^T + \\rho I`, depending on which matrix is smaller."""
+    or :math:`A A^T + \\rho I`, depending on which matrix is smaller.
+    """
 
     N, M = A.shape
     # If N < M it is cheaper to factorise A*A^T' + rho*I and then use the
@@ -285,7 +285,8 @@ def factorise(A, rho):
 
 def linsolve(A, rho, lu, piv, b):
     """Solve the linear system :math:`(A A^T + \\rho I)\\mathbf{x} =
-    \\mathbf{b}`."""
+    \\mathbf{b}`.
+    """
 
     N, M = A.shape
     if N >= M:

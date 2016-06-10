@@ -283,7 +283,6 @@ def solvedbi_sm(ah, rho, b, c=None, axis=4):
     -------
     x : array_like
       Linear system solution :math:`\mathbf{x}`
-
     """
 
     a = np.conj(ah)
@@ -436,7 +435,6 @@ def solvemdbi_rsm(ah, rho, b, axisK, dimN=2):
     -------
     x : array_like
       Linear system solution :math:`\mathbf{x}`
-
     """
 
     axisM = dimN + 2
@@ -703,7 +701,6 @@ def atleast_nd(n, u):
     -------
     v : array_like
       Output array with at least n dimensions
-
     """
 
     if u.ndim >= n:
@@ -873,7 +870,6 @@ def psnr(vref, vcmp):
     -------
     x : float
       PSNR of vcmp with respect to vref
-
     """
 
     r = vref.ravel()

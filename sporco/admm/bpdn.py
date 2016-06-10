@@ -255,7 +255,8 @@ class BPDN(admm.ADMMEqual):
 
 def factorise(D, rho):
     """Compute factorisation of either :math:`D^T D + \\rho I`
-    or :math:`D D^T + \\rho I`, depending on which matrix is smaller."""
+    or :math:`D D^T + \\rho I`, depending on which matrix is smaller.
+    """
 
     N, M = D.shape
     # If N < M it is cheaper to factorise D*D^T' + rho*I and then use the
@@ -270,7 +271,8 @@ def factorise(D, rho):
 
 def linsolve(D, rho, lu, piv, b):
     """Solve the linear system :math:`(D^T D + \\rho I)\\mathbf{x} =
-    \\mathbf{b}`."""
+    \\mathbf{b}`.
+    """
 
     N, M = D.shape
     if N >= M:

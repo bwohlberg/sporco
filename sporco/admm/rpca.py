@@ -61,7 +61,6 @@ class RobustPCA(admm.ADMM):
        ``Rho`` : Penalty parameter
 
        ``Time`` : Cumulative run time
-
     """
 
 
@@ -200,7 +199,8 @@ class RobustPCA(admm.ADMM):
 
     def obfn_gvar(self):
         """Variable to be evaluated in computing regularisation term,
-        depending on 'gEvalY' option value."""
+        depending on 'gEvalY' option value.
+        """
 
         if self.opt['gEvalY']:
             return self.Y
@@ -210,8 +210,7 @@ class RobustPCA(admm.ADMM):
 
 
     def iteration_stats(self, k, r, s, epri, edua, tk):
-        """
-        Construct iteration stats record tuple.
+        """Construct iteration stats record tuple.
         """
 
         gvr = self.obfn_gvar()
@@ -230,8 +229,7 @@ class RobustPCA(admm.ADMM):
 
     def cnst_A(self, X):
         """Compute :math:`A \mathbf{x}` component of ADMM problem constraint.
-        In this case
-        :math:`A \mathbf{x} = \mathbf{x}`.
+        In this case :math:`A \mathbf{x} = \mathbf{x}`.
         """
 
         return X
@@ -241,7 +239,8 @@ class RobustPCA(admm.ADMM):
     def cnst_AT(self, X):
         """Compute :math:`A^T \mathbf{x}` where :math:`A \mathbf{x}` is
         a component of ADMM problem constraint. In this case
-        :math:`A^T \mathbf{x} = \mathbf{x}`."""
+        :math:`A^T \mathbf{x} = \mathbf{x}`.
+        """
 
         return X
 
@@ -249,15 +248,16 @@ class RobustPCA(admm.ADMM):
 
     def cnst_B(self, Y):
         """Compute :math:`B \mathbf{y}` component of ADMM problem constraint.
-        In this case :math:`B \mathbf{y} = -\mathbf{y}`."""
+        In this case :math:`B \mathbf{y} = -\mathbf{y}`.
+        """
 
         return Y
 
 
     def cnst_c(self):
         """Compute constant component :math:`\mathbf{c}` of ADMM problem
-        constraint. In this case
-        :math:`\mathbf{c} = \mathbf{s}`."""
+        constraint. In this case :math:`\mathbf{c} = \mathbf{s}`.
+        """
 
         return self.S
 

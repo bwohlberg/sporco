@@ -366,8 +366,8 @@ def tikhonov_filter(s, lmbda, npd=16):
 
 
 def solve_status_str(hdrtxt, fwiter=4, fpothr=2):
-    """Construct header and format details for status display of an iterative
-    solver
+    """Construct header and format details for status display of an
+    iterative solver.
     """
 
     # Field width for all fields other than first depends on precision
@@ -413,7 +413,8 @@ class Timer(object):
 
 def convdicts():
     """Get a dict associating description strings with example learned
-    convolutional dictionaries"""
+    convolutional dictionaries.
+    """
 
     pth = os.path.join(os.path.dirname(__file__), 'data', 'convdict.npz')
     npz = np.load(pth)

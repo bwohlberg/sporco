@@ -245,7 +245,8 @@ class TVL2Denoise(admm.ADMM):
 
     def obfn_gvar(self):
         """Variable to be evaluated in computing regularisation term,
-        depending on 'gEvalY' option value."""
+        depending on 'gEvalY' option value.
+        """
 
         if self.opt['gEvalY']:
             return self.Y
@@ -286,7 +287,8 @@ class TVL2Denoise(admm.ADMM):
     def cnst_AT(self, X):
         """Compute :math:`A^T \mathbf{x}` where :math:`A \mathbf{x}` is
         a component of ADMM problem constraint. In this case
-        :math:`A^T \mathbf{x} = (G_r^T \;\; G_c^T) \mathbf{x}`."""
+        :math:`A^T \mathbf{x} = (G_r^T \;\; G_c^T) \mathbf{x}`.
+        """
 
         return np.sum(np.concatenate(
             [sl.GTax(X[...,ax], ax)[...,np.newaxis] for ax in self.axes],
@@ -296,7 +298,8 @@ class TVL2Denoise(admm.ADMM):
 
     def cnst_B(self, Y):
         """Compute :math:`B \mathbf{y}` component of ADMM problem constraint.
-        In this case :math:`B \mathbf{y} = -\mathbf{y}`."""
+        In this case :math:`B \mathbf{y} = -\mathbf{y}`.
+        """
 
         return -Y
 
@@ -304,7 +307,8 @@ class TVL2Denoise(admm.ADMM):
 
     def cnst_c(self):
         """Compute constant component :math:`\mathbf{c}` of ADMM problem
-        constraint. In this case :math:`\mathbf{c} = \mathbf{0}`."""
+        constraint. In this case :math:`\mathbf{c} = \mathbf{0}`.
+        """
 
         return np.zeros(self.S.shape + (len(self.axes),), self.dtype)
 
@@ -555,7 +559,8 @@ class TVL2Deconv(admm.ADMM):
 
     def obfn_gvar(self):
         """Variable to be evaluated in computing regularisation term,
-        depending on 'gEvalY' option value."""
+        depending on 'gEvalY' option value.
+        """
 
         if self.opt['gEvalY']:
             return self.Y
@@ -597,7 +602,8 @@ class TVL2Deconv(admm.ADMM):
     def cnst_AT(self, X):
         """Compute :math:`A^T \mathbf{x}` where :math:`A \mathbf{x}` is
         a component of ADMM problem constraint. In this case
-        :math:`A^T \mathbf{x} = (G_r^T \;\; G_c^T) \mathbf{x}`."""
+        :math:`A^T \mathbf{x} = (G_r^T \;\; G_c^T) \mathbf{x}`.
+        """
 
         Xf = sl.rfftn(X, axes=self.axes)
         return np.sum(sl.irfftn(np.conj(self.Gf)*Xf, None, axes=self.axes),
@@ -607,7 +613,8 @@ class TVL2Deconv(admm.ADMM):
 
     def cnst_B(self, Y):
         """Compute :math:`B \mathbf{y}` component of ADMM problem constraint.
-        In this case :math:`B \mathbf{y} = -\mathbf{y}`."""
+        In this case :math:`B \mathbf{y} = -\mathbf{y}`.
+        """
 
         return -Y
 
@@ -615,6 +622,7 @@ class TVL2Deconv(admm.ADMM):
 
     def cnst_c(self):
         """Compute constant component :math:`\mathbf{c}` of ADMM problem
-        constraint. In this case :math:`\mathbf{c} = \mathbf{0}`."""
+        constraint. In this case :math:`\mathbf{c} = \mathbf{0}`.
+        """
 
         return np.zeros(self.S.shape + (len(self.axes),), self.dtype)

@@ -103,7 +103,6 @@ class ConvCnstrMOD(admm.ADMMEqual):
           ``MaxIter`` : Maximum iterations
 
           ``StopTol`` : Stopping tolerance
-
         """
 
         defaults = copy.deepcopy(admm.ADMMEqual.Options.defaults)
@@ -231,7 +230,6 @@ class ConvCnstrMOD(admm.ADMMEqual):
           Number of spatial dimensions
         dimK : int, optional (default 1)
           Number of dimensions for multiple signals in input S
-
         """
 
         if opt is None:
@@ -378,7 +376,8 @@ class ConvCnstrMOD(admm.ADMMEqual):
 
     def obfn_fvarf(self):
         """Variable to be evaluated in computing data fidelity term,
-        depending on 'fEvalX' option value."""
+        depending on 'fEvalX' option value.
+        """
 
         return self.Xf if self.opt['fEvalX'] else \
             sl.rfftn(self.Y, None, self.axisN)
@@ -406,7 +405,8 @@ class ConvCnstrMOD(admm.ADMMEqual):
 
 def stdformD(D, C, M, dimN=2):
     """Reshape dictionary array (X here, D in cbpdn module) to internal
-    standard form"""
+    standard form.
+    """
 
     return D.reshape(D.shape[0:dimN] + (C,) + (1,) + (M,))
 
@@ -423,15 +423,17 @@ def getPcn(opt, dsz, Nv, axisN=(0,1), dimN=2):
 
 
 def zeromean(v, axisN=(0,1)):
-    """Return array with mean subtraction for vectors represented by specified
-    axes"""
+    """Return array with mean subtraction for vectors represented by
+    specified axes.
+    """
 
     return v - np.mean(v, axisN)
 
 
 def normalise(v, axisN=(0,1,2)):
     """Return array with normalisation of vectors represented by specified
-    axes"""
+    axes.
+    """
 
     vn = np.sqrt(np.sum(v**2, axisN, keepdims=True))
     vn[vn == 0] = 1.0
@@ -448,7 +450,9 @@ def zpad(v, Nv):
 
 
 def bcrop(v, dsz, dimN=2):
-    """Crop specified number of initial dimensions of array to specified size"""
+    """Crop specified number of initial dimensions of array to specified
+    size.
+    """
 
     if isinstance(dsz[0], tuple):
         # Multi-scale dictionary specification

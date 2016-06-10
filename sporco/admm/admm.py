@@ -222,7 +222,6 @@ class ADMM(object):
         optimisation is displayed at every iteration. At termination
         of this method, attribute :attr:`itstat` is a list of tuples
         representing statistics of each iteration.
-
         """
 
         # Open status display
@@ -285,11 +284,11 @@ class ADMM(object):
 
 
 
-
     def xstep(self):
         """Minimise Augmented Lagrangian with respect to x.
 
-        Overriding this method is required."""
+        Overriding this method is required.
+        """
 
         raise NotImplementedError()
 
@@ -298,7 +297,8 @@ class ADMM(object):
     def ystep(self):
         """Minimise Augmented Lagrangian with respect to y.
 
-        Overriding this method is required."""
+        Overriding this method is required.
+        """
 
         raise NotImplementedError()
 
@@ -457,7 +457,8 @@ class ADMM(object):
     def obfn_f(self, X):
         """Compute :math:`f(\mathbf{x})` component of ADMM objective function.
 
-        Overriding this method is required."""
+        Overriding this method is required.
+        """
 
         raise NotImplementedError()
 
@@ -466,7 +467,8 @@ class ADMM(object):
     def obfn_g(self, Y):
         """Compute :math:`g(\mathbf{y})` component of ADMM objective function.
 
-        Overriding this method is required."""
+        Overriding this method is required.
+        """
 
         raise NotImplementedError()
 
@@ -578,7 +580,8 @@ class ADMM(object):
     def rhochange(self):
         """Action to be taken, if any, when rho parameter is changed.
 
-        Overriding this method is optional."""
+        Overriding this method is optional.
+        """
 
         pass
 
@@ -676,7 +679,8 @@ class ADMMEqual(ADMM):
 
     def obfn_fvar(self):
         """Variable to be evaluated in computing :meth:`ADMM.obfn_f`, depending
-        on the ``fEvalX`` option value."""
+        on the ``fEvalX`` option value.
+        """
 
         return self.X if self.opt['fEvalX'] else self.Y
 
@@ -684,7 +688,8 @@ class ADMMEqual(ADMM):
 
     def obfn_gvar(self):
         """Variable to be evaluated in computing :meth:`ADMM.obfn_g`, depending
-        on the ``gEvalY`` option value."""
+        on the ``gEvalY`` option value.
+        """
 
         return self.Y if self.opt['gEvalY'] else self.X
 
@@ -705,7 +710,8 @@ class ADMMEqual(ADMM):
     def cnst_A(self, X):
         """Compute :math:`A \mathbf{x}` component of ADMM problem constraint.
         In this case :math:`A \mathbf{x} = \mathbf{x}` since the constraint
-        is :math:`\mathbf{x} = \mathbf{y}`"""
+        is :math:`\mathbf{x} = \mathbf{y}`.
+        """
 
         return X
 
@@ -714,7 +720,8 @@ class ADMMEqual(ADMM):
         """Compute :math:`A^T \mathbf{x}` where :math:`A \mathbf{x}` is
         a component of ADMM problem constraint. In this case
         :math:`A^T \mathbf{x} = \mathbf{x}` since the constraint
-        is :math:`\mathbf{x} = \mathbf{y}`"""
+        is :math:`\mathbf{x} = \mathbf{y}`.
+        """
 
         return X
 
@@ -723,7 +730,8 @@ class ADMMEqual(ADMM):
     def cnst_B(self, Y):
         """Compute :math:`B \mathbf{y}` component of ADMM problem constraint.
         In this case :math:`B \mathbf{y} = -\mathbf{y}` since the constraint
-        is :math:`\mathbf{x} = \mathbf{y}`"""
+        is :math:`\mathbf{x} = \mathbf{y}`.
+        """
 
         return -Y
 
@@ -732,7 +740,8 @@ class ADMMEqual(ADMM):
     def cnst_c(self):
         """Compute constant component :math:`\mathbf{c}` of ADMM problem
         constraint. In this case :math:`\mathbf{c} = \mathbf{0}` since
-        the constraint is :math:`\mathbf{x} = \mathbf{y}`"""
+        the constraint is :math:`\mathbf{x} = \mathbf{y}`.
+        """
 
         return np.zeros(self.X.shape, self.X.dtype)
 
