@@ -85,8 +85,7 @@ dd = os.path.join(docdirbase,'examples')
 pp = os.path.join('examples')
 data.append((dd, glob(os.path.join(pp ,"*.py"))))
 
-#longdesc = read('README.rst')
-#longdesc = longdesc[longdesc.index('==\n\n')+4:]
+
 longdesc = \
 """
 SPORCO is a Python package for solving optimisation problems with
