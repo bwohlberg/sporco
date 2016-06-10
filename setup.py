@@ -85,8 +85,18 @@ dd = os.path.join(docdirbase,'examples')
 pp = os.path.join('examples')
 data.append((dd, glob(os.path.join(pp ,"*.py"))))
 
-longdesc = read('README.rst')
-longdesc = longdesc[longdesc.index('==\n\n')+4:]
+#longdesc = read('README.rst')
+#longdesc = longdesc[longdesc.index('==\n\n')+4:]
+longdesc = \
+"""
+SPORCO is a Python package for solving optimisation problems with
+sparsity-inducing regularisation. These consist primarily of sparse
+coding and dictionary learning problems, including convolutional
+sparse coding and dictionary learning, but there is also support for
+other problems such as Total Variation regularisation and Robust
+PCA. In the current version all of the optimisation algorithms are
+based on the Alternating Direction Method of Multipliers (ADMM).
+"""
 
 on_rtd = os.environ.get('READTHEDOCS') == 'True'
 if on_rtd:
@@ -99,8 +109,13 @@ else:
 setup(
     name             = name,
     version          = version,
-    description      = 'Sparse Optimisation Research Code',
+    description      = 'Sparse Optimisation Research Code: A Python package ' \
+                       'for sparse coding and dictionary learning',
     long_description = longdesc,
+    keywords         = ['Sparse Representations', 'Sparse Coding',
+                        'Dictionary Learning',
+                        'Convolutional Sparse Representations',
+                        'Convolutional Sparse Coding', 'Optimization', 'ADMM'],
     platforms        = 'Any',
     license          = 'BSD',
     url              = 'http://math.lanl.gov/~brendt/Software/SPORCO/',
