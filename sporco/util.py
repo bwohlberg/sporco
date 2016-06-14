@@ -380,7 +380,7 @@ def solve_status_str(hdrtxt, fwiter=4, fpothr=2):
     # Construct iteration status format string
     fmtstr = ("%%%dd" % (fwiter)) + ((("  %%%d.%de" % (fwothr, fpothr)) * \
         (len(hdrtxt)-1)))
-    # Compute length of seperator string
+    # Compute length of separator string
     nsep = fwiter + (fwothr + 2)*(len(hdrtxt)-1)
 
     return hdrstr, fmtstr, nsep
