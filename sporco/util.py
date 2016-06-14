@@ -309,7 +309,8 @@ def imageblocks(imgs, blksz):
 def rgb2gray(rgb):
     """RGB to gray conversion function."""
 
-    return np.dot(rgb[..., :3], [0.299, 0.587, 0.144])
+    return np.dot(rgb[..., :3], np.array([0.299, 0.587, 0.144],
+                                         dtype=np.float32))
 
 
 
