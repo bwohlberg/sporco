@@ -165,7 +165,7 @@ class BPDNDictLearn(object):
             # Call utility function to construct status display formatting
             hdrstr, fmtstr, nsep = util.solve_status_str(hdrtxt,
                                         type(self).fwiter, type(self).fpothr)
-            # Print header and seperator strings
+            # Print header and separator strings
             if self.opt['StatusHeader']:
                 print(hdrstr)
                 print("-" * nsep)
@@ -173,7 +173,7 @@ class BPDNDictLearn(object):
         # Reset timer
         self.timer.start()
 
-        for j in range(0, self.opt['MaxMainIter']):
+        for j in range(self.j, self.j + self.opt['MaxMainIter']):
 
             # X update
             self.bpdn.solve()
@@ -218,6 +218,23 @@ class BPDNDictLearn(object):
         # Record iteration count
         self.j = j+1
 
-        # Print final seperator string if Verbose option enabled
+        # Print final separator string if Verbose option enabled
         if self.opt['Verbose'] and self.opt['StatusHeader']:
             print("-" * nsep)
+
+        # Return final dictionary
+        return self.getdict()
+
+
+
+    def getdict(self):
+        """Get final dictionary"""
+
+        return self.cmod.getdict()
+
+
+
+    def getcoef(self):
+        """Get final coefficient map array"""
+
+        return self.bpdn.getcoef()
