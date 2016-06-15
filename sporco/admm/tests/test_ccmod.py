@@ -18,7 +18,7 @@ class TestSet01(object):
         N = 64
         M = 4
         Nd = 8
-        D0 = ccmod.normalise(np.random.randn(Nd, Nd, M), axisN=(0,1))
+        D0 = ccmod.normalise(np.random.randn(Nd, Nd, M), dimN=2)
         X = np.zeros((N, N, M))
         xr = np.random.randn(N, N, M)
         xp = np.abs(xr) > 3
