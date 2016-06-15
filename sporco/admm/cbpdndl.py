@@ -178,7 +178,7 @@ class ConvBPDNDictLearn(object):
         Nv = S.shape[0:dimN]
 
         # Normalise dictionary
-        D0 = ccmod.normalise(ccmod.bcrop(D0, dsz, dimN), axisN)
+        D0 = ccmod.getPcn0(opt['CCMOD'], dsz, dimN, dimC)(D0)
 
         # Initialise ConvBPDN and ConvCnstrMOD objects
         self.cbpdn = cbpdn.ConvBPDN(D0, S, lmbda, opt['CBPDN'], dimN)
@@ -202,7 +202,7 @@ class ConvBPDNDictLearn(object):
             # Call utility function to construct status display formatting
             hdrstr, fmtstr, nsep = util.solve_status_str(hdrtxt,
                                         type(self).fwiter, type(self).fpothr)
-            # Print header and seperator strings
+            # Print header and separator strings
             if self.opt['StatusHeader']:
                 print(hdrstr)
                 print("-" * nsep)
@@ -238,7 +238,7 @@ class ConvBPDNDictLearn(object):
             # Construct iteration stats for current iteration and append to
             # record of iteration stats
             tk = self.timer.elapsed()
-            itstatk = type(self).IterationStats(j, obj, dfd, l1n, rX, sX, 
+            itstatk = type(self).IterationStats(j, obj, dfd, l1n, rX, sX,
                                     rD, sD, self.cbpdn.rho, self.ccmod.rho, tk)
             self.itstat.append(itstatk)
 
@@ -256,6 +256,23 @@ class ConvBPDNDictLearn(object):
         # Record iteration count
         self.j = j+1
 
-        # Print final seperator string if Verbose option enabled
+        # Print final separator string if Verbose option enabled
         if self.opt['Verbose'] and self.opt['StatusHeader']:
             print("-" * nsep)
+
+        # Return final dictionary
+        return self.getdict()
+
+
+
+    def getdict(self):
+        """Get final dictionary"""
+
+        return self.ccmod.getdict()
+
+
+
+    def getcoef(self):
+        """Get final coefficient map array"""
+
+        return self.cbpdn.getcoef()
