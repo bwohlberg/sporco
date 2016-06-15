@@ -47,8 +47,7 @@ class CnstrMOD(admm.ADMMEqual):
 
        ``Iter`` : Iteration number
 
-       ``DFid`` :  Value of data fidelity term \
-       :math:`(1/2) \|  D X - S \|_2^2`
+       ``DFid`` :  Value of data fidelity term :math:`(1/2) \|  D X - S \|_2^2`
 
        ``Cnstr`` : Constraint violation measure
 
@@ -158,7 +157,7 @@ class CnstrMOD(admm.ADMMEqual):
         super(CnstrMOD, self).__init__(Nx, opt)
 
         # Create constraint set projection function
-        self.Pcn = getPcn(opt)
+        self.Pcn = getPcn(opt['ZeroMean'])
 
         # Set rho value (computed from K if not specified)
         self.opt.set_K(S.shape[1])
@@ -208,6 +207,13 @@ class CnstrMOD(admm.ADMMEqual):
 
 
 
+    def getdict(self):
+        """Get final dictionary."""
+
+        return self.Y
+
+
+
     def xstep(self):
         """Minimise Augmented Lagrangian with respect to x."""
 
@@ -245,13 +251,15 @@ class CnstrMOD(admm.ADMMEqual):
 
 
 
-def getPcn(opt):
+
+def getPcn(zm):
     """Construct constraint set projection function"""
 
-    if opt['ZeroMean']:
+    if zm:
         return lambda x: normalise(zeromean(x))
     else:
         return normalise
+
 
 
 def zeromean(v):
@@ -260,12 +268,14 @@ def zeromean(v):
     return v - np.mean(v, 0)
 
 
+
 def normalise(v):
     """Normalise columns of matrix."""
 
     vn = np.sqrt(np.sum(v**2, 0))
     vn[vn == 0] = 1.0
     return v / vn
+
 
 
 def factorise(A, rho):
