@@ -22,6 +22,77 @@ import sporco.linalg as sl
 __author__ = """Brendt Wohlberg <brendt@ieee.org>"""
 
 
+class ConvRepIndexing(object):
+    """Manage the inference of problem dimensions and the roles of ndarray
+    indices for convolutional representations as in :class:`.ConvBPDN`
+    and related classes.
+    """
+
+    def __init__(self, S, dsz, dimN=2, dimK=1):
+        """Initialise a ConvRepIndexing object, inferring the problem
+        dimensions from input dictionary and signal arrays D and S
+        respectively.
+
+        The internal data layout for S, D (X here), and X (A here) is:
+        ::
+
+          dim<0> - dim<Nds-1> : Spatial dimensions, product of N0,N1,... is N
+          dim<Nds>            : C number of channels in S and D
+          dim<Nds+1>          : K number of signals in S
+          dim<Nds+2>          : M number of filters in D
+
+            sptl.      chn  sig  flt
+          S(N0,  N1,   C,   K,   1)
+          D(N0,  N1,   C,   1,   M)   (X here)
+          X(N0,  N1,   1,   K,   M)   (A here)
+        """
+
+        # Numbers of spatial, channel, and signal dimensions in
+        # external X (A here) and S. These need to be calculated since
+        # inputs D and S do not already have the standard data layout
+        # above, i.e. singleton dimensions will not be present
+        self.dimN = dimN                  # Number of spatial dimensions
+        self.dimC = S.ndim - dimN - dimK  # Number of channel dimensions in S
+        self.dimK = dimK                  # Number of signal dimensions in S
+
+        # Number of channels in D and S
+        if self.dimC == 1:
+            self.C = S.shape[dimN]
+        else:
+            self.C = 1
+
+        # Number of signals in S
+        if self.dimK == 1:
+            self.K = S.shape[dimN+self.dimC]
+        else:
+            self.K = 1
+
+        # Number of filters
+        self.dsz = dsz
+        if isinstance(dsz[0], tuple):
+            self.M = sum(x[self.dimN] for x in dsz)
+        else:
+            self.M = dsz[self.dimN]
+
+        # Number of spatial samples
+        self.Nv = S.shape[0:dimN]
+        self.N = np.prod(np.array(self.Nv))
+
+        # Axis indices for each component of S, D (X here), and X (A here)
+        self.axisN = tuple(range(0, dimN))
+        self.axisC = dimN
+        self.axisK = dimN + 1
+        self.axisM = dimN + 2
+
+        # Shapes of internal S, D (X here), and X (A here)
+        self.shpD = self.Nv + (self.C,) + (1,) + (self.M,)
+        self.shpS = self.Nv + (self.C,) + (self.K,) + (1,)
+        self.shpX = self.Nv + (1,) + (self.K,) + (self.M,)
+
+
+
+
+
 class ConvCnstrMOD(admm.ADMMEqual):
     """ADMM algorithm for Convolutional Constrained MOD problem
     :cite:`wohlberg-2016-efficient` :cite:`wohlberg-2016-convolutional`.
@@ -156,8 +227,7 @@ class ConvCnstrMOD(admm.ADMMEqual):
 
 
     def __init__(self, A, S, dsz, opt=None, dimN=2, dimK=1):
-        """
-        Initialise a ConvCnstrMOD object with problem parameters.
+        """Initialise a ConvCnstrMOD object with problem parameters.
 
         This class supports an arbitrary number of spatial dimensions,
         dimN, with a default of 2. The input coefficient map array A
@@ -194,27 +264,8 @@ class ConvCnstrMOD(admm.ADMMEqual):
 
         The dsz parameter indicates the desired filter supports in the
         output dictionary, since this cannot be inferred from the
-        input variables. Parameter dsz must have one of the two forms:
-
-        ::
-
-          (flt_rows, filt_cols, num_filts)
-
-        or
-
-        ::
-
-          (
-           (flt_rows, filt_cols, num_filts),
-           (flt_rows, filt_cols, num_filts),
-           ...
-          )
-
-        M, the total number of dictionary filters, is either num_filts
-        in the first form, or the sum of all num_filts in the second
-        form. NB: If dimN != 2, dimensions above vary accordingly,
-        i.e., there may be fewer or more filter spatial dimensions
-        than flt_rows, filt_cols.
+        input variables. The format is the same as the dsz parameter
+        of :func:`bcrop`.
 
         Parameters
         ----------
@@ -232,58 +283,30 @@ class ConvCnstrMOD(admm.ADMMEqual):
           Number of dimensions for multiple signals in input S
         """
 
+        # Set default options if none specified
         if opt is None:
             opt = ConvCnstrMOD.Options()
 
-        self.dsz = dsz
-
-        self.dimN = dimN                  # Number of spatial dimensions
-        self.dimC = S.ndim - dimN - dimK  # Number of channel dimensions in S
-        self.dimK = dimK                  # Number of signal dimensions in S
-
-        # Axis indices for each component of A (X), and reshaped S, D
-        self.axisN = tuple(range(0, dimN))
-        self.axisC = dimN
-        self.axisK = dimN + 1
-        self.axisM = dimN + 2
-
-        # Number of channels in D and S
-        if self.dimC == 1:
-            self.C = S.shape[dimN]
-        else:
-            self.C = 1
-
-        # Number of signals in S
-        if self.dimK == 1:
-            self.K = S.shape[dimN+self.dimC]
-        else:
-            self.K = 1
-
-        # Number of filters
-        if isinstance(self.dsz[0], tuple):
-            self.M = sum(x[self.dimN] for x in dsz)
-        else:
-            self.M = dsz[self.dimN]
-
-        # Number of spatial samples
-        self.Nv = S[(slice(None),)*dimN + (0,)*(S.ndim-dimN)].shape
-        self.N = np.prod(np.array(self.Nv))
+        # Infer problem dimensions and set relevant attributes of self
+        cri = ConvRepIndexing(S, dsz, dimN, dimK)
+        for attr in ['dimN', 'dimC', 'dimK', 'C', 'K', 'M', 'Nv', 'N',
+                     'axisN', 'axisC', 'axisK', 'axisM', 'dsz']:
+            setattr(self, attr, getattr(cri, attr))
 
         # Call parent class __init__
         Nx = self.M*self.N
         super(ConvCnstrMOD, self).__init__(Nx, opt)
 
-
         # Reshape S to standard layout (A, i.e. X in cbpdn, is assumed
         # to be taken from cbpdn, and therefore already in standard
         # form)
-        self.S = S.reshape(self.Nv + (self.C,) + (self.K,) + (1,))
+        self.S = S.reshape(cri.shpS)
 
         # Compute signal S in DFT domain
         self.Sf = sl.rfftn(self.S, None, self.axisN)
 
         # Create constraint set projection function
-        self.Pcn = getPcn(opt, dsz, self.Nv, self.axisN, self.dimN)
+        self.Pcn = getPcn(opt['ZeroMean'], dsz, self.Nv, self.dimN)
 
         # Set rho value (computed from K if not specified)
         self.opt.set_K(self.K)
@@ -295,8 +318,7 @@ class ConvCnstrMOD(admm.ADMMEqual):
 
         # Initial values for Y
         if self.opt['Y0'] is None:
-            self.Y = np.zeros(self.Nv + (self.C,) + (1,) + (self.M,),
-                              dtype)
+            self.Y = np.zeros(cri.shpD, dtype)
         else:
             self.Y = self.opt['Y0']
         self.Yprev = self.Y
@@ -304,8 +326,7 @@ class ConvCnstrMOD(admm.ADMMEqual):
         # Initial value for U
         if  self.opt['U0'] is None:
             if  self.opt['Y0'] is None:
-                self.U = self.U = np.zeros(self.Nv + (self.C,) + (1,) +
-                                           (self.M,), dtype)
+                self.U = self.U = np.zeros(cri.shpD, dtype)
             else:
                 # If Y0 is given, but not U0, then choose the initial
                 # U so that the relevant dual optimality criterion
@@ -339,6 +360,13 @@ class ConvCnstrMOD(admm.ADMMEqual):
 
 
 
+    def getdict(self):
+        """Get final dictionary."""
+
+        return bcrop(self.Y, self.dsz)
+
+
+
     def xstep(self):
         """Minimise Augmented Lagrangian with respect to x."""
 
@@ -366,11 +394,11 @@ class ConvCnstrMOD(admm.ADMMEqual):
             self.xrrs = sl.rrs(ax, b)
 
 
+
     def ystep(self):
         """Minimise Augmented Lagrangian with respect to y."""
 
         self.Y = self.Pcn(self.AX + self.U)
-
 
 
 
@@ -406,42 +434,181 @@ class ConvCnstrMOD(admm.ADMMEqual):
 def stdformD(D, C, M, dimN=2):
     """Reshape dictionary array (X here, D in cbpdn module) to internal
     standard form.
+
+    Parameters
+    ----------
+    D : array_like
+      Dictionary array
+    C : int
+      Size of channel index
+    M : int
+      Number of filters in dictionary
+    dimN : int, optional (default 2)
+      Number of problem spatial indices
+
+    Returns
+    -------
+    Dr : ndarray
+      Reshaped dictionary array
     """
 
     return D.reshape(D.shape[0:dimN] + (C,) + (1,) + (M,))
 
 
-def getPcn(opt, dsz, Nv, axisN=(0,1), dimN=2):
-    """Construct constraint set projection function"""
 
-    axisnrm = axisN + (axisN[-1]+1,)
-    if opt['ZeroMean']:
-        return lambda x: normalise(zpad(zeromean(bcrop(x, dsz, dimN),
-                                                 axisN), Nv), axisnrm)
+def getPcn0(zm, dsz, dimN=2, dimC=1):
+    """Construct constraint set projection function without support
+    projection. The dsz parameter specifies the support sizes of each
+    filter using the same format as the dsz argument of :func:`bcrop`.
+
+    Parameters
+    ----------
+    zm : bool
+      Flag indicating whether the projection function should include
+      filter mean subtraction
+    dsz : tuple
+      Filter support size(s)
+    dimN : int, optional (default 2)
+      Number of problem spatial indices
+    dimC : int, optional (default 1)
+      Number of problem channel indices
+
+    Returns
+    -------
+    fn : function
+      Constraint set projection function
+    """
+
+    if zm:
+        return lambda x: normalise(zeromean(bcrop(x, dsz), dsz), dimN+dimC)
     else:
-        return lambda x: normalise(zpad(bcrop(x, dsz, dimN), Nv), axisnrm)
+        return lambda x: normalise(bcrop(x, dsz), dimN+dimC)
 
 
-def zeromean(v, axisN=(0,1)):
-    """Return array with mean subtraction for vectors represented by
-    specified axes.
+
+def getPcn(zm, dsz, Nv, dimN=2, dimC=1):
+    """Construct the constraint set projection function utilised by
+    ystep. The dsz parameter specifies the support sizes of each
+    filter using the same format as the dsz argument of :func:`bcrop`.
+
+    Parameters
+    ----------
+    zm : bool
+      Flag indicating whether the projection function should include
+      filter mean subtraction
+    dsz : tuple
+      Filter support size(s)
+    Nv : tuple
+      Sizes of problem spatial indices
+    dimN : int, optional (default 2)
+      Number of problem spatial indices
+    dimC : int, optional (default 1)
+      Number of problem channel indices
+
+    Returns
+    -------
+    fn : function
+      Constraint set projection function
     """
 
-    return v - np.mean(v, axisN)
+    if zm:
+        return lambda x: normalise(zeromean(zpad(bcrop(x, dsz), Nv), dsz),
+                                   dimN+dimC)
+    else:
+        return lambda x: normalise(zpad(bcrop(x, dsz), Nv), dimN+dimC)
 
 
-def normalise(v, axisN=(0,1,2)):
-    """Return array with normalisation of vectors represented by specified
-    axes.
+
+def zeromean(v, dsz):
+    """Subtract mean value from each filter in the input array v. The dsz
+    parameter specifies the support sizes of each filter using the
+    same format as the dsz argument of :func:`bcrop`. Support sizes
+    must be taken into account to ensure that the mean values are
+    computed over the correct number of samples, ingoring the
+    zero-padded region in which the filter is embedded.
+
+    Parameters
+    ----------
+    v : array_like
+      Input dictionary array
+    dsz : tuple
+      Filter support size(s)
+
+    Returns
+    -------
+    vz : array_like
+      Dictionary array with filter means subtracted
     """
 
+    vz = v.copy()
+    if isinstance(dsz[0], tuple):
+        # Multi-scale dictionary specification
+        dimN = len(dsz[0]) - 1
+        axisN = tuple(range(0, dimN))
+        m0 = 0  # Initial index of current block of equi-sized filters
+        # Iterate over distinct filter sizes
+        for mb in range(0, len(dsz)):
+            m1 = m0 + dsz[mb][-1]  # End index of current block of filters
+            # Construct slice corresponding to cropped part of
+            # current block of filters in output array and set from
+            # input array
+            mbslc = tuple([slice(0, x) for x in dsz[mb][0:-1]]) + \
+                    (Ellipsis,) + (slice(m0, m1),)
+            vz[mbslc] -= np.mean(v[mbslc], axisN)
+            m0 = m1  # Update initial index for start of next block
+    else:
+        # Single scale dictionary specification
+        dimN = len(dsz) - 1
+        axisN = tuple(range(0, dimN))
+        axnslc = tuple([slice(0, x) for x in dsz[0:dimN]])
+        vz[axnslc] -= np.mean(v[axnslc], axisN)
+
+    return vz
+
+
+
+def normalise(v, dimN=2):
+    """Normalise vectors, corresponding to slices along specified number
+    of initial spatial dimensions of an array, to have unit
+    :math:`\ell^2` norm. The remaining axes enumerate the distinct
+    vectors to be normalised.
+
+    Parameters
+    ----------
+    v : array_like
+      Array with components to be normalised
+    dimN : int, optional (default 2)
+      Number of initial dimensions over which norm should be computed
+
+    Returns
+    -------
+    vp : array_like
+      Normalised array
+    """
+
+    axisN = tuple(range(0,dimN))
     vn = np.sqrt(np.sum(v**2, axisN, keepdims=True))
     vn[vn == 0] = 1.0
     return v / vn
 
 
+
 def zpad(v, Nv):
-    """Zero-pad initial axes of array to specified size"""
+    """Zero-pad initial axes of array to specified size. Padding is
+    applied to the right, top, etc. of the array indices.
+
+    Parameters
+    ----------
+    v : array_like
+      Array to be padded
+    Nv : tuple
+      Sizes to which each of initial indices should be padded
+
+    Returns
+    -------
+    vp : array_like
+      Padded array
+    """
 
     vp = np.zeros(Nv + v.shape[len(Nv):])
     axnslc = tuple([slice(0, x) for x in v.shape])
@@ -449,24 +616,77 @@ def zpad(v, Nv):
     return vp
 
 
-def bcrop(v, dsz, dimN=2):
-    """Crop specified number of initial dimensions of array to specified
-    size.
+
+def bcrop(v, dsz):
+    """Crop specified number of initial spatial dimensions of dictionary
+    array to specified size. Parameter dsz must have one of the two
+    forms (assuming two spatial dimensions):
+
+    ::
+
+      (flt_rows, filt_cols, num_filts)
+
+    or
+
+    ::
+
+      (
+       (flt_rows1, filt_cols1, num_filts1),
+       (flt_rows2, filt_cols2, num_filts2),
+       ...
+      )
+
+    The total number of dictionary filters, is either num_filts in the
+    first form, or the sum of all num_filts in the second form. If the
+    filters are not two-dimensional, then the dimensions above vary
+    accordingly, i.e., there may be fewer or more filter spatial
+    dimensions than flt_rows, filt_cols, e.g.
+
+    ::
+
+      (flt_rows, num_filts)
+
+    for one-dimensional signals, or
+
+    ::
+
+      (flt_rows, filt_cols, filt_planes, num_filts)
+
+    for three-dimensional signals.
+
+    Parameters
+    ----------
+    v : array_like
+      Dictionary array to be cropped
+    dsz : tuple
+      Filter support size(s)
+
+    Returns
+    -------
+    vc : array_like
+      Cropped dictionary array
+
     """
 
     if isinstance(dsz[0], tuple):
         # Multi-scale dictionary specification
-        maxsz = np.amax(np.array(dsz)[:, 0:dimN], axis=0)
-        vc = np.zeros(tuple(maxsz) + v.shape[dimN:])
-        m0 = 0
+        dimN = len(dsz[0]) - 1
+        maxsz = np.amax(np.array(dsz)[:, 0:dimN], axis=0)  # Max. support size
+        vc = np.zeros(tuple(maxsz) + v.shape[dimN:])  # Init. cropped array
+        m0 = 0  # Initial index of current block of equi-sized filters
+        # Iterate over distinct filter sizes
         for mb in range(0, len(dsz)):
-            m1 = m0 + dsz[mb][-1]
-            mbslc = tuple([slice(0, x) for x in dsz[mb][0:-1]]) +\
+            m1 = m0 + dsz[mb][-1]  # End index of current block of filters
+            # Construct slice corresponding to cropped part of
+            # current block of filters in output array and set from
+            # input array
+            mbslc = tuple([slice(0, x) for x in dsz[mb][0:-1]]) + \
                     (Ellipsis,) + (slice(m0, m1),)
             vc[mbslc] = v[mbslc]
-            m0 = m1
+            m0 = m1  # Update initial index for start of next block
         return vc
     else:
         # Single scale dictionary specification
+        dimN = len(dsz) - 1
         axnslc = tuple([slice(0, x) for x in dsz[0:dimN]])
         return v[axnslc]
