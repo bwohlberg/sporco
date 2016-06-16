@@ -6,7 +6,8 @@ SPORCO Documentation
 
    overview
    install
-   algorithms
+   invprob
+   admm
    modules
    zreferences
 
