@@ -25,7 +25,7 @@ class BPDN(admm.ADMMEqual):
     """ADMM algorithm for the Basis Pursuit DeNoising (BPDN)
     :cite:`chen-1998-atomic` problem.
 
-    Solve the optimisation problem
+    Solve the Single Measurement Vector (SMV) BPDN problem
 
     .. math::
        \mathrm{argmin}_\mathbf{x} \;
@@ -37,6 +37,15 @@ class BPDN(admm.ADMMEqual):
        \mathrm{argmin}_\mathbf{x} \;
        (1/2) \| D \mathbf{x} - \mathbf{s} \|_2^2 + \lambda \| \mathbf{y} \|_1
        \quad \\text{such that} \quad \mathbf{x} = \mathbf{y} \;\;.
+
+
+    The Multiple Measurement Vector (MMV) BPDN problem
+
+    .. math::
+       \mathrm{argmin}_X \;
+       (1/2) \| D X - S \|_F^2 + \lambda \| X \|_1
+
+    is also supported.
 
     After termination of the :meth:`solve` method, attribute :attr:`itstat` is
     a list of tuples representing statistics of each iteration. The
@@ -77,7 +86,7 @@ class BPDN(admm.ADMMEqual):
 
         ``AuxVarObj`` : Flag indicating whether the objective function \
         should be evaluated using variable X  (``False``) or Y (``True``) \
-        as its argument
+        as its argument.
 
         ``L1Weight`` : An array of weights for the :math:`\ell^1`
         norm. The array shape must be such that the array is
@@ -209,6 +218,13 @@ class BPDN(admm.ADMMEqual):
         # Factorise dictionary for efficient solves
         self.lu, self.piv = factorise(D, self.rho)
         self.runtime += self.timer.elapsed()
+
+
+
+    def getcoef(self):
+        """Get final coefficient array."""
+
+        return self.Y
 
 
 
