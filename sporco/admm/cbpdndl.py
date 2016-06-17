@@ -27,7 +27,7 @@ __author__ = """Brendt Wohlberg <brendt@ieee.org>"""
 
 
 class ConvBPDNDictLearn(object):
-    """Dictionary learning based on CBPDN and CCMOD
+    """Dictionary learning based on ConvBPDN and ConvCnstrMOD
     :cite:`wohlberg-2016-efficient`.
 
     Solve the optimisation problem
@@ -225,7 +225,8 @@ class ConvBPDNDictLearn(object):
                         keepdims=True) - self.cbpdn.Sf
             dfd = sl.rfl2norm2(Ef, self.cbpdn.S.shape,
                                axis=tuple(range(self.cbpdn.dimN)))/2.0
-            l1n = linalg.norm(self.cbpdn.Y.ravel(), 1)
+            l1n = linalg.norm((self.cbpdn.opt['L1Weight'] *
+                               self.cbpdn.Y).ravel(), 1)
             obj = dfd + self.cbpdn.lmbda*l1n
             cns = linalg.norm((self.ccmod.Pcn(self.ccmod.X) - self.ccmod.X))
 

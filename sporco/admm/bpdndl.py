@@ -26,7 +26,7 @@ __author__ = """Brendt Wohlberg <brendt@ieee.org>"""
 
 
 class BPDNDictLearn(object):
-    """Dictionary learning based on BPDN and CMOD
+    """Dictionary learning based on BPDN and CnstrMOD
 
     Solve the optimisation problem
 
@@ -186,7 +186,8 @@ class BPDNDictLearn(object):
             # Compute functional value etc.
             Ef = self.bpdn.D.dot(self.cmod.A) - self.bpdn.S
             dfd = 0.5*(linalg.norm(Ef)**2)
-            l1n = linalg.norm(self.bpdn.Y.ravel(), 1)
+            l1n = linalg.norm((self.bpdn.opt['L1Weight'] *
+                               self.bpdn.Y).ravel(), 1)
             obj = dfd + self.bpdn.lmbda*l1n
             cns = linalg.norm((self.cmod.Pcn(self.cmod.X) - self.cmod.X))
 
