@@ -51,9 +51,9 @@ class ConvRepIndexing(object):
         # external D and S. These need to be calculated since inputs D
         # and S do not already have the standard data layout above,
         # i.e. singleton dimensions will not be present
-        self.dimN = dimN                  # Number of spatial dimensions
-        self.dimC = D.ndim-dimN-1         # Number of channel dimensions in D
-        self.dimK = S.ndim-dimN-self.dimC # Number of signal dimensions in S
+        self.dimN = dimN                   # Number of spatial dimensions
+        self.dimC = D.ndim-dimN-1          # Number of channel dimensions in D
+        self.dimK = S.ndim-dimN-self.dimC  # Number of signal dimensions in S
 
         # Number of channels in external D and S
         if self.dimC == 1:
@@ -69,6 +69,7 @@ class ConvRepIndexing(object):
 
         # Number of filters
         self.M = D.shape[self.dimN+self.dimC]
+ 
         # Shape of spatial indices and number of spatial samples
         self.Nv = S.shape[0:dimN]
         self.N = np.prod(np.array(self.Nv))
@@ -86,8 +87,9 @@ class ConvRepIndexing(object):
 
 
 
-class ConvBPDN(admm.ADMMEqual):
 
+
+class ConvBPDN(admm.ADMMEqual):
     """ADMM algorithm for the Convolutional BPDN (CBPDN)
     :cite:`wohlberg-2014-efficient` :cite:`wohlberg-2016-efficient`
     :cite:`wohlberg-2016-convolutional` problem.
@@ -99,6 +101,8 @@ class ConvBPDN(admm.ADMMEqual):
        (1/2) \\left\| \sum_m \mathbf{d}_m * \mathbf{x}_m -
        \mathbf{s} \\right\|_2^2 + \lambda \sum_m \| \mathbf{x}_m \|_1
 
+    for input image :math:`\mathbf{s}`, dictionary filters
+    :math:`\mathbf{d}_m`, and coefficient maps :math:`\mathbf{x}_m`,
     via the ADMM problem
 
     .. math::
@@ -107,6 +111,25 @@ class ConvBPDN(admm.ADMMEqual):
        \mathbf{s} \\right\|_2^2 + \lambda \sum_m \| \mathbf{y}_m \|_1
        \quad \\text{such that} \quad \mathbf{x}_m = \mathbf{y}_m \;\;.
 
+    Multi-image and multi-channel problems are
+    also supported. The multi-image problem is
+
+    .. math::
+       \mathrm{argmin}_\mathbf{x} \;
+       (1/2) \sum_k \\left\| \sum_m \mathbf{d}_m * \mathbf{x}_{k,m} -
+       \mathbf{s}_k \\right\|_2^2 + \lambda \sum_k \sum_m
+       \| \mathbf{x}_{k,m} \|_1
+
+    with input images :math:`\mathbf{s}_k` and coefficient maps
+    :math:`\mathbf{x}_{k,m}`, and the multi-channel problem is
+
+    .. math::
+       \mathrm{argmin}_\mathbf{x} \;
+       (1/2) \sum_c \\left\| \sum_m \mathbf{d}_{c,m} * \mathbf{x}_m -
+       \mathbf{s}_c \\right\|_2^2 + \lambda \sum_m \| \mathbf{x}_m \|_1
+
+    with input image channels :math:`\mathbf{s}_c` and dictionary
+    filters :math:`\mathbf{d}_{c,m}`.
 
     After termination of the :meth:`solve` method, attribute :attr:`itstat` is
     a list of tuples representing statistics of each iteration. The
@@ -183,7 +206,7 @@ class ConvBPDN(admm.ADMMEqual):
 
 
         def __init__(self, opt=None):
-            """Initialise CBPDN algorithm options object"""
+            """Initialise ConvBPDN algorithm options object."""
 
             if opt is None:
                 opt = {}
@@ -202,8 +225,8 @@ class ConvBPDN(admm.ADMMEqual):
 
             if override or self['rho'] is None:
                 self['rho'] = 50.0*lmbda + 1.0
-            if override or self['AutoRho','RsdlTarget'] is None:
-                self['AutoRho','RsdlTarget'] = 1.0 + \
+            if override or self['AutoRho', 'RsdlTarget'] is None:
+                self['AutoRho', 'RsdlTarget'] = 1.0 + \
                   (18.3)**(np.log10(lmbda)+1.0)
 
 
@@ -276,8 +299,7 @@ class ConvBPDN(admm.ADMMEqual):
             setattr(self, attr, getattr(cri, attr))
 
         # Call parent class __init__
-        Nx = self.M*self.N
-        super(ConvBPDN, self).__init__(Nx, opt)
+        super(ConvBPDN, self).__init__(self.M*self.N, opt)
 
         # Reshape D and S to standard layout
         self.D = D.reshape(cri.shpD)
@@ -326,6 +348,7 @@ class ConvBPDN(admm.ADMMEqual):
         xfshp = list(self.Y.shape)
         xfshp[dimN-1] = xfshp[dimN-1]//2 + 1
         self.Xf = sl.pyfftw_empty_aligned(xfshp, dtype=sl.complex_dtype(dtype))
+
         self.runtime += self.timer.elapsed()
 
         self.setdict()
@@ -349,6 +372,12 @@ class ConvBPDN(admm.ADMMEqual):
             self.c = None
         self.runtime += self.timer.elapsed()
 
+
+
+    def getcoef(self):
+        """Get final coefficient array."""
+
+        return self.Y
 
 
 
@@ -382,7 +411,7 @@ class ConvBPDN(admm.ADMMEqual):
         """Minimise Augmented Lagrangian with respect to y."""
 
         self.Y = sl.shrink1(self.AX + self.U,
-                            (self.lmbda/self.rho)*self.opt['L1Weight'])
+                            (self.lmbda/self.rho) * self.opt['L1Weight'])
         if self.opt['NonNegCoef']:
             self.Y[self.Y < 0.0] = 0.0
         if self.opt['NoBndryCross']:
@@ -411,7 +440,7 @@ class ConvBPDN(admm.ADMMEqual):
 
         Ef = np.sum(self.Df * self.obfn_fvarf(), axis=self.axisM,
                     keepdims=True) - self.Sf
-        dfd = sl.rfl2norm2(Ef, self.S.shape, axis=tuple(range(self.dimN)))/2.0
+        dfd = sl.rfl2norm2(Ef, self.S.shape, axis=self.axisN)/2.0
         reg = linalg.norm((self.opt['L1Weight'] * self.obfn_gvar()).ravel(), 1)
         obj = dfd + self.lmbda*reg
         itst = type(self).IterationStats(k, obj, dfd, reg, r, s,
@@ -424,8 +453,8 @@ class ConvBPDN(admm.ADMMEqual):
         """Updated cached c array when rho changes."""
 
         if self.opt['HighMemSolve']:
-            self.c = self.Df / (np.sum(self.Df * np.conj(self.Df),
-                     axis=self.axisM, keepdims=True) + self.rho)
+            self.c = sl.solvedbi_sm_c(self.Df, np.conj(self.Df), self.rho,
+                                      self.axisM)
 
 
 
@@ -529,6 +558,8 @@ class ConvElasticNet(ConvBPDN):
           Regularisation parameter (l2)
         opt : :class:`ConvBPDN.Options` object
           Algorithm options
+        dimN : int, optional (default 2)
+          Number of spatial dimensions
         """
 
         if opt is None:
@@ -595,7 +626,7 @@ class ConvElasticNet(ConvBPDN):
 
         Ef = np.sum(self.Df * self.obfn_fvarf(), axis=self.axisM,
                     keepdims=True) - self.Sf
-        dfd = sl.rfl2norm2(Ef, self.S.shape, axis=tuple(range(self.dimN)))/2.0
+        dfd = sl.rfl2norm2(Ef, self.S.shape, axis=self.axisN)/2.0
         rl1 = linalg.norm((self.opt['L1Weight'] * self.obfn_gvar()).ravel(), 1)
         rl2 = 0.5*linalg.norm(self.obfn_gvar())**2
         obj = dfd + self.lmbda*rl1 + self.mu*rl2
