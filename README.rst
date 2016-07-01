@@ -45,12 +45,8 @@ for Python 2
 
 ::
 
-   sudo apt-get install python-numpy
-   sudo apt-get install python-scipy
-   sudo apt-get install python-numexpr
-   sudo apt-get install python-matplotlib
-   sudo apt-get install python-pip
-   sudo apt-get install libfftw3-dev
+   sudo apt-get install python-numpy python-scipy python-numexpr
+   sudo apt-get install python-matplotlib python-pip libfftw3-dev
    sudo pip install future
    sudo pip install pyfftw
 
@@ -58,12 +54,8 @@ or Python 3
 
 ::
 
-   sudo apt-get install python3-numpy
-   sudo apt-get install python3-scipy
-   sudo apt-get install python3-numexpr
-   sudo apt-get install python3-matplotlib
-   sudo apt-get install python3-pip
-   sudo apt-get install libfftw3-dev
+   sudo apt-get install python3-numpy python3-scipy python3-numexpr
+   sudo apt-get install python3-matplotlib python3-pip libfftw3-dev 
    sudo pip3 install future
    sudo pip3 install pyfftw
 
@@ -75,8 +67,7 @@ for Python 2
 
 ::
 
-   sudo apt-get install python-pytest
-   sudo apt-get install python-numpydoc
+   sudo apt-get install python-pytest python-numpydoc
    sudo pip install pytest-runner
    sudo pip install sphinxcontrib-bibtex
 
@@ -84,8 +75,7 @@ or Python 3
 
 ::
 
-   sudo apt-get install python3-pytest
-   sudo apt-get install python3-numpydoc
+   sudo apt-get install python3-pytest python3-numpydoc
    sudo pip3 install pytest-runner
    sudo pip3 install sphinxcontrib-bibtex
 
