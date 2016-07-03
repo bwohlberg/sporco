@@ -19,7 +19,7 @@ Usage Examples
 
         :class:`.ConvCnstrMOD` usage (greyscale images) 
 
-    .. literalinclude:: ../../../examples/demo_ccmod_gry.py
+    .. literalinclude:: ../../../examples/cnvsparse/demo_ccmod_gry.py
        :language: python
        :lines: 14-
 
@@ -30,6 +30,6 @@ Usage Examples
 
         :class:`.ConvCnstrMOD` usage (colour images)
 
-    .. literalinclude:: ../../../examples/demo_ccmod_clr.py
+    .. literalinclude:: ../../../examples/cnvsparse/demo_ccmod_clr.py
        :language: python
        :lines: 14-

@@ -20,7 +20,7 @@ Usage Examples
 
         :class:`.ConvBPDNDictLearn` usage (greyscale images, example 1)
 
-    .. literalinclude:: ../../../examples/demo_cbpdndl_gry_1.py
+    .. literalinclude:: ../../../examples/cnvsparse/demo_cbpdndl_gry_1.py
        :language: python
        :lines: 14-
 
@@ -30,7 +30,7 @@ Usage Examples
 
         :class:`.ConvBPDNDictLearn` usage (greyscale images, example 2)
 
-    .. literalinclude:: ../../../examples/demo_cbpdndl_gry_2.py
+    .. literalinclude:: ../../../examples/cnvsparse/demo_cbpdndl_gry_2.py
        :language: python
        :lines: 14-
 
@@ -40,7 +40,7 @@ Usage Examples
 
         :class:`.ConvBPDNDictLearn` usage (colour images, example 1)
 
-    .. literalinclude:: ../../../examples/demo_cbpdndl_clr_1.py
+    .. literalinclude:: ../../../examples/cnvsparse/demo_cbpdndl_clr_1.py
        :language: python
        :lines: 14-
 
@@ -50,6 +50,6 @@ Usage Examples
 
         :class:`.ConvBPDNDictLearn` usage (colour images, example 2)
 
-    .. literalinclude:: ../../../examples/demo_cbpdndl_clr_2.py
+    .. literalinclude:: ../../../examples/cnvsparse/demo_cbpdndl_clr_2.py
        :language: python
        :lines: 14-

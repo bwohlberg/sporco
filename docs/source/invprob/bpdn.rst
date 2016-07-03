@@ -41,7 +41,7 @@ Usage Examples
 
         :class:`.BPDN` usage
 
-    .. literalinclude:: ../../../examples/demo_bpdn.py
+    .. literalinclude:: ../../../examples/stdsparse/demo_bpdn.py
        :language: python
        :lines: 14-
 
@@ -52,6 +52,6 @@ Usage Examples
 
         :class:`.ElasticNet` usage
 
-    .. literalinclude:: ../../../examples/demo_elnet.py
+    .. literalinclude:: ../../../examples/stdsparse/demo_elnet.py
        :language: python
        :lines: 14-

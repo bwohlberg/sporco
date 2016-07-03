@@ -46,7 +46,7 @@ Usage Examples
 
         :class:`.ConvBPDN` usage (greyscale image)
 
-    .. literalinclude:: ../../../examples/demo_cbpdn_gry.py
+    .. literalinclude:: ../../../examples/cnvsparse/demo_cbpdn_gry.py
        :language: python
        :lines: 14-
 
@@ -56,7 +56,7 @@ Usage Examples
 
         :class:`.ConvBPDN` usage (colour image)
 
-    .. literalinclude:: ../../../examples/demo_cbpdn_clr.py
+    .. literalinclude:: ../../../examples/cnvsparse/demo_cbpdn_clr.py
        :language: python
        :lines: 14-
 
@@ -66,7 +66,7 @@ Usage Examples
 
         :class:`.ConvElasticNet` usage (greyscale image)
 
-    .. literalinclude:: ../../../examples/demo_celnet_gry.py
+    .. literalinclude:: ../../../examples/cnvsparse/demo_celnet_gry.py
        :language: python
        :lines: 14-
 
@@ -76,6 +76,6 @@ Usage Examples
 
         :class:`.ConvElasticNet` usage (colour image)
 
-    .. literalinclude:: ../../../examples/demo_celnet_clr.py
+    .. literalinclude:: ../../../examples/cnvsparse/demo_celnet_clr.py
        :language: python
        :lines: 14-

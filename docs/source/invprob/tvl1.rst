@@ -31,7 +31,7 @@ Usage Examples
 
         :class:`.TVL1Denoise` usage
 
-    .. literalinclude:: ../../../examples/demo_tvl1denoise_1.py
+    .. literalinclude:: ../../../examples/misc/demo_tvl1denoise_1.py
        :language: python
        :lines: 14-
 
@@ -42,7 +42,7 @@ Usage Examples
 
         :class:`.TVL1Deconv` usage (example 1)
 
-    .. literalinclude:: ../../../examples/demo_tvl1deconv_1.py
+    .. literalinclude:: ../../../examples/misc/demo_tvl1deconv_1.py
        :language: python
        :lines: 14-
 
@@ -53,6 +53,6 @@ Usage Examples
 
         :class:`.TVL1Deconv` usage (example 2)
 
-    .. literalinclude:: ../../../examples/demo_tvl1deconv_2.py
+    .. literalinclude:: ../../../examples/misc/demo_tvl1deconv_2.py
        :language: python
        :lines: 14-

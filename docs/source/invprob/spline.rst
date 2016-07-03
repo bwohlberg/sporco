@@ -20,6 +20,6 @@ Usage Examples
 
         :class:`.SplineL1` usage
 
-    .. literalinclude:: ../../../examples/demo_spline.py
+    .. literalinclude:: ../../../examples/misc/demo_spline.py
        :language: python
        :lines: 14-

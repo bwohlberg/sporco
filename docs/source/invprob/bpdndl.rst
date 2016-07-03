@@ -20,6 +20,6 @@ Usage Examples
 
         :class:`.BPDNDictLearn` usage
 
-    .. literalinclude:: ../../../examples/demo_bpdndl.py
+    .. literalinclude:: ../../../examples/stdsparse/demo_bpdndl.py
        :language: python
        :lines: 14-

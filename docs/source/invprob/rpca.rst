@@ -21,6 +21,6 @@ Usage Examples
 
         :class:`.RobustPCA` usage
 
-    .. literalinclude:: ../../../examples/demo_rpca.py
+    .. literalinclude:: ../../../examples/misc/demo_rpca.py
        :language: python
        :lines: 14-

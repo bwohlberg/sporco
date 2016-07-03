@@ -19,6 +19,6 @@ Usage Examples
 
         :class:`.CnstrMOD` usage
 
-    .. literalinclude:: ../../../examples/demo_cmod.py
+    .. literalinclude:: ../../../examples/stdsparse/demo_cmod.py
        :language: python
        :lines: 14-
