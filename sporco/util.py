@@ -31,7 +31,7 @@ __author__ = """Brendt Wohlberg <brendt@ieee.org>"""
 
 
 def plot(dat, x=None, title=None, xlbl=None, ylbl=None, lgnd=None, lglc=None,
-         ptyp='plot', block=False, fgrf=None, fgnm=None, fgsz=(12, 12)):
+         ptyp='plot', block=False, fgrf=None, fgnm=None, fgsz=None):
     """Plot columns of array.
 
     Parameters
