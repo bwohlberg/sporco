@@ -1,24 +1,27 @@
 tvl2
 ====
 
-This module includes the :class:`.TVL2Denoise` and :class:`.TVL2Deconv`
-classes, solving the following problems:
+This module includes the following classes:
 
 * :class:`.TVL2Denoise`
 
-    .. math::
-       \mathrm{argmin}_\mathbf{x} \;
-        \| W_{\mathrm{df}}  (\mathbf{x} - \mathbf{s}) \|_2^2 +
-             \lambda \| W_{\mathrm{tv}} \sqrt{(G_r \mathbf{x})^2 + 
-             (G_c \mathbf{x})^2}\|_1
+  Solve the :math:`\ell^2`-TV denoising problem
+
+  .. math::
+     \mathrm{argmin}_\mathbf{x} \;
+     (1/2) \| W_{\mathrm{df}}  (\mathbf{x} - \mathbf{s}) \|_2^2 +
+     \lambda \left \| W_{\mathrm{tv}} \sqrt{(G_r \mathbf{x})^2 +
+     (G_c \mathbf{x})^2} \right \|_1
 
 * :class:`.TVL2Deconv`
 
-    .. math::
-       \mathrm{argmin}_\mathbf{x} \;
-       \| A * \mathbf{x} - \mathbf{s} \|_2^2 +
-       \lambda \| W_{\mathrm{tv}} \sqrt{(G_r \mathbf{x})^2 +
-       (G_c \mathbf{x})^2} \|_1
+  Solve the :math:`\ell^2`-TV deconvolution problem
+
+  .. math::
+     \mathrm{argmin}_\mathbf{x} \;
+     (1/2) \| A * \mathbf{x} - \mathbf{s} \|_2^2 +
+     \lambda \left \| W_{\mathrm{tv}} \sqrt{(G_r \mathbf{x})^2 +
+     (G_c \mathbf{x})^2} \right \|_1
 
 
 
@@ -31,28 +34,28 @@ Usage Examples
 
         :class:`.TVL2Denoise` usage
 
-    .. literalinclude:: ../../../examples/misc/demo_tvl1denoise_1.py
+    .. literalinclude:: ../../../examples/misc/demo_tvl2denoise.py
        :language: python
-       :lines: 14-
+       :lines: 9-
 
 
 .. container:: toggle
 
     .. container:: header
 
-        :class:`.TVL2Deconv` usage (example 1)
+        :class:`.TVL2Deconv` usage (denoising problem)
 
-    .. literalinclude:: ../../../examples/misc/demo_tvl1deconv_1.py
+    .. literalinclude:: ../../../examples/misc/demo_tvl2deconv_den.py
        :language: python
-       :lines: 14-
+       :lines: 9-
 
 
 .. container:: toggle
 
     .. container:: header
 
-        :class:`.TVL2Deconv` usage (example 2)
+        :class:`.TVL2Deconv` usage (deconvolution problem)
 
-    .. literalinclude:: ../../../examples/misc/demo_tvl1deconv_2.py
+    .. literalinclude:: ../../../examples/misc/demo_tvl2deconv_dcn.py
        :language: python
-       :lines: 14-
+       :lines: 9-

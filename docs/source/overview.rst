@@ -69,7 +69,7 @@ example
 
 ::
 
-   python examples/demo_bpdn.py
+   python examples/stdsparse/demo_bpdn.py
 
 
 To run these scripts prior to installing the package it will be

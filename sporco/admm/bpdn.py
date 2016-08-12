@@ -17,6 +17,8 @@ import collections
 
 from sporco.admm import admm
 import sporco.linalg as sl
+from sporco.util import u
+
 
 __author__ = """Brendt Wohlberg <brendt@ieee.org>"""
 
@@ -137,10 +139,11 @@ class BPDN(admm.ADMMEqual):
                  'EpsPrimal', 'EpsDual', 'Rho', 'Time'])
     """Named tuple type for recording ADMM iteration statistics"""
 
-    hdrtxt = ['Itn', 'Fnc', 'DFid', 'l1', 'r', 's', 'rho']
+    hdrtxt = ['Itn', 'Fnc', 'DFid', u('ℓ1'), 'r', 's', u('ρ')]
     """Display column header text"""
-    hdrval = {'Itn' : 'Iter', 'Fnc' : 'ObjFun', 'DFid' : 'DFid', 'l1' : 'RegL1',
-              'r' : 'PrimalRsdl', 's' : 'DualRsdl', 'rho' : 'Rho'}
+    hdrval = {'Itn' : 'Iter', 'Fnc' : 'ObjFun', 'DFid' : 'DFid',
+              u('ℓ1') : 'RegL1', 'r' : 'PrimalRsdl', 's' : 'DualRsdl',
+              u('ρ') : 'Rho'}
     """Dictionary mapping display column headers to IterationStats entries"""
 
 
@@ -216,7 +219,7 @@ class BPDN(admm.ADMMEqual):
         self.D = D
         self.DTS = D.T.dot(self.S)
         # Factorise dictionary for efficient solves
-        self.lu, self.piv = factorise(D, self.rho)
+        self.lu, self.piv = sl.lu_factor(D, self.rho)
         self.runtime += self.timer.elapsed()
 
 
@@ -231,8 +234,9 @@ class BPDN(admm.ADMMEqual):
     def xstep(self):
         """Minimise Augmented Lagrangian with respect to x."""
 
-        self.X = linsolve(self.D, self.rho, self.lu, self.piv,
-                          self.DTS + self.rho*(self.Y - self.U))
+        self.X = sl.lu_solve_ATAI(self.D, self.rho, self.DTS +
+                                  self.rho*(self.Y - self.U),
+                                  self.lu, self.piv,)
 
 
 
@@ -265,37 +269,126 @@ class BPDN(admm.ADMMEqual):
     def rhochange(self):
         """Re-factorise matrix when rho changes."""
 
-        self.lu, self.piv = factorise(self.D, self.rho)
+        self.lu, self.piv = sl.lu_factor(self.D, self.rho)
 
 
 
-def factorise(D, rho):
-    """Compute factorisation of either :math:`D^T D + \\rho I`
-    or :math:`D D^T + \\rho I`, depending on which matrix is smaller.
+
+
+class BPDNJoint(BPDN):
+    """ADMM algorithm for BPDN with joint sparsity via an :math:`\ell^{2,1}`
+    norm term.
+
+    Solve the optimisation problem
+
+    .. math::
+       \mathrm{argmin}_X \; (1/2) \| D X - S \|_2^2 + \lambda \| X \|_1
+       + \mu \| X \|_{2,1}
+
+    via the ADMM problem
+
+    .. math::
+       \mathrm{argmin}_X \; (1/2) \| D X - S \|_2^2 +
+       \lambda \| Y \|_1 + \mu \| Y \|_{2,1} \quad \\text{such that} \quad
+       X = Y \;\;.
+
+    After termination of the :meth:`solve` method, attribute :attr:`itstat` is
+    a list of tuples representing statistics of each iteration. The
+    fields of the named tuple ``IterationStats`` are:
+
+       ``Iter`` : Iteration number
+
+       ``ObjFun`` : Objective function value
+
+       ``DFid`` :  Value of data fidelity term :math:`(1/2) \| D X - S \|_2^2`
+
+       ``RegL1`` : Value of regularisation term :math:`\| X \|_1`
+
+       ``RegL21`` : Value of regularisation term :math:`\| X \|_{2,1}`
+
+       ``PrimalRsdl`` : Norm of primal residual
+
+       ``DualRsdl`` : Norm of dual Residual
+
+       ``EpsPrimal`` : Primal residual stopping tolerance \
+       :math:`\epsilon_{\mathrm{pri}}`
+
+       ``EpsDual`` : Dual residual stopping tolerance \
+       :math:`\epsilon_{\mathrm{dua}}`
+
+       ``Rho`` : Penalty parameter
+
+       ``Time`` : Cumulative run time
     """
 
-    N, M = D.shape
-    # If N < M it is cheaper to factorise D*D^T' + rho*I and then use the
-    # matrix inversion lemma to compute the inverse of D^T*D + rho*I
-    if N >= M:
-        lu, piv = linalg.lu_factor(D.T.dot(D) + rho*np.identity(M))
-    else:
-        lu, piv = linalg.lu_factor(D.dot(D.T) + rho*np.identity(N))
-    return lu, piv
+
+    IterationStats = collections.namedtuple('IterationStats',
+                ['Iter', 'ObjFun', 'DFid', 'RegL1', 'RegL21',
+                 'PrimalRsdl', 'DualRsdl', 'EpsPrimal', 'EpsDual',
+                 'Rho', 'Time'])
+    """Named tuple type for recording ADMM iteration statistics"""
+
+    hdrtxt = ['Itn', 'Fnc', 'DFid', 'l1', 'l21', 'r', 's', 'rho']
+    """Display column header text"""
+    hdrval = {'Itn' : 'Iter', 'Fnc' : 'ObjFun', 'DFid' : 'DFid',
+              'l1' : 'RegL1', 'l21' : 'RegL21', 'r' : 'PrimalRsdl',
+              's' : 'DualRsdl', 'rho' : 'Rho'}
+    """Dictionary mapping display column headers to IterationStats entries"""
 
 
 
-def linsolve(D, rho, lu, piv, b):
-    """Solve the linear system :math:`(D^T D + \\rho I)\\mathbf{x} =
-    \\mathbf{b}`.
-    """
+    def __init__(self, D, S, lmbda=None, mu=0.0, opt=None):
+        """
+        Initialise a BPDNJoint object with problem parameters.
 
-    N, M = D.shape
-    if N >= M:
-        x = linalg.lu_solve((lu, piv), b)
-    else:
-        x = (b - D.T.dot(linalg.lu_solve((lu, piv), D.dot(b), 1))) / rho
-    return x
+        Parameters
+        ----------
+        D : array_like, shape (N, M)
+          Dictionary matrix
+        S : array_like, shape (M, K)
+          Signal vector or matrix
+        lmbda : float
+          Regularisation parameter (l1)
+        mu : float
+          Regularisation parameter (l2,1)
+        opt : :class:`BPDN.Options` object
+          Algorithm options
+        """
+
+        if opt is None:
+            opt = BPDN.Options()
+        self.mu = mu
+        super(BPDNJoint, self).__init__(D, S, lmbda, opt)
+
+
+
+    def ystep(self):
+        """Minimise Augmented Lagrangian with respect to y."""
+
+        self.Y = sl.shrink12(self.AX + self.U,
+                             (self.lmbda/self.rho)*self.opt['L1Weight'],
+                             self.mu/self.rho)
+        if self.opt['NonNegCoef']:
+            self.Y[self.Y < 0.0] = 0.0
+
+
+
+
+    def iteration_stats(self, k, r, s, epri, edua, tk):
+        """
+        Construct iteration stats record tuple. Data fidelity term is
+        :math:`(1/2) \| D X - S \|_2^2` and regularisation terms are
+        :math:`\| Y \|_1` and :math:`\| Y \|_{2,1}`.
+        """
+
+        dfd = 0.5*linalg.norm((self.D.dot(self.obfn_fvar()) - self.S))**2
+        rl1 = linalg.norm((self.opt['L1Weight'] * self.obfn_gvar()).ravel(), 1)
+        rl21 = np.sum(np.sqrt(np.sum(self.obfn_gvar()**2, axis=1)))
+        obj = dfd + self.lmbda*rl1 + self.mu*rl21
+        itst = type(self).IterationStats(k, obj, dfd, rl1, rl21, r, s,
+                                         epri, edua, self.rho, tk)
+        return itst
+
 
 
 
@@ -316,7 +409,7 @@ class ElasticNet(BPDN):
     .. math::
        \mathrm{argmin}_\mathbf{x} \;
        (1/2) \| D \mathbf{x} - \mathbf{s} \|_2^2 + \lambda \| \mathbf{y} \|_1
-       + (\mu/2) \| \mathbf{x} \|_2^2 \quad \\text{such that} \quad 
+       + (\mu/2) \| \mathbf{x} \|_2^2 \quad \\text{such that} \quad
        \mathbf{x} = \mathbf{y} \;\;.
 
     After termination of the :meth:`solve` method, attribute :attr:`itstat` is
@@ -400,7 +493,7 @@ class ElasticNet(BPDN):
         self.D = D
         self.DTS = D.T.dot(self.S)
         # Factorise dictionary for efficient solves
-        self.lu, self.piv = factorise(D, self.mu + self.rho)
+        self.lu, self.piv = sl.lu_factor(D, self.mu + self.rho)
         self.runtime += self.timer.elapsed()
 
 
@@ -408,8 +501,8 @@ class ElasticNet(BPDN):
     def xstep(self):
         """Minimise Augmented Lagrangian with respect to x."""
 
-        self.X = linsolve(self.D, self.mu + self.rho, self.lu, self.piv,
-                          self.DTS + self.rho*(self.Y - self.U))
+        self.X = sl.lu_solve_ATAI(self.D, self.mu + self.rho, self.DTS +
+                                  self.rho*(self.Y - self.U), self.lu, self.piv)
 
 
 
@@ -436,4 +529,4 @@ class ElasticNet(BPDN):
     def rhochange(self):
         """Re-factorise matrix when rho changes."""
 
-        self.lu, self.piv = factorise(self.D, self.mu + self.rho)
+        self.lu, self.piv = sl.lu_factor(self.D, self.mu + self.rho)

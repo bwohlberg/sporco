@@ -19,13 +19,15 @@ import copy
 
 from sporco import cdict
 from sporco import util
+from sporco.util import u
 from sporco.admm import bpdn
 from sporco.admm import cmod
+from sporco.admm import dictlrn
 
 __author__ = """Brendt Wohlberg <brendt@ieee.org>"""
 
 
-class BPDNDictLearn(object):
+class BPDNDictLearn(dictlrn.DictLearn):
     """Dictionary learning based on BPDN and CnstrMOD
 
     Solve the optimisation problem
@@ -49,26 +51,28 @@ class BPDNDictLearn(object):
        ``DFid`` :  Value of data fidelity term \
        :math:`(1/2) \| D X - S \|_F^2`
 
-       ``Reg`` : Value of regularisation term \
+       ``RegL1`` : Value of regularisation term \
        :math:`\| X \|_1`
+
+       ``Cnstr`` : Constraint violation measure
 
        ``XPrRsdl`` : Norm of X primal residual
 
        ``XDlRsdl`` : Norm of X dual residual
 
+       ``XRho`` : X penalty parameter
+
        ``DPrRsdl`` : Norm of D primal residual
 
-       ``DDlRsdl`` : Norm of D dual Residual
+       ``DDlRsdl`` : Norm of D dual residual
 
-       ``Rho`` : X penalty parameter
-
-       ``Sigma`` : D penalty parameter
+       ``DRho`` : D penalty parameter
 
        ``Time`` : Cumulative run time
     """
 
 
-    class Options(cdict.ConstrainedDict):
+    class Options(dictlrn.DictLearn.Options):
         """BPDN dictionary learning algorithm options.
 
         Options:
@@ -76,7 +80,7 @@ class BPDNDictLearn(object):
           ``Verbose`` : Flag determining whether iteration status is displayed.
 
           ``StatusHeader`` : Flag determining whether status header and \
-              separator are dislayed
+          separator are dislayed
 
           ``MaxMainIter`` : Maximum main iterations
 
@@ -94,31 +98,18 @@ class BPDNDictLearn(object):
         def __init__(self, opt=None):
             """Initialise BPDN dictionary learning algorithm options."""
 
-            cdict.ConstrainedDict.__init__(self, {
+            dictlrn.DictLearn.Options.__init__(self, {
                 'BPDN' : bpdn.BPDN.Options({'MaxMainIter' : 1,
                     'AutoRho' : {'Period' : 10, 'AutoScaling' : False,
                     'RsdlRatio' : 10.0, 'Scaling': 2.0, 'RsdlTarget' : 1.0}}),
                 'CMOD' : cmod.CnstrMOD.Options({'MaxMainIter' : 1,
-                                    'AutoRho' : {'Period' : 10}})
+                    'AutoRho' : {'Period' : 10}, 'AuxVarObj' : False})
                 })
 
             if opt is None:
                 opt = {}
             self.update(opt)
 
-
-    IterationStats = collections.namedtuple('IterationStats',
-            ['Iter', 'ObjFun', 'DFid', 'Reg', 'XPrRsdl', 'XDlRsdl',
-             'DPrRsdl', 'DDlRsdl', 'Rho', 'Sigma', 'Time'])
-    """Named tuple type for recording ADMM iteration statistics"""
-
-    fwiter = 4
-    """Field width for iteration count display column"""
-    fpothr = 2
-    """Field precision for other display columns"""
-    hdrtxt = ['Itn', 'Fnc', 'DFid', 'l1', 'Cnstr', 'r_X', 's_X',
-              'r_D', 's_D', 'rho_X', 'rho_D']
-    """Display column header text"""
 
 
     def __init__(self, D0, S, lmbda=None, opt=None):
@@ -137,105 +128,41 @@ class BPDNDictLearn(object):
           Algorithm options
         """
 
-        self.runtime = 0.0
-        self.timer = util.Timer()
-
         if opt is None:
             opt = BPDNDictLearn.Options()
         self.opt = opt
+
+        # Normalise dictionary according to D update options
+        D0 = cmod.getPcn(opt['CMOD', 'ZeroMean'])(D0)
+
+        # Modify D update options to include initial values for Y and U
         Nc = D0.shape[1]
-        Nm = S.shape[1]
-        D0 = cmod.getPcn(opt['CMOD'])(D0)
-        self.bpdn = bpdn.BPDN(D0, S, lmbda, opt['BPDN'])
         opt['CMOD'].update({'Y0' : D0, 'U0' : np.zeros((S.shape[0], Nc))})
-        self.cmod = cmod.CnstrMOD(self.bpdn.Y, S, (Nc, Nm), opt['CMOD'])
 
-        self.itstat = []
-        self.j = 0
+        # Create X update object
+        xstep = bpdn.BPDN(D0, S, lmbda, opt['BPDN'])
 
-        self.runtime += self.timer.elapsed()
+        # Create D update object
+        Nm = S.shape[1]
+        dstep = cmod.CnstrMOD(xstep.Y, S, (Nc, Nm), opt['CMOD'])
 
+        # Configure iteration statistics reporting
+        isc = dictlrn.IterStatsConfig(
+            isfld = ['Iter', 'ObjFun', 'DFid', 'RegL1', 'Cnstr', 'XPrRsdl',
+                     'XDlRsdl', 'XRho', 'DPrRsdl', 'DDlRsdl', 'DRho', 'Time'],
+            isxmap = {'ObjFun' : 'ObjFun', 'DFid' : 'DFid', 'RegL1' : 'RegL1',
+                      'XPrRsdl' : 'PrimalRsdl', 'XDlRsdl' : 'DualRsdl',
+                      'XRho' : 'Rho'},
+            isdmap = {'Cnstr' :  'Cnstr', 'DPrRsdl' : 'PrimalRsdl',
+                      'DDlRsdl' : 'DualRsdl', 'DRho' : 'Rho'},
+            evlmap = {},
+            hdrtxt = ['Itn', 'Fnc', 'DFid', 'l1', 'Cnstr', 'r_X', 's_X',
+                      u('ρ_X'), 'r_D', 's_D', u('ρ_D')],
+            hdrmap = {'Itn' : 'Iter', 'Fnc' : 'ObjFun', 'DFid' : 'DFid',
+                      'l1' : 'RegL1', 'Cnstr' : 'Cnstr', 'r_X' : 'XPrRsdl',
+                      's_X' : 'XDlRsdl', u('ρ_X') : 'XRho', 'r_D' : 'DPrRsdl',
+                      's_D' : 'DDlRsdl', u('ρ_D') : 'DRho'}
+            )
 
-
-    def solve(self):
-        """Run optimisation"""
-
-        if self.opt['Verbose']:
-            hdrtxt = type(self).hdrtxt
-            # Call utility function to construct status display formatting
-            hdrstr, fmtstr, nsep = util.solve_status_str(hdrtxt,
-                                        type(self).fwiter, type(self).fpothr)
-            # Print header and separator strings
-            if self.opt['StatusHeader']:
-                print(hdrstr)
-                print("-" * nsep)
-
-        # Reset timer
-        self.timer.start()
-
-        for j in range(self.j, self.j + self.opt['MaxMainIter']):
-
-            # X update
-            self.bpdn.solve()
-            self.cmod.setcoef(self.bpdn.Y)
-
-            # D update
-            self.cmod.solve()
-            self.bpdn.setdict(self.cmod.Y)
-
-            # Compute functional value etc.
-            Ef = self.bpdn.D.dot(self.cmod.A) - self.bpdn.S
-            dfd = 0.5*(linalg.norm(Ef)**2)
-            l1n = linalg.norm((self.bpdn.opt['L1Weight'] *
-                               self.bpdn.Y).ravel(), 1)
-            obj = dfd + self.bpdn.lmbda*l1n
-            cns = linalg.norm((self.cmod.Pcn(self.cmod.X) - self.cmod.X))
-
-            # Get X and D primal and dual residuals
-            rX = self.bpdn.itstat[-1].PrimalRsdl
-            sX = self.bpdn.itstat[-1].DualRsdl
-            rD = self.cmod.itstat[-1].PrimalRsdl
-            sD = self.cmod.itstat[-1].DualRsdl
-
-            # Construct iteration stats for current iteration and append to
-            # record of iteration stats
-            tk = self.timer.elapsed()
-            itstatk = type(self).IterationStats(j, obj, dfd, l1n,
-                                    rX, sX, rD, sD, self.bpdn.rho,
-                                    self.cmod.rho, tk)
-            self.itstat.append(itstatk)
-
-            # Display iteration stats if Verbose option enabled
-            if self.opt['Verbose']:
-                itdsp = (j, obj, dfd, l1n, cns, rX, sX, rD, sD,
-                         self.bpdn.rho, self.cmod.rho)
-                print(fmtstr % itdsp)
-
-
-
-        # Record run time
-        self.runtime += self.timer.elapsed()
-
-        # Record iteration count
-        self.j = j+1
-
-        # Print final separator string if Verbose option enabled
-        if self.opt['Verbose'] and self.opt['StatusHeader']:
-            print("-" * nsep)
-
-        # Return final dictionary
-        return self.getdict()
-
-
-
-    def getdict(self):
-        """Get final dictionary"""
-
-        return self.cmod.getdict()
-
-
-
-    def getcoef(self):
-        """Get final coefficient map array"""
-
-        return self.bpdn.getcoef()
+        # Call parent constructor
+        super(BPDNDictLearn, self).__init__(xstep, dstep, opt, isc)

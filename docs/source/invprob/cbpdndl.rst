@@ -4,11 +4,12 @@ cbpdndl
 This module includes the :class:`.ConvBPDNDictLearn` class for solving the
 problem
 
-    .. math::
-       \mathrm{argmin}_{\mathbf{d}, \mathbf{x}} \;
-       (1/2) \sum_k \|  \sum_m \mathbf{d}_m * \mathbf{x}_{k,m} -
-       \mathbf{s}_k \|_2^2 + \lambda \sum_k \sum_m \| \mathbf{x}_{k,m} \|_1
-       \quad \text{ s.t } \quad \|\mathbf{d}_m\|_2 = 1
+.. math::
+   \mathrm{argmin}_{\mathbf{d}, \mathbf{x}} \;
+   \frac{1}{2} \sum_k \left \|  \sum_m \mathbf{d}_m * \mathbf{x}_{k,m} -
+   \mathbf{s}_k \right \|_2^2 + \lambda \sum_k \sum_m \| \mathbf{x}_{k,m} \|_1
+   \quad \text{ s.t } \quad \|\mathbf{d}_m\|_2 = 1
+
 
 
 Usage Examples
@@ -18,38 +19,42 @@ Usage Examples
 
     .. container:: header
 
-        :class:`.ConvBPDNDictLearn` usage (greyscale images, example 1)
+        :class:`.ConvBPDNDictLearn` usage (greyscale images,
+        single-scale dictionary)
 
-    .. literalinclude:: ../../../examples/cnvsparse/demo_cbpdndl_gry_1.py
+    .. literalinclude:: ../../../examples/cnvsparse/demo_cbpdndl_gry_ssd.py
        :language: python
-       :lines: 14-
+       :lines: 9-
 
 .. container:: toggle
 
     .. container:: header
 
-        :class:`.ConvBPDNDictLearn` usage (greyscale images, example 2)
+        :class:`.ConvBPDNDictLearn` usage (greyscale images,
+	multi-scale dictionary)
 
-    .. literalinclude:: ../../../examples/cnvsparse/demo_cbpdndl_gry_2.py
+    .. literalinclude:: ../../../examples/cnvsparse/demo_cbpdndl_gry_msd.py
        :language: python
-       :lines: 14-
+       :lines: 9-
 
 .. container:: toggle
 
     .. container:: header
 
-        :class:`.ConvBPDNDictLearn` usage (colour images, example 1)
+        :class:`.ConvBPDNDictLearn` usage (colour images,
+        single-scale colour dictionary)
 
-    .. literalinclude:: ../../../examples/cnvsparse/demo_cbpdndl_clr_1.py
+    .. literalinclude:: ../../../examples/cnvsparse/demo_cbpdndl_clr_ssd.py
        :language: python
-       :lines: 14-
+       :lines: 9-
 
 .. container:: toggle
 
     .. container:: header
 
-        :class:`.ConvBPDNDictLearn` usage (colour images, example 2)
+        :class:`.ConvBPDNDictLearn` usage (colour images,
+        multi-scale colour dictionary)
 
-    .. literalinclude:: ../../../examples/cnvsparse/demo_cbpdndl_clr_2.py
+    .. literalinclude:: ../../../examples/cnvsparse/demo_cbpdndl_clr_msd.py
        :language: python
-       :lines: 14-
+       :lines: 9-

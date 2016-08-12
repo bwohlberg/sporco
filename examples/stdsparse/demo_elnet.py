@@ -15,6 +15,7 @@ from builtins import range
 import numpy as np
 import matplotlib.pyplot as plt
 
+from sporco import util
 from sporco.admm import bpdn
 
 
@@ -26,6 +27,7 @@ L = 32
 # Noise level
 sigma = 0.5
 
+
 # Construct random dictionary and random sparse coefficients
 np.random.seed(12345)
 D = np.random.randn(N, M)
@@ -36,6 +38,7 @@ x0[si[0:L]] = np.random.randn(L, 1)
 s0 = D.dot(x0)
 s = s0 + sigma*np.random.randn(N,1)
 
+
 # Set BPDN options
 lmbda = 20.0
 mu = 1.0
@@ -43,35 +46,32 @@ opt = bpdn.ElasticNet.Options({'Verbose' : True, 'MaxMainIter' : 500,
                                'RelStopTol' : 1e-6, 'AuxVarObj' : True,
                                'AutoRho' : {'RsdlTarget' : 1.0}})
 
+
 # Initialise and run BPDN object
 b = bpdn.ElasticNet(D, s, lmbda, mu, opt)
 b.solve()
-print("Solve time: %.3fs" % b.runtime)
+print("ElasticNet solve time: %.2fs" % b.runtime)
 
 
 # Plot results
-fig1 = plt.figure(1)
-plt.plot(x0,'r')
-plt.plot(b.Y, 'b')
-fig1.show()
+util.plot(np.hstack((x0, b.Y)), fgnm=1, title='Sparse representation',
+          lgnd=['Reference', 'Reconstructed'])
 
 
 # Plot functional value, residuals, and rho
-fig2 = plt.figure(2, figsize=(25,10))
+its = b.getitstat()
+fig2 = plt.figure(2, figsize=(21,7))
 plt.subplot(1,3,1)
-plt.plot([b.itstat[k].ObjFun for k in range(0, len(b.itstat))])
-plt.xlabel('Iterations')
-plt.ylabel('Functional')
-ax=plt.subplot(1,3,2)
-plt.semilogy([b.itstat[k].PrimalRsdl for k in range(0, len(b.itstat))])
-plt.semilogy([b.itstat[k].DualRsdl for k in range(0, len(b.itstat))])
-plt.xlabel('Iterations')
-plt.ylabel('Residual')
-plt.legend(['Primal', 'Dual'])
+util.plot(its.ObjFun, fgrf=fig2, ptyp='semilogy', xlbl='Iterations',
+          ylbl='Functional')
+plt.subplot(1,3,2)
+util.plot(np.vstack((its.PrimalRsdl, its.DualRsdl)).T, fgrf=fig2,
+          ptyp='semilogy', xlbl='Iterations', ylbl='Residual',
+          lgnd=['Primal', 'Dual']);
 plt.subplot(1,3,3)
-plt.plot([b.itstat[k].Rho for k in range(0, len(b.itstat))])
-plt.xlabel('Iterations')
-plt.ylabel('Penalty Parameter')
+util.plot(its.Rho, fgrf=fig2, xlbl='Iterations', ylbl='Penalty Parameter')
 fig2.show()
 
+
+# Wait for enter on keyboard
 input()

@@ -1,34 +1,35 @@
 bpdn
 ====
 
-This module includes the :class:`.BPDN` and :class:`.ElasticNet`
-classes, solving the following problems:
+This module includes the following classes:
 
 * :class:`.BPDN`
 
-    .. math::
-       \mathrm{argmin}_\mathbf{x} \;
-       (1/2) \| D \mathbf{x} - \mathbf{s} \|_2^2 + \lambda \| \mathbf{x} \|_1
+  Solve the BPDN problem
 
-    or
+  .. math::
+     \mathrm{argmin}_\mathbf{x} \;
+     (1/2) \| D \mathbf{x} - \mathbf{s} \|_2^2 + \lambda \| \mathbf{x} \|_1
 
-    .. math::
-       \mathrm{argmin}_X \;
-       (1/2) \| D X - S \|_F^2 + \lambda \| X \|_1
+
+* :class:`.BPDNJoint`
+
+  Solve the BPDN problem with an additional :math:`\ell^{2,1}` norm
+  term to promote joint sparsity
+
+  .. math::
+     \mathrm{argmin}_X \; (1/2) \| D X - S \|_2^2 + \lambda \| X \|_1
+     + \mu \| X \|_{2,1}
+
 
 * :class:`.ElasticNet`
 
-    .. math::
-       \mathrm{argmin}_\mathbf{x} \;
-       (1/2) \| D \mathbf{x} - \mathbf{s} \|_2^2 + \lambda \| \mathbf{x} \|_1
+  Solve the Elastic Net problem
+
+  .. math::
+     \mathrm{argmin}_\mathbf{x} \;
+     (1/2) \| D \mathbf{x} - \mathbf{s} \|_2^2 + \lambda \| \mathbf{x} \|_1
                                                  + (\mu/2) \| \mathbf{x} \|_2^2
-
-    or
-
-    .. math::
-       \mathrm{argmin}_X \;
-       (1/2) \| D X - S \|_F^2 + \lambda \| X \|_1 + (\mu/2) \| X \|_2^2
-
 
 
 
@@ -43,7 +44,18 @@ Usage Examples
 
     .. literalinclude:: ../../../examples/stdsparse/demo_bpdn.py
        :language: python
-       :lines: 14-
+       :lines: 9-
+
+
+.. container:: toggle
+
+    .. container:: header
+
+        :class:`.BPDNJoint` usage
+
+    .. literalinclude:: ../../../examples/stdsparse/demo_bpdnjnt.py
+       :language: python
+       :lines: 9-
 
 
 .. container:: toggle
@@ -54,4 +66,4 @@ Usage Examples
 
     .. literalinclude:: ../../../examples/stdsparse/demo_elnet.py
        :language: python
-       :lines: 14-
+       :lines: 9-

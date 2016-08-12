@@ -4,10 +4,15 @@ ccmod
 This module includes the :class:`.ConvCnstrMOD` class for solving the
 problem
 
-    .. math::
-       \mathrm{argmin}_\mathbf{d} \;
-       (1/2) \sum_k \|  \sum_m \mathbf{d}_m * \mathbf{x}_{k,m} - 
-       \mathbf{s}_k \|_2^2 \quad \text{ s.t } \quad  \|\mathbf{d}_m\|_2 = 1
+.. math::
+   \mathrm{argmin}_\mathbf{d} \;
+   \frac{1}{2} \sum_k \left \| \sum_m \mathbf{d}_m * \mathbf{x}_{k,m} -
+   \mathbf{s}_k \right \|_2^2 \quad \text{ such that } \quad \mathbf{d}_m
+   \in C
+
+where :math:`C` is the feasible set :math:`C` consisting of filters
+with unit norm and constrained support.
+
 
 
 Usage Examples
@@ -17,19 +22,30 @@ Usage Examples
 
     .. container:: header
 
-        :class:`.ConvCnstrMOD` usage (greyscale images) 
+        :class:`.ConvCnstrMOD` usage (greyscale images)
 
     .. literalinclude:: ../../../examples/cnvsparse/demo_ccmod_gry.py
        :language: python
-       :lines: 14-
+       :lines: 9-
 
 
 .. container:: toggle
 
     .. container:: header
 
-        :class:`.ConvCnstrMOD` usage (colour images)
+        :class:`.ConvCnstrMOD` usage (colour images, greyscale dictionary)
 
-    .. literalinclude:: ../../../examples/cnvsparse/demo_ccmod_clr.py
+    .. literalinclude:: ../../../examples/cnvsparse/demo_ccmod_clr_gd.py
        :language: python
-       :lines: 14-
+       :lines: 9-
+
+
+.. container:: toggle
+
+    .. container:: header
+
+        :class:`.ConvCnstrMOD` usage (colour images, colour dictionary)
+
+    .. literalinclude:: ../../../examples/cnvsparse/demo_ccmod_clr_cd.py
+       :language: python
+       :lines: 9-

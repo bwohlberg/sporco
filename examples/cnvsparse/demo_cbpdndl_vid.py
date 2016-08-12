@@ -68,7 +68,7 @@ D0 = np.random.randn(5, 5, 3, 75)
 # Set ConvBPDNDictLearn parameters
 lmbda = 0.1
 opt = cbpdndl.ConvBPDNDictLearn.Options({'Verbose' : True, 'MaxMainIter' : 200,
-                                         'CBPDN' : {'rho' : 5e4*lmbda,
+                                         'CBPDN' : {'rho' : 1e3*lmbda,
                                             'AutoRho' : {'Enabled' : True}},
                                          'CCMOD' : {'rho' : 5, 
                                            'AutoRho' : {'Enabled' : True},
@@ -76,45 +76,36 @@ opt = cbpdndl.ConvBPDNDictLearn.Options({'Verbose' : True, 'MaxMainIter' : 200,
 
 
 # Run optimisation
-d = cbpdndl.ConvBPDNDictLearn(D0, vh, lmbda, opt, dimN=3, dimK=0)
-d.solve()
-print("ConvBPDNDictLearn solve time: %.2fs" % d.runtime, "\n")
+d = cbpdndl.ConvBPDNDictLearn(D0, vh, lmbda, opt, dimK=0, dimN=3)
+D1 = d.solve()
+print("ConvBPDNDictLearn solve time: %.2fs" % d.runtime)
 
 
 # Display central temporal slice (index 2) of dictionaries
-D1 = ccmod.bcrop(d.ccmod.Y, D0.shape).squeeze()
-fig1 = plt.figure(1, figsize=(20,10))
+D1 = D1.squeeze()
+fig1 = plt.figure(1, figsize=(14,7))
 plt.subplot(1,2,1)
-plt.imshow(util.tiledict(D0[...,1,:]), interpolation="nearest",
-           cmap=plt.get_cmap('gray'))
-plt.title('D0 slice')
+util.imview(util.tiledict(D0[...,1,:]), fgrf=fig1, title='D0')
 plt.subplot(1,2,2)
-plt.imshow(util.tiledict(D1[...,1,:]), interpolation="nearest",
-           cmap=plt.get_cmap('gray'))
-plt.title('D1 slice')
+util.imview(util.tiledict(D1[...,1,:]), fgrf=fig1, title='D1')
 fig1.show()
 
 
 # Plot functional value and residuals
-fig2 = plt.figure(2, figsize=(25,10))
+its = d.getitstat()
+fig2 = plt.figure(2, figsize=(21,7))
 plt.subplot(1,3,1)
-plt.plot([d.itstat[k].ObjFun for k in range(0, len(d.itstat))])
-plt.xlabel('Iterations')
-plt.ylabel('Functional')
-ax=plt.subplot(1,3,2)
-plt.semilogy([d.itstat[k].XPrRsdl for k in range(0, len(d.itstat))])
-plt.semilogy([d.itstat[k].XDlRsdl for k in range(0, len(d.itstat))])
-plt.semilogy([d.itstat[k].DPrRsdl for k in range(0, len(d.itstat))])
-plt.semilogy([d.itstat[k].DDlRsdl for k in range(0, len(d.itstat))])
-plt.xlabel('Iterations')
-plt.ylabel('Residual')
-plt.legend(['X Primal', 'X Dual', 'D Primal', 'D Dual'])
+util.plot(its.ObjFun, fgrf=fig2, xlbl='Iterations', ylbl='Functional')
+plt.subplot(1,3,2)
+util.plot(np.vstack((its.XPrRsdl, its.XDlRsdl, its.DPrRsdl, its.DDlRsdl)).T,
+          fgrf=fig2, ptyp='semilogy', xlbl='Iterations', ylbl='Residual',
+          lgnd=['X Primal', 'X Dual', 'D Primal', 'D Dual']);
 plt.subplot(1,3,3)
-plt.semilogy([d.itstat[k].Rho for k in range(0, len(d.itstat))])
-plt.semilogy([d.itstat[k].Sigma for k in range(0, len(d.itstat))])
-plt.xlabel('Iterations')
-plt.ylabel('Penalty Parameter')
-plt.legend(['Rho', 'Sigma'])
+util.plot(np.vstack((its.XRho, its.DRho)).T, fgrf=fig2, xlbl='Iterations',
+          ylbl='Penalty Parameter', ptyp='semilogy',
+          lgnd=['$\\rho_X$', '$\\rho_D$'])
 fig2.show()
 
+
+# Wait for enter on keyboard
 input()

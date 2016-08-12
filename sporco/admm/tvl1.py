@@ -194,9 +194,9 @@ class TVL1Denoise(admm.ADMM):
                 # If Y0 is given, but not U0, then choose the initial
                 # U so that the relevant dual optimality criterion
                 # (see (3.10) in boyd-2010-distributed) is satisfied.
-                Yss = np.sqrt(np.sum(self.Y[...,0:-1]**2, axis=S.ndim, 
+                Yss = np.sqrt(np.sum(self.Y[...,0:-1]**2, axis=S.ndim,
                                      keepdims=True))
-                U0 = (self.lmbda/self.rho)*sl.zquotient(self.Y[...,0:-1], Yss)
+                U0 = (self.lmbda/self.rho)*sl.zdivide(self.Y[...,0:-1], Yss)
                 U1 = (1.0 / self.rho)*np.sign(self.Y[...,-1:])
                 self.U = np.concatenate((U0, U1), axis=S.ndim)
         else:
@@ -533,9 +533,9 @@ class TVL1Deconv(admm.ADMM):
                 # If Y0 is given, but not U0, then choose the initial
                 # U so that the relevant dual optimality criterion
                 # (see (3.10) in boyd-2010-distributed) is satisfied.
-                Yss = np.sqrt(np.sum(self.Y[...,0:-1]**2, axis=S.ndim, 
+                Yss = np.sqrt(np.sum(self.Y[...,0:-1]**2, axis=S.ndim,
                                      keepdims=True))
-                U0 = (self.lmbda/self.rho)*sl.zquotient(self.Y[...,0:-1], Yss)
+                U0 = (self.lmbda/self.rho)*sl.zdivide(self.Y[...,0:-1], Yss)
                 U1 = (1.0 / self.rho)*np.sign(self.Y[...,-1:])
                 self.U = np.concatenate((U0, U1), axis=S.ndim)
         else:
@@ -555,7 +555,7 @@ class TVL1Deconv(admm.ADMM):
         else:
             self.Wtvna = self.Wtv
 
-        g = np.zeros([2 if k in axes else 1 for k in range(S.ndim)] + 
+        g = np.zeros([2 if k in axes else 1 for k in range(S.ndim)] +
                      [len(axes),], self.dtype)
         for k in axes:
             g[(0,)*k +(slice(None),)+(0,)*(g.ndim-2-k)+(k,)] = [1,-1]

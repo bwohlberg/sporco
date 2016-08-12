@@ -17,33 +17,30 @@ class TestSet01(object):
 
 
     def test_01(self):
-        rho = 1e-1
-        N = 64
-        M = 128
-        K = 32
+        N = 8
+        M = 16
         D = np.random.randn(N, M)
-        X = np.random.randn(M, K)
-        S = D.dot(X)
-        Z = (D.T.dot(D).dot(X) + rho*X - D.T.dot(S)) / rho
-        lu, piv = bpdn.factorise(D, rho)
-        Xslv = bpdn.linsolve(D, rho, lu, piv, D.T.dot(S) + rho*Z)
-        assert(sl.rrs(D.T.dot(D).dot(Xslv) + rho*Xslv,
-                        D.T.dot(S) + rho*Z) < 1e-11)
+        s = np.random.randn(N, 1)
+        lmbda = 1e-1
+        try:
+            b = bpdn.BPDN(D, s, lmbda)
+            b.solve()
+        except Exception as e:
+            print(e)
+            assert(0)
 
 
     def test_02(self):
-        rho = 1e-1
-        N = 128
-        M = 64
-        K = 32
+        N = 8
+        M = 16
         D = np.random.randn(N, M)
-        X = np.random.randn(M, K)
-        S = D.dot(X)
-        Z = (D.T.dot(D).dot(X) + rho*X - D.T.dot(S)) / rho
-        lu, piv = bpdn.factorise(D, rho)
-        Xslv = bpdn.linsolve(D, rho, lu, piv, D.T.dot(S) + rho*Z)
-        assert(sl.rrs(D.T.dot(D).dot(Xslv) + rho*Xslv,
-                        D.T.dot(S) + rho*Z) < 1e-14)
+        s = np.random.randn(N, 1)
+        try:
+            b = bpdn.BPDN(D, s)
+            b.solve()
+        except Exception as e:
+            print(e)
+            assert(0)
 
 
     def test_03(self):
@@ -74,8 +71,9 @@ class TestSet01(object):
         D = np.random.randn(N, M)
         s = np.random.randn(N, 1)
         lmbda = 1e-1
+        mu = 1e-2
         try:
-            b = bpdn.BPDN(D, s, lmbda)
+            b = bpdn.BPDNJoint(D, s, lmbda, mu)
             b.solve()
         except Exception as e:
             print(e)
@@ -87,8 +85,10 @@ class TestSet01(object):
         M = 16
         D = np.random.randn(N, M)
         s = np.random.randn(N, 1)
+        lmbda = 1e-1
+        mu = 1e-2
         try:
-            b = bpdn.BPDN(D, s)
+            b = bpdn.ElasticNet(D, s, lmbda, mu)
             b.solve()
         except Exception as e:
             print(e)

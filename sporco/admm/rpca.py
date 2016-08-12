@@ -205,7 +205,7 @@ class RobustPCA(admm.ADMM):
         if self.opt['gEvalY']:
             return self.Y
         else:
-            return self.cnst_c() - self.cnst_A(self.X) 
+            return self.cnst_c() - self.cnst_A(self.X)
 
 
 

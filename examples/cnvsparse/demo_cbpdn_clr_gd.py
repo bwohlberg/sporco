@@ -6,13 +6,14 @@
 # and user license can be found in the 'LICENSE.txt' file distributed
 # with the package.
 
-"""Basic cbpdn.ConvBPDN usage example (greyscale images)"""
+"""Basic cbpdn.ConvBPDN usage example (colour images, greyscale dictionary)"""
 
 from __future__ import print_function
 from builtins import input
 from builtins import range
 
 import numpy as np
+from scipy.ndimage.interpolation import zoom
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 
@@ -22,28 +23,28 @@ import sporco.linalg as spl
 
 
 # Load demo image
-img = util.ExampleImages().image('lena.grey', scaled=True)
+img = zoom(util.ExampleImages().image('lena', scaled=True), (0.5, 0.5, 1.0))
 
 
 # Highpass filter test image
 npd = 16
-fltlmbd = 5
+fltlmbd = 10
 sl, sh = util.tikhonov_filter(img, fltlmbd, npd)
 
 
 # Load dictionary
-D = util.convdicts()['G:12x12x36']
+D = util.convdicts()['G:8x8x64']
 
 
 # Set up ConvBPDN options
 lmbda = 1e-2
-opt = cbpdn.ConvBPDN.Options({'Verbose' : True, 'MaxMainIter' : 500,
-                    'HighMemSolve' : True, 'LinSolveCheck' : True,
-                    'RelStopTol' : 1e-3, 'AuxVarObj' : False})
+opt = cbpdn.ConvBPDN.Options({'Verbose' : True, 'MaxMainIter' : 200,
+                    'LinSolveCheck' : True, 'RelStopTol' : 1e-3,
+                    'AuxVarObj' : False})
 
 
 # Initialise and run ConvBPDN object
-b = cbpdn.ConvBPDN(D, sh, lmbda, opt)
+b = cbpdn.ConvBPDN(D, sh, lmbda, opt, dimK=0)
 X = b.solve()
 print("ConvBPDN solve time: %.2fs" % b.runtime)
 

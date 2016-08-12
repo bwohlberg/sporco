@@ -17,6 +17,7 @@ from scipy.ndimage.filters import gaussian_filter
 import matplotlib.pyplot as plt
 
 from sporco.admm import rpca
+from sporco import util
 
 
 N = 256
@@ -34,42 +35,36 @@ opt = rpca.RobustPCA.Options({'Verbose' : True, 'gEvalY' : False,
                               'AutoRho' : {'Enabled' : True}})
 b = rpca.RobustPCA(S1, None, opt)
 X, Y = b.solve()
-print("RobustPCA solve time: %.2fs" % b.runtime, "\n")
-
-print(np.linalg.norm(S0 - X))
+print("RobustPCA solve time: %.2fs" % b.runtime)
+print(" low rank error (l2): %.2e" % np.linalg.norm(S0 - X))
 
 
 # Display S0 and X image
-fig1 = plt.figure(1, figsize=(30,10))
+fig1 = plt.figure(1, figsize=(21,7))
 plt.subplot(1,3,1)
-plt.imshow(S0, interpolation="nearest", cmap=plt.get_cmap('gray'))
-plt.title('Original matrix')
+util.imview(S0, fgrf=fig1, title='Original matrix')
 plt.subplot(1,3,2)
-plt.imshow(S1, interpolation="nearest", cmap=plt.get_cmap('gray'))
-plt.title('Corrupted matrix')
+util.imview(S1, fgrf=fig1, title='Corrupted matrix')
 plt.subplot(1,3,3)
-plt.imshow(X, interpolation="nearest", cmap=plt.get_cmap('gray'))
-plt.title('Low rank component')
+util.imview(X, fgrf=fig1, title='Low rank component')
 fig1.show()
 
 
 # Plot functional value, residuals, and rho
-fig2 = plt.figure(2, figsize=(25,10))
+its = b.getitstat()
+fig2 = plt.figure(2, figsize=(21,7))
 plt.subplot(1,3,1)
-plt.plot([b.itstat[k].ObjFun for k in range(0, len(b.itstat))])
-plt.xlabel('Iterations')
-plt.ylabel('Functional')
+util.plot(its.ObjFun, fgrf=fig2, ptyp='semilogy', xlbl='Iterations',
+          ylbl='Functional')
 plt.subplot(1,3,2)
-plt.semilogy([b.itstat[k].PrimalRsdl for k in range(0, len(b.itstat))])
-plt.semilogy([b.itstat[k].DualRsdl for k in range(0, len(b.itstat))])
-plt.xlabel('Iterations')
-plt.ylabel('Residual')
-plt.legend(['Primal', 'Dual'])
+util.plot(np.vstack((its.PrimalRsdl, its.DualRsdl)).T, fgrf=fig2,
+          ptyp='semilogy', xlbl='Iterations', ylbl='Residual',
+          lgnd=['Primal', 'Dual']);
 plt.subplot(1,3,3)
-plt.plot([b.itstat[k].Rho for k in range(0, len(b.itstat))])
-plt.xlabel('Iterations')
-plt.ylabel('Penalty Parameter')
+util.plot(its.Rho, fgrf=fig2, xlbl='Iterations', ylbl='Penalty Parameter')
 fig2.show()
 
+
+# Wait for enter on keyboard
 input()
 

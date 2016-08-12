@@ -64,7 +64,6 @@ class ADMM(object):
        ``Rho`` : Penalty parameter
 
        ``Time`` : Cumulative run time
-
     """
 
 
@@ -233,6 +232,9 @@ class ADMM(object):
         # Main optimisation iterations
         for k in range(self.k, self.k + self.opt['MaxMainIter']):
 
+            # Update record of Y from previous iteration
+            self.Yprev = self.Y.copy()
+
             # X update
             self.xstep()
 
@@ -259,9 +261,6 @@ class ADMM(object):
             # Automatic rho adjustment
             self.update_rho(k, r, s)
 
-            # Update record of Y from previous iteration
-            self.Yprev = self.Y.copy()
-
             # Call callback function if defined
             if self.opt['Callback'] is not None:
                 self.opt['Callback'](self, k)
@@ -277,7 +276,7 @@ class ADMM(object):
         # Record iteration count
         self.k = k+1
 
-        # Print final seperator string if Verbose option enabled
+        # Print final separator string if Verbose option enabled
         self.display_end(nsep)
 
         return self.X
@@ -311,7 +310,6 @@ class ADMM(object):
 
 
 
-
     def relax_AX(self):
         """Implement relaxation if option ``RelaxParam`` != 1.0."""
 
@@ -328,7 +326,6 @@ class ADMM(object):
 
 
 
-
     def compute_residuals(self):
         """Compute residuals and stopping thresholds."""
 
@@ -341,7 +338,11 @@ class ADMM(object):
                 self.rsdl_sn(self.U)*self.opt['RelStopTol']
         else:
             rn = self.rsdl_rn(self.AXnr, self.Y)
+            if rn == 0.0:
+                rn = 1.0
             sn = self.rsdl_sn(self.U)
+            if sn == 0.0:
+                sn = 1.0
             r = linalg.norm(self.rsdl_r(self.AXnr, self.Y)) / rn
             s = linalg.norm(self.rsdl_s(self.Yprev, self.Y)) / sn
             epri = scipy.sqrt(self.Nc)*self.opt['AbsStopTol']/rn + \
@@ -365,7 +366,23 @@ class ADMM(object):
 
 
 
+    def getitstat(self):
+        """Get iteration stats as named tuple of arrays instead of array of
+        named tuples.
+        """
+
+        if len(self.itstat) == 0:
+            return None
+        else:
+            return type(self).IterationStats(
+                *[[self.itstat[k][l] for k in range(len(self.itstat))]
+                  for l in range(len(self.itstat[0]))]
+            )
+
+
+
     def update_rho(self, k, r, s):
+
         """Automatic rho adjustment."""
 
         if self.opt['AutoRho','Enabled']:
@@ -406,7 +423,7 @@ class ADMM(object):
             # Call utility function to construct status display formatting
             hdrstr, fmtstr, nsep = util.solve_status_str(hdrtxt,
                                 type(self).fwiter, type(self).fpothr)
-            # Print header and seperator strings
+            # Print header and separator strings
             if self.opt['StatusHeader']:
                 print(hdrstr)
                 print("-" * nsep)
@@ -457,7 +474,8 @@ class ADMM(object):
     def obfn_f(self, X):
         """Compute :math:`f(\mathbf{x})` component of ADMM objective function.
 
-        Overriding this method is required.
+        Overriding this method is required if :meth:`iteration_stats`
+        is not overridden.
         """
 
         raise NotImplementedError()
@@ -467,11 +485,11 @@ class ADMM(object):
     def obfn_g(self, Y):
         """Compute :math:`g(\mathbf{y})` component of ADMM objective function.
 
-        Overriding this method is required.
+        Overriding this method is required if :meth:`iteration_stats`
+        is not overridden.
         """
 
         raise NotImplementedError()
-
 
 
 
@@ -654,14 +672,12 @@ class ADMMEqual(ADMM):
 
 
 
-
     def solve(self):
         """Run optimisation."""
 
         super(ADMMEqual, self).solve()
 
         return self.X if self.opt['ReturnX'] else self.Y
-
 
 
 
@@ -743,7 +759,7 @@ class ADMMEqual(ADMM):
         the constraint is :math:`\mathbf{x} = \mathbf{y}`.
         """
 
-        return np.zeros(self.X.shape, self.X.dtype)
+        return 0.0
 
 
 
@@ -772,3 +788,419 @@ class ADMMEqual(ADMM):
         """Compute dual residual normalisation term."""
 
         return self.rho*linalg.norm(U)
+
+
+
+
+class ADMMTwoBlockCnstrnt(ADMM):
+    """Base class for ADMM algorithms for problems for which
+    :math:`g(\mathbf{y}) = g_0(\mathbf{y}_0) + g_1(\mathbf{y}_1)` with
+    :math:`\mathbf{y}^T = (\mathbf{y}_0^T \; \mathbf{y}_1^T)`.
+
+    Solve optimisation problems of the form
+
+    .. math::
+       \mathrm{argmin}_{\mathbf{x}} \; f(\mathbf{x}) + g_0(A_0 \mathbf{x}) +
+       g_1(A_1 \mathbf{x})
+
+    via an ADMM problem of the form
+
+    .. math::
+       \mathrm{argmin}_{\mathbf{x},\mathbf{y}_0,\mathbf{y}_1} \;
+       f(\mathbf{x}) + g_0(\mathbf{y}_0) + g_0(\mathbf{y}_1)
+       \;\\text{such that}\;
+       \\left( \\begin{array}{c} A_0 \\\\ A_1 \\end{array} \\right) \mathbf{x}
+       - \\left( \\begin{array}{c} \mathbf{y}_0 \\\\ \mathbf{y}_1 \\end{array}
+       \\right) = \\left( \\begin{array}{c} \mathbf{c}_0 \\\\
+       \mathbf{c}_1 \\end{array} \\right) \;\;.
+
+    This class specialises class :class:`.ADMM`, but remains a base class for
+    other classes that specialise to specific optimisation problems.
+    """
+
+
+    class Options(ADMM.Options):
+        """ADMMTwoBlockCnstrnt algorithm options.
+
+        Options include all of those defined in :class:`ADMM.Options`,
+        together with additional options:
+
+        ``AuxVarObj`` : Flag indicating whether the :math:`g(\mathbf{y})`
+        component of the objective function should be evaluated using
+        variable X  (``False``) or Y (``True``) as its argument.
+
+        ``ReturnVar`` : A string (valid values are 'X', 'Y0', or 'Y1')
+        indicating which of the objective function variables should be
+        returned by the solve method.
+        """
+
+        defaults = copy.deepcopy(ADMM.Options.defaults)
+        defaults.update({'AuxVarObj' : False, 'ReturnVar' : 'X'})
+
+        def __init__(self, opt=None):
+            """Initialise ADMMTwoBlockCnstrnt algorithm options object."""
+
+            if opt is None:
+                opt = {}
+            ADMM.Options.__init__(self, opt)
+
+
+
+    IterationStats = collections.namedtuple('IterationStats',
+                ['Iter', 'ObjFun', 'FVal', 'G0Val', 'G1Val',
+                 'PrimalRsdl', 'DualRsdl', 'EpsPrimal', 'EpsDual',
+                 'Rho', 'Time'])
+    """Named tuple type for recording ADMM iteration statistics"""
+
+    """Field precision for other display columns"""
+    hdrtxt = ['Itn', 'Fnc', 'f', 'g0', 'g1', 'r', 's', 'rho']
+    """Display column header text. NB: The display_start function assumes
+    that the first entry is the iteration count and the last is the
+    rho value"""
+    hdrval = {'Itn' : 'Iter', 'Fnc' : 'ObjFun', 'f' : 'FVal',
+              'g0' : 'G0Val', 'g1' : 'G1Val', 'r' : 'PrimalRsdl',
+              's' : 'DualRsdl', 'rho' : 'Rho'}
+    """Dictionary mapping display column headers to IterationStats entries"""
+
+
+
+    def __init__(self, Nx, Nc, blkaxis, blkidx, opt=None):
+        """
+        Initialise an ADMMTwoBlockCnstrnt object with problem size and options.
+
+        Parameters
+        ----------
+        Nx : int
+          Size of variable :math:`\mathbf{x}` in objective function
+        Nc : int
+          Size of constant :math:`\mathbf{c}` in constraint
+        blkaxis : int
+          Axis on which :math:`\mathbf{y}_0` and :math:`\mathbf{y}_1` are
+          concatenated to form :math:`\mathbf{y}`
+        blkidx : int
+          Index of boundary between :math:`\mathbf{y}_0` and
+          :math:`\mathbf{y}_1` on axis on which they are concatenated to
+          form :math:`\mathbf{y}`
+        opt : :class:`ADMMTwoBlockCnstrnt.Options` object
+          Algorithm options
+        """
+
+        if opt is None:
+            opt = ADMM.Options()
+        super(ADMMTwoBlockCnstrnt, self).__init__(Nx, Nc, opt)
+        self.blkaxis = blkaxis
+        self.blkidx = blkidx
+
+
+
+    def solve(self):
+        """Run optimisation."""
+
+        super(ADMMTwoBlockCnstrnt, self).solve()
+
+        if self.opt['ReturnVar'] == 'X':
+            return self.var_x()
+        elif self.opt['ReturnVar'] == 'Y0':
+            return self.var_y0()
+        elif self.opt['ReturnVar'] == 'Y1':
+            return self.var_y1()
+        else:
+            raise ValueError(self.opt['ReturnVar'] + ' is not a valid value'
+                             'for option ReturnVar')
+
+
+
+    def block_sep0(self, Y):
+        """Separate variable into component corresponding to Y0 in Y."""
+
+        return Y[(slice(None),)*self.blkaxis + (slice(0,self.blkidx),)]
+
+
+
+    def block_sep1(self, Y):
+        """Separate variable into component corresponding to Y1 in Y."""
+
+        return Y[(slice(None),)*self.blkaxis + (slice(self.blkidx,None),)]
+
+
+
+    def block_sep(self, Y):
+        """Separate variable into components corresponding to blocks in Y."""
+
+        return (self.block_sep0(Y), self.block_sep1(Y))
+
+
+
+    def block_cat(self, Y0, Y1):
+        """Concatenate components corresponding to Y0 and Y1 blocks into Y."""
+
+        return np.concatenate((Y0, Y1), axis=self.blkaxis)
+
+
+
+    def relax_AX(self):
+        """Implement relaxation if option ``RelaxParam`` != 1.0."""
+
+        self.AXnr = self.cnst_A(self.X)
+        if self.opt['RelaxParam'] == 1.0:
+            self.AX = self.AXnr
+        else:
+            if not hasattr(self, 'c0'):
+                self.c0 = self.cnst_c0()
+            if not hasattr(self, 'c1'):
+                self.c1 = self.cnst_c1()
+            alpha = self.opt['RelaxParam']
+            self.AX = alpha*self.cnst_A(self.X) + \
+                      (1-alpha)*self.block_cat(self.var_y0() + self.c0,
+                                               self.var_y1() + self.c1)
+
+
+
+    def var_y0(self):
+        """Get :math:`\mathbf{y}_0` variable."""
+
+        return self.block_sep0(self.Y)
+
+
+
+    def var_y1(self):
+        """Get :math:`\mathbf{y}_1` variable."""
+
+        return self.block_sep1(self.Y)
+
+
+
+    def obfn_fvar(self):
+        """Variable to be evaluated in computing :meth:`ADMM.obfn_f`."""
+
+        return self.X
+
+
+
+    def obfn_g0var(self):
+        """Variable to be evaluated in computing
+        :meth:`ADMMTwoBlockCnstrnt.obfn_g0`, depending on the ``AuxVarObj``
+        option value.
+        """
+
+        return self.var_y0() if self.opt['AuxVarObj'] else \
+            self.cnst_A0(self.X) - self.cnst_c0()
+
+
+
+    def obfn_g1var(self):
+        """Variable to be evaluated in computing
+        :meth:`ADMMTwoBlockCnstrnt.obfn_g1`, depending on the ``AuxVarObj``
+        option value.
+        """
+
+        return self.var_y1() if self.opt['AuxVarObj'] else \
+            self.cnst_A1(self.X) - self.cnst_c1()
+
+
+
+    def obfn_f(self, X):
+        """Compute :math:`f(\mathbf{x})` component of ADMM objective
+        function. Unless overridden, :math:`f(\mathbf{x}) = 0`.
+        """
+
+        return 0.0
+
+
+
+    def obfn_g(self, Y):
+        """Compute :math:`g(\mathbf{y})` component of ADMM objective
+        function.
+        """
+
+        return self.obfn_g0(self.obfn_g0var()) + self.obfn_g1(self.obfn_g1var())
+
+
+
+    def obfn_g0(self, Y0):
+        """Compute :math:`g_0(\mathbf{y}_0)` component of ADMM objective
+        function.
+
+        Overriding this method is required.
+        """
+
+        raise NotImplementedError()
+
+
+
+    def obfn_g1(self, Y1):
+        """Compute :math:`g_1(\mathbf{y_1})` component of ADMM objective
+        function.
+
+        Overriding this method is required.
+        """
+
+        raise NotImplementedError()
+
+
+
+    def iteration_stats(self, k, r, s, epri, edua, tk):
+        """Construct iteration stats record tuple."""
+
+        fval = self.obfn_f(self.obfn_fvar())
+        g0val = self.obfn_g0(self.obfn_g0var())
+        g1val = self.obfn_g1(self.obfn_g1var())
+        obj = fval + g0val + g1val
+        itst = type(self).IterationStats(k, obj, fval, g0val, g1val, r, s,
+                                         epri, edua, self.rho, tk)
+        return itst
+
+
+
+    def cnst_A(self, X):
+        """Compute :math:`A \mathbf{x}` component of ADMM problem
+        constraint.
+        """
+
+        return self.block_cat(self.cnst_A0(X), self.cnst_A1(X))
+
+
+
+    def cnst_AT(self, Y):
+        """Compute :math:`A^T \mathbf{y}` where :math:`A \mathbf{x}` is
+        a component of ADMM problem constraint.
+        """
+
+        return self.cnst_A0T(self.block_sep0(Y)) + \
+            self.cnst_A1T(self.block_sep1(Y))
+
+
+
+    def cnst_B(self, Y):
+        """Compute :math:`B \mathbf{y}` component of ADMM problem constraint.
+        In this case :math:`B \mathbf{y} = -\mathbf{y}` since the constraint
+        is :math:`A \mathbf{x} - \mathbf{y} = \mathbf{c}`.
+        """
+
+        return -Y
+
+
+
+    def cnst_c(self):
+        """Compute constant component :math:`\mathbf{c}` of ADMM problem
+        constraint. This method should not be used or overridden: all
+        calculations should make use of components :meth:`cnst_c0` and
+        :meth:`cnst_c1` so that these methods can return scalar zeros
+        instead of zero arrays if appropriate.
+        """
+
+        raise NotImplementedError()
+
+
+
+    def cnst_c0(self):
+        """Compute constant component :math:`\mathbf{c}_0` of ADMM problem
+        constraint. Unless overridden, :math:`\mathbf{c}_0 = 0`.
+        """
+
+        return 0.0
+
+
+
+    def cnst_c1(self):
+        """Compute constant component :math:`\mathbf{c}_1` of ADMM problem
+        constraint. Unless overridden, :math:`\mathbf{c}_1 = 0`.
+        """
+
+        return 0.0
+
+
+
+    def cnst_A0(self, X):
+        """Compute :math:`A_0 \mathbf{x}` component of ADMM problem
+        constraint. Unless overridden, :math:`A_0 \mathbf{x} = \mathbf{x}`,
+        i.e. :math:`A_0 = I`.
+        """
+
+        return X
+
+
+
+    def cnst_A0T(self, X):
+        """Compute :math:`A_0^T \mathbf{x}` where :math:`A_0 \mathbf{x}` is a
+        component of ADMM problem constraint. Unless overridden,
+        :math:`A_0 \mathbf{x} = \mathbf{x}`, i.e. :math:`A_0 = I`.
+        """
+
+        return X
+
+
+
+    def cnst_A1(self, X):
+        """Compute :math:`A_1 \mathbf{x}` component of ADMM problem
+        constraint. Unless overridden, :math:`A_1 \mathbf{x} = \mathbf{x}`,
+        i.e. :math:`A_1 = I`.
+        """
+
+        return X
+
+
+
+    def cnst_A1T(self, X):
+        """Compute :math:`A_1^T \mathbf{x}` where :math:`A_1 \mathbf{x}` is a
+        component of ADMM problem constraint. Unless overridden,
+        :math:`A_1 \mathbf{x} = \mathbf{x}`, i.e. :math:`A_1 = I`.
+        """
+
+        return X
+
+
+
+    def rsdl_r(self, AX, Y):
+        """Compute primal residual vector.
+
+        Overriding this method is required if methods :meth:`cnst_A`,
+        :meth:`cnst_AT`, :meth:`cnst_c0` and :meth:`cnst_c1` are not
+        overridden.
+        """
+
+        if not hasattr(self, 'c0'):
+            self.c0 = self.cnst_c0()
+        if not hasattr(self, 'c1'):
+            self.c1 = self.cnst_c1()
+        return AX - self.block_cat(self.var_y0() + self.c0,
+                                   self.var_y1() + self.c1)
+
+
+
+    def rsdl_s(self, Yprev, Y):
+        """Compute dual residual vector.
+
+        Overriding this method is required if methods :meth:`cnst_A`,
+        :meth:`cnst_AT`, :meth:`cnst_B`, and :meth:`cnst_c` are not
+        overridden.
+        """
+
+        return self.rho*self.cnst_AT(Yprev - Y)
+
+
+
+    def rsdl_rn(self, AX, Y):
+        """Compute primal residual normalisation term.
+
+        Overriding this method is required if methods :meth:`cnst_A`,
+        :meth:`cnst_AT`, :meth:`cnst_B`, and :meth:`cnst_c` are not
+        overridden.
+        """
+
+        if not hasattr(self, 'nc'):
+            self.nc = np.sqrt(linalg.norm(self.cnst_c0())**2 +
+                              linalg.norm(self.cnst_c1())**2)
+        return max((linalg.norm(AX), linalg.norm(Y), self.nc))
+
+
+
+    def rsdl_sn(self, U):
+        """Compute dual residual normalisation term.
+
+        Overriding this method is required if methods :meth:`cnst_A`,
+        :meth:`cnst_AT`, :meth:`cnst_B`, and :meth:`cnst_c` are not
+        overridden.
+        """
+
+        return self.rho*linalg.norm(self.cnst_AT(U))

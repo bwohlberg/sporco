@@ -6,7 +6,7 @@
 # and user license can be found in the 'LICENSE.txt' file distributed
 # with the package.
 
-"""Basic tvl1.TVL1Deconv usage example"""
+"""Basic tvl1.TVL1Deconv usage example (denoising problem)"""
 
 from __future__ import print_function
 from builtins import input
@@ -32,37 +32,32 @@ opt = tvl1.TVL1Deconv.Options({'Verbose' : True, 'MaxMainIter' : 200,
 # Initialise and run TVDeconv object
 b = tvl1.TVL1Deconv(np.ones((1,1)), imgn, lmbda, opt)
 b.solve()
-print("TV solve time: %.2fs" % b.runtime, "\n")
+print("TVL1Deconv solve time: %.2fs" % b.runtime)
 
 
 # Display input and result image
-fig1 = plt.figure(1, figsize=(20,10))
+fig1 = plt.figure(1, figsize=(14,7))
 plt.subplot(1,2,1)
-plt.imshow(imgn, interpolation="nearest", cmap=plt.get_cmap('gray'))
-plt.title('Noisy')
+util.imview(imgn, fgrf=fig1, title='Noisy')
 plt.subplot(1,2,2)
-plt.imshow(b.X, interpolation="nearest", cmap=plt.get_cmap('gray'))
-plt.title('l1-TV Result')
+util.imview(b.X, fgrf=fig1, title='l1-TV Result')
 fig1.show()
 
 
 # Plot functional value, residuals, and rho
-fig2 = plt.figure(2, figsize=(25,10))
+its = b.getitstat()
+fig2 = plt.figure(2, figsize=(21,7))
 plt.subplot(1,3,1)
-plt.plot([b.itstat[k].ObjFun for k in range(0, len(b.itstat))])
-plt.xlabel('Iterations')
-plt.ylabel('Functional')
-ax=plt.subplot(1,3,2)
-plt.semilogy([b.itstat[k].PrimalRsdl for k in range(0, len(b.itstat))])
-plt.semilogy([b.itstat[k].DualRsdl for k in range(0, len(b.itstat))])
-plt.xlabel('Iterations')
-plt.ylabel('Residual')
-plt.legend(['Primal', 'Dual'])
+util.plot(its.ObjFun, fgrf=fig2, xlbl='Iterations', ylbl='Functional')
+plt.subplot(1,3,2)
+util.plot(np.vstack((its.PrimalRsdl, its.DualRsdl)).T, fgrf=fig2,
+          ptyp='semilogy', xlbl='Iterations', ylbl='Residual',
+          lgnd=['Primal', 'Dual']);
 plt.subplot(1,3,3)
-plt.plot([b.itstat[k].Rho for k in range(0, len(b.itstat))])
-plt.xlabel('Iterations')
-plt.ylabel('Penalty Parameter')
+util.plot(its.Rho, fgrf=fig2, xlbl='Iterations', ylbl='Penalty Parameter')
 fig2.show()
 
 
+# Wait for enter on keyboard
 input()
+

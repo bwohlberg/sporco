@@ -90,7 +90,7 @@ class SplineL1(admm.ADMM):
         (``True``) or X (``False``) as its argument
 
         ``DFidWeight`` : Data fidelity weight matrix
- 
+
         ``LinSolveCheck`` : If ``True``, compute relative residual of
         X step solver
         """
@@ -206,7 +206,6 @@ class SplineL1(admm.ADMM):
 
 
 
-
     def xstep(self):
         """Minimise Augmented Lagrangian with respect to x."""
 
@@ -227,11 +226,12 @@ class SplineL1(admm.ADMM):
         self.Y = sl.shrink1(self.AX - self.S + self.U, self.Wdf / self.rho)
 
 
+
     def rhochange(self):
         """Action to be taken when rho parameter is changed."""
 
         self.Gamma = 1.0 / (1.0 + (self.lmbda/self.rho)*(self.Alpha**2))
-        
+
 
 
     def obfn_gvar(self):
@@ -290,6 +290,7 @@ class SplineL1(admm.ADMM):
         """
 
         return -Y
+
 
 
     def cnst_c(self):

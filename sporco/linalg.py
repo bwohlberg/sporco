@@ -30,6 +30,8 @@ __author__ = """Brendt Wohlberg <brendt@ieee.org>"""
 pyfftw.interfaces.cache.enable()
 pyfftw.interfaces.cache.set_keepalive_time(300)
 
+pyfftw_threads = multiprocessing.cpu_count()
+"""Global variable setting the number of threads used in pyfftw computations"""
 
 
 def complex_dtype(dtype):
@@ -61,7 +63,7 @@ def pyfftw_empty_aligned(shape, dtype, order='C', n=None):
       Output array shape
     dtype : dtype
       Output array dtype
-    n : int, optional
+    n : int, optional (default None)
       Output array should be aligned to n-byte boundary
 
     Returns
@@ -85,10 +87,10 @@ def fftn(a, s=None, axes=None):
     ----------
     a : array_like
       Input array (can be complex)
-    s : sequence of ints, optional
+    s : sequence of ints, optional (default None)
       Shape of the output along each axis (input is cropped or zero-padded
       to match).
-    axes : sequence of ints, optional
+    axes : sequence of ints, optional (default None)
       Axes over which to compute the DFT.
 
     Returns
@@ -97,9 +99,9 @@ def fftn(a, s=None, axes=None):
       DFT of input array
     """
 
-    return pyfftw.interfaces.numpy_fft.fftn(a, s=s, axes=axes, 
+    return pyfftw.interfaces.numpy_fft.fftn(a, s=s, axes=axes,
                     overwrite_input=False, planner_effort='FFTW_MEASURE',
-                    threads=multiprocessing.cpu_count())
+                    threads=pyfftw_threads)
 
 
 
@@ -114,10 +116,10 @@ def ifftn(a, s=None, axes=None):
     ----------
     a : array_like
       Input array (can be complex)
-    s : sequence of ints, optional
+    s : sequence of ints, optional (default None)
       Shape of the output along each axis (input is cropped or zero-padded
       to match).
-    axes : sequence of ints, optional
+    axes : sequence of ints, optional (default None)
       Axes over which to compute the inverse DFT.
 
     Returns
@@ -128,7 +130,7 @@ def ifftn(a, s=None, axes=None):
 
     return pyfftw.interfaces.numpy_fft.ifftn(a, s=s, axes=axes,
                     overwrite_input=False, planner_effort='FFTW_MEASURE',
-                    threads=multiprocessing.cpu_count())
+                    threads=pyfftw_threads)
 
 
 
@@ -143,10 +145,10 @@ def rfftn(a, s=None, axes=None):
     ----------
     a : array_like
       Input array (taken to be real)
-    s : sequence of ints, optional
+    s : sequence of ints, optional (default None)
       Shape of the output along each axis (input is cropped or zero-padded
       to match).
-    axes : sequence of ints, optional
+    axes : sequence of ints, optional (default None)
       Axes over which to compute the DFT.
 
     Returns
@@ -157,7 +159,7 @@ def rfftn(a, s=None, axes=None):
 
     return pyfftw.interfaces.numpy_fft.rfftn(a, s=s, axes=axes,
                     overwrite_input=False, planner_effort='FFTW_MEASURE',
-                    threads=multiprocessing.cpu_count())
+                    threads=pyfftw_threads)
 
 
 
@@ -173,10 +175,10 @@ def irfftn(a, s=None, axes=None):
     ----------
     a : array_like
       Input array
-    s : sequence of ints, optional
+    s : sequence of ints, optional (default None)
       Shape of the output along each axis (input is cropped or zero-padded
       to match).
-    axes : sequence of ints, optional
+    axes : sequence of ints, optional (default None)
       Axes over which to compute the inverse DFT.
 
     Returns
@@ -187,7 +189,7 @@ def irfftn(a, s=None, axes=None):
 
     return pyfftw.interfaces.numpy_fft.irfftn(a, s=s, axes=axes,
                     overwrite_input=False, planner_effort='FFTW_MEASURE',
-                    threads=multiprocessing.cpu_count())
+                    threads=pyfftw_threads)
 
 
 
@@ -203,7 +205,7 @@ def dctii(x, axes=None):
     ----------
     a : array_like
       Input array
-    axes : sequence of ints, optional
+    axes : sequence of ints, optional (default None)
       Axes over which to compute the DCT-II.
 
     Returns
@@ -232,7 +234,7 @@ def idctii(x, axes=None):
     ----------
     a : array_like
       Input array
-    axes : sequence of ints, optional
+    axes : sequence of ints, optional (default None)
       Axes over which to compute the inverse DCT-II.
 
     Returns
@@ -258,7 +260,7 @@ def solvedbi_sm(ah, rho, b, c=None, axis=4):
     systems of the form (see :cite:`wohlberg-2016-efficient`)
 
     .. math::
-      (\\rho I + \mathbf{a} \mathbf{a}^H ) \; \mathbf{x} = \mathbf{b}
+      (\\rho I + \mathbf{a} \mathbf{a}^H ) \; \mathbf{x} = \mathbf{b} \;\;.
 
     In this equation inner products and matrix products are taken along
     the specified axis of the corresponding multi-dimensional arrays; the
@@ -273,10 +275,10 @@ def solvedbi_sm(ah, rho, b, c=None, axis=4):
       Linear system parameter :math:`\\rho`
     b : array_like
       Linear system component :math:`\mathbf{b}`
-    c : array_like, optional
+    c : array_like, optional (default None)
       Solution component :math:`\mathbf{c}` that may be pre-computed using
       :func:`solvedbi_sm_c` and cached for re-use.
-    axis : int, optional
+    axis : int, optional (default 4)
       Axis along which to solve the linear system
 
     Returns
@@ -309,7 +311,7 @@ def solvedbi_sm_c(ah, a, rho, axis=4):
       Linear system component :math:`\mathbf{a}`
     rho : float
       Linear system parameter :math:`\\rho`
-    axis : int, optional
+    axis : int, optional (default 4)
       Axis along which to solve the linear system
 
     Returns
@@ -395,13 +397,12 @@ def solvemdbi_ism(ah, rho, b, axisM, axisK):
 
 
 def solvemdbi_rsm(ah, rho, b, axisK, dimN=2):
-    """
-    Solve a multiple diagonal block linear system with a scaled
+    """Solve a multiple diagonal block linear system with a scaled
     identity term by repeated application of the Sherman-Morrison
     equation. The computation is performed by explictly constructing
     the inverse operator, leading to an :math:`O(K)` time cost and
-    :math:`O(M^2)` memory cost, where M is the dimension of the axis
-    over which inner products are taken.
+    :math:`O(M^2)` memory cost, where :math:`M` is the dimension of
+    the axis over which inner products are taken.
 
     The solution is obtained by independently solving a set of linear
     systems of the form (see :cite:`wohlberg-2016-efficient`)
@@ -427,7 +428,7 @@ def solvemdbi_rsm(ah, rho, b, axisK, dimN=2):
       Linear system component :math:`\mathbf{b}`
     axisK : int
       Axis in input corresponding to index k in linear system
-    dimN : int, optional
+    dimN : int, optional (default 2)
       Number of spatial dimensions arranged as leading axes in input array.
       Axis M is taken to be at dimN+2.
 
@@ -519,11 +520,112 @@ def solvemdbi_cg(ah, rho, b, axisM, axisK, tol=1e-5, mit=1000, isn=None):
 
 
 
+def lu_factor(A, rho):
+    """
+    Compute LU factorisation of either :math:`A^T A + \\rho I` or
+    :math:`A A^T + \\rho I`, depending on which matrix is smaller.
+
+    Parameters
+    ----------
+    A : array_like
+      Array :math:`A`
+    rho : float
+      Scalar :math:`\\rho`
+
+    Returns
+    -------
+    lu : ndarray
+      Matrix containing U in its upper triangle, and L in its lower triangle,
+      as returned by :func:`scipy.linalg.lu_factor`
+    piv : ndarray
+      Pivot indices representing the permutation matrix P, as returned by
+      :func:`scipy.linalg.lu_factor`
+    """
+
+    N, M = A.shape
+    # If N < M it is cheaper to factorise A*A^T' + rho*I and then use the
+    # matrix inversion lemma to compute the inverse of A^T*A + rho*I
+    if N >= M:
+        lu, piv = linalg.lu_factor(A.T.dot(A) + rho*np.identity(M))
+    else:
+        lu, piv = linalg.lu_factor(A.dot(A.T) + rho*np.identity(N))
+    return lu, piv
+
+
+
+def lu_solve_ATAI(A, rho, b, lu, piv):
+    """
+    Solve the linear system :math:`(A^T A + \\rho I)\\mathbf{x} = \\mathbf{b}`
+    or :math:`(A^T A + \\rho I)X = B` using :func:`scipy.linalg.lu_solve`.
+
+    Parameters
+    ----------
+    A : array_like
+      Matrix :math:`A`
+    rho : float
+      Scalar :math:`\\rho`
+    b : array_like
+      Vector :math:`\\mathbf{b}` or matrix :math:`B`
+    lu : array_like
+      Matrix containing U in its upper triangle, and L in its lower triangle,
+      as returned by :func:`scipy.linalg.lu_factor`
+    piv : array_like
+      Pivot indices representing the permutation matrix P, as returned by
+      :func:`scipy.linalg.lu_factor`
+
+    Returns
+    -------
+    x : ndarray
+      Solution to the linear system.
+    """
+
+    N, M = A.shape
+    if N >= M:
+        x = linalg.lu_solve((lu, piv), b)
+    else:
+        x = (b - A.T.dot(linalg.lu_solve((lu, piv), A.dot(b), 1))) / rho
+    return x
+
+
+
+def lu_solve_AATI(A, rho, b, lu, piv):
+    """
+    Solve the linear system :math:`(A A^T + \\rho I)\\mathbf{x} = \\mathbf{b}`
+    or :math:`(A A^T + \\rho I)X = B` using :func:`scipy.linalg.lu_solve`.
+
+    Parameters
+    ----------
+    A : array_like
+      Matrix :math:`A`
+    rho : float
+      Scalar :math:`\\rho`
+    b : array_like
+      Vector :math:`\\mathbf{b}` or matrix :math:`B`
+    lu : array_like
+      Matrix containing U in its upper triangle, and L in its lower triangle,
+      as returned by :func:`scipy.linalg.lu_factor`
+    piv : array_like
+      Pivot indices representing the permutation matrix P, as returned by
+      :func:`scipy.linalg.lu_factor`
+
+    Returns
+    -------
+    x : ndarray
+      Solution to the linear system.
+    """
+
+    N, M = A.shape
+    if N >= M:
+        x = (b - linalg.lu_solve((lu, piv), b.dot(A).T).T.dot(A.T)) / rho
+    else:
+        x = linalg.lu_solve((lu, piv), b.T).T
+    return x
+
+
 
 def zpad(x, pd, ax):
     """
     Zero-pad array x with pd=(leading,trailing) zeros on axis ax.
-
 
     Parameters
     ----------
@@ -596,11 +698,12 @@ def GTax(x, ax):
 
 def shrink1(x, alpha):
     """
-    Shrinkage/soft thresholding function
+    Scalar shrinkage/soft thresholding function
 
      .. math::
-      \mathcal{S}_{1,\\alpha}(\mathbf{x}) =
-      \mathrm{sign}(\mathbf{x}) \odot \max(0, |\mathbf{x}| - \\alpha)
+      \mathcal{S}_{1,\\alpha}(\mathbf{x}) = \mathrm{sign}(\mathbf{x}) \odot
+      \max(0, |\mathbf{x}| - \\alpha) = \mathrm{prox}_f(\mathbf{x}) \;\;
+      \\text{where} \;\; f(\mathbf{u}) = \\alpha \|\mathbf{u}\|_1 \;\;.
 
 
     Parameters
@@ -625,7 +728,7 @@ def shrink1(x, alpha):
 
 
 
-def zquotient(x, y):
+def zdivide(x, y):
     """
     Return x/y, with 0 instead of NaN where y is 0.
 
@@ -646,21 +749,23 @@ def zquotient(x, y):
     x = x.copy()
     y = y.copy()
     zm = y == 0.0
-    x[zm] = 0.0
-    y[zm] = 1.0
+    x[np.where(zm)] = 0.0
+    y[np.where(zm)] = 1.0
     return x / y
 
 
 
-def shrink2(x, alpha):
+def shrink2(x, alpha, axis=-1):
     """Vector shrinkage/soft thresholding function
 
      .. math::
       \mathcal{S}_{2,\\alpha}(\mathbf{x}) =
       \\frac{\mathbf{x}}{\|\mathbf{x}\|_2} \max(0, \|\mathbf{x}\|_2 - \\alpha)
+      = \mathrm{prox}_f(\mathbf{x}) \;\;
+      \\text{where} \;\; f(\mathbf{u}) = \\alpha \|\mathbf{u}\|_2 \;\;.
 
-    The :math:`\ell^2` norm is applied over the last axis of a
-    multi-dimensional input.
+    The :math:`\ell^2` norm is applied over the specified axis of a
+    multi-dimensional input (the last axis by default).
 
 
     Parameters
@@ -669,18 +774,83 @@ def shrink2(x, alpha):
       Input array :math:`\mathbf{x}`
     alpha : float or array_like
       Shrinkage parameter :math:`\\alpha`
+    axis : int, optional (default -1)
+      Axis of x over which the :math:`\ell^2` norm
 
     Returns
     -------
     x : array_like
       Output array
-
     """
 
-    a = np.sqrt(np.sum(x**2, axis=x.ndim-1, keepdims=True))
+    a = np.sqrt(np.sum(x**2, axis=axis, keepdims=True))
     b = np.maximum(0, a - alpha)
-    b = zquotient(b, a)
+    b = zdivide(b, a)
     return b*x
+
+
+
+def shrink12(x, alpha, beta, axis=-1):
+    """Compound shrinkage/soft thresholding function
+    :cite:`wohlberg-2012-local` :cite:`chartrand-2013-nonconvex`
+
+     .. math::
+      \mathcal{S}_{1,2,\\alpha,\\beta}(\mathbf{x}) =
+      \mathcal{S}_{2,\\beta}(\mathcal{S}_{1,\\alpha}(\mathbf{x}))
+      = \mathrm{prox}_f(\mathbf{x}) \;\;
+      \\text{where} \;\; f(\mathbf{u}) = \\alpha \|\mathbf{u}\|_1 +
+      \\beta \|\mathbf{u}\|_2 \;\;.
+
+    The :math:`\ell^2` norm is applied over the specified axis of a
+    multi-dimensional input (the last axis by default).
+
+
+    Parameters
+    ----------
+    x : array_like
+      Input array :math:`\mathbf{x}`
+    alpha : float or array_like
+      Shrinkage parameter :math:`\\alpha`
+    beta : float or array_like
+      Shrinkage parameter :math:`\\beta`
+    axis : int, optional (default -1)
+      Axis of x over which the :math:`\ell^2` norm
+
+    Returns
+    -------
+    x : array_like
+      Output array
+    """
+
+    return shrink2(shrink1(x, alpha), beta, axis)
+
+
+
+def proj_l2ball(b, s, r, axes=None):
+    """Project :math:`\mathbf{b}` into the :math:`\ell^2` ball of radius
+    :math:`r` about :math:`\mathbf{s}`, i.e.
+    :math:`\{ \mathbf{x} : \|\mathbf{x} - \mathbf{s} \|_2 \leq r \}`.
+
+    Parameters
+    ----------
+    b : array_like
+      Vector :math:`\mathbf{b}` to be projected
+    s : array_like
+      Centre of :math:`\ell^2` ball :math:`\mathbf{s}`
+    r : float
+      Radius of ball
+    axes : sequence of ints, optional (default all axes)
+      Axes over which to compute :math:`\ell^2` norms
+
+    Returns
+    -------
+    x : array_like
+      Projection of :math:`\mathbf{b}` into ball
+    """
+
+    d = np.sqrt(np.sum((b - s)**2, axis=axes, keepdims=True))
+    p = zdivide(b - s, d)
+    return (d <= r) * b + (d > r) * (s + r*p)
 
 
 
@@ -722,7 +892,7 @@ def fl2norm2(xf, axis=(0,1)):
     ----------
     xf : array_like
       Input array
-    axis : sequence of ints, optional
+    axis : sequence of ints, optional (default (0,1))
       Axes on which the input is in the frequency domain
 
     Returns
@@ -753,7 +923,7 @@ def rfl2norm2(xf, xs, axis=(0,1)):
     xs : sequence of ints
       Shape of original array to which :func:`rfftn` was applied to
       obtain the input array
-    axis : sequence of ints, optional
+    axis : sequence of ints, optional (default (0,1))
       Axes on which the input is in the frequency domain
 
     Returns
@@ -781,7 +951,7 @@ def rrs(ax, b):
     """
     Compute relative residual :math:`\|\mathbf{b} - A \mathbf{x}\|_2 /
     \|\mathbf{b}\|_2` of the solution to a linear equation :math:`A \mathbf{x}
-    = \mathbf{b}`.
+    = \mathbf{b}`. Returns 1.0 if :math:`\mathbf{b} = 0`.
 
 
     Parameters
@@ -797,7 +967,11 @@ def rrs(ax, b):
       Relative residual
     """
 
-    return linalg.norm((ax - b).ravel()) / linalg.norm(b.ravel())
+    nrm = linalg.norm(b.ravel())
+    if nrm == 0.0:
+        return 1.0
+    else:
+        return linalg.norm((ax - b).ravel()) / nrm
 
 
 

@@ -7,7 +7,10 @@
 
 """Utility functions"""
 
+from __future__ import absolute_import
 from __future__ import division
+from __future__ import print_function
+from future.utils import PY2
 from builtins import range
 from builtins import object
 
@@ -28,6 +31,17 @@ else:
 import sporco.linalg as sla
 
 __author__ = """Brendt Wohlberg <brendt@ieee.org>"""
+
+
+# Python 2/3 unicode literal compatibility
+if PY2:
+    import codecs
+    def u(x):
+        return x.decode('utf8')
+else:
+    def u(x):
+        return x
+
 
 
 def plot(dat, x=None, title=None, xlbl=None, ylbl=None, lgnd=None, lglc=None,
@@ -235,14 +249,16 @@ def tiledict(D, sz=None):
 
     if D.ndim == 4:
         axisM = 3
+        szni = 3
     else:
         axisM = 2
+        szni = 2
 
     # Construct dictionary atom size vector if not provided
     if sz is None:
         sz = np.tile(np.array(dsz[0:2]).reshape([2, 1]), (1, D.shape[axisM]))
     else:
-        sz = np.array(sum(tuple((x[0:2],) * x[2] for x in sz), ())).T
+        sz = np.array(sum(tuple((x[0:2],) * x[szni] for x in sz), ())).T
 
     # Compute the maximum atom dimensions
     mxsz = np.amax(sz, 1)

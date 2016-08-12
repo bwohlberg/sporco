@@ -16,6 +16,7 @@ import copy
 import collections
 
 from sporco.admm import admm
+import sporco.linalg as sl
 
 __author__ = """Brendt Wohlberg <brendt@ieee.org>"""
 
@@ -202,7 +203,7 @@ class CnstrMOD(admm.ADMMEqual):
         self.A = A
         self.SAT = self.S.dot(A.T)
         # Factorise dictionary for efficient solves
-        self.lu, self.piv = factorise(A, self.rho)
+        self.lu, self.piv = sl.lu_factor(A, self.rho)
         self.runtime += self.timer.elapsed()
 
 
@@ -217,8 +218,10 @@ class CnstrMOD(admm.ADMMEqual):
     def xstep(self):
         """Minimise Augmented Lagrangian with respect to x."""
 
-        self.X = linsolve(self.A, self.rho, self.lu, self.piv,
-                          self.SAT + self.rho*(self.Y - self.U))
+        self.X = sl.lu_solve_AATI(self.A, self.rho, self.SAT +
+                                  self.rho*(self.Y - self.U),
+                                  self.lu, self.piv,)
+
 
 
     def ystep(self):
@@ -247,7 +250,7 @@ class CnstrMOD(admm.ADMMEqual):
     def rhochange(self):
         """Re-factorise matrix when rho changes"""
 
-        self.lu, self.piv = factorise(self.A, self.rho)
+        self.lu, self.piv = sl.lu_factor(self.A, self.rho)
 
 
 
@@ -275,32 +278,3 @@ def normalise(v):
     vn = np.sqrt(np.sum(v**2, 0))
     vn[vn == 0] = 1.0
     return v / vn
-
-
-
-def factorise(A, rho):
-    """Compute factorisation of either :math:`A^T A + \\rho I`
-    or :math:`A A^T + \\rho I`, depending on which matrix is smaller.
-    """
-
-    N, M = A.shape
-    # If N < M it is cheaper to factorise A*A^T' + rho*I and then use the
-    # matrix inversion lemma to compute the inverse of A^T*A + rho*I
-    if N >= M:
-        lu, piv = linalg.lu_factor(A.T.dot(A) + rho*np.identity(M))
-    else:
-        lu, piv = linalg.lu_factor(A.dot(A.T) + rho*np.identity(N))
-    return lu, piv
-
-
-def linsolve(A, rho, lu, piv, b):
-    """Solve the linear system :math:`(A A^T + \\rho I)\\mathbf{x} =
-    \\mathbf{b}`.
-    """
-
-    N, M = A.shape
-    if N >= M:
-        x = (b - linalg.lu_solve((lu, piv), b.dot(A).T).T.dot(A.T)) / rho
-    else:
-        x = linalg.lu_solve((lu, piv), b.T).T
-    return x

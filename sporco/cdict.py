@@ -4,7 +4,7 @@
 # This file is part of the SPORCO package. Details of the copyright
 # and user license can be found in the 'LICENSE.txt' file distributed
 # with the package.
- 
+
 """Constrained dictionary class"""
 
 from builtins import str

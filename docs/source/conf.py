@@ -122,11 +122,12 @@ pygments_style = 'sphinx'
 # a list of builtin themes.
 #html_theme = 'default'
 #import sphinx_rtd_theme
+#import sphinx_readable_theme
 #html_theme = "sphinx_rtd_theme"
 #html_theme = "bizstyle"
 html_theme = "haiku"
 #html_theme = "agogo"
-
+#html_theme = 'readable'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -136,6 +137,7 @@ html_theme = "haiku"
 # Add any paths that contain custom themes here, relative to this directory.
 #html_theme_path = []
 #html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
+#html_theme_path = [sphinx_readable_theme.get_html_theme_path()]
 
 # The name for this set of Sphinx documents.  If None, it defaults to
 # "<project> v<release> documentation".
@@ -333,6 +335,7 @@ if on_rtd:
 # Sort members by type
 #autodoc_member_order = 'groupwise'
 autodoc_member_order = 'bysource'
+#autodoc_default_flags = ['members', 'inherited-members', 'show-inheritance']
 
 # Ensure that the __init__ method gets documented.
 def skip_member(app, what, name, obj, skip, options):

@@ -6,7 +6,7 @@
 # and user license can be found in the 'LICENSE.txt' file distributed
 # with the package.
 
-"""Basic spline.SplineL1 usage example"""
+"""Basic bpdn.BPDNJoint usage example"""
 
 from __future__ import print_function
 from builtins import input
@@ -14,34 +14,52 @@ from builtins import range
 
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.cm as cm
 
 from sporco import util
-from sporco.admm import spline
+from sporco.admm import bpdn
 
 
-# Load demo image
-img = util.ExampleImages().image('lena.grey', scaled=True)
+# Signal and dictionary size
+N = 32
+M = 4*N
+# Number of non-zero coefficients in generator
+L = 12
+# Number of signals
+K = 16;
+# Noise level
+sigma = 0.5
+
+
+# Construct random dictionary and random sparse coefficients
 np.random.seed(12345)
-imgn = util.spnoise(img, 0.2)
+D = np.random.randn(N, M)
+x0 = np.zeros((M, K))
+si = np.random.permutation(list(range(0, M-1)))
+x0[si[0:L],:] = np.random.randn(L, K)
+# Construct reference and noisy signal
+s0 = D.dot(x0)
+s = s0 + sigma*np.random.randn(N,K)
 
 
-# Set up SplineL1 options
-lmbda = 4.0
-opt = spline.SplineL1.Options({'Verbose' : True, 'gEvalY' : False})
+# Set BPDNJoint options
+lmbda = 0.0
+mu = 45.0
+opt = bpdn.BPDN.Options({'Verbose' : True, 'MaxMainIter' : 500,
+                         'RelStopTol' : 1e-6, 'AutoRho' : {'RsdlTarget' : 1.0}})
 
-
-# Initialise and run SplineL1 object
-b = spline.SplineL1(imgn, lmbda, opt)
+# Initialise and run BPDNJoint object
+b = bpdn.BPDNJoint(D, s, lmbda, mu, opt)
 b.solve()
-print("SplineL1 solve time: %.2fs" % b.runtime)
+print("BPDNJoint solve time: %.2fs" % b.runtime)
 
 
-# Display input and result image
-fig1 = plt.figure(1, figsize=(14,7))
+# Plot results
+fig1 = plt.figure(1, figsize=(6,8))
 plt.subplot(1,2,1)
-util.imview(imgn, fgrf=fig1, title='Noisy')
+util.imview(x0, fgrf=fig1, cmap=cm.Blues, title='Reference')
 plt.subplot(1,2,2)
-util.imview(b.X, fgrf=fig1, title='l1-Spline Result')
+util.imview(b.Y, fgrf=fig1, cmap=cm.Blues, title='Reconstruction')
 fig1.show()
 
 
@@ -62,4 +80,3 @@ fig2.show()
 
 # Wait for enter on keyboard
 input()
-

@@ -6,9 +6,10 @@
 # and user license can be found in the 'LICENSE.txt' file distributed
 # with the package.
 
-"""Basic bpdndl.BPDNDictLearn usage example"""
+"""Basic cbpdndl.ConvBPDNDictLearn usage example (greyscale images,
+multi-scale dictionary).
+"""
 
-from __future__ import division
 from __future__ import print_function
 from builtins import input
 from builtins import range
@@ -17,7 +18,8 @@ import numpy as np
 from scipy.ndimage.interpolation import zoom
 import matplotlib.pyplot as plt
 
-from sporco.admm import bpdndl
+from sporco.admm import cbpdndl
+from sporco.admm import ccmod
 from sporco import util
 
 
@@ -31,44 +33,47 @@ img5 = exim.image('man.grey')[100:612, 100:612]
 
 
 # Reduce images size to speed up demo script
-S1 = zoom(img1, 0.25)
-S2 = zoom(img2, 0.25)
-S3 = zoom(img3, 0.25)
-S4 = zoom(img4, 0.25)
-S5 = zoom(img5, 0.25)
+S1 = zoom(img1, 0.5)
+S2 = zoom(img2, 0.5)
+S3 = zoom(img3, 0.5)
+S4 = zoom(img4, 0.5)
+S5 = zoom(img5, 0.5)
+S = np.dstack((S1,S2,S3,S4,S5))
 
 
-# Extract all 8x8 image blocks, reshape, and subtract block means
-S = util.imageblocks((S1,S2,S3,S4,S5), (8,8))
-S = np.reshape(S, (np.prod(S.shape[0:2]), S.shape[2]))
-S -= np.mean(S, axis=0)
+# Highpass filter test images
+npd = 16
+fltlmbd = 5
+sl, sh = util.tikhonov_filter(S, fltlmbd, npd)
 
 
 # Initial dictionary
 np.random.seed(12345)
-D0 = np.random.randn(S.shape[0], 128)
+D0 = np.random.randn(10, 10, 48)
 
 
-# Set BPDNDictLearn parameters
-lmbda = 0.1
-opt = bpdndl.BPDNDictLearn.Options({'Verbose' : True, 'MaxMainIter' : 100,
-                      'BPDN' : {'rho' : 50.0*lmbda + 0.5},
-                      'CMOD' : {'rho' : S.shape[1] / 200.0}})
+# Set ConvBPDNDictLearn parameters, including multi-scale dictionary size
+lmbda = 0.5
+dsz = ((6,6,16), (8,8,16), (10,10,16))
+opt = cbpdndl.ConvBPDNDictLearn.Options({'Verbose' : True, 'MaxMainIter' : 200,
+                                         'DictSize' : dsz,
+                                    'CBPDN' : {'rho' : 50.0*lmbda + 0.5},
+                                    'CCMOD' : {'rho' : 10, 'ZeroMean' : True}})
+
 
 # Run optimisation
-d = bpdndl.BPDNDictLearn(D0, S, lmbda, opt)
-d.solve()
-print("BPDNDictLearn solve time: %.2fs" % d.runtime)
+d = cbpdndl.ConvBPDNDictLearn(D0, sh, lmbda, opt)
+D1 = d.solve()
+print("ConvBPDNDictLearn solve time: %.2fs" % d.runtime)
 
 
 # Display dictionaries
-D1 = d.getdict().reshape((8,8,D0.shape[1]))
-D0 = D0.reshape(8,8,D0.shape[-1])
+D1 = D1.squeeze()
 fig1 = plt.figure(1, figsize=(14,7))
 plt.subplot(1,2,1)
 util.imview(util.tiledict(D0), fgrf=fig1, title='D0')
 plt.subplot(1,2,2)
-util.imview(util.tiledict(D1), fgrf=fig1, title='D1')
+util.imview(util.tiledict(D1, dsz), fgrf=fig1, title='D1')
 fig1.show()
 
 

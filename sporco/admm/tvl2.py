@@ -59,7 +59,7 @@ class TVL2Denoise(admm.ADMM):
        :math:`(1/2) \| W_{\mathrm{df}} (\mathbf{x} - \mathbf{s}) \|_2^2`
 
        ``RegTV`` : Value of regularisation term \
-       :math:`\| W_{\mathrm{tv}} \sqrt{(G_r \mathbf{x})^2 + 
+       :math:`\| W_{\mathrm{tv}} \sqrt{(G_r \mathbf{x})^2 +
        (G_c \mathbf{x})^2} \|_1`
 
        ``PrimalRsdl`` : Norm of primal residual
@@ -194,7 +194,7 @@ class TVL2Denoise(admm.ADMM):
                 # U so that the relevant dual optimality criterion
                 # (see (3.10) in boyd-2010-distributed) is satisfied.
                 Yss = np.sqrt(np.sum(self.Y**2, axis=S.ndim, keepdims=True))
-                self.U = (self.lmbda/self.rho)*sl.zquotient(self.Y,Yss)
+                self.U = (self.lmbda/self.rho)*sl.zdivide(self.Y,Yss)
         else:
             self.U = self.opt['U0']
 
@@ -505,7 +505,7 @@ class TVL2Deconv(admm.ADMM):
                 # U so that the relevant dual optimality criterion
                 # (see (3.10) in boyd-2010-distributed) is satisfied.
                 Yss = np.sqrt(np.sum(self.Y**2, axis=S.ndim, keepdims=True))
-                self.U = (self.lmbda/self.rho)*sl.zquotient(self.Y,Yss)
+                self.U = (self.lmbda/self.rho)*sl.zdivide(self.Y,Yss)
         else:
             self.U = self.opt['U0']
 
@@ -523,7 +523,8 @@ class TVL2Deconv(admm.ADMM):
         else:
             self.Wtvna = self.Wtv
 
-        g = np.zeros([2 if k in axes else 1 for k in range(S.ndim)] + 
+        # Construct gradient operators in frequency domain
+        g = np.zeros([2 if k in axes else 1 for k in range(S.ndim)] +
                      [len(axes),], self.dtype)
         for k in axes:
             g[(0,)*k +(slice(None),)+(0,)*(g.ndim-2-k)+(k,)] = [1,-1]

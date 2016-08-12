@@ -5,7 +5,7 @@ This module includes the :class:`.CnstrMOD` class for solving the
 problem
 
     .. math::
-       \mathrm{argmin}_D \| D X - S \|_2^2 \quad \text{ s.t }
+       \mathrm{argmin}_D (1/2) \| D X - S \|_2^2 \quad \text{ s.t }
        \quad \|\mathbf{d}_m\|_2 = 1
 
 
@@ -21,4 +21,4 @@ Usage Examples
 
     .. literalinclude:: ../../../examples/stdsparse/demo_cmod.py
        :language: python
-       :lines: 14-
+       :lines: 9-

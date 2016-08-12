@@ -5,6 +5,7 @@ import sporco.admm.bpdn
 import sporco.admm.cbpdn
 import sporco.admm.cmod
 import sporco.admm.ccmod
+import sporco.admm.dictlrn
 import sporco.admm.bpdndl
 import sporco.admm.cbpdndl
 import sporco.admm.tvl2

@@ -55,7 +55,7 @@ opt = bpdn.BPDN.Options({'Verbose' : True,
                          'MaxMainIter' : 200, 'RelStopTol' : 1e-3})
 b = bpdn.BPDN(D0, S, lmbda, opt)
 b.solve()
-print("BPDN solve time: %.2fs" % b.runtime, "\n")
+print("BPDN solve time: %.2fs" % b.runtime)
 
 
 # Update dictionary for training set S
@@ -63,7 +63,7 @@ opt = cmod.CnstrMOD.Options({'Verbose' : True,
                              'MaxMainIter' : 500, 'RelStopTol' : 1e-5})
 c = cmod.CnstrMOD(b.Y, S, None, opt)
 c.solve()
-print("CMOD solve time: %.2fs" % c.runtime, "\n")
+print("CMOD solve time: %.2fs" % c.runtime)
 
 
 # Display dictionaries
@@ -71,32 +71,26 @@ D0 = D0.reshape(8,8,D0.shape[-1])
 D1 = c.Y.reshape((8,8,c.Y.shape[-1]))
 fig1 = plt.figure(1, figsize=(20,10))
 plt.subplot(1,2,1)
-plt.imshow(util.tiledict(D0), interpolation="nearest",
-           cmap=plt.get_cmap('gray'))
-plt.title('D0')
+util.imview(util.tiledict(D0), fgrf=fig1, title='D0')
 plt.subplot(1,2,2)
-plt.imshow(util.tiledict(D1), interpolation="nearest",
-           cmap=plt.get_cmap('gray'))
-plt.title('D1')
+util.imview(util.tiledict(D1), fgrf=fig1, title='D1')
 fig1.show()
 
 
 # Plot functional value, residuals, and rho
-fig2 = plt.figure(2, figsize=(25,10))
+its = c.getitstat()
+fig2 = plt.figure(2, figsize=(21,7))
 plt.subplot(1,3,1)
-plt.plot([c.itstat[k].DFid for k in range(0, len(c.itstat))])
-plt.xlabel('Iterations')
-plt.ylabel('Functional')
-ax=plt.subplot(1,3,2)
-plt.semilogy([c.itstat[k].PrimalRsdl for k in range(0, len(c.itstat))])
-plt.semilogy([c.itstat[k].DualRsdl for k in range(0, len(c.itstat))])
-plt.xlabel('Iterations')
-plt.ylabel('Residual')
-plt.legend(['Primal', 'Dual'])
+util.plot(its.DFid, fgrf=fig2, ptyp='semilogy', xlbl='Iterations',
+          ylbl='Functional')
+plt.subplot(1,3,2)
+util.plot(np.vstack((its.PrimalRsdl, its.DualRsdl)).T, fgrf=fig2,
+          ptyp='semilogy', xlbl='Iterations', ylbl='Residual',
+          lgnd=['Primal', 'Dual']);
 plt.subplot(1,3,3)
-plt.plot([c.itstat[k].Rho for k in range(0, len(c.itstat))])
-plt.xlabel('Iterations')
-plt.ylabel('Penalty Parameter')
+util.plot(its.Rho, fgrf=fig2, xlbl='Iterations', ylbl='Penalty Parameter')
 fig2.show()
 
+
+# Wait for enter on keyboard
 input()

@@ -14,8 +14,67 @@ class TestSet01(object):
         np.random.seed(12345)
 
 
-
     def test_01(self):
+        rho = 1e-1
+        N = 64
+        M = 128
+        K = 32
+        D = np.random.randn(N, M)
+        X = np.random.randn(M, K)
+        S = D.dot(X)
+        Z = (D.T.dot(D).dot(X) + rho*X - D.T.dot(S)) / rho
+        lu, piv = linalg.lu_factor(D, rho)
+        Xslv = linalg.lu_solve_ATAI(D, rho, D.T.dot(S) + rho*Z, lu, piv)
+        assert(linalg.rrs(D.T.dot(D).dot(Xslv) + rho*Xslv,
+                        D.T.dot(S) + rho*Z) < 1e-11)
+
+
+    def test_02(self):
+        rho = 1e-1
+        N = 128
+        M = 64
+        K = 32
+        D = np.random.randn(N, M)
+        X = np.random.randn(M, K)
+        S = D.dot(X)
+        Z = (D.T.dot(D).dot(X) + rho*X - D.T.dot(S)) / rho
+        lu, piv = linalg.lu_factor(D, rho)
+        Xslv = linalg.lu_solve_ATAI(D, rho, D.T.dot(S) + rho*Z, lu, piv)
+        assert(linalg.rrs(D.T.dot(D).dot(Xslv) + rho*Xslv,
+                        D.T.dot(S) + rho*Z) < 1e-14)
+
+
+    def test_03(self):
+        rho = 1e-1
+        N = 64
+        M = 128
+        K = 32
+        D = np.random.randn(N, M)
+        X = np.random.randn(M, K)
+        S = D.dot(X)
+        Z = (D.dot(X).dot(X.T) + rho*D - S.dot(X.T)) / rho
+        lu, piv = linalg.lu_factor(X, rho)
+        Dslv = linalg.lu_solve_AATI(X, rho, S.dot(X.T) + rho*Z, lu, piv)
+        assert(linalg.rrs(Dslv.dot(X).dot(X.T) + rho*Dslv,
+                        S.dot(X.T) + rho*Z) < 1e-11)
+
+
+    def test_04(self):
+        rho = 1e-1
+        N = 128
+        M = 64
+        K = 32
+        D = np.random.randn(N, M)
+        X = np.random.randn(M, K)
+        S = D.dot(X)
+        Z = (D.dot(X).dot(X.T) + rho*D - S.dot(X.T)) / rho
+        lu, piv = linalg.lu_factor(X, rho)
+        Dslv = linalg.lu_solve_AATI(X, rho, S.dot(X.T) + rho*Z, lu, piv)
+        assert(linalg.rrs(Dslv.dot(X).dot(X.T) + rho*Dslv,
+                        S.dot(X.T) + rho*Z) < 1e-11)
+
+
+    def test_05(self):
         rho = 1e-1
         N = 64
         M = 32
@@ -33,7 +92,7 @@ class TestSet01(object):
 
 
 
-    def test_02(self):
+    def test_06(self):
         rho = 1e-1
         N = 64
         M = 32
@@ -53,7 +112,7 @@ class TestSet01(object):
 
 
 
-    def test_03(self):
+    def test_07(self):
         rho = 1e-1
         N = 32
         M = 16
@@ -74,7 +133,7 @@ class TestSet01(object):
 
 
 
-    def test_04(self):
+    def test_08(self):
         rho = 1e-1
         N = 32
         M = 16
@@ -94,7 +153,7 @@ class TestSet01(object):
 
 
 
-    def test_05(self):
+    def test_09(self):
         rho = 1e-1
         N = 64
         M = 32
@@ -115,7 +174,7 @@ class TestSet01(object):
 
 
 
-    def test_06(self):
+    def test_10(self):
         rho = 1e-1
         N = 32
         M = 16
@@ -135,7 +194,7 @@ class TestSet01(object):
 
 
 
-    def test_07(self):
+    def test_11(self):
         rho = 1e-1
         N = 64
         M = 32
