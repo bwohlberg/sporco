@@ -164,7 +164,7 @@ class BPDN(admm.ADMMEqual):
           Algorithm options
         """
 
-        Nr, Nc = D.shape
+        Nc = D.shape[1]
         Nm = S.shape[1]
         Nx = Nc*Nm
         if opt is None:
