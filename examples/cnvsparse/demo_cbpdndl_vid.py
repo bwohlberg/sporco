@@ -25,7 +25,6 @@ except ImportError:
     raise
 
 from sporco.admm import cbpdndl
-from sporco.admm import ccmod
 from sporco import util
 
 

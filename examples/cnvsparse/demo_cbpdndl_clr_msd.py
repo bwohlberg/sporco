@@ -20,7 +20,6 @@ from scipy.ndimage.interpolation import zoom
 import matplotlib.pyplot as plt
 
 from sporco.admm import cbpdndl
-from sporco.admm import ccmod
 from sporco import util
 
 

@@ -13,10 +13,8 @@ from __future__ import print_function
 from builtins import range
 from builtins import object
 
-import numpy as np
 from scipy import linalg
 import collections
-import copy
 
 from sporco import cdict
 from sporco import util

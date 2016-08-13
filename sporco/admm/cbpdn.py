@@ -1195,7 +1195,6 @@ class ConvTwoBlockCnstrnt(admm.ADMMTwoBlockCnstrnt):
                  'Time'])
     """Named tuple type for recording ADMM iteration statistics"""
 
-    """Field precision for other display columns"""
     hdrtxt = ['Itn', 'Fnc', 'g0', 'g1', 'r', 's', 'rho']
     """Display column header text. NB: The display_start function assumes
     that the first entry is the iteration count and the last is the
@@ -1617,7 +1616,7 @@ class ConvBPDNMaskDcpl(ConvTwoBlockCnstrnt):
                 # If Y0 is given, but not U0, then choose the initial
                 # U so that the relevant dual optimality criterion
                 # (see (3.10) in boyd-2010-distributed) is satisfied.
-                Ub0 = (self.W**2) * self.block_sep0(self.Y) / rho
+                Ub0 = (self.W**2) * self.block_sep0(self.Y) / self.rho
                 Ub1 = (self.lmbda/self.rho) * np.sign(self.block_sep1(self.Y))
                 self.U = self.block_cat(Ub0, Ub1)
         else:

@@ -852,7 +852,6 @@ class ADMMTwoBlockCnstrnt(ADMM):
                  'Rho', 'Time'])
     """Named tuple type for recording ADMM iteration statistics"""
 
-    """Field precision for other display columns"""
     hdrtxt = ['Itn', 'Fnc', 'f', 'g0', 'g1', 'r', 's', 'rho']
     """Display column header text. NB: The display_start function assumes
     that the first entry is the iteration count and the last is the

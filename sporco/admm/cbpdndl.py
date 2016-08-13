@@ -13,14 +13,9 @@ from builtins import range
 from builtins import object
 
 import numpy as np
-from scipy import linalg
-import collections
 import copy
 
-import sporco.linalg as sl
-from sporco import util
 from sporco.util import u
-from sporco import cdict
 from sporco.admm import cbpdn
 from sporco.admm import ccmod
 from sporco.admm import dictlrn

@@ -13,12 +13,8 @@ from builtins import range
 from builtins import object
 
 import numpy as np
-from scipy import linalg
-import collections
 import copy
 
-from sporco import cdict
-from sporco import util
 from sporco.util import u
 from sporco.admm import bpdn
 from sporco.admm import cmod
