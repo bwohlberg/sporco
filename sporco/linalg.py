@@ -283,7 +283,7 @@ def solvedbi_sm(ah, rho, b, c=None, axis=4):
 
     Returns
     -------
-    x : array_like
+    x : ndarray
       Linear system solution :math:`\mathbf{x}`
     """
 
@@ -316,7 +316,7 @@ def solvedbi_sm_c(ah, a, rho, axis=4):
 
     Returns
     -------
-    c : array_like
+    c : ndarray
       Argument :math:`\mathbf{c}` used by :func:`solvedbi_sm`
     """
 
@@ -361,7 +361,7 @@ def solvemdbi_ism(ah, rho, b, axisM, axisK):
 
     Returns
     -------
-    x : array_like
+    x : ndarray
       Linear system solution :math:`\mathbf{x}`
     """
 
@@ -434,7 +434,7 @@ def solvemdbi_rsm(ah, rho, b, axisK, dimN=2):
 
     Returns
     -------
-    x : array_like
+    x : ndarray
       Linear system solution :math:`\mathbf{x}`
     """
 
@@ -501,7 +501,7 @@ def solvemdbi_cg(ah, rho, b, axisM, axisK, tol=1e-5, mit=1000, isn=None):
 
     Returns
     -------
-    x : array_like
+    x : ndarray
       Linear system solution :math:`\mathbf{x}`
     cgit : int
       Number of CG iterations
@@ -662,7 +662,7 @@ def Gax(x, ax):
 
     Returns
     -------
-    xg : array_like
+    xg : ndarray
       Output array
     """
 
@@ -685,7 +685,7 @@ def GTax(x, ax):
 
     Returns
     -------
-    xg : array_like
+    xg : ndarray
       Output array
     """
 
@@ -715,7 +715,7 @@ def shrink1(x, alpha):
 
     Returns
     -------
-    x : array_like
+    x : ndarray
       Output array
     """
 
@@ -742,16 +742,14 @@ def zdivide(x, y):
 
     Returns
     -------
-    z : array_like
+    z : ndarray
       Quotient `x`/`y`
     """
 
-    x = x.copy()
-    y = y.copy()
-    zm = y == 0.0
-    x[np.where(zm)] = 0.0
-    y[np.where(zm)] = 1.0
-    return x / y
+    with np.errstate(divide='ignore'):
+        div = x / y
+    div[np.logical_or(np.isnan(div), np.isinf(div))] = 0
+    return div
 
 
 
@@ -779,7 +777,7 @@ def shrink2(x, alpha, axis=-1):
 
     Returns
     -------
-    x : array_like
+    x : ndarray
       Output array
     """
 
@@ -818,7 +816,7 @@ def shrink12(x, alpha, beta, axis=-1):
 
     Returns
     -------
-    x : array_like
+    x : ndarray
       Output array
     """
 
@@ -844,7 +842,7 @@ def proj_l2ball(b, s, r, axes=None):
 
     Returns
     -------
-    x : array_like
+    x : ndarray
       Projection of :math:`\mathbf{b}` into ball
     """
 
@@ -869,7 +867,7 @@ def atleast_nd(n, u):
 
     Returns
     -------
-    v : array_like
+    v : ndarray
       Output array with at least n dimensions
     """
 
