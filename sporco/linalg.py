@@ -746,7 +746,7 @@ def zdivide(x, y):
       Quotient `x`/`y`
     """
 
-    with np.errstate(divide='ignore'):
+    with np.errstate(divide='ignore', invalid='ignore'):
         div = x / y
     div[np.logical_or(np.isnan(div), np.isinf(div))] = 0
     return div
