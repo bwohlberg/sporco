@@ -136,7 +136,7 @@ setup(
     },
     classifiers = [
     'License :: OSI Approved :: BSD License',
-    'Development Status :: 3 - Alpha',
+    'Development Status :: 4 - Beta',
     'Intended Audience :: Education',
     'Intended Audience :: Science/Research',
     'License :: OSI Approved :: BSD License',
