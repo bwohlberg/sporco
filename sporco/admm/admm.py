@@ -66,7 +66,6 @@ class ADMM(object):
        ``Time`` : Cumulative run time
     """
 
-
     class Options(cdict.ConstrainedDict):
         """ADMM algorithm options.
 
@@ -151,6 +150,8 @@ class ADMM(object):
 
             if override or self['DataType'] is None:
                 self['DataType'] = dtype
+
+
 
 
     IterationStats = collections.namedtuple('IterationStats',
@@ -382,15 +383,14 @@ class ADMM(object):
 
 
     def update_rho(self, k, r, s):
-
         """Automatic rho adjustment."""
 
-        if self.opt['AutoRho','Enabled']:
-            tau = self.opt['AutoRho','Scaling']
-            mu = self.opt['AutoRho','RsdlRatio']
-            xi = self.opt['AutoRho','RsdlTarget']
-            if k != 0 and scipy.mod(k+1,self.opt['AutoRho','Period']) == 0:
-                if self.opt['AutoRho','AutoScaling']:
+        if self.opt['AutoRho', 'Enabled']:
+            tau = self.opt['AutoRho', 'Scaling']
+            mu = self.opt['AutoRho', 'RsdlRatio']
+            xi = self.opt['AutoRho', 'RsdlTarget']
+            if k != 0 and scipy.mod(k+1, self.opt['AutoRho', 'Period']) == 0:
+                if self.opt['AutoRho', 'AutoScaling']:
                     if s == 0.0 or r == 0.0:
                         rhomlt = tau
                     else:
@@ -416,7 +416,7 @@ class ADMM(object):
 
         if self.opt['Verbose']:
             # If AutoRho option enabled rho is included in iteration status
-            if self.opt['AutoRho','Enabled']:
+            if self.opt['AutoRho', 'Enabled']:
                 hdrtxt = type(self).hdrtxt
             else:
                 hdrtxt = type(self).hdrtxt[0:-1]
