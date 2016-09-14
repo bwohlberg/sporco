@@ -808,9 +808,9 @@ class ConvElasticNet(ConvBPDN):
 
         Parameters
         ----------
-        D : array_like, shape (N, M)
+        D : array_like
           Dictionary matrix
-        S : array_like, shape (M, K)
+        S : array_like
           Signal vector or matrix
         lmbda : float
           Regularisation parameter (l1)
@@ -1011,9 +1011,9 @@ class ConvBPDNGradReg(ConvBPDN):
 
         Parameters
         ----------
-        D : array_like, shape (N, M)
+        D : array_like
           Dictionary matrix
-        S : array_like, shape (M, K)
+        S : array_like
           Signal vector or matrix
         lmbda : float
           Regularisation parameter (l1)
