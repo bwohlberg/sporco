@@ -21,6 +21,7 @@ import os
 import glob
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
+from mpl_toolkits.mplot3d import Axes3D
 try:
     import mpldatacursor as mpldc
 except ImportError:
@@ -125,8 +126,85 @@ def plot(dat, x=None, title=None, xlbl=None, ylbl=None, lgnd=None, lglc=None,
 
 
 
+def surf(z, x=None, y=None, title=None, xlbl=None, ylbl=None, zlbl=None,
+         block=False, cmap=None, fgrf=None, fgnm=None, fgsz=None):
+    """Plot columns of array.
+
+    Parameters
+    ----------
+    z : array_like
+        2d array of data to plot
+    x : array_like, optional (default=None)
+        Values for x-axis of the plot
+    y : array_like, optional (default=None)
+        Values for x-axis of the plot
+    title : string, optional (default=None)
+        Figure title
+    xlbl : string, optional (default=None)
+        Label for x-axis
+    ylbl : string, optional (default=None)
+        Label for y-axis
+    zlbl : string, optional (default=None)
+        Label for z-axis
+    block : boolean, optional (default=False)
+        If True, the function only returns when the figure is closed
+    cmap : matplotlib.cm colormap, optional (default=None)
+        Colour map for surface. If none specifed, defaults to cm.coolwarm
+    fgrf : figure object reference, optional (default=None)
+        Draw in specified figure instead of creating one
+    fgnm : integer, optional (default=None)
+        Figure number of figure
+    fgsz : tuple (width,height), optional (default=None)
+        Specify figure dimensions in inches.
+
+    Returns
+    -------
+    fig : matplotlib.figure.Figure
+      Figure object for this figure.
+    """
+
+    if fgrf is None:
+        fig = plt.figure(num=fgnm, figsize=fgsz)
+        fig.clf()
+    else:
+        fig = fgrf
+
+    if x is None:
+        x = range(z.shape[1])
+    if y is None:
+        y = range(z.shape[0])
+
+    if cmap is None:
+        cmap = cm.coolwarm
+
+    xg, yg = np.meshgrid(x, y)
+    ax = plt.axes(projection='3d')
+    ax.plot_surface(xg, yg, z, rstride=1, cstride=1, cmap=cmap)
+
+    if title is not None:
+        plt.title(title)
+    if xlbl is not None:
+        ax.set_xlabel(xlbl)
+    if ylbl is not None:
+        ax.set_ylabel(ylbl)
+    if ylbl is not None:
+        ax.set_zlabel(zlbl)
+
+    def press(event):
+        if event.key == 'q':
+            plt.close(fig)
+
+    fig.canvas.mpl_connect('key_press_event', press)
+
+    if fgrf is None:
+        plt.show(block=block)
+
+    return fig
+
+
+
 def imview(img, title=None, block=False, cmap=None, fgrf=None, fgnm=None,
-           fgsz=(12, 12), cbar=False, axes=None):
+           fgsz=(12, 12), intrp='nearest', cbar=False, axes=None):
     """Display an image.
 
     Pixel values are displayed when the pointer is over valid image
@@ -166,6 +244,9 @@ def imview(img, title=None, block=False, cmap=None, fgrf=None, fgnm=None,
       imview call.
     """
 
+    if img.ndim > 2:
+        raise ValueError('Argument img must be a two dimensional array')
+
     imgd = np.copy(img)
 
     if cmap is None and img.ndim == 2:
@@ -185,8 +266,9 @@ def imview(img, title=None, block=False, cmap=None, fgrf=None, fgnm=None,
         axes.set_adjustable('box-forced')
         ax.set_adjustable('box-forced')
 
-    plt.imshow(imgd, cmap=cmap, interpolation="nearest",
-               vmin=imgd.min(), vmax=imgd.max())
+    plt.imshow(imgd, cmap=cmap, interpolation=intrp, vmin=imgd.min(),
+               vmax=imgd.max())
+
     if title is not None:
         plt.title(title)
     if cbar:
