@@ -117,7 +117,7 @@ setup(
                         'Convolutional Sparse Coding', 'Optimization', 'ADMM'],
     platforms        = 'Any',
     license          = 'BSD',
-    url              = 'http://math.lanl.gov/~brendt/Software/SPORCO/',
+    url              = 'http://bwohlberg.github.io/sporco',
     author           = 'Brendt Wohlberg',
     author_email     = 'brendt@ieee.org',
     packages         = packages,
