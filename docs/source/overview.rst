@@ -93,7 +93,10 @@ If you use this library for published work, please cite it as in
 :cite:`wohlberg-2016-sporco` (see bibtex entry ``wohlberg-2016-sporco`` in
 ``docs/source/references.bib`` in the source distribution). If you make
 use of any of the convolutional sparse representation functions,
-please also cite :cite:`wohlberg-2016-efficient`.
+please also cite :cite:`wohlberg-2016-efficient` and any other papers
+relevant to the specific functionality that is used, e.g.
+:cite:`wohlberg-2016-convolutional`, :cite:`wohlberg-2016-convolutional2`,
+:cite:`wohlberg-2016-boundary`.
 
 
 
