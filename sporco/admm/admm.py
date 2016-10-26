@@ -318,10 +318,14 @@ class ADMM(object):
         # required for computation of primal residual r
         self.AXnr = self.cnst_A(self.X)
         if self.opt['RelaxParam'] == 1.0:
+            # If RelaxParam option is 1.0 there is no relaxation
             self.AX = self.AXnr
         else:
+            # Avoid calling cnst_c() more than once in case it is expensive
+            # (e.g. due to allocation of a large block of memory)
             if not hasattr(self, 'c'):
                 self.c = self.cnst_c()
+            # Compute relaxed version of AX
             alpha = self.opt['RelaxParam']
             self.AX = alpha*self.AXnr - (1-alpha)*(self.cnst_B(self.Y) - self.c)
 
@@ -471,6 +475,13 @@ class ADMM(object):
 
 
 
+    def var_u(self):
+        """Get :math:`\mathbf{u}` variable."""
+
+        return self.U
+
+
+
     def obfn_f(self, X):
         """Compute :math:`f(\mathbf{x})` component of ADMM objective function.
 
@@ -551,6 +562,8 @@ class ADMM(object):
         overridden.
         """
 
+        # Avoid calling cnst_c() more than once in case it is expensive
+        # (e.g. due to allocation of a large block of memory)
         if not hasattr(self, 'c'):
             self.c = self.cnst_c()
         return AX + self.cnst_B(Y) - self.c
@@ -577,6 +590,8 @@ class ADMM(object):
         overridden.
         """
 
+        # Avoid computing the norm of the value returned by cnst_c()
+        # more than once
         if not hasattr(self, 'nc'):
             self.nc = linalg.norm(self.cnst_c())
         return max((linalg.norm(AX), linalg.norm(self.cnst_B(Y)), self.nc))
