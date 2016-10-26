@@ -231,17 +231,19 @@ class ConstrainedDict(dict):
           Dict value corresponding to key
         """
 
-        # Get corresponding node to self, as determined by pth
-        # attribute, of the defaults dict tree
-        a = self.__class__.getnode(self.dflt, self.pth)
-        # Raise UnknownKeyError exception if key not in corresponding
-        # node of defaults tree
-        if key not in a:
-            raise UnknownKeyError(self.pth + (key,))
-        # Raise InvalidValueError if the key value in the defaults
-        # tree is a dict and the value parameter is not a dict and
-        elif isinstance(a[key], dict) and not isinstance(value, dict):
-            raise InvalidValueError(self.pth + (key,))
+        # This test necessary to avoid unpickling errors in Python 3
+        if hasattr(self, 'dflt'):
+            # Get corresponding node to self, as determined by pth
+            # attribute, of the defaults dict tree
+            a = self.__class__.getnode(self.dflt, self.pth)
+            # Raise UnknownKeyError exception if key not in corresponding
+            # node of defaults tree
+            if key not in a:
+                raise UnknownKeyError(self.pth + (key,))
+                # Raise InvalidValueError if the key value in the defaults
+                # tree is a dict and the value parameter is not a dict and
+            elif isinstance(a[key], dict) and not isinstance(value, dict):
+                raise InvalidValueError(self.pth + (key,))
 
 
 
