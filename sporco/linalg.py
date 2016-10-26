@@ -298,7 +298,6 @@ def solvedbi_sm(ah, rho, b, c=None, axis=4):
 
 
 
-
 def solvedbi_sm_c(ah, a, rho, axis=4):
     """Compute cached component used by :func:`solvedbi_sm`.
 
@@ -878,6 +877,58 @@ def atleast_nd(n, u):
 
 
 
+def roll(u, shift):
+    """
+    Apply :func:`numpy.roll` to multiple array axes.
+
+    Parameters
+    ----------
+    u : array_like
+      Input array
+    shift : array_like of int
+      Shifts to apply to axes of input `u`
+
+    Returns
+    -------
+    v : ndarray
+      Output array
+    """
+
+    v = u.copy()
+    for k in range(len(shift)):
+        v = np.roll(v, shift[k], axis=k)
+    return v
+
+
+
+def blockcirculant(A):
+    """
+    Construct a block circulant matrix from a tuple of arrays. This is a
+    block-matrix variant of :func:`scipy.linalg.circulant`.
+
+
+    Parameters
+    ----------
+    A : tuple of array_like
+      Tuple of arrays corresponding to the first block column of the output
+      block matrix
+
+    Returns
+    -------
+    B : ndarray
+      Output array
+    """
+
+    r,c = A[0].shape
+    B = np.zeros((len(A)*r, len(A)*c), dtype=A[0].dtype)
+    for k in range(len(A)):
+        for l in range(len(A)):
+            kl = np.mod(k + l, len(A))
+            B[r*kl:r*(kl+1), c*k:c*(k+1)] = A[l]
+    return B
+
+
+
 def fl2norm2(xf, axis=(0,1)):
     """
     Compute the squared :math:`\ell^2` norm in the DFT domain, taking
@@ -973,6 +1024,29 @@ def rrs(ax, b):
 
 
 
+def mae(vref, vcmp):
+    """
+    Compute Mean Absolute Error (MAE) between two images.
+
+
+    Parameters
+    ----------
+    vref : array_like
+      Reference image
+    vcmp : array_like
+      Comparison image
+
+    Returns
+    -------
+    x : float
+      MAE between `vref` and `vcmp`
+    """
+
+    r = np.asarray(vref, dtype=np.float64).ravel()
+    c = np.asarray(vcmp, dtype=np.float64).ravel()
+    return np.mean(np.fabs(r - c))
+
+
 
 def mse(vref, vcmp):
     """
@@ -989,10 +1063,12 @@ def mse(vref, vcmp):
     Returns
     -------
     x : float
-      MSE between vref and vcmp
+      MSE between `vref` and `vcmp`
     """
 
-    return np.mean(np.fabs(vref.ravel()-vcmp.ravel())**2)
+    r = np.asarray(vref, dtype=np.float64).ravel()
+    c = np.asarray(vcmp, dtype=np.float64).ravel()
+    return np.mean(np.fabs(r - c)**2)
 
 
 
@@ -1011,24 +1087,22 @@ def snr(vref, vcmp):
     Returns
     -------
     x : float
-      SNR of vcmp with respect to vref
+      SNR of `vcmp` with respect to `vref`
     """
 
-    r = vref.ravel()
-    c = vcmp.ravel()
-    mse = np.mean((r - c)**2)
-    dv = np.var(r)
-    return 10.0*np.log10(dv / mse)
+    dv = np.var(vref)
+    with np.errstate(divide='ignore'):
+        rt = dv/mse(vref, vcmp)
+    return 10.0*np.log10(rt)
 
 
 
-def psnr(vref, vcmp):
-    """
-    Compute Peak Signal to Noise Ratio (PSNR) of two images. The PSNR
-    calculation uses the less common definition in terms of the actual
-    range (i.e. max minus min) of the reference signal instead of the
-    maximum possible range for the data type (i.e. :math:`2^b-1` for a
-    :math:`b` bit representation).
+def psnr(vref, vcmp, rng=None):
+    """Compute Peak Signal to Noise Ratio (PSNR) of two images. The PSNR
+    calculation defaults to using the less common definition in terms
+    of the actual range (i.e. max minus min) of the reference signal
+    instead of the maximum possible range for the data type
+    (i.e. :math:`2^b-1` for a :math:`b` bit representation).
 
 
     Parameters
@@ -1037,15 +1111,19 @@ def psnr(vref, vcmp):
       Reference image
     vcmp : array_like
       Comparison image
+    rng : None or int, optional (default None)
+      Signal range, either the value to use (e.g. 255 for 8 bit samples) or
+      None, in which case the actual range of the reference signal is used
 
     Returns
     -------
     x : float
-      PSNR of vcmp with respect to vref
+      PSNR of `vcmp` with respect to `vref`
     """
 
-    r = vref.ravel()
-    c = vcmp.ravel()
-    mse = np.mean((r - c)**2)
-    dv = (r.max() - r.min())**2
-    return 10.0*np.log10(dv / mse)
+    if rng is None:
+        rng = vref.max() - vref.min()
+    dv = (rng + 0.0)**2
+    with np.errstate(divide='ignore'):
+        rt = dv/mse(vref, vcmp)
+    return 10.0*np.log10(rt)
