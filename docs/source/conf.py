@@ -263,6 +263,7 @@ mathjax_path = 'https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS
 intersphinx_mapping = {'http://docs.python.org/': None,
                        'http://docs.scipy.org/doc/numpy/': None,
                        'http://docs.scipy.org/doc/scipy/reference/': None,
+                       'http://matplotlib.sourceforge.net/': None,
                        'http://hgomersall.github.io/pyFFTW/': None
                       }
 
