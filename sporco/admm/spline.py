@@ -213,7 +213,7 @@ class SplineL1(admm.ADMM):
                                          axes=self.axes), axes=self.axes)
         if self.opt['LinSolveCheck']:
             self.xrrs = sl.rrs(self.X + (self.lmbda/self.rho)*
-                    sl.idctii((self.Alpha**2)*sl.dctii(self.X, axes=self.axes), 
+                    sl.idctii((self.Alpha**2)*sl.dctii(self.X, axes=self.axes),
                     axes=self.axes), self.Y + self.S - self.U)
         else:
             self.xrrs = None
