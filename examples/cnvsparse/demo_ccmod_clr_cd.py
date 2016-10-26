@@ -14,11 +14,11 @@ from builtins import range
 
 import numpy as np
 from scipy.ndimage.interpolation import zoom
-import matplotlib.pyplot as plt
 
 from sporco.admm import cbpdn
 from sporco.admm import ccmod
 from sporco import util
+from sporco import plot
 
 
 # Training images
@@ -47,8 +47,8 @@ b.solve()
 
 
 # Update dictionary for training set sh
-opt = ccmod.ConvCnstrMOD.Options({'Verbose' : True,
-                                  'MaxMainIter' : 100, 'rho' : 5.0})
+opt = ccmod.ConvCnstrMOD.Options({'Verbose' : True, 'MaxMainIter' : 100,
+                                  'rho' : 5.0})
 c = ccmod.ConvCnstrMOD(b.Y, sh, D0.shape, opt)
 c.solve()
 print("ConvCnstrMOD solve time: %.2fs" % c.runtime)
@@ -56,26 +56,26 @@ D1 = c.getdict().squeeze()
 
 
 # Display dictionaries
-fig1 = plt.figure(1, figsize=(14,7))
-plt.subplot(1,2,1)
-util.imview(util.tiledict(D0), fgrf=fig1, title='D0')
-plt.subplot(1,2,2)
-util.imview(util.tiledict(D1), fgrf=fig1, title='D1')
+fig1 = plot.figure(1, figsize=(14,7))
+plot.subplot(1,2,1)
+plot.imview(util.tiledict(D0), fgrf=fig1, title='D0')
+plot.subplot(1,2,2)
+plot.imview(util.tiledict(D1), fgrf=fig1, title='D1')
 fig1.show()
 
 
 # Plot functional value, residuals, and rho
 its = c.getitstat()
-fig2 = plt.figure(2, figsize=(21,7))
-plt.subplot(1,3,1)
-util.plot(its.DFid, fgrf=fig2, ptyp='semilogy', xlbl='Iterations',
+fig2 = plot.figure(2, figsize=(21,7))
+plot.subplot(1,3,1)
+plot.plot(its.DFid, fgrf=fig2, ptyp='semilogy', xlbl='Iterations',
           ylbl='Functional')
-plt.subplot(1,3,2)
-util.plot(np.vstack((its.PrimalRsdl, its.DualRsdl)).T, fgrf=fig2,
+plot.subplot(1,3,2)
+plot.plot(np.vstack((its.PrimalRsdl, its.DualRsdl)).T, fgrf=fig2,
           ptyp='semilogy', xlbl='Iterations', ylbl='Residual',
           lgnd=['Primal', 'Dual']);
-plt.subplot(1,3,3)
-util.plot(its.Rho, fgrf=fig2, xlbl='Iterations', ylbl='Penalty Parameter')
+plot.subplot(1,3,3)
+plot.plot(its.Rho, fgrf=fig2, xlbl='Iterations', ylbl='Penalty Parameter')
 fig2.show()
 
 

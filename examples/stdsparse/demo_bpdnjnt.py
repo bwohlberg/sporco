@@ -13,10 +13,9 @@ from builtins import input
 from builtins import range
 
 import numpy as np
-import matplotlib.pyplot as plt
-import matplotlib.cm as cm
 
 from sporco import util
+from sporco import plot
 from sporco.admm import bpdn
 
 
@@ -43,38 +42,60 @@ s = s0 + sigma*np.random.randn(N,K)
 
 
 # Set BPDNJoint options
-lmbda = 0.0
-mu = 45.0
-opt = bpdn.BPDN.Options({'Verbose' : True, 'MaxMainIter' : 500,
-                         'RelStopTol' : 1e-6, 'AutoRho' : {'RsdlTarget' : 1.0}})
+opt = bpdn.BPDNJoint.Options({'Verbose' : False, 'MaxMainIter' : 500,
+                              'RelStopTol' : 1e-3, 'rho' : 10.0,
+                              'AutoRho' : {'RsdlTarget' : 1.0}})
 
-# Initialise and run BPDNJoint object
+
+# Function computing reconstruction error for (lmbda, mu) pair
+def evalerr(prm):
+    lmbda = prm[0]
+    mu = prm[1]
+    b = bpdn.BPDNJoint(D, s, lmbda, mu, opt)
+    x = b.solve()
+    return np.sum(np.abs(x-x0))
+
+
+# Parallel evalution of error function on lmbda,mu grid
+lrng = np.logspace(-4, 0.5, 10)
+mrng = np.logspace(0.5, 1.6, 10)
+sprm, sfvl, sidx, fvmx = util.grid_search(evalerr, (lrng, mrng))
+lmbda = sprm[0]
+mu = sprm[1]
+print('Minimum ℓ1 error: %5.2f at (𝜆,μ) = (%.2e, %.2e)' % (sfvl, lmbda, mu))
+
+
+# Initialise and run BPDNJoint object for best lmbda and mu
+opt['Verbose'] = True
 b = bpdn.BPDNJoint(D, s, lmbda, mu, opt)
 b.solve()
 print("BPDNJoint solve time: %.2fs" % b.runtime)
 
 
 # Plot results
-fig1 = plt.figure(1, figsize=(6,8))
-plt.subplot(1,2,1)
-util.imview(x0, fgrf=fig1, cmap=cm.Blues, title='Reference')
-plt.subplot(1,2,2)
-util.imview(b.Y, fgrf=fig1, cmap=cm.Blues, title='Reconstruction')
+fig1 = plot.figure(1, figsize=(6,8))
+plot.subplot(1,2,1)
+plot.imview(x0, fgrf=fig1, cmap=plot.cm.Blues, title='Reference')
+plot.subplot(1,2,2)
+plot.imview(b.Y, fgrf=fig1, cmap=plot.cm.Blues, title='Reconstruction')
 fig1.show()
 
 
-# Plot functional value, residuals, and rho
+# Plot lmbda,mu error surface, functional value, residuals, and rho
 its = b.getitstat()
-fig2 = plt.figure(2, figsize=(21,7))
-plt.subplot(1,3,1)
-util.plot(its.ObjFun, fgrf=fig2, ptyp='semilogy', xlbl='Iterations',
+fig2 = plot.figure(2, figsize=(14,14))
+ax = fig2.add_subplot(2, 2, 1, projection='3d')
+plot.surf(fvmx, x=np.log10(mrng), y=np.log10(lrng), xlbl='log($\mu$)',
+          ylbl='log($\lambda$)', zlbl='Error', fgrf=fig2, axrf=ax)
+plot.subplot(2,2,2)
+plot.plot(its.ObjFun, fgrf=fig2, ptyp='semilogy', xlbl='Iterations',
           ylbl='Functional')
-plt.subplot(1,3,2)
-util.plot(np.vstack((its.PrimalRsdl, its.DualRsdl)).T, fgrf=fig2,
+plot.subplot(2,2,3)
+plot.plot(np.vstack((its.PrimalRsdl, its.DualRsdl)).T, fgrf=fig2,
           ptyp='semilogy', xlbl='Iterations', ylbl='Residual',
           lgnd=['Primal', 'Dual']);
-plt.subplot(1,3,3)
-util.plot(its.Rho, fgrf=fig2, xlbl='Iterations', ylbl='Penalty Parameter')
+plot.subplot(2,2,4)
+plot.plot(its.Rho, fgrf=fig2, xlbl='Iterations', ylbl='Penalty Parameter')
 fig2.show()
 
 

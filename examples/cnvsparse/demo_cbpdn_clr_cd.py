@@ -14,10 +14,9 @@ from builtins import range
 
 import numpy as np
 from scipy.ndimage.interpolation import zoom
-import matplotlib.pyplot as plt
-import matplotlib.cm as cm
 
 from sporco import util
+from sporco import plot
 from sporco.admm import cbpdn
 import sporco.linalg as spl
 
@@ -56,29 +55,29 @@ print("reconstruction PSNR: %.2fdB\n" % spl.psnr(img, imgr))
 
 
 # Display representation and reconstructed image
-fig1 = plt.figure(1, figsize=(21,7))
-plt.subplot(1,3,1)
-util.imview(np.sum(abs(X), axis=b.axisM).squeeze(), fgrf=fig1, cmap=cm.Blues,
-            title='Representation')
-plt.subplot(1,3,2)
-util.imview(imgr, fgrf=fig1, title='Reconstructed image')
-plt.subplot(1,3,3)
-util.imview(imgr - img, fgrf=fig1, title='Reconstruction difference')
+fig1 = plot.figure(1, figsize=(21,7))
+plot.subplot(1,3,1)
+plot.imview(np.sum(abs(X), axis=b.axisM).squeeze(), fgrf=fig1,
+            cmap=plot.cm.Blues, title='Representation')
+plot.subplot(1,3,2)
+plot.imview(imgr, fgrf=fig1, title='Reconstructed image')
+plot.subplot(1,3,3)
+plot.imview(imgr - img, fgrf=fig1, title='Reconstruction difference')
 fig1.show()
 
 
 # Plot functional value, residuals, and rho
 its = b.getitstat()
-fig2 = plt.figure(2, figsize=(21,7))
-plt.subplot(1,3,1)
-util.plot(its.ObjFun, fgrf=fig2, ptyp='semilogy', xlbl='Iterations',
+fig2 = plot.figure(2, figsize=(21,7))
+plot.subplot(1,3,1)
+plot.plot(its.ObjFun, fgrf=fig2, ptyp='semilogy', xlbl='Iterations',
           ylbl='Functional')
-plt.subplot(1,3,2)
-util.plot(np.vstack((its.PrimalRsdl, its.DualRsdl)).T, fgrf=fig2,
+plot.subplot(1,3,2)
+plot.plot(np.vstack((its.PrimalRsdl, its.DualRsdl)).T, fgrf=fig2,
           ptyp='semilogy', xlbl='Iterations', ylbl='Residual',
           lgnd=['Primal', 'Dual']);
-plt.subplot(1,3,3)
-util.plot(its.Rho, fgrf=fig2, xlbl='Iterations', ylbl='Penalty Parameter')
+plot.subplot(1,3,3)
+plot.plot(its.Rho, fgrf=fig2, xlbl='Iterations', ylbl='Penalty Parameter')
 fig2.show()
 
 

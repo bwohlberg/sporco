@@ -13,10 +13,9 @@ from builtins import input
 from builtins import range
 
 import numpy as np
-import matplotlib.pyplot as plt
-import matplotlib.cm as cm
 
 from sporco import util
+from sporco import plot
 from sporco.admm import cbpdn
 import sporco.linalg as spl
 
@@ -63,42 +62,42 @@ print("                   reconstruction PSNR: %.2fdB\n" % spl.psnr(S, Sr))
 
 
 # Display representation and reconstructed image
-fig1 = plt.figure(1, figsize=(14,14))
-plt.subplot(2,2,1)
-util.imview(np.squeeze(np.sum(abs(X), axis=ams.cri.axisM)), fgrf=fig1,
-            cmap=cm.Blues, title='Representation')
-plt.subplot(2,2,2)
-util.imview(S, fgrf=fig1, title='Reference image')
-plt.subplot(2,2,3)
-util.imview(Sr, fgrf=fig1, title='Reconstructed image')
-plt.subplot(2,2,4)
-util.imview(W[...,np.newaxis] * Sr, fgrf=fig1,
+fig1 = plot.figure(1, figsize=(14,14))
+plot.subplot(2,2,1)
+plot.imview(np.squeeze(np.sum(abs(X), axis=ams.cri.axisM)), fgrf=fig1,
+            cmap=plot.cm.Blues, title='Representation')
+plot.subplot(2,2,2)
+plot.imview(S, fgrf=fig1, title='Reference image')
+plot.subplot(2,2,3)
+plot.imview(Sr, fgrf=fig1, title='Reconstructed image')
+plot.subplot(2,2,4)
+plot.imview(W[...,np.newaxis] * Sr, fgrf=fig1,
             title='Masked reconstructed image')
 fig1.show()
 
 
 # Display mask and additive mask component
-fig2 = plt.figure(2, figsize=(14,7))
-plt.subplot(1,2,1)
-util.imview(W, fgrf=fig2, cmap=cm.Blues, title='Mask')
-plt.subplot(1,2,2)
-util.imview(ams.cbpdn.Y[ams.index_addmsk()].squeeze(), fgrf=fig2,
+fig2 = plot.figure(2, figsize=(14,7))
+plot.subplot(1,2,1)
+plot.imview(W, fgrf=fig2, cmap=plot.cm.Blues, title='Mask')
+plot.subplot(1,2,2)
+plot.imview(ams.cbpdn.Y[ams.index_addmsk()].squeeze(), fgrf=fig2,
             title='AMS component')
 fig2.show()
 
 
 # Plot functional value, residuals, and rho
 its = ams.getitstat()
-fig3 = plt.figure(3, figsize=(21,7))
-plt.subplot(1,3,1)
-util.plot(its.ObjFun, fgrf=fig3, ptyp='semilogy', xlbl='Iterations',
+fig3 = plot.figure(3, figsize=(21,7))
+plot.subplot(1,3,1)
+plot.plot(its.ObjFun, fgrf=fig3, ptyp='semilogy', xlbl='Iterations',
           ylbl='Functional')
-plt.subplot(1,3,2)
-util.plot(np.vstack((its.PrimalRsdl, its.DualRsdl)).T, fgrf=fig3,
+plot.subplot(1,3,2)
+plot.plot(np.vstack((its.PrimalRsdl, its.DualRsdl)).T, fgrf=fig3,
           ptyp='semilogy', xlbl='Iterations', ylbl='Residual',
           lgnd=['Primal', 'Dual']);
-plt.subplot(1,3,3)
-util.plot(its.Rho, fgrf=fig3, xlbl='Iterations', ylbl='Penalty Parameter')
+plot.subplot(1,3,3)
+plot.plot(its.Rho, fgrf=fig3, xlbl='Iterations', ylbl='Penalty Parameter')
 fig3.show()
 
 

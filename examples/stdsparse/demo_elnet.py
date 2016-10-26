@@ -13,9 +13,9 @@ from builtins import input
 from builtins import range
 
 import numpy as np
-import matplotlib.pyplot as plt
 
 from sporco import util
+from sporco import plot
 from sporco.admm import bpdn
 
 
@@ -54,22 +54,22 @@ print("ElasticNet solve time: %.2fs" % b.runtime)
 
 
 # Plot results
-util.plot(np.hstack((x0, b.Y)), fgnm=1, title='Sparse representation',
+plot.plot(np.hstack((x0, b.Y)), fgnm=1, title='Sparse representation',
           lgnd=['Reference', 'Reconstructed'])
 
 
 # Plot functional value, residuals, and rho
 its = b.getitstat()
-fig2 = plt.figure(2, figsize=(21,7))
-plt.subplot(1,3,1)
-util.plot(its.ObjFun, fgrf=fig2, ptyp='semilogy', xlbl='Iterations',
+fig2 = plot.figure(2, figsize=(21,7))
+plot.subplot(1,3,1)
+plot.plot(its.ObjFun, fgrf=fig2, ptyp='semilogy', xlbl='Iterations',
           ylbl='Functional')
-plt.subplot(1,3,2)
-util.plot(np.vstack((its.PrimalRsdl, its.DualRsdl)).T, fgrf=fig2,
+plot.subplot(1,3,2)
+plot.plot(np.vstack((its.PrimalRsdl, its.DualRsdl)).T, fgrf=fig2,
           ptyp='semilogy', xlbl='Iterations', ylbl='Residual',
           lgnd=['Primal', 'Dual']);
-plt.subplot(1,3,3)
-util.plot(its.Rho, fgrf=fig2, xlbl='Iterations', ylbl='Penalty Parameter')
+plot.subplot(1,3,3)
+plot.plot(its.Rho, fgrf=fig2, xlbl='Iterations', ylbl='Penalty Parameter')
 fig2.show()
 
 

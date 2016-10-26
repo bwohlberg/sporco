@@ -17,7 +17,6 @@ import urllib2
 import os.path
 import tempfile
 import sys
-import matplotlib.pyplot as plt
 try:
     import cv2
 except ImportError:
@@ -26,6 +25,7 @@ except ImportError:
 
 from sporco.admm import cbpdndl
 from sporco import util
+from sporco import plot
 
 
 # Get test video
@@ -37,6 +37,7 @@ if not os.path.isfile(pth):
     f = open(pth, 'w')
     f.write(content)
     f.close()
+
 
 # Extract video as 3d array
 vid = np.zeros((144,176,300))
@@ -82,25 +83,25 @@ print("ConvBPDNDictLearn solve time: %.2fs" % d.runtime)
 
 # Display central temporal slice (index 2) of dictionaries
 D1 = D1.squeeze()
-fig1 = plt.figure(1, figsize=(14,7))
-plt.subplot(1,2,1)
-util.imview(util.tiledict(D0[...,1,:]), fgrf=fig1, title='D0')
-plt.subplot(1,2,2)
-util.imview(util.tiledict(D1[...,1,:]), fgrf=fig1, title='D1')
+fig1 = plot.figure(1, figsize=(14,7))
+plot.subplot(1,2,1)
+plot.imview(util.tiledict(D0[...,1,:]), fgrf=fig1, title='D0')
+plot.subplot(1,2,2)
+plot.imview(util.tiledict(D1[...,1,:]), fgrf=fig1, title='D1')
 fig1.show()
 
 
 # Plot functional value and residuals
 its = d.getitstat()
-fig2 = plt.figure(2, figsize=(21,7))
-plt.subplot(1,3,1)
-util.plot(its.ObjFun, fgrf=fig2, xlbl='Iterations', ylbl='Functional')
-plt.subplot(1,3,2)
-util.plot(np.vstack((its.XPrRsdl, its.XDlRsdl, its.DPrRsdl, its.DDlRsdl)).T,
+fig2 = plot.figure(2, figsize=(21,7))
+plot.subplot(1,3,1)
+plot.plot(its.ObjFun, fgrf=fig2, xlbl='Iterations', ylbl='Functional')
+plot.subplot(1,3,2)
+plot.plot(np.vstack((its.XPrRsdl, its.XDlRsdl, its.DPrRsdl, its.DDlRsdl)).T,
           fgrf=fig2, ptyp='semilogy', xlbl='Iterations', ylbl='Residual',
           lgnd=['X Primal', 'X Dual', 'D Primal', 'D Dual']);
-plt.subplot(1,3,3)
-util.plot(np.vstack((its.XRho, its.DRho)).T, fgrf=fig2, xlbl='Iterations',
+plot.subplot(1,3,3)
+plot.plot(np.vstack((its.XRho, its.DRho)).T, fgrf=fig2, xlbl='Iterations',
           ylbl='Penalty Parameter', ptyp='semilogy',
           lgnd=['$\\rho_X$', '$\\rho_D$'])
 fig2.show()

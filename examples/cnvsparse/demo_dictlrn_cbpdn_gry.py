@@ -15,12 +15,12 @@ from builtins import range
 
 import numpy as np
 from scipy.ndimage.interpolation import zoom
-import matplotlib.pyplot as plt
 
 from sporco.admm import cbpdn
 from sporco.admm import ccmod
 from sporco.admm import dictlrn
 from sporco import util
+from sporco import plot
 
 
 # Training images
@@ -88,27 +88,27 @@ print("DictLearn solve time: %.2fs" % d.runtime, "\n")
 
 # Display dictionaries
 D1 = D1.squeeze()
-fig1 = plt.figure(1, figsize=(14,7))
-plt.subplot(1,2,1)
-util.imview(util.tiledict(D0), fgrf=fig1, title='D0')
-plt.subplot(1,2,2)
-util.imview(util.tiledict(D1), fgrf=fig1, title='D1')
+fig1 = plot.figure(1, figsize=(14,7))
+plot.subplot(1,2,1)
+plot.imview(util.tiledict(D0), fgrf=fig1, title='D0')
+plot.subplot(1,2,2)
+plot.imview(util.tiledict(D1), fgrf=fig1, title='D1')
 fig1.show()
 
 
 # Plot functional value and residuals
 itsx = xstep.getitstat()
 itsd = dstep.getitstat()
-fig2 = plt.figure(2, figsize=(21,7))
-plt.subplot(1,3,1)
-util.plot(itsx.ObjFun, fgrf=fig2, xlbl='Iterations', ylbl='Functional')
-plt.subplot(1,3,2)
-util.plot(np.vstack((itsx.PrimalRsdl, itsx.DualRsdl, itsd.PrimalRsdl,
+fig2 = plot.figure(2, figsize=(21,7))
+plot.subplot(1,3,1)
+plot.plot(itsx.ObjFun, fgrf=fig2, xlbl='Iterations', ylbl='Functional')
+plot.subplot(1,3,2)
+plot.plot(np.vstack((itsx.PrimalRsdl, itsx.DualRsdl, itsd.PrimalRsdl,
                      itsd.DualRsdl)).T,
           fgrf=fig2, ptyp='semilogy', xlbl='Iterations', ylbl='Residual',
           lgnd=['X Primal', 'X Dual', 'D Primal', 'D Dual']);
-plt.subplot(1,3,3)
-util.plot(np.vstack((itsx.Rho, itsd.Rho)).T, fgrf=fig2, xlbl='Iterations',
+plot.subplot(1,3,3)
+plot.plot(np.vstack((itsx.Rho, itsd.Rho)).T, fgrf=fig2, xlbl='Iterations',
           ylbl='Penalty Parameter', ptyp='semilogy', lgnd=['Rho', 'Sigma'])
 fig2.show()
 

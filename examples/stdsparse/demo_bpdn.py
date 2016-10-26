@@ -13,9 +13,9 @@ from builtins import input
 from builtins import range
 
 import numpy as np
-import matplotlib.pyplot as plt
 
 from sporco import util
+from sporco import plot
 from sporco.admm import bpdn
 
 
@@ -40,34 +40,52 @@ s = s0 + sigma*np.random.randn(N,1)
 
 
 # Set BPDN options
-lmbda = 25.0
-opt = bpdn.BPDN.Options({'Verbose' : True, 'MaxMainIter' : 500,
-                    'RelStopTol' : 1e-6, 'AutoRho' : {'RsdlTarget' : 1.0}})
+opt = bpdn.BPDN.Options({'Verbose' : False, 'MaxMainIter' : 500,
+                    'RelStopTol' : 1e-3, 'AutoRho' : {'RsdlTarget' : 1.0}})
 
 
-# Initialise and run BPDN object
+# Function computing reconstruction error at lmbda
+def evalerr(prm):
+    lmbda = prm[0]
+    b = bpdn.BPDN(D, s, lmbda, opt)
+    x = b.solve()
+    return np.sum(np.abs(x-x0))
+
+
+# Parallel evalution of error function on lmbda grid
+lrng = np.logspace(1, 2, 10)
+sprm, sfvl, sidx, fvmx = util.grid_search(evalerr, (lrng,))
+lmbda = sprm[0]
+print('Minimum ℓ1 error: %5.2f at 𝜆 = %.2e' % (sfvl, lmbda))
+
+
+# Initialise and run BPDN object for best lmbda
+opt['Verbose'] = True
 b = bpdn.BPDN(D, s, lmbda, opt)
 b.solve()
 print("BPDN solve time: %.2fs" % b.runtime)
 
 
 # Plot results
-util.plot(np.hstack((x0, b.Y)), fgnm=1, title='Sparse representation',
+plot.plot(np.hstack((x0, b.Y)), fgnm=1, title='Sparse representation',
           lgnd=['Reference', 'Reconstructed'])
 
 
-# Plot functional value, residuals, and rho
+# Plot lmbda error curve, functional value, residuals, and rho
 its = b.getitstat()
-fig2 = plt.figure(2, figsize=(21,7))
-plt.subplot(1,3,1)
-util.plot(its.ObjFun, fgrf=fig2, ptyp='semilogy', xlbl='Iterations',
+fig2 = plot.figure(2, figsize=(14,14))
+plot.subplot(2,2,1)
+plot.plot(fvmx, x=lrng, ptyp='semilogx', xlbl='$\lambda$',
+          ylbl='Error', fgrf=fig2)
+plot.subplot(2,2,2)
+plot.plot(its.ObjFun, fgrf=fig2, ptyp='semilogy', xlbl='Iterations',
           ylbl='Functional')
-plt.subplot(1,3,2)
-util.plot(np.vstack((its.PrimalRsdl, its.DualRsdl)).T, fgrf=fig2,
+plot.subplot(2,2,3)
+plot.plot(np.vstack((its.PrimalRsdl, its.DualRsdl)).T, fgrf=fig2,
           ptyp='semilogy', xlbl='Iterations', ylbl='Residual',
           lgnd=['Primal', 'Dual']);
-plt.subplot(1,3,3)
-util.plot(its.Rho, fgrf=fig2, xlbl='Iterations', ylbl='Penalty Parameter')
+plot.subplot(2,2,4)
+plot.plot(its.Rho, fgrf=fig2, xlbl='Iterations', ylbl='Penalty Parameter')
 fig2.show()
 
 

@@ -14,11 +14,11 @@ from builtins import range
 
 import numpy as np
 from scipy.ndimage.interpolation import zoom
-import matplotlib.pyplot as plt
 
 from sporco.admm import bpdn
 from sporco.admm import cmod
 from sporco import util
+from sporco import plot
 
 
 # Training images
@@ -51,16 +51,15 @@ D0 = np.reshape(D0, (np.prod(D0.shape[0:2]), D0.shape[2]))
 
 # Compute sparse representation on current dictionary
 lmbda = 0.1
-opt = bpdn.BPDN.Options({'Verbose' : True,
-                         'MaxMainIter' : 200, 'RelStopTol' : 1e-3})
+opt = bpdn.BPDN.Options({'Verbose' : True, 'MaxMainIter' : 200, 'RelStopTol' : 1e-3})
 b = bpdn.BPDN(D0, S, lmbda, opt)
 b.solve()
 print("BPDN solve time: %.2fs" % b.runtime)
 
 
 # Update dictionary for training set S
-opt = cmod.CnstrMOD.Options({'Verbose' : True,
-                             'MaxMainIter' : 500, 'RelStopTol' : 1e-5})
+opt = cmod.CnstrMOD.Options({'Verbose' : True, 'MaxMainIter' : 500,
+                             'RelStopTol' : 1e-5})
 c = cmod.CnstrMOD(b.Y, S, None, opt)
 c.solve()
 print("CMOD solve time: %.2fs" % c.runtime)
@@ -69,26 +68,26 @@ print("CMOD solve time: %.2fs" % c.runtime)
 # Display dictionaries
 D0 = D0.reshape(8,8,D0.shape[-1])
 D1 = c.Y.reshape((8,8,c.Y.shape[-1]))
-fig1 = plt.figure(1, figsize=(20,10))
-plt.subplot(1,2,1)
-util.imview(util.tiledict(D0), fgrf=fig1, title='D0')
-plt.subplot(1,2,2)
-util.imview(util.tiledict(D1), fgrf=fig1, title='D1')
+fig1 = plot.figure(1, figsize=(20,10))
+plot.subplot(1,2,1)
+plot.imview(util.tiledict(D0), fgrf=fig1, title='D0')
+plot.subplot(1,2,2)
+plot.imview(util.tiledict(D1), fgrf=fig1, title='D1')
 fig1.show()
 
 
 # Plot functional value, residuals, and rho
 its = c.getitstat()
-fig2 = plt.figure(2, figsize=(21,7))
-plt.subplot(1,3,1)
-util.plot(its.DFid, fgrf=fig2, ptyp='semilogy', xlbl='Iterations',
+fig2 = plot.figure(2, figsize=(21,7))
+plot.subplot(1,3,1)
+plot.plot(its.DFid, fgrf=fig2, ptyp='semilogy', xlbl='Iterations',
           ylbl='Functional')
-plt.subplot(1,3,2)
-util.plot(np.vstack((its.PrimalRsdl, its.DualRsdl)).T, fgrf=fig2,
+plot.subplot(1,3,2)
+plot.plot(np.vstack((its.PrimalRsdl, its.DualRsdl)).T, fgrf=fig2,
           ptyp='semilogy', xlbl='Iterations', ylbl='Residual',
           lgnd=['Primal', 'Dual']);
-plt.subplot(1,3,3)
-util.plot(its.Rho, fgrf=fig2, xlbl='Iterations', ylbl='Penalty Parameter')
+plot.subplot(1,3,3)
+plot.plot(its.Rho, fgrf=fig2, xlbl='Iterations', ylbl='Penalty Parameter')
 fig2.show()
 
 

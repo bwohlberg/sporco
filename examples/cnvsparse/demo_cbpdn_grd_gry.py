@@ -13,10 +13,9 @@ from builtins import input
 from builtins import range
 
 import numpy as np
-import matplotlib.pyplot as plt
-import matplotlib.cm as cm
 
 from sporco import util
+from sporco import plot
 from sporco.admm import cbpdn
 import sporco.linalg as spl
 
@@ -27,11 +26,14 @@ img = util.ExampleImages().image('lena.grey', scaled=True)
 
 # Load dictionary
 Db = util.convdicts()['G:12x12x36']
+# Append impulse filter for lowpass component representation
 di = np.zeros(Db.shape[0:2] + (1,))
 di[0,0] = 1
 D = np.concatenate((di, Db), axis=2)
+# Weights for l1 norm: no regularization on impulse filter
 wl1 = np.ones((1,)*4 + (D.shape[2:]))
 wl1[...,0] = 0.0
+# Weights for l2 norm of gradient: regularization only on impulse filter
 wgr = np.zeros((D.shape[2]))
 wgr[0] = 1.0
 
@@ -57,32 +59,32 @@ print("       reconstruction PSNR: %.2fdB\n" % spl.psnr(img, imgr))
 
 
 # Display representation and reconstructed image
-fig1 = plt.figure(1, figsize=(14,14))
-plt.subplot(2,2,1)
-util.imview(b.Y[...,0].squeeze(), fgrf=fig1, cmap=cm.Blues,
+fig1 = plot.figure(1, figsize=(14,14))
+plot.subplot(2,2,1)
+plot.imview(b.Y[...,0].squeeze(), fgrf=fig1, cmap=plot.cm.Blues,
             title='Lowpass component')
-plt.subplot(2,2,2)
-util.imview(np.sum(abs(b.Y[...,1:]), axis=b.axisM).squeeze(), fgrf=fig1,
-            cmap=cm.Blues, title='Main representation')
-plt.subplot(2,2,3)
-util.imview(imgr, fgrf=fig1, title='Reconstructed image')
-plt.subplot(2,2,4)
-util.imview(imgr - img, fgrf=fig1, title='Reconstruction difference')
+plot.subplot(2,2,2)
+plot.imview(np.sum(abs(b.Y[...,1:]), axis=b.axisM).squeeze(), fgrf=fig1,
+            cmap=plot.cm.Blues, title='Main representation')
+plot.subplot(2,2,3)
+plot.imview(imgr, fgrf=fig1, title='Reconstructed image')
+plot.subplot(2,2,4)
+plot.imview(imgr - img, fgrf=fig1, title='Reconstruction difference')
 fig1.show()
 
 
 # Plot functional value, residuals, and rho
 its = b.getitstat()
-fig2 = plt.figure(2, figsize=(21,7))
-plt.subplot(1,3,1)
-util.plot(its.ObjFun, fgrf=fig2, ptyp='semilogy', xlbl='Iterations',
+fig2 = plot.figure(2, figsize=(21,7))
+plot.subplot(1,3,1)
+plot.plot(its.ObjFun, fgrf=fig2, ptyp='semilogy', xlbl='Iterations',
           ylbl='Functional')
-plt.subplot(1,3,2)
-util.plot(np.vstack((its.PrimalRsdl, its.DualRsdl)).T, fgrf=fig2,
+plot.subplot(1,3,2)
+plot.plot(np.vstack((its.PrimalRsdl, its.DualRsdl)).T, fgrf=fig2,
           ptyp='semilogy', xlbl='Iterations', ylbl='Residual',
           lgnd=['Primal', 'Dual']);
-plt.subplot(1,3,3)
-util.plot(its.Rho, fgrf=fig2, xlbl='Iterations', ylbl='Penalty Parameter')
+plot.subplot(1,3,3)
+plot.plot(its.Rho, fgrf=fig2, xlbl='Iterations', ylbl='Penalty Parameter')
 fig2.show()
 
 

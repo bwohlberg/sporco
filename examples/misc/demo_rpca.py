@@ -14,10 +14,9 @@ from builtins import range
 
 import numpy as np
 from scipy.ndimage.filters import gaussian_filter
-import matplotlib.pyplot as plt
 
 from sporco.admm import rpca
-from sporco import util
+from sporco import plot
 
 
 N = 256
@@ -40,28 +39,28 @@ print(" low rank error (l2): %.2e" % np.linalg.norm(S0 - X))
 
 
 # Display S0 and X image
-fig1 = plt.figure(1, figsize=(21,7))
-plt.subplot(1,3,1)
-util.imview(S0, fgrf=fig1, title='Original matrix')
-plt.subplot(1,3,2)
-util.imview(S1, fgrf=fig1, title='Corrupted matrix')
-plt.subplot(1,3,3)
-util.imview(X, fgrf=fig1, title='Low rank component')
+fig1 = plot.figure(1, figsize=(21,7))
+plot.subplot(1,3,1)
+plot.imview(S0, fgrf=fig1, title='Original matrix')
+plot.subplot(1,3,2)
+plot.imview(S1, fgrf=fig1, title='Corrupted matrix')
+plot.subplot(1,3,3)
+plot.imview(X, fgrf=fig1, title='Low rank component')
 fig1.show()
 
 
 # Plot functional value, residuals, and rho
 its = b.getitstat()
-fig2 = plt.figure(2, figsize=(21,7))
-plt.subplot(1,3,1)
-util.plot(its.ObjFun, fgrf=fig2, ptyp='semilogy', xlbl='Iterations',
+fig2 = plot.figure(2, figsize=(21,7))
+plot.subplot(1,3,1)
+plot.plot(its.ObjFun, fgrf=fig2, ptyp='semilogy', xlbl='Iterations',
           ylbl='Functional')
-plt.subplot(1,3,2)
-util.plot(np.vstack((its.PrimalRsdl, its.DualRsdl)).T, fgrf=fig2,
+plot.subplot(1,3,2)
+plot.plot(np.vstack((its.PrimalRsdl, its.DualRsdl)).T, fgrf=fig2,
           ptyp='semilogy', xlbl='Iterations', ylbl='Residual',
           lgnd=['Primal', 'Dual']);
-plt.subplot(1,3,3)
-util.plot(its.Rho, fgrf=fig2, xlbl='Iterations', ylbl='Penalty Parameter')
+plot.subplot(1,3,3)
+plot.plot(its.Rho, fgrf=fig2, xlbl='Iterations', ylbl='Penalty Parameter')
 fig2.show()
 
 

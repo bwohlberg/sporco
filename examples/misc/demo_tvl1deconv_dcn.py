@@ -14,9 +14,9 @@ from builtins import range
 
 import numpy as np
 from scipy import ndimage
-import matplotlib.pyplot as plt
 
 from sporco import util
+from sporco import plot
 from sporco.admm import tvl1
 
 
@@ -31,7 +31,7 @@ imgcn = util.spnoise(imgc, 0.2)
 # Set up TVDeconv options
 lmbda = 1e-2
 opt = tvl1.TVL1Deconv.Options({'Verbose' : True, 'MaxMainIter' : 200,
-                               'gEvalY' : False})
+                               'rho' : 2e0, 'gEvalY' : False})
 
 # Initialise and run TVL1Deconv object
 b = tvl1.TVL1Deconv(h, imgcn, lmbda, opt)
@@ -40,25 +40,25 @@ print("TVL1Deconv solve time: %.2fs" % b.runtime)
 
 
 # Display input and result image
-fig1 = plt.figure(1, figsize=(14,7))
-plt.subplot(1,2,1)
-util.imview(imgcn, fgrf=fig1, title='Blurred/Noisy')
-plt.subplot(1,2,2)
-util.imview(b.X, fgrf=fig1, title='l1-TV Result')
+fig1 = plot.figure(1, figsize=(14,7))
+plot.subplot(1,2,1)
+plot.imview(imgcn, fgrf=fig1, title='Blurred/Noisy')
+plot.subplot(1,2,2)
+plot.imview(b.X, fgrf=fig1, title='l1-TV Result')
 fig1.show()
 
 
 # Plot functional value, residuals, and rho
 its = b.getitstat()
-fig2 = plt.figure(2, figsize=(21,7))
-plt.subplot(1,3,1)
-util.plot(its.ObjFun, fgrf=fig2, xlbl='Iterations', ylbl='Functional')
-plt.subplot(1,3,2)
-util.plot(np.vstack((its.PrimalRsdl, its.DualRsdl)).T, fgrf=fig2,
+fig2 = plot.figure(2, figsize=(21,7))
+plot.subplot(1,3,1)
+plot.plot(its.ObjFun, fgrf=fig2, xlbl='Iterations', ylbl='Functional')
+plot.subplot(1,3,2)
+plot.plot(np.vstack((its.PrimalRsdl, its.DualRsdl)).T, fgrf=fig2,
           ptyp='semilogy', xlbl='Iterations', ylbl='Residual',
           lgnd=['Primal', 'Dual']);
-plt.subplot(1,3,3)
-util.plot(its.Rho, fgrf=fig2, xlbl='Iterations', ylbl='Penalty Parameter')
+plot.subplot(1,3,3)
+plot.plot(its.Rho, fgrf=fig2, xlbl='Iterations', ylbl='Penalty Parameter')
 fig2.show()
 
 
