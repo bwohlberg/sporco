@@ -318,12 +318,21 @@ class ExampleImages(object):
 
 def grid_search(fn, grd, fmin=True, nproc=None):
     """Perform a grid search for optimal parameters of a specified
-    function.  In the simplest case the function returns a float value
+    function.  In the simplest case the function returns a float value,
     and a single optimum value and corresponding parameter values are
     identified. If the function returns a tuple of values, each of
     these is taken to define a separate function on the search grid,
     with optimum function values and corresponding parameter values
     being identified for each of them.
+
+    **Warning:** This function will hang if `fn` makes use of :mod:`pyfftw`
+    with multi-threading enabled (the
+    `bug <https://github.com/pyFFTW/pyFFTW/issues/135>`_ has been reported).
+    When using the FFT functions in :mod:`sporco.linalg`, multi-threading
+    can be disabled by including the following code::
+
+      import sporco.linalg
+      sporco.linalg.pyfftw_threads = 1
 
 
     Parameters
@@ -349,10 +358,10 @@ def grid_search(fn, grd, fmin=True, nproc=None):
       and columns corresponding to function values.
     sfvl : float or ndarray
       Optimum function value or values
-    sidx : tuple of int or tuple of ndarray
-      Indices of optimal values on parameter grid
     fvmx : ndarray
       Function value(s) on search grid
+    sidx : tuple of int or tuple of ndarray
+      Indices of optimal values on parameter grid
     """
 
     if fmin:
@@ -377,4 +386,4 @@ def grid_search(fn, grd, fmin=True, nproc=None):
         sprm = np.array([grd[k][sidx[k]] for k in range(len(grd))])
         sfvl = fvmx[sidx]
 
-    return (sprm, sfvl, sidx, fvmx)
+    return sprm, sfvl, fvmx, sidx

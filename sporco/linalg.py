@@ -31,7 +31,8 @@ pyfftw.interfaces.cache.enable()
 pyfftw.interfaces.cache.set_keepalive_time(300)
 
 pyfftw_threads = multiprocessing.cpu_count()
-"""Global variable setting the number of threads used in pyfftw computations"""
+"""Global variable setting the number of threads used in :mod:`pyfftw`
+computations"""
 
 
 def complex_dtype(dtype):
@@ -55,7 +56,7 @@ def complex_dtype(dtype):
 
 def pyfftw_empty_aligned(shape, dtype, order='C', n=None):
     """Construct an empty byte-aligned array for efficient use by
-    pyfftw. This function is a wrapper for :func:`pyfftw.empty_aligned`
+    :mod:`pyfftw`. This function is a wrapper for :func:`pyfftw.empty_aligned`
 
     Parameters
     ----------
