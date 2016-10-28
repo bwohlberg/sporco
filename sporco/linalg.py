@@ -36,7 +36,8 @@ computations"""
 
 
 def complex_dtype(dtype):
-    """Construct the corresponding complex dtype for a given real dtype,
+    """
+    Construct the corresponding complex dtype for a given real dtype,
     e.g. the complex dtype corresponding to np.float32 is np.complex64.
 
     Parameters
@@ -55,8 +56,9 @@ def complex_dtype(dtype):
 
 
 def pyfftw_empty_aligned(shape, dtype, order='C', n=None):
-    """Construct an empty byte-aligned array for efficient use by
-    :mod:`pyfftw`. This function is a wrapper for :func:`pyfftw.empty_aligned`
+    """
+    Construct an empty byte-aligned array for efficient use by :mod:`pyfftw`.
+    This function is a wrapper for :func:`pyfftw.empty_aligned`
 
     Parameters
     ----------
@@ -82,7 +84,6 @@ def fftn(a, s=None, axes=None):
     Compute the multi-dimensional discrete Fourier transform. This function
     is a wrapper for :func:`pyfftw.interfaces.numpy_fft.fftn`,
     with an interface similar to that of :func:`numpy.fft.fftn`.
-
 
     Parameters
     ----------
@@ -112,7 +113,6 @@ def ifftn(a, s=None, axes=None):
     This function is a wrapper for :func:`pyfftw.interfaces.numpy_fft.ifftn`,
     with an interface similar to that of :func:`numpy.fft.ifftn`.
 
-
     Parameters
     ----------
     a : array_like
@@ -140,7 +140,6 @@ def rfftn(a, s=None, axes=None):
     Compute the multi-dimensional discrete Fourier transform for real input.
     This function is a wrapper for :func:`pyfftw.interfaces.numpy_fft.rfftn`,
     with an interface similar to that of :func:`numpy.fft.rfftn`.
-
 
     Parameters
     ----------
@@ -171,7 +170,6 @@ def irfftn(a, s=None, axes=None):
     :func:`pyfftw.interfaces.numpy_fft.irfftn`, with an interface similar to
     that of :func:`numpy.fft.irfftn`.
 
-
     Parameters
     ----------
     a : array_like
@@ -201,7 +199,6 @@ def dctii(x, axes=None):
     :func:`scipy.fftpack.dct` with normalization mode 'ortho' for each
     of the specified axes.
 
-
     Parameters
     ----------
     a : array_like
@@ -229,7 +226,6 @@ def idctii(x, axes=None):
     This function is implemented by calling the one-dimensional inverse
     DCT-II :func:`scipy.fftpack.idct` with normalization mode 'ortho'
     for each of the specified axes.
-
 
     Parameters
     ----------
@@ -267,7 +263,6 @@ def solvedbi_sm(ah, rho, b, c=None, axis=4):
     the specified axis of the corresponding multi-dimensional arrays; the
     solutions are independent over the other axes.
 
-
     Parameters
     ----------
     ah : array_like
@@ -300,8 +295,8 @@ def solvedbi_sm(ah, rho, b, c=None, axis=4):
 
 
 def solvedbi_sm_c(ah, a, rho, axis=4):
-    """Compute cached component used by :func:`solvedbi_sm`.
-
+    """
+    Compute cached component used by :func:`solvedbi_sm`.
 
     Parameters
     ----------
@@ -397,7 +392,8 @@ def solvemdbi_ism(ah, rho, b, axisM, axisK):
 
 
 def solvemdbi_rsm(ah, rho, b, axisK, dimN=2):
-    """Solve a multiple diagonal block linear system with a scaled
+    """
+    Solve a multiple diagonal block linear system with a scaled
     identity term by repeated application of the Sherman-Morrison
     equation. The computation is performed by explictly constructing
     the inverse operator, leading to an :math:`O(K)` time cost and
@@ -416,7 +412,6 @@ def solvemdbi_rsm(ah, rho, b, axisK, dimN=2):
     The sums, inner products, and matrix products in this equation are taken
     along the M and K axes of the corresponding multi-dimensional arrays;
     the solutions are independent over the other axes.
-
 
     Parameters
     ----------
@@ -478,7 +473,6 @@ def solvemdbi_cg(ah, rho, b, axisM, axisK, tol=1e-5, mit=1000, isn=None):
     The inner products and matrix products in this equation are taken
     along the M and K axes of the corresponding multi-dimensional arrays;
     the solutions are independent over the other axes.
-
 
     Parameters
     ----------
@@ -652,7 +646,6 @@ def Gax(x, ax):
     """
     Compute gradient of `x` along axis `ax`.
 
-
     Parameters
     ----------
     x : array_like
@@ -674,7 +667,6 @@ def Gax(x, ax):
 def GTax(x, ax):
     """
     Compute transpose of gradient of `x` along axis `ax`.
-
 
     Parameters
     ----------
@@ -705,7 +697,6 @@ def shrink1(x, alpha):
       \max(0, |\mathbf{x}| - \\alpha) = \mathrm{prox}_f(\mathbf{x}) \;\;
       \\text{where} \;\; f(\mathbf{u}) = \\alpha \|\mathbf{u}\|_1 \;\;.
 
-
     Parameters
     ----------
     x : array_like
@@ -732,7 +723,6 @@ def zdivide(x, y):
     """
     Return x/y, with 0 instead of NaN where y is 0.
 
-
     Parameters
     ----------
     x : array_like
@@ -754,7 +744,8 @@ def zdivide(x, y):
 
 
 def shrink2(x, alpha, axis=-1):
-    """Vector shrinkage/soft thresholding function
+    """
+    Vector shrinkage/soft thresholding function
 
      .. math::
       \mathcal{S}_{2,\\alpha}(\mathbf{x}) =
@@ -764,7 +755,6 @@ def shrink2(x, alpha, axis=-1):
 
     The :math:`\ell^2` norm is applied over the specified axis of a
     multi-dimensional input (the last axis by default).
-
 
     Parameters
     ----------
@@ -789,7 +779,8 @@ def shrink2(x, alpha, axis=-1):
 
 
 def shrink12(x, alpha, beta, axis=-1):
-    """Compound shrinkage/soft thresholding function
+    """
+    Compound shrinkage/soft thresholding function
     :cite:`wohlberg-2012-local` :cite:`chartrand-2013-nonconvex`
 
      .. math::
@@ -801,7 +792,6 @@ def shrink12(x, alpha, beta, axis=-1):
 
     The :math:`\ell^2` norm is applied over the specified axis of a
     multi-dimensional input (the last axis by default).
-
 
     Parameters
     ----------
@@ -825,7 +815,8 @@ def shrink12(x, alpha, beta, axis=-1):
 
 
 def proj_l2ball(b, s, r, axes=None):
-    """Project :math:`\mathbf{b}` into the :math:`\ell^2` ball of radius
+    """
+    Project :math:`\mathbf{b}` into the :math:`\ell^2` ball of radius
     :math:`r` about :math:`\mathbf{s}`, i.e.
     :math:`\{ \mathbf{x} : \|\mathbf{x} - \mathbf{s} \|_2 \leq r \}`.
 
@@ -907,7 +898,6 @@ def blockcirculant(A):
     Construct a block circulant matrix from a tuple of arrays. This is a
     block-matrix variant of :func:`scipy.linalg.circulant`.
 
-
     Parameters
     ----------
     A : tuple of array_like
@@ -937,7 +927,6 @@ def fl2norm2(xf, axis=(0,1)):
     multi-dimensional array computed via :func:`fftn`, return the
     squared :math:`\ell^2` norm of the original array.
 
-
     Parameters
     ----------
     xf : array_like
@@ -964,7 +953,6 @@ def rfl2norm2(xf, xs, axis=(0,1)):
     into account the unnormalised DFT scaling, i.e. given the DFT of a
     multi-dimensional array computed via :func:`rfftn`, return the
     squared :math:`\ell^2` norm of the original array.
-
 
     Parameters
     ----------
@@ -1003,7 +991,6 @@ def rrs(ax, b):
     \|\mathbf{b}\|_2` of the solution to a linear equation :math:`A \mathbf{x}
     = \mathbf{b}`. Returns 1.0 if :math:`\mathbf{b} = 0`.
 
-
     Parameters
     ----------
     ax : array_like
@@ -1029,7 +1016,6 @@ def mae(vref, vcmp):
     """
     Compute Mean Absolute Error (MAE) between two images.
 
-
     Parameters
     ----------
     vref : array_like
@@ -1052,7 +1038,6 @@ def mae(vref, vcmp):
 def mse(vref, vcmp):
     """
     Compute Mean Squared Error (MSE) between two images.
-
 
     Parameters
     ----------
@@ -1077,7 +1062,6 @@ def snr(vref, vcmp):
     """
     Compute Signal to Noise Ratio (SNR) of two images.
 
-
     Parameters
     ----------
     vref : array_like
@@ -1099,12 +1083,12 @@ def snr(vref, vcmp):
 
 
 def psnr(vref, vcmp, rng=None):
-    """Compute Peak Signal to Noise Ratio (PSNR) of two images. The PSNR
+    """
+    Compute Peak Signal to Noise Ratio (PSNR) of two images. The PSNR
     calculation defaults to using the less common definition in terms
     of the actual range (i.e. max minus min) of the reference signal
     instead of the maximum possible range for the data type
     (i.e. :math:`2^b-1` for a :math:`b` bit representation).
-
 
     Parameters
     ----------

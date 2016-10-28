@@ -33,7 +33,8 @@ __author__ = """Brendt Wohlberg <brendt@ieee.org>"""
 def plot(dat, x=None, title=None, xlbl=None, ylbl=None, lgnd=None, lglc=None,
          ptyp='plot', lwidth=1.0, lstyle='solid', block=False, fgrf=None,
          fgnm=None, fgsz=None):
-    """Plot columns of array.
+    """
+    Plot columns of array.
 
     Parameters
     ----------
@@ -118,7 +119,8 @@ def plot(dat, x=None, title=None, xlbl=None, ylbl=None, lgnd=None, lglc=None,
 
 def surf(z, x=None, y=None, title=None, xlbl=None, ylbl=None, zlbl=None,
          block=False, cmap=None, fgrf=None, axrf=None, fgnm=None, fgsz=None):
-    """Plot columns of array.
+    """
+    Plot columns of array.
 
     Parameters
     ----------
@@ -201,7 +203,8 @@ def surf(z, x=None, y=None, title=None, xlbl=None, ylbl=None, zlbl=None,
 
 def imview(img, title=None, block=False, cmap=None, fgrf=None, fgnm=None,
            fgsz=(12, 12), intrp='nearest', cbar=False, axes=None):
-    """Display an image.
+    """
+    Display an image.
 
     Pixel values are displayed when the pointer is over valid image
     data.  If a figure object is specified then the image is drawn in

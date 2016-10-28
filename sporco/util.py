@@ -49,10 +49,51 @@ def imview(*args, **kwargs):
 if PY2:
     import codecs
     def u(x):
+        """Python 2/3 compatible definition of utf8 literals"""
         return x.decode('utf8')
 else:
     def u(x):
+        """Python 2/3 compatible definition of utf8 literals"""
         return x
+
+
+
+def solve_status_str(hdrtxt, fwiter=4, fpothr=2):
+    """Construct header and format details for status display of an
+    iterative solver.
+
+    Parameters
+    ----------
+    hdrtxt : tuple of strings
+      Tuple of field header strings
+    fwiter : int, optional (default 4)
+      Number of characters in iteration count integer field
+    fpothr : int, optional (default 2)
+      Precision of other float field
+
+    Returns
+    -------
+    hdrstr : string
+      Complete header string
+    fmtstr : string
+      Complete print formatting string for numeric values
+    nsep : integer
+      Number of characters in separator string
+    """
+
+    # Field width for all fields other than first depends on precision
+    fwothr = fpothr + 6
+    # Construct header string from hdrtxt list of column headers
+    hdrstr = ("%-*s" % (fwiter+2, hdrtxt[0])) + \
+        ((("%%-%ds " % (fwothr+1)) * (len(hdrtxt)-1)) % \
+        tuple(hdrtxt[1:]))
+    # Construct iteration status format string
+    fmtstr = ("%%%dd" % (fwiter)) + ((("  %%%d.%de" % (fwothr, fpothr)) * \
+        (len(hdrtxt)-1)))
+    # Compute length of separator string
+    nsep = fwiter + (fwothr + 2)*(len(hdrtxt)-1)
+
+    return hdrstr, fmtstr, nsep
 
 
 
@@ -68,7 +109,7 @@ def tiledict(D, sz=None):
 
     Returns
     -------
-    im : array_like
+    im : ndarray
       Image tiled with dictionary entries.
     """
 
@@ -128,11 +169,23 @@ def tiledict(D, sz=None):
 
 
 def imageblocks(imgs, blksz):
-    """Extract all blocks of specified size from an image or list of images."""
+    """Extract all blocks of specified size from an image or list of images.
+
+    Parameters
+    ----------
+    imgs: array_like or tuple of array_like
+      Single image or tuple of images from which to extract blocks
+    blksz : tuple of two ints
+      Size of the blocks
+
+    Returns
+    -------
+    blks : ndarray
+      Array of extracted blocks
+    """
 
     # See http://stackoverflow.com/questions/16774148 and
     # sklearn.feature_extraction.image.extract_patches_2d
-
     if not isinstance(imgs, tuple):
         imgs = (imgs,)
 
@@ -154,15 +207,43 @@ def imageblocks(imgs, blksz):
 
 
 def rgb2gray(rgb):
-    """RGB to gray conversion function."""
+    """Convert RGB image to grayscale.
 
-    return np.dot(rgb[..., :3], np.array([0.299, 0.587, 0.144],
-                                         dtype=np.float32))
+    Parameters
+    ----------
+    rgb : ndarray
+      RGB image as Nr x Nc x 3 array
+
+    Returns
+    -------
+    gry : ndarray
+      Grayscale image as Nr x Nc array
+    """
+
+    return np.dot(rgb[...,:3], np.array([0.299, 0.587, 0.144],
+                    dtype=np.float32))
 
 
 
 def spnoise(s, frc, smn=0.0, smx=1.0):
-    """Return image with salt & pepper noise imposed on it"""
+    """Return image with salt & pepper noise imposed on it.
+
+    Parameters
+    ----------
+    s : ndarray
+      Input image
+    frc : float
+      Desired fraction of pixels corrupted by noise
+    smn : float, optional (default 0.0)
+      Lower value for noise (pepper)
+    smx : float, optional (default 1.0)
+      Upper value for noise (salt)
+
+    Returns
+    -------
+    sn : ndarray
+      Noisy image
+    """
 
     sn = s.copy()
     spm = np.random.uniform(-1.0, 1.0, s.shape)
@@ -178,7 +259,7 @@ def tikhonov_filter(s, lmbda, npd=16):
     Lowpass filter image(s) and return low and high frequency components,
     consisting of the lowpass filtered image and its difference with
     the input image. The lowpass filter is equivalent to Tikhonov
-    regularization with lmbda as the regularization parameter and a
+    regularization with `lmbda` as the regularization parameter and a
     discrete gradient as the operator in the regularization term.
 
     Parameters
@@ -213,109 +294,6 @@ def tikhonov_filter(s, lmbda, npd=16):
 
 
 
-def solve_status_str(hdrtxt, fwiter=4, fpothr=2):
-    """Construct header and format details for status display of an
-    iterative solver.
-    """
-
-    # Field width for all fields other than first depends on precision
-    fwothr = fpothr + 6
-    # Construct header string from hdrtxt list of column headers
-    hdrstr = ("%-*s" % (fwiter+2, hdrtxt[0])) + \
-        ((("%%-%ds " % (fwothr+1)) * (len(hdrtxt)-1)) % \
-        tuple(hdrtxt[1:]))
-    # Construct iteration status format string
-    fmtstr = ("%%%dd" % (fwiter)) + ((("  %%%d.%de" % (fwothr, fpothr)) * \
-        (len(hdrtxt)-1)))
-    # Compute length of separator string
-    nsep = fwiter + (fwothr + 2)*(len(hdrtxt)-1)
-
-    return hdrstr, fmtstr, nsep
-
-
-
-
-class Timer(object):
-    """Simple timer class."""
-
-    def __init__(self):
-        """Initialise timer."""
-
-        self.start()
-
-
-    def start(self):
-        """Reset timer."""
-
-        self.t0 = timer()
-
-
-
-    def elapsed(self):
-        """Get elapsed time since timer start."""
-
-        return timer() - self.t0
-
-
-
-
-def convdicts():
-    """Get a dict associating description strings with example learned
-    convolutional dictionaries.
-    """
-
-    pth = os.path.join(os.path.dirname(__file__), 'data', 'convdict.npz')
-    npz = np.load(pth)
-    cdd = {}
-    for k in list(npz.keys()):
-        cdd[k] = npz[k]
-    return cdd
-
-
-
-
-class ExampleImages(object):
-    """Example image access class"""
-
-    def __init__(self, scaled=False):
-        """Initialise object."""
-
-        self.scaled = scaled
-        self.bpth = os.path.join(os.path.dirname(__file__), 'data')
-        flst = glob.glob(os.path.join(self.bpth, '') + '*.png')
-        self.nlist = []
-        for pth in flst:
-            self.nlist.append(os.path.basename(os.path.splitext(pth)[0]))
-
-
-    def names(self):
-        """Get list of available names"""
-
-        return self.nlist
-
-
-
-    def image(self, name, scaled=None):
-        """Get named image"""
-
-        if scaled is None:
-            scaled = self.scaled
-        pth = os.path.join(self.bpth, name) + '.png'
-
-        try:
-            img = misc.imread(pth)
-        except IOError:
-            raise IOError('Could not access image with name ' + name)
-
-
-        if scaled:
-            img = np.float32(img) / 255.0
-
-        return img
-
-
-
-
 def grid_search(fn, grd, fmin=True, nproc=None):
     """Perform a grid search for optimal parameters of a specified
     function.  In the simplest case the function returns a float value,
@@ -343,7 +321,7 @@ def grid_search(fn, grd, fmin=True, nproc=None):
     grd : tuple of array_like
       A tuple providing an array of sample points for each axis of the grid
       on which the search is to be performed.
-    fmin : boolean, optional (default True)
+    fmin : bool, optional (default True)
       Determine whether optimal function values are selected as minima or
       maxima. If `fmin` is True then minima are selected.
     nproc : int or None, optional (default None)
@@ -387,3 +365,142 @@ def grid_search(fn, grd, fmin=True, nproc=None):
         sfvl = fvmx[sidx]
 
     return sprm, sfvl, fvmx, sidx
+
+
+
+def convdicts():
+    """Access a set of example learned convolutional dictionaries.
+
+    Returns
+    -------
+    cdd : dict
+      A dict associating description strings with dictionaries represented
+      as ndarrays
+
+    Examples
+    --------
+    Print the dict keys to obtain the identifiers of the available
+    dictionaries
+
+    >>> from sporco import util
+    >>> cd = util.convdicts()
+    >>> print(cdd.keys())
+    ['G:12x12x72', 'G:8x8x16,12x12x32,16x16x48', ...]
+
+    Select a specific example dictionary using the corresponding identifier
+
+    >>> D = cd['G:8x8x96']
+    """
+
+    pth = os.path.join(os.path.dirname(__file__), 'data', 'convdict.npz')
+    npz = np.load(pth)
+    cdd = {}
+    for k in list(npz.keys()):
+        cdd[k] = npz[k]
+    return cdd
+
+
+
+class ExampleImages(object):
+    """Access a set of example images"""
+
+    def __init__(self, scaled=False):
+        """Initialise an ExampleImages object.
+
+        Parameters
+        ----------
+        scaled : bool, optional (default False)
+          Flag indicating whether images should be on the range [0,...,255]
+          with np.uint8 dtype (False), or on the range [0,...,1] with
+          np.float32 dtype (True)
+        """
+
+        self.scaled = scaled
+        self.bpth = os.path.join(os.path.dirname(__file__), 'data')
+        flst = glob.glob(os.path.join(self.bpth, '') + '*.png')
+        self.nlist = []
+        for pth in flst:
+            self.nlist.append(os.path.basename(os.path.splitext(pth)[0]))
+
+
+    def names(self):
+        """Get list of available names.
+
+        Returns
+        -------
+        nlst : list
+          A list of names of available images
+        """
+
+        return self.nlist
+
+
+
+    def image(self, name, scaled=None):
+        """Get named image.
+
+        Parameters
+        ----------
+        name : string
+          Name of required image
+        scaled : bool or None, optional
+          Flag indicating whether images should be on the range [0,...,255]
+          with np.uint8 dtype (False), or on the range [0,...,1] with
+          np.float32 dtype (True). If the value is None, scaling behaviour
+          is determined by the `scaling` parameter passed to the object
+          initializer, otherwise that selection is overridden.
+
+        Returns
+        -------
+        img : ndarray
+          Image array
+
+        Raises
+        ------
+        IOError
+          If the named image is not accessible
+        """
+
+        if scaled is None:
+            scaled = self.scaled
+        pth = os.path.join(self.bpth, name) + '.png'
+
+        try:
+            img = misc.imread(pth)
+        except IOError:
+            raise IOError('Could not access image with name ' + name)
+
+
+        if scaled:
+            img = np.float32(img) / 255.0
+
+        return img
+
+
+
+class Timer(object):
+    """Simple timer class."""
+
+    def __init__(self):
+        """Initialise timer."""
+
+        self.start()
+
+
+    def start(self):
+        """Reset timer."""
+
+        self.t0 = timer()
+
+
+
+    def elapsed(self):
+        """Get elapsed time since timer start.
+
+        Returns
+        -------
+        dlt : float
+          Time interval since object was initialized or reset
+        """
+
+        return timer() - self.t0
