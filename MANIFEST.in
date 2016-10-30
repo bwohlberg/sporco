@@ -6,7 +6,7 @@ include README.rst
 include LICENSE
 
 recursive-include examples *.py
-recursive-include docs Makefile *.py *.rst *.bib *.css
+recursive-include docs *.py *.rst *.bib *.css
 
 include sporco/data/*.npz
 include sporco/tests/*.py
