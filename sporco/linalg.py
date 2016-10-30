@@ -340,7 +340,6 @@ def solvemdbi_ism(ah, rho, b, axisM, axisK):
     along the M and K axes of the corresponding multi-dimensional arrays;
     the solutions are independent over the other axes.
 
-
     Parameters
     ----------
     ah : array_like
