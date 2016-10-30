@@ -51,13 +51,12 @@ Derived classes should override the methods:
 
 as well as either
 
-* :meth:`.ADMM.iteration_stats`
+* :meth:`.ADMM.eval_objfn`
 
-  Construct a :py:func:`collections.namedtuple` recording
-  iterations statistics such as objective function value and the norms
-  of the primal and dual residuals.
+  Compute components of objective function as well as total
+  contribution to objective function and return as a tuple.
 
-or both of
+(and optionally :meth:`.ADMM.itstat_extra`) or both of
 
 * :meth:`.ADMM.obfn_f`
 

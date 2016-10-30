@@ -205,7 +205,346 @@ class ConvRepIndexing(object):
 
 
 
-class ConvBPDN(admm.ADMMEqual):
+class GenericConvBPDN(admm.ADMMEqual):
+    """Base class for ADMM algorithm for solving variants of the
+    Convolutional BPDN (CBPDN) :cite:`wohlberg-2016-efficient` problem.
+
+    The generic problem form is
+
+    .. math::
+       \mathrm{argmin}_\mathbf{x} \;
+       (1/2) \\left\| \sum_m \mathbf{d}_m * \mathbf{x}_m -
+       \mathbf{s} \\right\|_2^2 + \lambda f( \{ \mathbf{x}_m \} )
+
+    for input image :math:`\mathbf{s}`, dictionary filters
+    :math:`\mathbf{d}_m`, and coefficient maps :math:`\mathbf{x}_m`,
+    and where :math:`f(\cdot)` is a penalty term or the indicator
+    function of a constraint. It is solved via the ADMM problem
+
+    .. math::
+       \mathrm{argmin}_{\mathbf{x}, \mathbf{y}} \;
+       (1/2) \\left\| \sum_m \mathbf{d}_m * \mathbf{x}_m -
+       \mathbf{s} \\right\|_2^2 + f ( \{ \mathbf{y}_m \} )
+       \quad \\text{such that} \quad \mathbf{x}_m = \mathbf{y}_m \;\;.
+
+    After termination of the :meth:`solve` method, attribute
+    :attr:`itstat` is a list of tuples representing statistics of each
+    iteration. The fields of the named tuple ``IterationStats`` are:
+
+       ``Iter`` : Iteration number
+
+       ``ObjFun`` : Objective function value
+
+       ``DFid`` :  Value of data fidelity term \
+       :math:`(1/2) \| \sum_m \mathbf{d}_m * \mathbf{x}_m - \mathbf{s} \|_2^2`
+
+       ``Reg`` : Value of regularisation term
+
+       ``PrimalRsdl`` : Norm of primal residual
+
+       ``DualRsdl`` : Norm of dual residual
+
+       ``EpsPrimal`` : Primal residual stopping tolerance \
+       :math:`\epsilon_{\mathrm{pri}}`
+
+       ``EpsDual`` : Dual residual stopping tolerance \
+       :math:`\epsilon_{\mathrm{dua}}`
+
+       ``Rho`` : Penalty parameter
+
+       ``XSlvRelRes`` : Relative residual of X step solver
+
+       ``Time`` : Cumulative run time
+    """
+
+
+    class Options(admm.ADMMEqual.Options):
+        """ConvBPDN algorithm options
+
+        Options include all of those defined in
+        :class:`sporco.admm.admm.ADMMEqual.Options`, together with
+        additional options:
+
+        ``AuxVarObj`` : Flag indicating whether the objective function
+        should be evaluated using variable X  (``False``) or Y (``True``)
+        as its argument.
+
+        ``LinSolveCheck`` : Flag indicating whether to compute
+        relative residual of X step solver.
+
+        ``HighMemSolve`` : Flag indicating whether to use a slightly
+        faster algorithm at the expense of higher memory usage.
+
+        ``NonNegCoef`` : Flag indicating whether to force solution to
+        be non-negative.
+
+        ``NoBndryCross`` : Flag indicating whether all solution
+        coefficients corresponding to filters crossing the image
+        boundary should be forced to zero.
+        """
+
+        defaults = copy.deepcopy(admm.ADMMEqual.Options.defaults)
+        defaults.update({'AuxVarObj' : False,  'ReturnX' : False,
+                         'HighMemSolve' : False, 'LinSolveCheck' : False,
+                         'RelaxParam' : 1.8, 'NonNegCoef' : False,
+                         'NoBndryCross' : False})
+        defaults['AutoRho'].update({'Enabled' : True, 'Period' : 1,
+                                    'AutoScaling' : True, 'Scaling' : 1000.0,
+                                    'RsdlRatio' : 1.2})
+
+
+        def __init__(self, opt=None):
+            """Initialise GenericConvBPDN algorithm options object."""
+
+            if opt is None:
+                opt = {}
+            admm.ADMMEqual.Options.__init__(self, opt)
+
+            if self['AuxVarObj']:
+                self['fEvalX'] = False
+                self['gEvalY'] = True
+            else:
+                self['fEvalX'] = True
+                self['gEvalY'] = False
+
+
+
+    IterationStats = collections.namedtuple('IterationStats',
+                ['Iter', 'ObjFun', 'DFid', 'Reg', 'PrimalRsdl', 'DualRsdl',
+                 'EpsPrimal', 'EpsDual', 'Rho', 'XSlvRelRes', 'Time'])
+    """Named tuple type for recording ADMM iteration statistics"""
+
+    hdrtxt = ['Itn', 'Fnc', 'DFid', 'Reg', 'r', 's', 'rho']
+    """Display column header text"""
+    hdrval = {'Itn' : 'Iter', 'Fnc' : 'ObjFun', 'DFid' : 'DFid',
+              'Reg' : 'Reg', 'r' : 'PrimalRsdl', 's' : 'DualRsdl',
+              'rho' : 'Rho'}
+    """Dictionary mapping display column headers to IterationStats entries"""
+
+
+
+    def __init__(self, D, S, opt=None, dimK=None, dimN=2):
+        """
+        Initialise a GenericConvBPDN object with problem parameters.
+
+        This class supports an arbitrary number of spatial dimensions,
+        `dimN`, with a default of 2. The input dictionary `D` is either
+        `dimN` + 1 dimensional, in which case each spatial component
+        (image in the default case) is assumed to consist of a single
+        channel, or `dimN` + 2 dimensional, in which case the final
+        dimension is assumed to contain the channels (e.g. colour
+        channels in the case of images). The input signal set `S` is
+        either `dimN` dimensional (no channels, only one signal), `dimN` + 1
+        dimensional (either multiple channels or multiple signals), or
+        `dimN` + 2 dimensional (multiple channels and multiple signals).
+        Determination of problem dimensions is handled by
+        :class:`ConvRepIndexing`.
+
+
+        Parameters
+        ----------
+        D : array_like
+          Dictionary array
+        S : array_like
+          Signal array
+        opt : :class:`GenericConvBPDN.Options` object
+          Algorithm options
+        dimK : 0, 1, or None, optional (default None)
+          Number of dimensions in input signal corresponding to multiple
+          independent signals
+        dimN : int, optional (default 2)
+          Number of spatial/temporal dimensions
+        """
+
+        # Set default options if none specified
+        if opt is None:
+            opt = GenericConvBPDN.Options()
+
+        # Infer problem dimensions and set relevant attributes of self
+        cri = ConvRepIndexing(D, S, dimK=dimK, dimN=dimN)
+        for attr in ['dimN', 'dimC', 'dimK', 'C', 'Cd', 'K', 'M', 'Nv', 'N',
+                     'axisN', 'axisC', 'axisK', 'axisM', 'shpX']:
+            setattr(self, attr, getattr(cri, attr))
+
+        # Call parent class __init__
+        super(GenericConvBPDN, self).__init__(cri.shpX, S.dtype, opt)
+
+        # Reshape D and S to standard layout
+        self.D = D.reshape(cri.shpD)
+        self.S = S.reshape(cri.shpS)
+
+        # Compute signal in DFT domain
+        self.Sf = sl.rfftn(self.S, None, self.axisN)
+
+        # Initialise byte-aligned arrays for pyfftw
+        self.YU = sl.pyfftw_empty_aligned(self.Y.shape, dtype=self.dtype)
+        xfshp = list(self.Y.shape)
+        xfshp[dimN-1] = xfshp[dimN-1]//2 + 1
+        self.Xf = sl.pyfftw_empty_aligned(xfshp,
+                                          dtype=sl.complex_dtype(self.dtype))
+
+        self.setdict()
+
+        # Increment `runtime` to reflect object initialisation
+        # time. The timer object is reset to avoid double-counting of
+        # elapsed time if a similar increment is applied in a derived
+        # class __init__.
+        self.runtime += self.timer.elapsed(reset=True)
+
+
+
+
+    def dualinit(self):
+        """Initial value for dual variable U if initial Y is provided.
+        This base-class method is intended to be overridden, but an
+        implementation is provided so that overriding it is not
+        essential.
+        """
+
+        return np.zeros(self.shpX, self.dtype)
+
+
+
+    def setdict(self, D=None):
+        """Set dictionary array."""
+
+        if D is not None:
+            self.D = D
+        self.Df = sl.rfftn(self.D, self.Nv, self.axisN)
+        # Compute D^H S
+        self.DSf = np.conj(self.Df) * self.Sf
+        if self.Cd > 1:
+            self.DSf = np.sum(self.DSf, axis=self.axisC, keepdims=True)
+        if self.opt['HighMemSolve'] and self.Cd == 1:
+            self.c = sl.solvedbi_sm_c(self.Df, np.conj(self.Df), self.rho,
+                                      self.axisM)
+        else:
+            self.c = None
+
+
+
+    def getcoef(self):
+        """Get final coefficient array."""
+
+        return self.Y
+
+
+
+    def xstep(self):
+        """Minimise Augmented Lagrangian with respect to x."""
+
+        self.YU[:] = self.Y - self.U
+
+        b = self.DSf + self.rho*sl.rfftn(self.YU, None, self.axisN)
+        if self.Cd == 1:
+            self.Xf[:] = sl.solvedbi_sm(self.Df, self.rho, b, self.c,
+                                        self.axisM)
+        else:
+            self.Xf[:] = sl.solvemdbi_ism(self.Df, self.rho, b, self.axisM,
+                                          self.axisC)
+
+        self.X = sl.irfftn(self.Xf, self.Nv, self.axisN)
+
+        if self.opt['LinSolveCheck']:
+            Dop = lambda x: np.sum(self.Df * x, axis=self.axisM, keepdims=True)
+            DHop = lambda x: np.sum(np.conj(self.Df) * x, axis=self.axisC,
+                                    keepdims=True)
+            ax = DHop(Dop(self.Xf)) + self.rho*self.Xf
+            self.xrrs = sl.rrs(ax, b)
+        else:
+            self.xrrs = None
+
+
+
+    def ystep(self):
+        """Minimise Augmented Lagrangian with respect to y. If this
+        method is not overridden, the problem is solved without any
+        regularisation other than the option enforcement of
+        non-negativity of the solution and filter boundary crossing
+        supression. When it is overridden, it should be explicitly
+        called at the end of the overriding method.
+        """
+
+        if self.opt['NonNegCoef']:
+            self.Y[self.Y < 0.0] = 0.0
+        if self.opt['NoBndryCross']:
+            for n in range(0, self.dimN):
+                self.Y[(slice(None),)*n +(slice(1-self.D.shape[n],None),)] = 0.0
+
+
+
+    def obfn_fvarf(self):
+        """Variable to be evaluated in computing data fidelity term,
+        depending on ``fEvalX`` option value.
+        """
+
+        return self.Xf if self.opt['fEvalX'] else \
+            sl.rfftn(self.Y, None, self.axisN)
+
+
+
+    def eval_objfn(self):
+        """Compute components of objective function as well as total
+        contribution to objective function.
+        """
+
+        dfd = self.obfn_dfd()
+        reg = self.obfn_reg()
+        obj = dfd + reg[0]
+        return (obj, dfd) + reg[1:]
+
+
+
+    def obfn_dfd(self):
+        """Compute data fidelity term :math:`(1/2) \| \sum_m \mathbf{d}_m *
+        \mathbf{x}_m - \mathbf{s} \|_2^2`.
+        """
+
+        Ef = np.sum(self.Df * self.obfn_fvarf(), axis=self.axisM,
+                    keepdims=True) - self.Sf
+        return sl.rfl2norm2(Ef, self.S.shape, axis=self.axisN)/2.0
+
+
+
+    def obfn_reg(self):
+        """Compute regularisation term(s) and contribution to objective
+        function.
+        """
+
+        raise NotImplementedError()
+
+
+
+    def itstat_extra(self):
+        """Non-standard entries for the iteration stats record tuple."""
+
+        return (self.xrrs,)
+
+
+
+    def rhochange(self):
+        """Updated cached c array when rho changes."""
+
+        if self.opt['HighMemSolve'] and self.Cd == 1:
+            self.c = sl.solvedbi_sm_c(self.Df, np.conj(self.Df), self.rho,
+                                      self.axisM)
+
+
+
+    def reconstruct(self, X=None):
+        """Reconstruct representation."""
+
+        if X is None:
+            X = self.Y
+        Xf = sl.rfftn(X, None, self.axisN)
+        Sf = np.sum(self.Df * Xf, axis=self.axisM)
+        return sl.irfftn(Sf, self.Nv, self.axisN)
+
+
+
+
+
+class ConvBPDN(GenericConvBPDN):
     """ADMM algorithm for the Convolutional BPDN (CBPDN)
     :cite:`wohlberg-2014-efficient` :cite:`wohlberg-2016-efficient`
     :cite:`wohlberg-2016-convolutional` problem.
@@ -289,46 +628,23 @@ class ConvBPDN(admm.ADMMEqual):
     """
 
 
-    class Options(admm.ADMMEqual.Options):
+    class Options(GenericConvBPDN.Options):
         """ConvBPDN algorithm options
 
         Options include all of those defined in
         :class:`sporco.admm.admm.ADMMEqual.Options`, together with
         additional options:
 
-        ``AuxVarObj`` : Flag indicating whether the objective function
-        should be evaluated using variable X  (``False``) or Y (``True``)
-        as its argument.
-
-        ``LinSolveCheck`` : Flag indicating whether to compute
-        relative residual of X step solver.
-
-        ``HighMemSolve`` : Flag indicating whether to use a slightly
-        faster algorithm at the expense of higher memory usage.
-
-        ``L1Weight`` : An array of weights for the :math:`\ell^1`
+        ``L1Weight`` : An array of weights for the :math:`\ell_1`
         norm. The array shape must be such that the array is
         compatible for multiplication with the X/Y variables. If this
         option is defined, the regularization term is :math:`\lambda  \sum_m
         \| \mathbf{w}_m \odot \mathbf{x}_m \|_1` where :math:`\mathbf{w}_m`
         denotes slices of the weighting array on the filter index axis.
-
-        ``NonNegCoef`` : Flag indicating whether to force solution to
-        be non-negative.
-
-        ``NoBndryCross`` : Flag indicating whether all solution
-        coefficients corresponding to filters crossing the image
-        boundary should be forced to zero.
         """
 
-        defaults = copy.deepcopy(admm.ADMMEqual.Options.defaults)
-        defaults.update({'AuxVarObj' : False,  'ReturnX' : False,
-                         'HighMemSolve' : False, 'LinSolveCheck' : False,
-                         'RelaxParam' : 1.8, 'L1Weight' : 1.0,
-                         'NonNegCoef' : False, 'NoBndryCross' : False})
-        defaults['AutoRho'].update({'Enabled' : True, 'Period' : 1,
-                                    'AutoScaling' : True, 'Scaling' : 1000.0,
-                                    'RsdlRatio' : 1.2})
+        defaults = copy.deepcopy(GenericConvBPDN.Options.defaults)
+        defaults.update({'L1Weight' : 1.0})
 
 
         def __init__(self, opt=None):
@@ -336,24 +652,8 @@ class ConvBPDN(admm.ADMMEqual):
 
             if opt is None:
                 opt = {}
-            admm.ADMMEqual.Options.__init__(self, opt)
+            GenericConvBPDN.Options.__init__(self, opt)
 
-            if self['AuxVarObj']:
-                self['fEvalX'] = False
-                self['gEvalY'] = True
-            else:
-                self['fEvalX'] = True
-                self['gEvalY'] = False
-
-
-        def set_lambda(self, lmbda, override=False):
-            """Set parameters depending on lambda value"""
-
-            if override or self['rho'] is None:
-                self['rho'] = 50.0*lmbda + 1.0
-            if override or self['AutoRho', 'RsdlTarget'] is None:
-                self['AutoRho', 'RsdlTarget'] = 1.0 + \
-                  (18.3)**(np.log10(lmbda)+1.0)
 
 
     IterationStats = collections.namedtuple('IterationStats',
@@ -408,120 +708,46 @@ class ConvBPDN(admm.ADMMEqual):
         # Set default options if none specified
         if opt is None:
             opt = ConvBPDN.Options()
-
-        # Infer problem dimensions and set relevant attributes of self
-        cri = ConvRepIndexing(D, S, dimK=dimK, dimN=dimN)
-        for attr in ['dimN', 'dimC', 'dimK', 'C', 'Cd', 'K', 'M', 'Nv', 'N',
-                     'axisN', 'axisC', 'axisK', 'axisM']:
-            setattr(self, attr, getattr(cri, attr))
-
-        # Call parent class __init__
-        super(ConvBPDN, self).__init__(self.M*self.N, opt)
-
-        # Reshape D and S to standard layout
-        self.D = D.reshape(cri.shpD)
-        self.S = S.reshape(cri.shpS)
-
-        # Compute signal in DFT domain
-        self.Sf = sl.rfftn(self.S, None, self.axisN)
+        else:
+            opt = copy.deepcopy(opt)
 
         # Set default lambda value if not specified
         if lmbda is None:
-            Df = sl.rfftn(self.D, self.Nv, self.axisN)
-            b = np.conj(Df) * self.Sf
+            cri = ConvRepIndexing(D, S, dimK=dimK, dimN=dimN)
+            Df = sl.rfftn(D.reshape(cri.shpD), cri.Nv, axes=cri.axisN)
+            Sf = sl.rfftn(S.reshape(cri.shpS), axes=cri.axisN)
+            b = np.conj(Df) * Sf
             self.lmbda = 0.1*abs(b).max()
         else:
             self.lmbda = lmbda
 
-        # Set rho value (computed from lambda if not specified)
-        self.opt.set_lambda(self.lmbda)
-        self.rho = self.opt['rho']
+        # Set default option 'AutoRho','RsdlTarget' if necessary
+        if opt['AutoRho','RsdlTarget'] is None:
+            opt['AutoRho','RsdlTarget'] = 1.0 + \
+                  (18.3)**(np.log10(self.lmbda)+1.0)
 
-        # Determine working data type
-        self.opt.set_dtype(S.dtype)
-        dtype = self.opt['DataType']
+        # Call parent class __init__
+        super(ConvBPDN, self).__init__(D, S, opt, dimK, dimN)
 
-        # Initial values for Y
-        if self.opt['Y0'] is None:
-            self.Y = np.zeros(cri.shpX, dtype)
+
+
+    def rhoinit(self):
+        """Return initialiser for penalty parameter"""
+
+        return 50.0*self.lmbda + 1.0
+
+
+
+    def uinit(self, ushape):
+        """Return initialiser for working variable U"""
+
+        if  self.opt['Y0'] is None:
+            return np.zeros(ushape, dtype=self.dtype)
         else:
-            self.Y = self.opt['Y0']
-        self.Yprev = self.Y
-
-        # Initial value for U
-        if self.opt['U0'] is None:
-            if self.opt['Y0'] is None:
-                self.U = np.zeros(cri.shpX, dtype)
-            else:
-                # If Y0 is given, but not U0, then choose the initial
-                # U so that the relevant dual optimality criterion
-                # (see (3.10) in boyd-2010-distributed) is satisfied.
-                self.U = (self.lmbda/self.rho)*np.sign(self.Y)
-        else:
-            self.U = self.opt['U0']
-
-        # Initialise byte-aligned arrays for pyfftw
-        self.YU = sl.pyfftw_empty_aligned(self.Y.shape, dtype=dtype)
-        xfshp = list(self.Y.shape)
-        xfshp[dimN-1] = xfshp[dimN-1]//2 + 1
-        self.Xf = sl.pyfftw_empty_aligned(xfshp, dtype=sl.complex_dtype(dtype))
-
-        self.runtime += self.timer.elapsed()
-
-        self.setdict()
-
-
-
-    def setdict(self, D=None):
-        """Set dictionary array."""
-
-        self.timer.start()
-        if D is not None:
-            self.D = D
-        self.Df = sl.rfftn(self.D, self.Nv, self.axisN)
-        # Compute D^H S
-        self.DSf = np.conj(self.Df) * self.Sf
-        if self.Cd > 1:
-            self.DSf = np.sum(self.DSf, axis=self.axisC, keepdims=True)
-        if self.opt['HighMemSolve'] and self.Cd == 1:
-            self.c = sl.solvedbi_sm_c(self.Df, np.conj(self.Df), self.rho,
-                                      self.axisM)
-        else:
-            self.c = None
-        self.runtime += self.timer.elapsed()
-
-
-
-    def getcoef(self):
-        """Get final coefficient array."""
-
-        return self.Y
-
-
-
-    def xstep(self):
-        """Minimise Augmented Lagrangian with respect to x."""
-
-        self.YU[:] = self.Y - self.U
-
-        b = self.DSf + self.rho*sl.rfftn(self.YU, None, self.axisN)
-        if self.Cd == 1:
-            self.Xf[:] = sl.solvedbi_sm(self.Df, self.rho, b, self.c,
-                                        self.axisM)
-        else:
-            self.Xf[:] = sl.solvemdbi_ism(self.Df, self.rho, b, self.axisM,
-                                          self.axisC)
-
-        self.X = sl.irfftn(self.Xf, self.Nv, self.axisN)
-
-        if self.opt['LinSolveCheck']:
-            Dop = lambda x: np.sum(self.Df * x, axis=self.axisM, keepdims=True)
-            DHop = lambda x: np.sum(np.conj(self.Df) * x, axis=self.axisC,
-                                    keepdims=True)
-            ax = DHop(Dop(self.Xf)) + self.rho*self.Xf
-            self.xrrs = sl.rrs(ax, b)
-        else:
-            self.xrrs = None
+            # If initial Y is non-zero, initial U is chosen so that
+            # the relevant dual optimality criterion (see (3.10) in
+            # boyd-2010-distributed) is satisfied.
+            return (self.lmbda/self.rho)*np.sign(self.Y)
 
 
 
@@ -530,60 +756,16 @@ class ConvBPDN(admm.ADMMEqual):
 
         self.Y = sl.shrink1(self.AX + self.U,
                             (self.lmbda/self.rho) * self.opt['L1Weight'])
-        if self.opt['NonNegCoef']:
-            self.Y[self.Y < 0.0] = 0.0
-        if self.opt['NoBndryCross']:
-            for n in range(0, self.dimN):
-                self.Y[(slice(None),)*n +(slice(1-self.D.shape[n],None),)] = 0.0
+        super(ConvBPDN, self).ystep()
 
 
-
-    def obfn_fvarf(self):
-        """Variable to be evaluated in computing data fidelity term,
-        depending on ``fEvalX`` option value.
+    def obfn_reg(self):
+        """Compute regularisation term and contribution to objective
+        function.
         """
 
-        return self.Xf if self.opt['fEvalX'] else \
-            sl.rfftn(self.Y, None, self.axisN)
-
-
-
-    def iteration_stats(self, k, r, s, epri, edua, tk):
-        """
-        Construct iteration stats record tuple. Data fidelity term is
-        :math:`(1/2) \|  \sum_m \mathbf{d}_m * \mathbf{x}_m -
-        \mathbf{s} \|_2^2` and regularisation term is
-        :math:`\sum_m \| \mathbf{x}_m \|_1`.
-        """
-
-        Ef = np.sum(self.Df * self.obfn_fvarf(), axis=self.axisM,
-                    keepdims=True) - self.Sf
-        dfd = sl.rfl2norm2(Ef, self.S.shape, axis=self.axisN)/2.0
-        reg = linalg.norm((self.opt['L1Weight'] * self.obfn_gvar()).ravel(), 1)
-        obj = dfd + self.lmbda*reg
-        itst = type(self).IterationStats(k, obj, dfd, reg, r, s,
-                                         epri, edua, self.rho, self.xrrs, tk)
-        return itst
-
-
-
-    def rhochange(self):
-        """Updated cached c array when rho changes."""
-
-        if self.opt['HighMemSolve'] and self.Cd == 1:
-            self.c = sl.solvedbi_sm_c(self.Df, np.conj(self.Df), self.rho,
-                                      self.axisM)
-
-
-
-    def reconstruct(self, X=None):
-        """Reconstruct representation."""
-
-        if X is None:
-            X = self.Y
-        Xf = sl.rfftn(X, None, self.axisN)
-        Sf = np.sum(self.Df * Xf, axis=self.axisM)
-        return sl.irfftn(Sf, self.Nv, self.axisN)
+        rl1 = linalg.norm((self.opt['L1Weight'] * self.obfn_gvar()).ravel(), 1)
+        return (self.lmbda*rl1, rl1)
 
 
 
@@ -592,8 +774,8 @@ class ConvBPDN(admm.ADMMEqual):
 class ConvBPDNJoint(ConvBPDN):
     """
     ADMM algorithm for Convolutional BPDN with joint sparsity via an
-    :math:`\ell^{2,1}` norm term :cite:`wohlberg-2016-convolutional`
-    (the :math:`\ell^2` norms are computed over the channel index).
+    :math:`\ell_{2,1}` norm term :cite:`wohlberg-2016-convolutional`
+    (the :math:`\ell_2` norms are computed over the channel index).
 
     Solve the optimisation problem
 
@@ -651,7 +833,7 @@ class ConvBPDNJoint(ConvBPDN):
     IterationStats = collections.namedtuple('IterationStats',
                 ['Iter', 'ObjFun', 'DFid', 'RegL1', 'RegL21',
                  'PrimalRsdl', 'DualRsdl', 'EpsPrimal', 'EpsDual',
-                 'Rho', 'Time'])
+                 'Rho', 'XSlvRelRes', 'Time'])
     """Named tuple type for recording ADMM iteration statistics"""
 
     hdrtxt = ['Itn', 'Fnc', 'DFid', 'l1', 'l21', 'r', 's', 'rho']
@@ -700,32 +882,19 @@ class ConvBPDNJoint(ConvBPDN):
         self.Y = sl.shrink12(self.AX + self.U,
                              (self.lmbda/self.rho)*self.opt['L1Weight'],
                              self.mu/self.rho, axis=self.axisC)
-        if self.opt['NonNegCoef']:
-            self.Y[self.Y < 0.0] = 0.0
-        if self.opt['NoBndryCross']:
-            for n in range(0, self.dimN):
-                self.Y[(slice(None),)*n +(slice(1-self.D.shape[n],None),)] = 0.0
+        GenericConvBPDN.ystep(self)
 
 
 
-    def iteration_stats(self, k, r, s, epri, edua, tk):
-        """
-        Construct iteration stats record tuple. Data fidelity term is
-        :math:`(1/2) \|  \sum_m \mathbf{d}_m * \mathbf{x}_m -
-        \mathbf{s} \|_2^2` and regularisation terms are
-        :math:`\sum_m \| \mathbf{x}_m \|_1` and :math:`\| \{
-        \mathbf{x}_{k,m} \} \|_{2,1}`.
+    def obfn_reg(self):
+        """Compute regularisation terms and contribution to objective
+        function. Regularisation terms are :math:`\| Y \|_1` and
+        :math:`\| Y \|_{2,1}`.
         """
 
-        Ef = np.sum(self.Df * self.obfn_fvarf(), axis=self.axisM,
-                    keepdims=True) - self.Sf
-        dfd = sl.rfl2norm2(Ef, self.S.shape, axis=self.axisN)/2.0
         rl1 = linalg.norm((self.opt['L1Weight'] * self.obfn_gvar()).ravel(), 1)
         rl21 = np.sum(np.sqrt(np.sum(self.obfn_gvar()**2, axis=self.axisC)))
-        obj = dfd + self.lmbda*rl1 + self.mu*rl21
-        itst = type(self).IterationStats(k, obj, dfd, rl1, rl21, r, s,
-                                         epri, edua, self.rho, tk)
-        return itst
+        return (self.lmbda*rl1 + self.mu*rl21, rl1, rl21)
 
 
 
@@ -837,7 +1006,6 @@ class ConvElasticNet(ConvBPDN):
     def setdict(self, D=None):
         """Set dictionary array."""
 
-        self.timer.start()
         if D is not None:
             self.D = D
         self.Df = sl.rfftn(self.D, self.Nv, self.axisN)
@@ -850,7 +1018,6 @@ class ConvElasticNet(ConvBPDN):
                                       self.mu + self.rho, self.axisM)
         else:
             self.c = None
-        self.runtime += self.timer.elapsed()
 
 
 
@@ -879,25 +1046,14 @@ class ConvElasticNet(ConvBPDN):
             self.xrrs = None
 
 
-
-    def iteration_stats(self, k, r, s, epri, edua, tk):
-        """
-        Construct iteration stats record tuple. Data fidelity term is
-        :math:`(1/2) \|  \sum_m \mathbf{d}_m * \mathbf{x}_m -
-        \mathbf{s} \|_2^2` and regularisation terms are
-        :math:`\sum_m \| \mathbf{x}_m \|_1` and
-        :math:`(1/2) \sum_m \| \mathbf{x}_m \|_2^2`.
+    def obfn_reg(self):
+        """Compute regularisation term and contribution to objective
+        function.
         """
 
-        Ef = np.sum(self.Df * self.obfn_fvarf(), axis=self.axisM,
-                    keepdims=True) - self.Sf
-        dfd = sl.rfl2norm2(Ef, self.S.shape, axis=self.axisN)/2.0
         rl1 = linalg.norm((self.opt['L1Weight'] * self.obfn_gvar()).ravel(), 1)
         rl2 = 0.5*linalg.norm(self.obfn_gvar())**2
-        obj = dfd + self.lmbda*rl1 + self.mu*rl2
-        itst = type(self).IterationStats(k, obj, dfd, rl1, rl2, r, s,
-                                         epri, edua, self.rho, self.xrrs, tk)
-        return itst
+        return (self.lmbda*rl1 + self.mu*rl2, rl1, rl2)
 
 
 
@@ -1059,8 +1215,6 @@ class ConvBPDNGradReg(ConvBPDN):
     def setdict(self, D=None):
         """Set dictionary array."""
 
-        self.timer.start()
-
         if self.GHGf is None:
             self.make_GhGf()
 
@@ -1076,7 +1230,6 @@ class ConvBPDNGradReg(ConvBPDN):
                                       self.mu*self.GHGf + self.rho, self.axisM)
         else:
             self.c = None
-        self.runtime += self.timer.elapsed()
 
 
 
@@ -1106,25 +1259,16 @@ class ConvBPDNGradReg(ConvBPDN):
 
 
 
-    def iteration_stats(self, k, r, s, epri, edua, tk):
-        """
-        Construct iteration stats record tuple. Data fidelity term is
-        :math:`(1/2) \|  \sum_m \mathbf{d}_m * \mathbf{x}_m -
-        \mathbf{s} \|_2^2` and regularisation terms are
-        :math:`\sum_m \| \mathbf{x}_m \|_1` and
-        :math:`(1/2) \sum_i \sum_m \| G_i \mathbf{x}_m \|_2^2`
+    def obfn_reg(self):
+        """Compute regularisation term and contribution to objective
+        function.
         """
 
         fvf = self.obfn_fvarf()
-        Ef = np.sum(self.Df * fvf, axis=self.axisM, keepdims=True) - self.Sf
-        dfd = sl.rfl2norm2(Ef, self.S.shape, axis=self.axisN)/2.0
         rl1 = linalg.norm((self.opt['L1Weight'] * self.obfn_gvar()).ravel(), 1)
         rgr = sl.rfl2norm2(np.sqrt(self.GHGf*np.conj(fvf)*fvf), self.Nv,
                            self.axisN)/2.0
-        obj = dfd + self.lmbda*rl1 + self.mu*rgr
-        itst = type(self).IterationStats(k, obj, dfd, rl1, rgr, r, s,
-                                         epri, edua, self.rho, self.xrrs, tk)
-        return itst
+        return (self.lmbda*rl1 + self.mu*rgr, rl1, rgr)
 
 
 
@@ -1233,44 +1377,35 @@ class ConvTwoBlockCnstrnt(admm.ADMMTwoBlockCnstrnt):
 
         # Call parent class __init__
         Nx = self.M * self.N * self.K
-        Nc = (self.M + self.C) * self.N * self.K
-        super(ConvTwoBlockCnstrnt, self).__init__(Nx, Nc, cri.axisM, self.C,
-                                                  opt)
+        shpY = list(cri.shpX)
+        shpY[cri.axisM] += self.C
+        super(ConvTwoBlockCnstrnt, self).__init__(Nx, shpY, cri.axisM, self.C,
+                                                  S.dtype, opt)
 
         # Reshape D and S to standard layout
         self.D = D.reshape(cri.shpD)
         self.S = S.reshape(cri.shpS)
-
-        # Determine working data type
-        self.opt.set_dtype(S.dtype)
-        self.dtype = self.opt['DataType']
-
-        # Initial values for Y
-        if self.opt['Y0'] is None:
-            shpY = list(cri.shpX)
-            shpY[cri.axisM] += self.C
-            self.Y = np.zeros(shpY, self.dtype)
-        else:
-            self.Y = self.opt['Y0']
-        self.Yprev = self.Y
 
         # Initialise byte-aligned arrays for pyfftw
         self.YU = sl.pyfftw_empty_aligned(self.Y.shape, dtype=self.dtype)
         xfshp = list(cri.shpX)
         xfshp[dimN-1] = xfshp[dimN-1]//2 + 1
         self.Xf = sl.pyfftw_empty_aligned(xfshp,
-                                          dtype=sl.complex_dtype(self.dtype))
-
-        self.runtime += self.timer.elapsed()
+                            dtype=sl.complex_dtype(self.dtype))
 
         self.setdict()
+
+        # Increment `runtime` to reflect object initialisation
+        # time. The timer object is reset to avoid double-counting of
+        # elapsed time if a similar increment is applied in a derived
+        # class __init__.
+        self.runtime += self.timer.elapsed(reset=True)
 
 
 
     def setdict(self, D=None):
         """Set dictionary array."""
 
-        self.timer.start()
         if D is not None:
             self.D = D
         self.Df = sl.rfftn(self.D, self.Nv, self.axisN)
@@ -1279,7 +1414,6 @@ class ConvTwoBlockCnstrnt(admm.ADMMTwoBlockCnstrnt):
                                       self.axisM)
         else:
             self.c = None
-        self.runtime += self.timer.elapsed()
 
 
 
@@ -1357,7 +1491,7 @@ class ConvTwoBlockCnstrnt(admm.ADMMTwoBlockCnstrnt):
         """
 
         return np.swapaxes(Y[(slice(None),)*self.blkaxis +
-                             (slice(0,self.blkidx),)], self.axisC, self.axisM)
+                    (slice(0,self.blkidx),)], self.axisC, self.axisM)
 
 
 
@@ -1372,7 +1506,7 @@ class ConvTwoBlockCnstrnt(admm.ADMMTwoBlockCnstrnt):
         """
 
         return np.concatenate((np.swapaxes(Y0, self.axisC, self.axisM), Y1),
-                              axis=self.blkaxis)
+                    axis=self.blkaxis)
 
 
 
@@ -1434,17 +1568,22 @@ class ConvTwoBlockCnstrnt(admm.ADMMTwoBlockCnstrnt):
 
 
 
-    def iteration_stats(self, k, r, s, epri, edua, tk):
-        """
-        Construct iteration stats record tuple.
+    def eval_objfn(self):
+        """Compute components of regularisation function as well as total
+        contribution to objective function.
         """
 
         g0v = self.obfn_g0(self.obfn_g0var())
         g1v = self.obfn_g1(self.obfn_g1var())
         obj = g0v + g1v
-        itst = type(self).IterationStats(k, obj, g0v, g1v, r, s, epri, edua,
-                                         self.rho, self.xrrs, tk)
-        return itst
+        return (obj, g0v, g1v)
+
+
+
+    def itstat_extra(self):
+        """Non-standard entries for the iteration stats record tuple."""
+
+        return (self.xrrs,)
 
 
 
@@ -1541,7 +1680,7 @@ class ConvBPDNMaskDcpl(ConvTwoBlockCnstrnt):
         :class:`sporco.admm.cbpdn.ConvTwoBlockCnstrnt.Options`, together with
         additional options:
 
-        ``L1Weight`` : An array of weights for the :math:`\ell^1`
+        ``L1Weight`` : An array of weights for the :math:`\ell_1`
         norm. The array shape must be such that the array is
         compatible for multiplication with the X/Y variables. If this
         option is defined, the regularization term is :math:`\lambda  \sum_m
@@ -1605,23 +1744,22 @@ class ConvBPDNMaskDcpl(ConvTwoBlockCnstrnt):
         super(ConvBPDNMaskDcpl, self).__init__(D, S, opt, dimK=dimK, dimN=dimN)
 
         self.lmbda = lmbda
-        self.rho = self.opt['rho']
         self.W = sl.atleast_nd(self.S.ndim, W)
 
-        # Initial value for U
-        if self.opt['U0'] is None:
-            if self.opt['Y0'] is None:
-                self.U = np.zeros(self.Y.shape, self.dtype)
-            else:
-                # If Y0 is given, but not U0, then choose the initial
-                # U so that the relevant dual optimality criterion
-                # (see (3.10) in boyd-2010-distributed) is satisfied.
-                Ub0 = (self.W**2) * self.block_sep0(self.Y) / self.rho
-                Ub1 = (self.lmbda/self.rho) * np.sign(self.block_sep1(self.Y))
-                self.U = self.block_cat(Ub0, Ub1)
-        else:
-            self.U = self.opt['U0']
 
+
+    def uinit(self, ushape):
+        """Return initialiser for working variable U"""
+
+        if  self.opt['Y0'] is None:
+            return np.zeros(ushape, dtype=self.dtype)
+        else:
+            # If initial Y is non-zero, initial U is chosen so that
+            # the relevant dual optimality criterion (see (3.10) in
+            # boyd-2010-distributed) is satisfied.
+            Ub0 = (self.W**2) * self.block_sep0(self.Y) / self.rho
+            Ub1 = (self.lmbda/self.rho) * np.sign(self.block_sep1(self.Y))
+            return self.block_cat(Ub0, Ub1)
 
 
 

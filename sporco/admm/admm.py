@@ -9,6 +9,7 @@
 
 from __future__ import division
 from __future__ import print_function
+from future.utils import with_metaclass
 from builtins import range
 from builtins import object
 
@@ -17,6 +18,7 @@ from scipy import linalg
 import scipy
 import copy
 import collections
+import sys
 
 from sporco import cdict
 from sporco import util
@@ -24,7 +26,52 @@ from sporco import util
 __author__ = """Brendt Wohlberg <brendt@ieee.org>"""
 
 
-class ADMM(object):
+
+def _module_name_nested(cls, nstnm='Options'):
+    """Fix name lookup problem that prevents pickling of classes with nested
+    class definitions. The approach is loosely based on that implemented at
+    https://git.io/viGqU , simplified and modified to work
+    in both Python 2.7 and Python 3.x.
+
+    Parameters
+    ----------
+    cls : class
+      Class to which fix is to be applied
+    nstnm : str, optional (default 'Options')
+      Name of nested class to be renamed
+    """
+
+    # Check that nstmm is an attribute of cls
+    if nstnm in cls.__dict__:
+        # Get the attribute of cls by its name
+        nst = cls.__dict__[nstnm]
+        # Check that the attribute is a class
+        if isinstance(nst, type):
+            # Get the module in which the outer class is defined
+            mdl = sys.modules[cls.__module__]
+            # Construct an extended name by concatenating inner and outer names
+            extnm = cls.__name__  + nst.__name__
+            # Allow lookup of the nested class within the module via
+            # its extended name
+            setattr(mdl, extnm, nst)
+            # Change the nested class name to the extended name
+            nst.__name__ = extnm
+    return cls
+
+
+
+class _NestedClassFix(type):
+    """Metaclass that applies module_name_nested to class definitions."""
+
+    def __init__(self, *args):
+        """Apply _module_name_nested function to class after creation"""
+        _module_name_nested(self)
+
+
+
+
+
+class ADMM(with_metaclass(_NestedClassFix, object)):
     """Base class for Alternating Direction Method of Multipliers (ADMM)
     algorithms :cite:`boyd-2010-distributed`.
 
@@ -145,13 +192,6 @@ class ADMM(object):
 
 
 
-        def set_dtype(self, dtype, override=False):
-            """Set DataType value"""
-
-            if override or self['DataType'] is None:
-                self['DataType'] = dtype
-
-
 
 
     IterationStats = collections.namedtuple('IterationStats',
@@ -173,7 +213,7 @@ class ADMM(object):
 
 
 
-    def __init__(self, Nx, Nc, opt=None):
+    def __init__(self, Nx, yshape, ushape, dtype, opt=None):
         """
         Initialise an ADMM object with problem size and options.
 
@@ -181,8 +221,12 @@ class ADMM(object):
         ----------
         Nx : int
           Size of variable :math:`\mathbf{x}` in objective function
-        Nc : int
-          Size of constant :math:`\mathbf{c}` in constraint
+        yshape : tuple of ints
+          Shape of working variable Y (the auxiliary variable)
+        ushape : tuple of ints
+          Shape of working variable U (the scaled dual variable)
+        dtype : data-type
+          Data type for working variables (overridden by 'DataType' option)
         opt : :class:`ADMM.Options` object
           Algorithm options
         """
@@ -191,24 +235,68 @@ class ADMM(object):
             opt = ADMM.Options()
         if not isinstance(opt, ADMM.Options):
             raise TypeError("Parameter opt must be an instance of ADMM.Options")
+
+        # Management of timing of object initialisation is the
+        # responsibility of derived classes. Timing of :meth:`solve`
+        # is managed by this class.
         self.runtime = 0.0
         self.timer = util.Timer()
+
+        self.opt = opt
         self.Nx = Nx
-        self.Nc = Nc
+        # Working variable U has the same dimensionality as constant c
+        # in the constraint Ax + By = c
+        self.Nc = np.product(ushape)
+
+        # DataType option overrides data type inferred from __init__
+        # parameters of derived class
+        if opt['DataType'] is None:
+            self.dtype = dtype
+        else:
+            self.dtype = opt['DataType']
+
+        # Initialise penalty parameter
+        if opt['rho'] is None:
+            self.rho = self.dtype.type(self.rhoinit())
+        else:
+            self.rho = self.dtype.type(opt['rho'])
+
+        # Initialise working variable Y
+        if  self.opt['Y0'] is None:
+            self.Y = self.yinit(yshape)
+        else:
+            self.Y = self.opt['Y0'].astype(self.dtype, copy=True)
+        self.Yprev = self.Y.copy()
+
+        # Initialise working variable U
+        if  self.opt['U0'] is None:
+            self.U = self.uinit(ushape)
+        else:
+            self.U = self.opt['U0'].astype(self.dtype, copy=True)
+
         self.itstat = []
         self.k = 0
 
-        self.Y = None
-        self.U = None
 
-        if opt['DataType'] is not None:
-            if opt['Y0'] is not None:
-                opt['Y0'] = opt['Y0'].astype(opt['DataType'])
-            if opt['U0'] is not None:
-                opt['U0'] = opt['U0'].astype(opt['DataType'])
-        self.opt = opt
 
-        self.runtime += self.timer.elapsed()
+    def rhoinit(self):
+        """Return initialiser for penalty parameter"""
+
+        return 1.0
+
+
+
+    def yinit(self, yshape):
+        """Return initialiser for working variable Y"""
+
+        return np.zeros(yshape, dtype=self.dtype)
+
+
+
+    def uinit(self, ushape):
+        """Return initialiser for working variable U"""
+
+        return np.zeros(ushape, dtype=self.dtype)
 
 
 
@@ -251,9 +339,8 @@ class ADMM(object):
             # Compute residuals and stopping thresholds
             r, s, epri, edua = self.compute_residuals()
 
-            # Compute functional value
-            tk = self.timer.elapsed()
-            itst = self.iteration_stats(k, r, s, epri, edua, tk)
+            # Compute and record other iteration statistics
+            itst = self.iteration_stats(k, r, s, epri, edua)
             self.itstat.append(itst)
 
             # Display iteration stats if Verbose option enabled
@@ -359,15 +446,32 @@ class ADMM(object):
 
 
 
-    def iteration_stats(self, k, r, s, epri, edua, tk):
+    def iteration_stats(self, k, r, s, epri, edua):
         """Construct iteration stats record tuple."""
+
+        tk = self.timer.elapsed()
+        tpl = (k,) + self.eval_objfn() + (r, s, epri, edua, self.rho) +\
+              self.itstat_extra() + (tk,)
+        return type(self).IterationStats(*tpl)
+
+
+
+    def eval_objfn(self):
+        """Compute components of objective function as well as total
+        contribution to objective function.
+        """
 
         fval = self.obfn_f(self.X)
         gval = self.obfn_g(self.Y)
-        obj = gval + gval
-        itst = type(self).IterationStats(k, obj, fval, gval, r, s,
-                                         epri, edua, self.rho, tk)
-        return itst
+        obj = fval + gval
+        return (obj, fval, gval)
+
+
+
+    def itstat_extra(self):
+        """Non-standard entries for the iteration stats record tuple."""
+
+        return ()
 
 
 
@@ -485,7 +589,7 @@ class ADMM(object):
     def obfn_f(self, X):
         """Compute :math:`f(\mathbf{x})` component of ADMM objective function.
 
-        Overriding this method is required if :meth:`iteration_stats`
+        Overriding this method is required if :meth:`eval_objfun`
         is not overridden.
         """
 
@@ -496,7 +600,7 @@ class ADMM(object):
     def obfn_g(self, Y):
         """Compute :math:`g(\mathbf{y})` component of ADMM objective function.
 
-        Overriding this method is required if :meth:`iteration_stats`
+        Overriding this method is required if :meth:`eval_objfun`
         is not overridden.
         """
 
@@ -669,21 +773,24 @@ class ADMMEqual(ADMM):
 
 
 
-    def __init__(self, Nx, opt=None):
+    def __init__(self, xshape, dtype, opt=None):
         """
         Initialise an ADMMEqual object with problem size and options.
 
         Parameters
         ----------
-        Nx : int
-          Size of variable :math:`\mathbf{x}` in objective function
+        xshape : tuple of ints
+          Shape of working variable X (the primary variable)
+        dtype : data-type
+          Data type for working variables
         opt : :class:`ADMMEqual.Options` object
           Algorithm options
         """
 
         if opt is None:
             opt = ADMMEqual.Options()
-        super(ADMMEqual, self).__init__(Nx, Nx, opt)
+        Nx = np.product(xshape)
+        super(ADMMEqual, self).__init__(Nx, xshape, xshape, dtype, opt)
 
 
 
@@ -726,15 +833,15 @@ class ADMMEqual(ADMM):
 
 
 
-    def iteration_stats(self, k, r, s, epri, edua, tk):
-        """Construct iteration stats record tuple."""
+    def eval_objfn(self):
+        """Compute components of objective function as well as total
+        contribution to objective function.
+        """
 
         fval = self.obfn_f(self.obfn_fvar())
         gval = self.obfn_g(self.obfn_gvar())
         obj = fval + gval
-        itst = type(self).IterationStats(k, obj, fval, gval, r, s,
-                                         epri, edua, self.rho, tk)
-        return itst
+        return (obj, fval, gval)
 
 
 
@@ -878,7 +985,7 @@ class ADMMTwoBlockCnstrnt(ADMM):
 
 
 
-    def __init__(self, Nx, Nc, blkaxis, blkidx, opt=None):
+    def __init__(self, Nx, yshape, blkaxis, blkidx, dtype, opt=None):
         """
         Initialise an ADMMTwoBlockCnstrnt object with problem size and options.
 
@@ -886,8 +993,8 @@ class ADMMTwoBlockCnstrnt(ADMM):
         ----------
         Nx : int
           Size of variable :math:`\mathbf{x}` in objective function
-        Nc : int
-          Size of constant :math:`\mathbf{c}` in constraint
+        yshape : tuple of ints
+          Shape of working variable Y (the auxiliary variable)
         blkaxis : int
           Axis on which :math:`\mathbf{y}_0` and :math:`\mathbf{y}_1` are
           concatenated to form :math:`\mathbf{y}`
@@ -895,13 +1002,16 @@ class ADMMTwoBlockCnstrnt(ADMM):
           Index of boundary between :math:`\mathbf{y}_0` and
           :math:`\mathbf{y}_1` on axis on which they are concatenated to
           form :math:`\mathbf{y}`
+        dtype : data-type
+          Data type for working variables
         opt : :class:`ADMMTwoBlockCnstrnt.Options` object
           Algorithm options
         """
 
         if opt is None:
             opt = ADMM.Options()
-        super(ADMMTwoBlockCnstrnt, self).__init__(Nx, Nc, opt)
+        super(ADMMTwoBlockCnstrnt, self).__init__(Nx, yshape, yshape,
+                                                  dtype, opt)
         self.blkaxis = blkaxis
         self.blkidx = blkidx
 
@@ -1053,16 +1163,16 @@ class ADMMTwoBlockCnstrnt(ADMM):
 
 
 
-    def iteration_stats(self, k, r, s, epri, edua, tk):
-        """Construct iteration stats record tuple."""
+    def eval_objfn(self):
+        """Compute components of objective function as well as total
+        contribution to objective function.
+        """
 
         fval = self.obfn_f(self.obfn_fvar())
         g0val = self.obfn_g0(self.obfn_g0var())
         g1val = self.obfn_g1(self.obfn_g1var())
         obj = fval + g0val + g1val
-        itst = type(self).IterationStats(k, obj, fval, g0val, g1val, r, s,
-                                         epri, edua, self.rho, tk)
-        return itst
+        return (obj, fval, g0val, g1val)
 
 
 

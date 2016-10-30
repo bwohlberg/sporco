@@ -6,7 +6,7 @@
 # with the package.
 
 """Classes for ADMM algorithms for Total Variation (TV) optimisation with
-an :math:`\ell^1` data fidelity term"""
+an :math:`\ell_1` data fidelity term"""
 
 from __future__ import division
 from __future__ import absolute_import
@@ -24,7 +24,7 @@ __author__ = """Brendt Wohlberg <brendt@ieee.org>"""
 
 
 class TVL1Denoise(admm.ADMM):
-    """ADMM algorithm for :math:`\ell^1`-TV denoising problem
+    """ADMM algorithm for :math:`\ell_1`-TV denoising problem
     :cite:`alliney-1992-digital` :cite:`esser-2010-primal` (Sec. 2.4.4).
 
     Solve the optimisation problem
@@ -32,7 +32,7 @@ class TVL1Denoise(admm.ADMM):
     .. math::
        \mathrm{argmin}_\mathbf{x} \;
         \| W_{\mathrm{df}}  (\mathbf{x} - \mathbf{s}) \|_1 +
-             \lambda \\left\| W_{\mathrm{tv}} \sqrt{(G_r \mathbf{x})^2 + 
+             \lambda \\left\| W_{\mathrm{tv}} \sqrt{(G_r \mathbf{x})^2 +
              (G_c \mathbf{x})^2} \\right\|_1
 
     via the ADMM problem
@@ -40,7 +40,7 @@ class TVL1Denoise(admm.ADMM):
     .. math::
        \mathrm{argmin}_{\mathbf{x},\mathbf{y}_d,\mathbf{y}_r,\mathbf{y}_c} \;
        (1/2) \| W_{\mathrm{df}} \mathbf{y}_d \|_1 +
-             \lambda \\left\| W_{\mathrm{tv}} \sqrt{(\mathbf{y}_r)^2 + 
+             \lambda \\left\| W_{\mathrm{tv}} \sqrt{(\mathbf{y}_r)^2 +
              (\mathbf{y}_c)^2} \\right\|_1 \;\\text{such that}\;
        \\left( \\begin{array}{c} G_r \\\\ G_c \\\\ I \\end{array} \\right)
        \mathbf{x}  - \\left( \\begin{array}{c} \mathbf{y}_r \\\\
@@ -121,13 +121,7 @@ class TVL1Denoise(admm.ADMM):
                 opt = {}
             admm.ADMM.Options.__init__(self, opt)
 
-
-        def set_lambda(self, lmbda, override=False):
-            """Set parameters depending on lambda value"""
-
-            if override or self['rho'] is None:
-                self['rho'] = 2.0*lmbda + 0.1
-            if override or self['AutoRho','RsdlTarget'] is None:
+            if self['AutoRho','RsdlTarget'] is None:
                 self['AutoRho','RsdlTarget'] = 1.0
 
 
@@ -164,45 +158,14 @@ class TVL1Denoise(admm.ADMM):
 
         if opt is None:
             opt = TVL1Denoise.Options()
-        Nx = S.size
-        Nc = (len(axes)+1)*Nx
-        super(TVL1Denoise, self).__init__(Nx, Nc, opt)
 
+        self.S = S
         self.axes = axes
         self.lmbda = lmbda
 
-        # Set rho value (computed from lambda if not specified)
-        self.opt.set_lambda(self.lmbda)
-        self.rho = self.opt['rho']
+        yshape = S.shape + (len(axes)+1,)
+        super(TVL1Denoise, self).__init__(S.size, yshape, yshape, S.dtype, opt)
 
-        # Determine working data type
-        self.opt.set_dtype(S.dtype)
-        self.dtype = self.opt['DataType']
-
-        # Initial values for Y
-        if  self.opt['Y0'] is None:
-            self.Y = np.zeros(S.shape + (len(axes)+1,), self.dtype)
-        else:
-            self.Y = self.opt['Y0']
-        self.Yprev = self.Y
-
-        # Initial value for U
-        if  self.opt['U0'] is None:
-            if  self.opt['Y0'] is None:
-                self.U = np.zeros(S.shape + (len(axes)+1,), self.dtype)
-            else:
-                # If Y0 is given, but not U0, then choose the initial
-                # U so that the relevant dual optimality criterion
-                # (see (3.10) in boyd-2010-distributed) is satisfied.
-                Yss = np.sqrt(np.sum(self.Y[...,0:-1]**2, axis=S.ndim,
-                                     keepdims=True))
-                U0 = (self.lmbda/self.rho)*sl.zdivide(self.Y[...,0:-1], Yss)
-                U1 = (1.0 / self.rho)*np.sign(self.Y[...,-1:])
-                self.U = np.concatenate((U0, U1), axis=S.ndim)
-        else:
-            self.U = self.opt['U0']
-
-        self.S = S
         self.Wdf = self.opt['DFidWeight']
         self.lcw = self.LaplaceCentreWeight()
         self.Wtv = self.opt['TVWeight']
@@ -214,8 +177,35 @@ class TVL1Denoise(admm.ADMM):
         # Need to initialise X because of Gauss-Seidel in xstep
         self.X = S
 
-        self.runtime += self.timer.elapsed()
+        # Increment `runtime` to reflect object initialisation
+        # time. The timer object is reset to avoid double-counting of
+        # elapsed time if a similar increment is applied in a derived
+        # class __init__.
+        self.runtime += self.timer.elapsed(reset=True)
 
+
+
+    def rhoinit(self):
+        """Return initialiser for penalty parameter"""
+
+        return 2.0*self.lmbda + 0.1
+
+
+
+    def uinit(self, ushape):
+        """Return initialiser for working variable U"""
+
+        if  self.opt['Y0'] is None:
+            return np.zeros(ushape, dtype=self.dtype)
+        else:
+            # If initial Y is non-zero, initial U is chosen so that
+            # the relevant dual optimality criterion (see (3.10) in
+            # boyd-2010-distributed) is satisfied.
+            Yss = np.sqrt(np.sum(self.Y[...,0:-1]**2, axis=self.S.ndim,
+                        keepdims=True))
+            U0 = (self.lmbda/self.rho)*sl.zdivide(self.Y[...,0:-1], Yss)
+            U1 = (1.0 / self.rho)*np.sign(self.Y[...,-1:])
+            return np.concatenate((U0, U1), axis=self.S.ndim)
 
 
 
@@ -263,9 +253,9 @@ class TVL1Denoise(admm.ADMM):
 
 
 
-    def iteration_stats(self, k, r, s, epri, edua, tk):
-        """
-        Construct iteration stats record tuple. Data fidelity term is
+    def eval_objfn(self):
+        """Compute components of objective function as well as total
+        contribution to objective function. Data fidelity term is
         :math:`(1/2) \| \mathbf{x} - \mathbf{s} \|_2^2` and
         regularisation term is :math:`\| W_{\mathrm{tv}}
         \sqrt{(G_r \mathbf{x})^2 + (G_c \mathbf{x})^2}\|_1`.
@@ -276,9 +266,14 @@ class TVL1Denoise(admm.ADMM):
         reg = np.sum(self.Wtv * np.sqrt(np.sum(gvr[...,0:-1]**2,
                                                axis=self.Y.ndim-1)))
         obj = dfd + self.lmbda*reg
-        itst = type(self).IterationStats(k, obj, dfd, reg, r, s, epri,
-                                edua, self.rho, self.xs[0], self.xs[1], tk)
-        return itst
+        return (obj, dfd, reg)
+
+
+
+    def itstat_extra(self):
+        """Non-standard entries for the iteration stats record tuple."""
+
+        return (self.xs[0], self.xs[1])
 
 
 
@@ -368,7 +363,7 @@ class TVL1Denoise(admm.ADMM):
 
 
 class TVL1Deconv(admm.ADMM):
-    """ADMM algorithm for :math:`\ell^1`-TV deconvolution problem.
+    """ADMM algorithm for :math:`\ell_1`-TV deconvolution problem.
 
     Solve the optimisation problem
 
@@ -384,7 +379,7 @@ class TVL1Deconv(admm.ADMM):
     .. math::
        \mathrm{argmin}_{\mathbf{x},\mathbf{y}_d,\mathbf{y}_r,\mathbf{y}_c} \;
        (1/2) \| \mathbf{y}_d \|_1 +
-             \lambda \\left\| W_{\mathrm{tv}} \sqrt{(\mathbf{y}_r)^2 + 
+             \lambda \\left\| W_{\mathrm{tv}} \sqrt{(\mathbf{y}_r)^2 +
              (\mathbf{y}_c)^2} \\right\|_1 \;\\text{such that}\;
        \\left( \\begin{array}{c} G_r \\\\ G_c \\\\ H \\end{array} \\right)
        \mathbf{x}  - \\left( \\begin{array}{c} \mathbf{y}_r \\\\
@@ -457,14 +452,7 @@ class TVL1Deconv(admm.ADMM):
                 opt = {}
             admm.ADMM.Options.__init__(self, opt)
 
-
-
-        def set_lambda(self, lmbda, override=False):
-            """Set parameters depending on lambda value"""
-
-            if override or self['rho'] is None:
-                self['rho'] = 2.0*lmbda + 0.1
-            if override or self['AutoRho','RsdlTarget'] is None:
+            if self['AutoRho','RsdlTarget'] is None:
                 self['AutoRho','RsdlTarget'] = 1.0
 
 
@@ -503,47 +491,16 @@ class TVL1Deconv(admm.ADMM):
 
         if opt is None:
             opt = TVL1Deconv.Options()
-        Nx = S.size
-        Nc = (len(axes)+1)*Nx
-        super(TVL1Deconv, self).__init__(Nx, Nc, opt)
 
         self.axes = axes
         self.lmbda = lmbda
 
-        # Set rho value (computed from lambda if not specified)
-        self.opt.set_lambda(self.lmbda)
-        self.rho = self.opt['rho']
-
-        # Determine working data type
-        self.opt.set_dtype(S.dtype)
-        self.dtype = self.opt['DataType']
-
-        # Initial values for Y
-        if  self.opt['Y0'] is None:
-            self.Y = np.zeros(S.shape + (len(axes)+1,), self.dtype)
-        else:
-            self.Y = self.opt['Y0']
-        self.Yprev = self.Y
-
-        # Initial value for U
-        if  self.opt['U0'] is None:
-            if  self.opt['Y0'] is None:
-                self.U = np.zeros(S.shape + (len(axes)+1,), self.dtype)
-            else:
-                # If Y0 is given, but not U0, then choose the initial
-                # U so that the relevant dual optimality criterion
-                # (see (3.10) in boyd-2010-distributed) is satisfied.
-                Yss = np.sqrt(np.sum(self.Y[...,0:-1]**2, axis=S.ndim,
-                                     keepdims=True))
-                U0 = (self.lmbda/self.rho)*sl.zdivide(self.Y[...,0:-1], Yss)
-                U1 = (1.0 / self.rho)*np.sign(self.Y[...,-1:])
-                self.U = np.concatenate((U0, U1), axis=S.ndim)
-        else:
-            self.U = self.opt['U0']
+        yshape = S.shape + (len(axes)+1,)
+        self.S = S
+        super(TVL1Deconv, self).__init__(S.size, yshape, yshape, S.dtype, opt)
 
         self.axshp = [S.shape[k] for k in axes]
         self.A = sl.atleast_nd(S.ndim, A.astype(self.dtype))
-        self.S = S
         self.Af = sl.rfftn(self.A, self.axshp, axes=axes)
         self.Sf = sl.rfftn(S, axes=axes)
         self.AHAf = np.conj(self.Af)*self.Af
@@ -564,7 +521,35 @@ class TVL1Deconv(admm.ADMM):
         self.GAf = np.concatenate((self.Gf, self.Af[...,np.newaxis]),
                                   axis=self.Gf.ndim-1)
 
-        self.runtime += self.timer.elapsed()
+        # Increment `runtime` to reflect object initialisation
+        # time. The timer object is reset to avoid double-counting of
+        # elapsed time if a similar increment is applied in a derived
+        # class __init__.
+        self.runtime += self.timer.elapsed(reset=True)
+
+
+
+    def rhoinit(self):
+        """Return initialiser for penalty parameter"""
+
+        return 2.0*self.lmbda + 0.1
+
+
+
+    def uinit(self, ushape):
+        """Return initialiser for working variable U"""
+
+        if  self.opt['Y0'] is None:
+            return np.zeros(ushape, dtype=self.dtype)
+        else:
+            # If initial Y is non-zero, initial U is chosen so that
+            # the relevant dual optimality criterion (see (3.10) in
+            # boyd-2010-distributed) is satisfied.
+            Yss = np.sqrt(np.sum(self.Y[...,0:-1]**2, axis=self.S.ndim,
+                        keepdims=True))
+            U0 = (self.lmbda/self.rho)*sl.zdivide(self.Y[...,0:-1], Yss)
+            U1 = (1.0 / self.rho)*np.sign(self.Y[...,-1:])
+            return np.concatenate((U0, U1), axis=self.S.ndim)
 
 
 
@@ -606,9 +591,9 @@ class TVL1Deconv(admm.ADMM):
 
 
 
-    def iteration_stats(self, k, r, s, epri, edua, tk):
-        """
-        Construct iteration stats record tuple. Data fidelity term is
+    def eval_objfn(self):
+        """Compute components of objective function as well as total
+        contribution to objective function.  Data fidelity term is
         :math:`(1/2) \| H \mathbf{x} - \mathbf{s} \|_2^2` and
         regularisation term is :math:`\| W_{\mathrm{tv}}
         \sqrt{(G_r \mathbf{x})^2 + (G_c \mathbf{x})^2}\|_1`.
@@ -617,11 +602,16 @@ class TVL1Deconv(admm.ADMM):
         gvr = self.obfn_gvar()
         dfd = np.sum(np.abs(gvr[...,-1]))
         reg = np.sum(self.Wtv * np.sqrt(np.sum(gvr[...,0:-1]**2,
-                                               axis=self.Y.ndim-1)))
+                        axis=self.Y.ndim-1)))
         obj = dfd + self.lmbda*reg
-        itst = type(self).IterationStats(k, obj, dfd, reg, r, s, epri,
-                                         edua, self.rho, self.xrrs, tk)
-        return itst
+        return (obj, dfd, reg)
+
+
+
+    def itstat_extra(self):
+        """Non-standard entries for the iteration stats record tuple."""
+
+        return (self.xrrs,)
 
 
 

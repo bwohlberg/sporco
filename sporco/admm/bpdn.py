@@ -23,7 +23,214 @@ from sporco.util import u
 __author__ = """Brendt Wohlberg <brendt@ieee.org>"""
 
 
-class BPDN(admm.ADMMEqual):
+class GenericBPDN(admm.ADMMEqual):
+    """Base class for ADMM algorithm for solving variants of the
+    Basis Pursuit DeNoising (BPDN) :cite:`chen-1998-atomic` problem.
+
+    The generic problem form is
+
+    .. math::
+       \mathrm{argmin}_\mathbf{x} \;
+       (1/2) \| D \mathbf{x} - \mathbf{s} \|_2^2 + f(\mathbf{x}) \;\;,
+
+    where :math:`f(\cdot)` is a penalty term or the indicator function of
+    a constraint, and is solved via the ADMM problem
+
+    .. math::
+       \mathrm{argmin}_\mathbf{x} \;
+       (1/2) \| D \mathbf{x} - \mathbf{s} \|_2^2 + f(\mathbf{y})
+       \quad \\text{such that} \quad \mathbf{x} = \mathbf{y} \;\;.
+
+    After termination of the :meth:`solve` method, attribute
+    :attr:`itstat` is a list of tuples representing statistics of each
+    iteration. The fields of the named tuple ``IterationStats`` are:
+
+       ``Iter`` : Iteration number
+
+       ``ObjFun`` : Objective function value
+
+       ``DFid`` :  Value of data fidelity term \
+       :math:`(1/2) \| D \mathbf{x} - \mathbf{s} \|_2^2`
+
+       ``Reg`` : Value of regularisation term
+
+       ``PrimalRsdl`` : Norm of primal residual
+
+       ``DualRsdl`` : Norm of dual residual
+
+       ``EpsPrimal`` : Primal residual stopping tolerance \
+       :math:`\epsilon_{\mathrm{pri}}`
+
+       ``EpsDual`` : Dual residual stopping tolerance \
+       :math:`\epsilon_{\mathrm{dua}}`
+
+       ``Rho`` : Penalty parameter
+
+       ``Time`` : Cumulative run time
+    """
+
+
+    class Options(admm.ADMMEqual.Options):
+        """GenericBPDN algorithm options
+
+        Options include all of those defined in
+        :class:`sporco.admm.admm.ADMMEqual.Options`, together with
+        additional options:
+
+        ``AuxVarObj`` : Flag indicating whether the objective function \
+        should be evaluated using variable X  (``False``) or Y (``True``) \
+        as its argument.
+
+        ``NonNegCoef`` : If ``True``, force solution to be non-negative.
+        """
+
+        defaults = copy.deepcopy(admm.ADMMEqual.Options.defaults)
+        defaults.update({'AuxVarObj' : True, 'ReturnX' : False,
+                        'RelaxParam' : 1.8, 'NonNegCoef' : False})
+        defaults['AutoRho'].update({'Enabled' : True, 'Period' : 10,
+                                    'AutoScaling' : True, 'Scaling' : 1000.0,
+                                    'RsdlRatio' : 1.2})
+
+        def __init__(self, opt=None):
+            """Initialise GenericBPDN algorithm options object."""
+
+            if opt is None:
+                opt = {}
+            admm.ADMMEqual.Options.__init__(self, opt)
+
+            if self['AuxVarObj']:
+                self['fEvalX'] = False
+                self['gEvalY'] = True
+            else:
+                self['fEvalX'] = True
+                self['gEvalY'] = False
+
+
+
+    IterationStats = collections.namedtuple('IterationStats',
+                ['Iter', 'ObjFun', 'DFid', 'Reg', 'PrimalRsdl', 'DualRsdl',
+                 'EpsPrimal', 'EpsDual', 'Rho', 'Time'])
+    """Named tuple type for recording ADMM iteration statistics"""
+
+    hdrtxt = ['Itn', 'Fnc', 'DFid', 'Reg', 'r', 's', u('ρ')]
+    """Display column header text"""
+    hdrval = {'Itn' : 'Iter', 'Fnc' : 'ObjFun', 'DFid' : 'DFid',
+              'Reg' : 'Reg', 'r' : 'PrimalRsdl', 's' : 'DualRsdl',
+              u('ρ') : 'Rho'}
+    """Dictionary mapping display column headers to IterationStats entries"""
+
+
+
+    def __init__(self, D, S, opt=None):
+        """
+        Initialise a GenericBPDN object with problem parameters.
+
+        Parameters
+        ----------
+        D : array_like, shape (N, M)
+          Dictionary matrix
+        S : array_like, shape (N, K)
+          Signal vector or matrix
+        opt : :class:`BPDN.Options` object
+          Algorithm options
+        """
+
+        Nc = D.shape[1]
+        Nm = S.shape[1]
+        if opt is None:
+            opt = GenericBPDN.Options()
+        super(GenericBPDN, self).__init__((Nc, Nm), S.dtype, opt)
+
+        self.S = S
+        self.setdict(D)
+
+        # Increment `runtime` to reflect object initialisation
+        # time. The timer object is reset to avoid double-counting of
+        # elapsed time if a similar increment is applied in a derived
+        # class __init__.
+        self.runtime += self.timer.elapsed(reset=True)
+
+
+
+    def setdict(self, D):
+        """Set dictionary array."""
+
+        self.D = D
+        self.DTS = D.T.dot(self.S)
+        # Factorise dictionary for efficient solves
+        self.lu, self.piv = sl.lu_factor(D, self.rho)
+
+
+
+    def getcoef(self):
+        """Get final coefficient array."""
+
+        return self.Y
+
+
+
+    def xstep(self):
+        """Minimise Augmented Lagrangian with respect to x."""
+
+        self.X = sl.lu_solve_ATAI(self.D, self.rho, self.DTS +
+                    self.rho*(self.Y - self.U), self.lu, self.piv)
+
+
+
+    def ystep(self):
+        """Minimise Augmented Lagrangian with respect to y. If this
+        method is not overridden, the problem is solved without any
+        regularisation other than the option enforcement of
+        non-negativity of the solution. When it is overridden, it
+        should be explicitly called at the end of the overriding
+        method.
+        """
+
+        if self.opt['NonNegCoef']:
+            self.Y[self.Y < 0.0] = 0.0
+
+
+
+    def eval_objfn(self):
+        """Compute components of objective function as well as total
+        contribution to objective function.
+        """
+
+        dfd = self.obfn_dfd()
+        reg = self.obfn_reg()
+        obj = dfd + reg[0]
+        return (obj, dfd) + reg[1:]
+
+
+
+    def obfn_dfd(self):
+        """Compute data fidelity term :math:`(1/2) \| D \mathbf{x} -
+        \mathbf{s} \|_2^2`.
+        """
+
+        return 0.5*linalg.norm((self.D.dot(self.obfn_fvar()) - self.S))**2
+
+
+
+    def obfn_reg(self):
+        """Compute regularisation term(s) and contribution to objective
+        function.
+        """
+
+        raise NotImplementedError()
+
+
+
+    def rhochange(self):
+        """Re-factorise matrix when rho changes."""
+
+        self.lu, self.piv = sl.lu_factor(self.D, self.rho)
+
+
+
+
+
+class BPDN(GenericBPDN):
     """ADMM algorithm for the Basis Pursuit DeNoising (BPDN)
     :cite:`chen-1998-atomic` problem.
 
@@ -49,9 +256,9 @@ class BPDN(admm.ADMMEqual):
 
     is also supported.
 
-    After termination of the :meth:`solve` method, attribute :attr:`itstat` is
-    a list of tuples representing statistics of each iteration. The
-    fields of the named tuple ``IterationStats`` are:
+    After termination of the :meth:`solve` method, attribute
+    :attr:`itstat` is a list of tuples representing statistics of each
+    iteration. The fields of the named tuple ``IterationStats`` are:
 
        ``Iter`` : Iteration number
 
@@ -79,59 +286,32 @@ class BPDN(admm.ADMMEqual):
     """
 
 
-    class Options(admm.ADMMEqual.Options):
+    class Options(GenericBPDN.Options):
         """BPDN algorithm options
 
         Options include all of those defined in
-        :class:`sporco.admm.admm.ADMMEqual.Options`, together with
-        additional options:
+        :class:`.GenericBPDN.Options`, together with additional
+        options:
 
-        ``AuxVarObj`` : Flag indicating whether the objective function \
-        should be evaluated using variable X  (``False``) or Y (``True``) \
-        as its argument.
-
-        ``L1Weight`` : An array of weights for the :math:`\ell^1`
+        ``L1Weight`` : An array of weights for the :math:`\ell_1`
         norm. The array shape must be such that the array is
         compatible for multiplication with the X/Y variables. If this
         option is defined, the regularization term is :math:`\lambda \|
         \mathbf{w} \odot \mathbf{x} \|_1` where :math:`\mathbf{w}`
         denotes the weighting array.
-
-        ``NonNegCoef`` : If ``True``, force solution to be non-negative.
         """
 
-        defaults = copy.deepcopy(admm.ADMMEqual.Options.defaults)
-        defaults.update({'AuxVarObj' : True, 'ReturnX' : False,
-                        'RelaxParam' : 1.8, 'L1Weight' : 1.0,
-                        'NonNegCoef' : False})
-        defaults['AutoRho'].update({'Enabled' : True, 'Period' : 10,
-                                    'AutoScaling' : True, 'Scaling' : 1000.0,
-                                    'RsdlRatio' : 1.2})
+        defaults = copy.deepcopy(GenericBPDN.Options.defaults)
+        defaults.update({'L1Weight' : 1.0})
+
 
         def __init__(self, opt=None):
             """Initialise BPDN algorithm options object."""
 
             if opt is None:
                 opt = {}
-            admm.ADMMEqual.Options.__init__(self, opt)
+            GenericBPDN.Options.__init__(self, opt)
 
-            if self['AuxVarObj']:
-                self['fEvalX'] = False
-                self['gEvalY'] = True
-            else:
-                self['fEvalX'] = True
-                self['gEvalY'] = False
-
-
-
-        def set_lambda(self, lmbda, override=False):
-            """Set parameters depending on lambda value"""
-
-            if override or self['rho'] is None:
-                self['rho'] = 50.0*lmbda + 1.0
-            if override or self['AutoRho','RsdlTarget'] is None:
-                self['AutoRho','RsdlTarget'] = 1.0 + \
-                  (18.3)**(np.log10(lmbda)+1.0)
 
 
     IterationStats = collections.namedtuple('IterationStats',
@@ -164,12 +344,11 @@ class BPDN(admm.ADMMEqual):
           Algorithm options
         """
 
-        Nc = D.shape[1]
-        Nm = S.shape[1]
-        Nx = Nc*Nm
+        # Set default options if necessary
         if opt is None:
             opt = BPDN.Options()
-        super(BPDN, self).__init__(Nx, opt)
+        else:
+            opt = copy.deepcopy(opt)
 
         # Set default lambda value if not specified
         if lmbda is None:
@@ -178,65 +357,32 @@ class BPDN(admm.ADMMEqual):
         else:
             self.lmbda = lmbda
 
-        # Set rho value (computed from lambda if not specified)
-        self.opt.set_lambda(self.lmbda)
-        self.rho = self.opt['rho']
+        # Set default option 'AutoRho','RsdlTarget' if necessary
+        if opt['AutoRho','RsdlTarget'] is None:
+            opt['AutoRho','RsdlTarget'] = 1.0 + \
+                  (18.3)**(np.log10(self.lmbda)+1.0)
 
-        # Determine working data type
-        self.opt.set_dtype(S.dtype)
-        dtype = self.opt['DataType']
+        super(BPDN, self).__init__(D, S, opt)
 
-        # Initial values for Y
+
+
+    def rhoinit(self):
+        """Return initialiser for penalty parameter"""
+
+        return 50.0*self.lmbda + 1.0
+
+
+
+    def uinit(self, ushape):
+        """Return initialiser for working variable U"""
+
         if  self.opt['Y0'] is None:
-            self.Y = np.zeros((Nc, Nm), dtype)
+            return np.zeros(ushape, dtype=self.dtype)
         else:
-            self.Y = self.opt['Y0']
-        self.Yprev = self.Y
-
-        # Initial value for U
-        if  self.opt['U0'] is None:
-            if  self.opt['Y0'] is None:
-                self.U = np.zeros((Nc, Nm), dtype)
-            else:
-                # If Y0 is given, but not U0, then choose the initial
-                # U so that the relevant dual optimality criterion
-                # (see (3.10) in boyd-2010-distributed) is satisfied.
-                self.U = (self.lmbda/self.rho)*np.sign(self.Y)
-        else:
-            self.U = self.opt['U0']
-
-        self.runtime += self.timer.elapsed()
-
-        self.S = S
-        self.setdict(D)
-
-
-
-    def setdict(self, D):
-        """Set dictionary array."""
-
-        self.timer.start()
-        self.D = D
-        self.DTS = D.T.dot(self.S)
-        # Factorise dictionary for efficient solves
-        self.lu, self.piv = sl.lu_factor(D, self.rho)
-        self.runtime += self.timer.elapsed()
-
-
-
-    def getcoef(self):
-        """Get final coefficient array."""
-
-        return self.Y
-
-
-
-    def xstep(self):
-        """Minimise Augmented Lagrangian with respect to x."""
-
-        self.X = sl.lu_solve_ATAI(self.D, self.rho, self.DTS +
-                                  self.rho*(self.Y - self.U),
-                                  self.lu, self.piv,)
+            # If initial Y is non-zero, initial U is chosen so that
+            # the relevant dual optimality criterion (see (3.10) in
+            # boyd-2010-distributed) is satisfied.
+            return (self.lmbda/self.rho)*np.sign(self.Y)
 
 
 
@@ -245,38 +391,24 @@ class BPDN(admm.ADMMEqual):
 
         self.Y = sl.shrink1(self.AX + self.U,
                             (self.lmbda/self.rho)*self.opt['L1Weight'])
-        if self.opt['NonNegCoef']:
-            self.Y[self.Y < 0.0] = 0.0
+        super(BPDN, self).ystep()
 
 
 
-    def iteration_stats(self, k, r, s, epri, edua, tk):
-        """
-        Construct iteration stats record tuple. Data fidelity term is
-        :math:`(1/2) \| D \mathbf{x} - \mathbf{s} \|_2^2` and
-        regularisation term is :math:`\| \mathbf{y} \|_1`.
+    def obfn_reg(self):
+        """Compute regularisation term and contribution to objective
+        function.
         """
 
-        dfd = 0.5*linalg.norm((self.D.dot(self.obfn_fvar()) - self.S))**2
-        reg = linalg.norm((self.opt['L1Weight'] * self.obfn_gvar()).ravel(), 1)
-        obj = dfd + self.lmbda*reg
-        itst = type(self).IterationStats(k, obj, dfd, reg, r, s,
-                                         epri, edua, self.rho, tk)
-        return itst
-
-
-
-    def rhochange(self):
-        """Re-factorise matrix when rho changes."""
-
-        self.lu, self.piv = sl.lu_factor(self.D, self.rho)
+        rl1 = linalg.norm((self.opt['L1Weight'] * self.obfn_gvar()).ravel(), 1)
+        return (self.lmbda*rl1, rl1)
 
 
 
 
 
 class BPDNJoint(BPDN):
-    """ADMM algorithm for BPDN with joint sparsity via an :math:`\ell^{2,1}`
+    """ADMM algorithm for BPDN with joint sparsity via an :math:`\ell_{2,1}`
     norm term.
 
     Solve the optimisation problem
@@ -328,11 +460,11 @@ class BPDNJoint(BPDN):
                  'Rho', 'Time'])
     """Named tuple type for recording ADMM iteration statistics"""
 
-    hdrtxt = ['Itn', 'Fnc', 'DFid', 'l1', 'l21', 'r', 's', 'rho']
+    hdrtxt = ['Itn', 'Fnc', 'DFid', u('ℓ1'), u('ℓ2,1'), 'r', 's', u('ρ')]
     """Display column header text"""
     hdrval = {'Itn' : 'Iter', 'Fnc' : 'ObjFun', 'DFid' : 'DFid',
-              'l1' : 'RegL1', 'l21' : 'RegL21', 'r' : 'PrimalRsdl',
-              's' : 'DualRsdl', 'rho' : 'Rho'}
+              u('ℓ1') : 'RegL1', u('ℓ2,1') : 'RegL21', 'r' : 'PrimalRsdl',
+              's' : 'DualRsdl', u('ρ') : 'Rho'}
     """Dictionary mapping display column headers to IterationStats entries"""
 
 
@@ -368,26 +500,19 @@ class BPDNJoint(BPDN):
         self.Y = sl.shrink12(self.AX + self.U,
                              (self.lmbda/self.rho)*self.opt['L1Weight'],
                              self.mu/self.rho)
-        if self.opt['NonNegCoef']:
-            self.Y[self.Y < 0.0] = 0.0
+        GenericBPDN.ystep(self)
 
 
 
-
-    def iteration_stats(self, k, r, s, epri, edua, tk):
-        """
-        Construct iteration stats record tuple. Data fidelity term is
-        :math:`(1/2) \| D X - S \|_2^2` and regularisation terms are
-        :math:`\| Y \|_1` and :math:`\| Y \|_{2,1}`.
+    def obfn_reg(self):
+        """Compute regularisation terms and contribution to objective
+        function. Regularisation terms are :math:`\| Y \|_1` and
+        :math:`\| Y \|_{2,1}`.
         """
 
-        dfd = 0.5*linalg.norm((self.D.dot(self.obfn_fvar()) - self.S))**2
         rl1 = linalg.norm((self.opt['L1Weight'] * self.obfn_gvar()).ravel(), 1)
         rl21 = np.sum(np.sqrt(np.sum(self.obfn_gvar()**2, axis=1)))
-        obj = dfd + self.lmbda*rl1 + self.mu*rl21
-        itst = type(self).IterationStats(k, obj, dfd, rl1, rl21, r, s,
-                                         epri, edua, self.rho, tk)
-        return itst
+        return (self.lmbda*rl1 + self.mu*rl21, rl1, rl21)
 
 
 
@@ -489,12 +614,10 @@ class ElasticNet(BPDN):
     def setdict(self, D):
         """Set dictionary array."""
 
-        self.timer.start()
         self.D = D
         self.DTS = D.T.dot(self.S)
         # Factorise dictionary for efficient solves
         self.lu, self.piv = sl.lu_factor(D, self.mu + self.rho)
-        self.runtime += self.timer.elapsed()
 
 
 
@@ -506,23 +629,14 @@ class ElasticNet(BPDN):
 
 
 
-
-    def iteration_stats(self, k, r, s, epri, edua, tk):
-        """
-        Construct iteration stats record tuple. Data fidelity term is
-        :math:`(1/2) \| D \mathbf{x} - \mathbf{s} \|_2^2` and
-        regularisation terms are :math:`\| \mathbf{y} \|_1` and
-        :math:`(1/2)\| \mathbf{y} \|_2^2`.
+    def obfn_reg(self):
+        """Compute regularisation term and contribution to objective
+        function.
         """
 
-        dfd = 0.5*linalg.norm((self.D.dot(self.obfn_fvar()) - self.S))**2
         rl1 = linalg.norm((self.opt['L1Weight'] * self.obfn_gvar()).ravel(), 1)
         rl2 = 0.5*linalg.norm(self.obfn_gvar())**2
-        obj = dfd + self.lmbda*rl1 + self.mu*rl2
-        itst = type(self).IterationStats(k, obj, dfd, rl1, rl2, r, s,
-                                         epri, edua, self.rho, tk)
-        return itst
-
+        return (self.lmbda*rl1 + self.mu*rl2, rl1, rl2)
 
 
 

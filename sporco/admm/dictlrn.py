@@ -234,7 +234,11 @@ class DictLearn(object):
         self.itstat = []
         self.j = 0
 
-        self.runtime += self.timer.elapsed()
+        # Increment `runtime` to reflect object initialisation
+        # time. The timer object is reset to avoid double-counting of
+        # elapsed time if a similar increment is applied in a derived
+        # class __init__.
+        self.runtime += self.timer.elapsed(reset=True)
 
 
 

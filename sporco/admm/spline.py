@@ -5,7 +5,7 @@
 # and user license can be found in the 'LICENSE.txt' file distributed
 # with the package.
 
-"""Classes for ADMM algorithms for :math:`\ell^1` spline optimisation"""
+"""Classes for ADMM algorithms for :math:`\ell_1` spline optimisation"""
 
 from __future__ import division
 from __future__ import absolute_import
@@ -22,10 +22,10 @@ __author__ = """Brendt Wohlberg <brendt@ieee.org>"""
 
 
 class SplineL1(admm.ADMM):
-    """ADMM algorithm for the :math:`\ell^1`-spline problem
+    """ADMM algorithm for the :math:`\ell_1`-spline problem
     for equi-spaced samples :cite:`garcia-2010-robust`,
     :cite:`tepper-2013-fast`.
-   
+
     Solve the optimisation problem
 
     .. math::
@@ -33,8 +33,8 @@ class SplineL1(admm.ADMM):
         \| W(\mathbf{x} - \mathbf{s}) \|_1 + \\frac{\lambda}{2} \;
         \| D \mathbf{x} \|_2^2 \;\;,
 
-    where :math:`D = \\left( \\begin{array}{ccc} -1 & 1 & & & \\\\ 
-    1 & -2 & 1 & & \\\\ & \\ddots & \\ddots & \ddots &  \\\\ 
+    where :math:`D = \\left( \\begin{array}{ccc} -1 & 1 & & & \\\\
+    1 & -2 & 1 & & \\\\ & \\ddots & \\ddots & \ddots &  \\\\
     & & 1 & -2 & 1 \\\\ & & & 1 & -1 \\end{array} \\right)`,
 
     via the ADMM problem
@@ -42,7 +42,7 @@ class SplineL1(admm.ADMM):
     .. math::
        \mathrm{argmin}_{\mathbf{x}, \mathbf{y}} \;
         \| W \mathbf{y} \|_1 + \\frac{\lambda}{2} \;
-        \| D \mathbf{x} \|_2^2  \;\; \\text{such that} \;\; 
+        \| D \mathbf{x} \|_2^2  \;\; \\text{such that} \;\;
         \mathbf{x} - \mathbf{y} = \mathbf{s} \;\;.
 
     After termination of the :meth:`solve` method, attribute :attr:`itstat` is
@@ -111,15 +111,8 @@ class SplineL1(admm.ADMM):
                 opt = {}
             admm.ADMM.Options.__init__(self, opt)
 
-
-        def set_lambda(self, lmbda, override=False):
-            """Set parameters depending on lambda value"""
-
-            if override or self['rho'] is None:
-                self['rho'] = 2*lmbda + 0.1
-            if override or self['AutoRho','RsdlTarget'] is None:
+            if self['AutoRho','RsdlTarget'] is None:
                 self['AutoRho','RsdlTarget'] = 1.0
-
 
 
 
@@ -154,42 +147,15 @@ class SplineL1(admm.ADMM):
 
         if opt is None:
             opt = SplineL1.Options()
-        Nx = S.size
-        Nc = Nx
-        super(SplineL1, self).__init__(Nx, Nc, opt)
 
         self.axes = axes
         self.lmbda = lmbda
 
-        # Set rho value (computed from lambda if not specified)
-        self.opt.set_lambda(self.lmbda)
-        self.rho = self.opt['rho']
-
-        # Determine working data type
-        self.opt.set_dtype(S.dtype)
-        self.dtype = self.opt['DataType']
+        Nx = S.size
+        super(SplineL1, self).__init__(Nx, S.shape, S.shape, S.dtype, opt)
 
         self.S = S
         self.Wdf = self.opt['DFidWeight']
-
-        # Initial values for Y
-        if  self.opt['Y0'] is None:
-            self.Y = np.zeros(S.shape, self.dtype)
-        else:
-            self.Y = self.opt['Y0']
-        self.Yprev = self.Y
-
-        # Initial value for U
-        if  self.opt['U0'] is None:
-            if  self.opt['Y0'] is None:
-                self.U = np.zeros(S.shape, self.dtype)
-            else:
-                # If Y0 is given, but not U0, then choose the initial
-                # U so that the relevant dual optimality criterion
-                # (see (3.10) in boyd-2010-distributed) is satisfied.
-                self.U = (self.Wdf / self.rho)*np.sign(self.Y)
-        else:
-            self.U = self.opt['U0']
 
         ashp = [1,] * S.ndim
         for ax in axes:
@@ -202,7 +168,31 @@ class SplineL1(admm.ADMM):
             self.Alpha += -2.0 + 2.0*np.cos(axn*np.pi/float(ashp[ax]))
         self.Gamma = 1.0 / (1.0 + (self.lmbda/self.rho)*(self.Alpha**2))
 
-        self.runtime += self.timer.elapsed()
+        # Increment `runtime` to reflect object initialisation
+        # time. The timer object is reset to avoid double-counting of
+        # elapsed time if a similar increment is applied in a derived
+        # class __init__.
+        self.runtime += self.timer.elapsed(reset=True)
+
+
+
+    def rhoinit(self):
+        """Return initialiser for penalty parameter"""
+
+        return 2.0*self.lmbda + 0.1
+
+
+
+    def uinit(self, ushape):
+        """Return initialiser for working variable U"""
+
+        if  self.opt['Y0'] is None:
+            return np.zeros(ushape, dtype=self.dtype)
+        else:
+            # If initial Y is non-zero, initial U is chosen so that
+            # the relevant dual optimality criterion (see (3.10) in
+            # boyd-2010-distributed) is satisfied.
+            return (self.Wdf/self.rho)*np.sign(self.Y)
 
 
 
@@ -246,22 +236,26 @@ class SplineL1(admm.ADMM):
 
 
 
-    def iteration_stats(self, k, r, s, epri, edua, tk):
-        """
-        Construct iteration stats record tuple. Data fidelity term is
+    def eval_objfn(self):
+        """Compute components of objective function as well as total
+        contribution to objective function. Data fidelity term is
         :math:`(1/2) \| \mathbf{x} - \mathbf{s} \|_2^2` and
         regularisation term is :math:`\| D \mathbf{x} \|_2^2`.
         """
 
         gvr = self.obfn_gvar()
         dfd = np.sum(np.abs(self.Wdf * gvr))
-        reg = 0.5*linalg.norm(sl.idctii(
-            self.Alpha*sl.dctii(self.X, axes=self.axes),
-            axes=self.axes))**2
+        reg = 0.5*linalg.norm(sl.idctii(self.Alpha*sl.dctii(self.X,
+                        axes=self.axes), axes=self.axes))**2
         obj = dfd + self.lmbda*reg
-        itst = type(self).IterationStats(k, obj, dfd, reg, r, s, epri,
-                                edua, self.rho, self.xrrs, tk)
-        return itst
+        return (obj, dfd, reg)
+
+
+
+    def itstat_extra(self):
+        """Non-standard entries for the iteration stats record tuple."""
+
+        return (self.xrrs,)
 
 
 

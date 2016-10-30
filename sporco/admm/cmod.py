@@ -108,14 +108,6 @@ class CnstrMOD(admm.ADMMEqual):
 
 
 
-        def set_K(self, K, override=False):
-            """Set parameters depending on K value"""
-
-            if override or self['rho'] is None:
-                self['rho'] = K / 500.0
-
-
-
     IterationStats = collections.namedtuple('IterationStats',
                 ['Iter', 'DFid', 'Cnstr', 'PrimalRsdl', 'DualRsdl',
                  'EpsPrimal', 'EpsDual', 'Rho', 'Time'])
@@ -148,63 +140,56 @@ class CnstrMOD(admm.ADMMEqual):
         if opt is None:
             opt = CnstrMOD.Options()
 
+        self.S = S
         Nc = S.shape[0]
         # If A not specified, get dictionary size from dsz
         if A is None:
             Nm = dsz[0]
         else:
             Nm = A.shape[0]
-        Nx = Nc*Nm
-        super(CnstrMOD, self).__init__(Nx, opt)
+        super(CnstrMOD, self).__init__((Nc,Nm), S.dtype, opt)
 
         # Create constraint set projection function
         self.Pcn = getPcn(opt['ZeroMean'])
 
-        # Set rho value (computed from K if not specified)
-        self.opt.set_K(S.shape[1])
-        self.rho = self.opt['rho']
-
-        # Determine working data type
-        self.opt.set_dtype(S.dtype)
-        dtype = self.opt['DataType']
-
-        # Initial values for Y
-        if  self.opt['Y0'] is None:
-            self.Y = np.zeros((Nc, Nm), dtype)
-        else:
-            self.Y = self.opt['Y0']
-        self.Yprev = self.Y
-
-        # Initial value for U
-        if  self.opt['U0'] is None:
-            if  self.opt['Y0'] is None:
-                self.U = np.zeros((Nc, Nm), dtype)
-            else:
-                # If Y0 is given, but not U0, then choose the initial
-                # U so that the relevant dual optimality criterion
-                # (see (3.10) in boyd-2010-distributed) is satisfied.
-                self.U = self.Y
-        else:
-            self.U = self.opt['U0']
-
-        self.S = S
-
-        self.runtime += self.timer.elapsed()
-
         if A is not None:
             self.setcoef(A)
+
+        # Increment `runtime` to reflect object initialisation
+        # time. The timer object is reset to avoid double-counting of
+        # elapsed time if a similar increment is applied in a derived
+        # class __init__.
+        self.runtime += self.timer.elapsed(reset=True)
+
+
+
+    def rhoinit(self):
+        """Return initialiser for penalty parameter"""
+
+        return self.S.shape[1] / 500.0
+
+
+
+    def uinit(self, ushape):
+        """Return initialiser for working variable U"""
+
+        if  self.opt['Y0'] is None:
+            return np.zeros(ushape, dtype=self.dtype)
+        else:
+            # If initial Y is non-zero, initial U is chosen so that
+            # the relevant dual optimality criterion (see (3.10) in
+            # boyd-2010-distributed) is satisfied.
+            return self.Y
 
 
 
     def setcoef(self, A):
         """Set coefficient array."""
 
-        self.timer.start()
         self.A = A
         self.SAT = self.S.dot(A.T)
         # Factorise dictionary for efficient solves
         self.lu, self.piv = sl.lu_factor(A, self.rho)
-        self.runtime += self.timer.elapsed()
 
 
 
@@ -231,19 +216,32 @@ class CnstrMOD(admm.ADMMEqual):
 
 
 
-    def iteration_stats(self, k, r, s, epri, edua, tk):
-        """
-        Construct iteration stats record tuple. Data fidelity term is
-        :math:`(1/2) \| D \mathbf{x} - \mathbf{s} \|_2^2` and
-        measure of constraint violation is
-        :math:`\| P(\mathbf{y}) -  \mathbf{y}\|_2`.
+    def eval_objfn(self):
+        """Compute components of objective function as well as total
+        contribution to objective function.
         """
 
-        dfd = 0.5*linalg.norm((self.obfn_fvar().dot(self.A) - self.S))**2
-        cns = linalg.norm((self.Pcn(self.obfn_gvar()) - self.obfn_gvar()))
-        itst = type(self).IterationStats(k, dfd, cns, r, s, epri, edua,
-                                         self.rho, tk)
-        return itst
+        dfd = self.obfn_dfd()
+        cns = self.obfn_cns()
+        return (dfd, cns)
+
+
+
+    def obfn_dfd(self):
+        """Compute data fidelity term :math:`(1/2) \| D \mathbf{x} -
+        \mathbf{s} \|_2^2`.
+        """
+
+        return 0.5*linalg.norm((self.obfn_fvar().dot(self.A) - self.S))**2
+
+
+
+    def obfn_cns(self):
+        """Compute constraint violation measure :math:`\| P(\mathbf{y}) -
+        \mathbf{y}\|_2`.
+        """
+
+        return linalg.norm((self.Pcn(self.obfn_gvar()) - self.obfn_gvar()))
 
 
 

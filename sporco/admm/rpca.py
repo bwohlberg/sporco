@@ -23,7 +23,7 @@ __author__ = """Brendt Wohlberg <brendt@ieee.org>"""
 class RobustPCA(admm.ADMM):
     """ADMM algorithm for Robust PCA problem :cite:`candes-2011-robust`
     :cite:`cai-2010-singular`.
-   
+
     Solve the optimisation problem
 
     .. math::
@@ -44,7 +44,7 @@ class RobustPCA(admm.ADMM):
 
        ``NrmNuc`` :  Value of nuclear norm term :math:`\| X \|_*`
 
-       ``NrmL1`` : Value of :math:`\ell^1` norm term :math:`\| Y \|_1`
+       ``NrmL1`` : Value of :math:`\ell_1` norm term :math:`\| Y \|_1`
 
        ``Cnstr`` : Constraint violation :math:`\| X + Y - S\|_2`
 
@@ -72,13 +72,17 @@ class RobustPCA(admm.ADMM):
         :class:`sporco.admm.admm.ADMM.Options`, together with
         an additional option:
 
+        ``fEvalX`` : Flag indicating whether the :math:`f` component of the \
+        objective function should be evaluated using variable X \
+        (``True``) or Y (``False``) as its argument
+
         ``gEvalY`` : Flag indicating whether the :math:`g` component of the \
         objective function should be evaluated using variable Y \
         (``True``) or X (``False``) as its argument
         """
 
         defaults = copy.deepcopy(admm.ADMM.Options.defaults)
-        defaults.update({'gEvalY' : True, 'RelaxParam' : 1.8})
+        defaults.update({'gEvalY' : True, 'fEvalX' : True, 'RelaxParam' : 1.8})
         defaults['AutoRho'].update({'Enabled' : True, 'Period' : 1,
                                     'AutoScaling' : True, 'Scaling' : 1000.0,
                                     'RsdlRatio' : 1.2})
@@ -91,15 +95,8 @@ class RobustPCA(admm.ADMM):
                 opt = {}
             admm.ADMM.Options.__init__(self, opt)
 
-
-        def set_lambda(self, lmbda, override=False):
-            """Set parameters depending on lambda value"""
-
-            if override or self['rho'] is None:
-                self['rho'] = 2*lmbda + 0.1
-            if override or self['AutoRho','RsdlTarget'] is None:
+            if self['AutoRho','RsdlTarget'] is None:
                 self['AutoRho','RsdlTarget'] = 1.0
-
 
 
 
@@ -132,46 +129,43 @@ class RobustPCA(admm.ADMM):
 
         if opt is None:
             opt = RobustPCA.Options()
-        Nx = S.size
-        Nc = Nx
-        super(RobustPCA, self).__init__(Nx, Nc, opt)
 
-        # Set default lambda value if not specified
+       # Set default lambda value if not specified
         if lmbda is None:
             self.lmbda = 1.0 / np.sqrt(S.shape[0])
         else:
             self.lmbda = lmbda
 
-        # Set rho value (computed from lambda if not specified)
-        self.opt.set_lambda(self.lmbda)
-        self.rho = self.opt['rho']
-
-        # Determine working data type
-        self.opt.set_dtype(S.dtype)
-        self.dtype = self.opt['DataType']
-
-        # Initial values for Y
-        if  self.opt['Y0'] is None:
-            self.Y = np.zeros(S.shape, self.dtype)
-        else:
-            self.Y = self.opt['Y0']
-        self.Yprev = self.Y
-
-        # Initial value for U
-        if  self.opt['U0'] is None:
-            if  self.opt['Y0'] is None:
-                self.U = np.zeros(S.shape, self.dtype)
-            else:
-                # If Y0 is given, but not U0, then choose the initial
-                # U so that the relevant dual optimality criterion
-                # (see (3.10) in boyd-2010-distributed) is satisfied.
-                self.U = (self.lmbda/self.rho)*np.sign(self.Y)
-        else:
-            self.U = self.opt['U0']
+        Nx = S.size
+        super(RobustPCA, self).__init__(Nx, S.shape, S.shape, S.dtype, opt)
 
         self.S = S
 
-        self.runtime += self.timer.elapsed()
+        # Increment `runtime` to reflect object initialisation
+        # time. The timer object is reset to avoid double-counting of
+        # elapsed time if a similar increment is applied in a derived
+        # class __init__.
+        self.runtime += self.timer.elapsed(reset=True)
+
+
+
+    def rhoinit(self):
+        """Return initialiser for penalty parameter"""
+
+        return 2.0*self.lmbda + 0.1
+
+
+
+    def uinit(self, ushape):
+        """Return initialiser for working variable U"""
+
+        if  self.opt['Y0'] is None:
+            return np.zeros(ushape, dtype=self.dtype)
+        else:
+            # If initial Y is non-zero, initial U is chosen so that
+            # the relevant dual optimality criterion (see (3.10) in
+            # boyd-2010-distributed) is satisfied.
+            return (self.lmbda/self.rho)*np.sign(self.Y)
 
 
 
@@ -197,6 +191,18 @@ class RobustPCA(admm.ADMM):
 
 
 
+    def obfn_fvar(self):
+        """Variable to be evaluated in computing regularisation term,
+        depending on 'fEvalX' option value.
+        """
+
+        if self.opt['fEvalX']:
+            return self.X
+        else:
+            return self.cnst_c() - self.cnst_B(self.Y)
+
+
+
     def obfn_gvar(self):
         """Variable to be evaluated in computing regularisation term,
         depending on 'gEvalY' option value.
@@ -209,21 +215,20 @@ class RobustPCA(admm.ADMM):
 
 
 
-    def iteration_stats(self, k, r, s, epri, edua, tk):
-        """Construct iteration stats record tuple.
+    def eval_objfn(self):
+        """Compute components of objective function as well as total
+        contribution to objective function.
         """
 
         gvr = self.obfn_gvar()
-        if 0:
-            rnn = nucnorm(self.X)
-        else:
+        if self.opt['fEvalX']:
             rnn = np.sum(self.ss)
+        else:
+            rnn = nucnorm(self.X)
         rl1 = np.sum(np.abs(gvr))
         cns = np.linalg.norm(self.X + self.Y - self.S)
         obj = rnn + self.lmbda*rl1
-        itst = type(self).IterationStats(k, obj, rnn, rl1, cns, r, s, epri,
-                                edua, self.rho, tk)
-        return itst
+        return (obj, rnn, rl1, cns)
 
 
 

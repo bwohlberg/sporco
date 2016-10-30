@@ -404,12 +404,6 @@ class ConvCnstrMOD(admm.ADMMEqual):
                 self['AutoRho','RsdlTarget'] = 1.0
 
 
-        def set_K(self, K, override=False):
-            """Set parameters depending on K value"""
-
-            if override or self['rho'] is None:
-                self['rho'] = np.float32(K)
-
 
 
     IterationStats = collections.namedtuple('IterationStats',
@@ -495,7 +489,7 @@ class ConvCnstrMOD(admm.ADMMEqual):
 
         # Call parent class __init__
         Nx = self.M*self.N
-        super(ConvCnstrMOD, self).__init__(Nx, opt)
+        super(ConvCnstrMOD, self).__init__(cri.shpD, S.dtype, opt)
 
         # Reshape S to standard layout (A, i.e. X in cbpdn, is assumed
         # to be taken from cbpdn, and therefore already in standard
@@ -516,43 +510,41 @@ class ConvCnstrMOD(admm.ADMMEqual):
         # Create constraint set projection function
         self.Pcn = getPcn(opt['ZeroMean'], dsz, self.Nv, self.dimN)
 
-        # Set rho value (computed from K if not specified)
-        self.opt.set_K(self.K)
-        self.rho = self.opt['rho']
-
-        # Determine working data type
-        self.opt.set_dtype(S.dtype)
-        dtype = self.opt['DataType']
-
-        # Initial values for Y
-        if self.opt['Y0'] is None:
-            self.Y = np.zeros(cri.shpD, dtype)
-        else:
-            self.Y = self.opt['Y0']
-        self.Yprev = self.Y
-
-        # Initial value for U
-        if  self.opt['U0'] is None:
-            if  self.opt['Y0'] is None:
-                self.U = self.U = np.zeros(cri.shpD, dtype)
-            else:
-                # If Y0 is given, but not U0, then choose the initial
-                # U so that the relevant dual optimality criterion
-                # (see (3.10) in boyd-2010-distributed) is satisfied.
-                self.U = self.Y
-        else:
-            self.U = self.opt['U0']
-
         # Create byte aligned arrays for FFT calls
-        self.YU = sl.pyfftw_empty_aligned(self.Y.shape, dtype=dtype)
+        self.YU = sl.pyfftw_empty_aligned(self.Y.shape, dtype=self.dtype)
         xfshp = list(self.Y.shape)
         xfshp[dimN-1] = xfshp[dimN-1]//2 + 1
-        self.Xf = sl.pyfftw_empty_aligned(xfshp, dtype=sl.complex_dtype(dtype))
-
-        self.runtime += self.timer.elapsed()
+        self.Xf = sl.pyfftw_empty_aligned(xfshp,
+                        dtype=sl.complex_dtype(self.dtype))
 
         if A is not None:
             self.setcoef(A)
+
+       # Increment `runtime` to reflect object initialisation
+        # time. The timer object is reset to avoid double-counting of
+        # elapsed time if a similar increment is applied in a derived
+        # class __init__.
+        self.runtime += self.timer.elapsed(reset=True)
+
+
+
+    def rhoinit(self):
+        """Return initialiser for penalty parameter"""
+
+        return self.K
+
+
+
+    def uinit(self, ushape):
+        """Return initialiser for working variable U"""
+
+        if  self.opt['Y0'] is None:
+            return np.zeros(ushape, dtype=self.dtype)
+        else:
+            # If initial Y is non-zero, initial U is chosen so that
+            # the relevant dual optimality criterion (see (3.10) in
+            # boyd-2010-distributed) is satisfied.
+            return self.Y
 
 
 
@@ -634,21 +626,42 @@ class ConvCnstrMOD(admm.ADMMEqual):
 
 
 
-    def iteration_stats(self, k, r, s, epri, edua, tk):
+    def eval_objfn(self):
+        """Compute components of objective function as well as total
+        contribution to objective function.
         """
-        Construct iteration stats record tuple. Data fidelity term is
-        :math:`(1/2) \|  \sum_m \mathbf{d}_m * \mathbf{x}_m -
-        \mathbf{s} \|_2^2` and measure of constraint violation is
-        :math:`\| P(\mathbf{y}) -  \mathbf{y}\|_2`.
+
+        dfd = self.obfn_dfd()
+        cns = self.obfn_cns()
+        return (dfd, cns)
+
+
+
+    def obfn_dfd(self):
+        """Compute data fidelity term :math:`(1/2) \| \sum_m \mathbf{d}_m *
+        \mathbf{x}_m - \mathbf{s} \|_2^2`.
         """
 
         Ef = np.sum(self.Af * self.obfn_fvarf(), axis=self.axisM,
                     keepdims=True) - self.Sf
-        dfd = sl.rfl2norm2(Ef, self.S.shape, axis=tuple(range(self.dimN))) / 2.0
-        cns = linalg.norm((self.Pcn(self.obfn_gvar()) - self.obfn_gvar()))
-        itst = type(self).IterationStats(k, dfd, cns, r, s, epri, edua,
-                                         self.rho, self.xrrs, self.cgit, tk)
-        return itst
+        return sl.rfl2norm2(Ef, self.S.shape, axis=self.axisN) / 2.0
+
+
+
+    def obfn_cns(self):
+        """Compute constraint violation measure :math:`\| P(\mathbf{y}) -
+        \mathbf{y}\|_2`.
+        """
+
+        return linalg.norm((self.Pcn(self.obfn_gvar()) - self.obfn_gvar()))
+
+
+
+    def itstat_extra(self):
+        """Non-standard entries for the iteration stats record tuple."""
+
+        return (self.xrrs, self.cgit)
+
 
 
 
