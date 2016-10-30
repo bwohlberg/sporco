@@ -487,6 +487,7 @@ class Timer(object):
         self.start()
 
 
+
     def start(self):
         """Reset timer."""
 
@@ -494,8 +495,13 @@ class Timer(object):
 
 
 
-    def elapsed(self):
+    def elapsed(self, reset=False):
         """Get elapsed time since timer start.
+
+        Parameters
+        ----------
+        reset : bool, optional (default False)
+          Reset timer after reading elapsed time
 
         Returns
         -------
@@ -503,4 +509,7 @@ class Timer(object):
           Time interval since object was initialized or reset
         """
 
-        return timer() - self.t0
+        dlt = timer() - self.t0
+        if reset:
+            self.start()
+        return dlt
