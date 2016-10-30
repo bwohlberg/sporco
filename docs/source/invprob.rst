@@ -27,9 +27,9 @@ Convolutional Sparse Representations
 Miscellaneous
 -------------
 
-* :doc:`tvl1 <invprob/tvl1>` (:math:`\ell^1` Total Variation)
-* :doc:`tvl2 <invprob/tvl2>` (:math:`\ell^2` Total Variation)
-* :doc:`spline <invprob/spline>` (:math:`\ell^1` Spline)
+* :doc:`tvl1 <invprob/tvl1>` (:math:`\ell_1` Total Variation)
+* :doc:`tvl2 <invprob/tvl2>` (:math:`\ell_2` Total Variation)
+* :doc:`spline <invprob/spline>` (:math:`\ell_1` Spline)
 * :doc:`rpca <invprob/rpca>` (Robust Principal Component Analysis)
 
 
