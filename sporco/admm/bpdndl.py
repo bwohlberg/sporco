@@ -152,10 +152,10 @@ class BPDNDictLearn(dictlrn.DictLearn):
             isdmap = {'Cnstr' :  'Cnstr', 'DPrRsdl' : 'PrimalRsdl',
                       'DDlRsdl' : 'DualRsdl', 'DRho' : 'Rho'},
             evlmap = {},
-            hdrtxt = ['Itn', 'Fnc', 'DFid', 'l1', 'Cnstr', 'r_X', 's_X',
+            hdrtxt = ['Itn', 'Fnc', 'DFid', u('ℓ1'), 'Cnstr', 'r_X', 's_X',
                       u('ρ_X'), 'r_D', 's_D', u('ρ_D')],
             hdrmap = {'Itn' : 'Iter', 'Fnc' : 'ObjFun', 'DFid' : 'DFid',
-                      'l1' : 'RegL1', 'Cnstr' : 'Cnstr', 'r_X' : 'XPrRsdl',
+                      u('ℓ1') : 'RegL1', 'Cnstr' : 'Cnstr', 'r_X' : 'XPrRsdl',
                       's_X' : 'XDlRsdl', u('ρ_X') : 'XRho', 'r_D' : 'DPrRsdl',
                       's_D' : 'DDlRsdl', u('ρ_D') : 'DRho'}
             )
