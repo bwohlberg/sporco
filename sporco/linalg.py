@@ -752,7 +752,7 @@ def shrink2(x, alpha, axis=-1):
       = \mathrm{prox}_f(\mathbf{x}) \;\;
       \\text{where} \;\; f(\mathbf{u}) = \\alpha \|\mathbf{u}\|_2 \;\;.
 
-    The :math:`\ell^2` norm is applied over the specified axis of a
+    The :math:`\ell_2` norm is applied over the specified axis of a
     multi-dimensional input (the last axis by default).
 
     Parameters
@@ -762,7 +762,7 @@ def shrink2(x, alpha, axis=-1):
     alpha : float or array_like
       Shrinkage parameter :math:`\\alpha`
     axis : int, optional (default -1)
-      Axis of x over which the :math:`\ell^2` norm
+      Axis of x over which the :math:`\ell_2` norm
 
     Returns
     -------
@@ -789,7 +789,7 @@ def shrink12(x, alpha, beta, axis=-1):
       \\text{where} \;\; f(\mathbf{u}) = \\alpha \|\mathbf{u}\|_1 +
       \\beta \|\mathbf{u}\|_2 \;\;.
 
-    The :math:`\ell^2` norm is applied over the specified axis of a
+    The :math:`\ell_2` norm is applied over the specified axis of a
     multi-dimensional input (the last axis by default).
 
     Parameters
@@ -801,7 +801,7 @@ def shrink12(x, alpha, beta, axis=-1):
     beta : float or array_like
       Shrinkage parameter :math:`\\beta`
     axis : int, optional (default -1)
-      Axis of x over which the :math:`\ell^2` norm
+      Axis of x over which the :math:`\ell_2` norm
 
     Returns
     -------
@@ -815,7 +815,7 @@ def shrink12(x, alpha, beta, axis=-1):
 
 def proj_l2ball(b, s, r, axes=None):
     """
-    Project :math:`\mathbf{b}` into the :math:`\ell^2` ball of radius
+    Project :math:`\mathbf{b}` into the :math:`\ell_2` ball of radius
     :math:`r` about :math:`\mathbf{s}`, i.e.
     :math:`\{ \mathbf{x} : \|\mathbf{x} - \mathbf{s} \|_2 \leq r \}`.
 
@@ -824,11 +824,11 @@ def proj_l2ball(b, s, r, axes=None):
     b : array_like
       Vector :math:`\mathbf{b}` to be projected
     s : array_like
-      Centre of :math:`\ell^2` ball :math:`\mathbf{s}`
+      Centre of :math:`\ell_2` ball :math:`\mathbf{s}`
     r : float
       Radius of ball
     axes : sequence of ints, optional (default all axes)
-      Axes over which to compute :math:`\ell^2` norms
+      Axes over which to compute :math:`\ell_2` norms
 
     Returns
     -------
@@ -921,10 +921,10 @@ def blockcirculant(A):
 
 def fl2norm2(xf, axis=(0,1)):
     """
-    Compute the squared :math:`\ell^2` norm in the DFT domain, taking
+    Compute the squared :math:`\ell_2` norm in the DFT domain, taking
     into account the unnormalised DFT scaling, i.e. given the DFT of a
     multi-dimensional array computed via :func:`fftn`, return the
-    squared :math:`\ell^2` norm of the original array.
+    squared :math:`\ell_2` norm of the original array.
 
     Parameters
     ----------
@@ -948,10 +948,10 @@ def fl2norm2(xf, axis=(0,1)):
 
 def rfl2norm2(xf, xs, axis=(0,1)):
     """
-    Compute the squared :math:`\ell^2` norm in the DFT domain, taking
+    Compute the squared :math:`\ell_2` norm in the DFT domain, taking
     into account the unnormalised DFT scaling, i.e. given the DFT of a
     multi-dimensional array computed via :func:`rfftn`, return the
-    squared :math:`\ell^2` norm of the original array.
+    squared :math:`\ell_2` norm of the original array.
 
     Parameters
     ----------
