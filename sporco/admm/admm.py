@@ -344,7 +344,7 @@ class ADMM(with_metaclass(_NestedClassFix, object)):
             self.itstat.append(itst)
 
             # Display iteration stats if Verbose option enabled
-            self.display_status(fmtstr, k, itst)
+            self.display_status(fmtstr, itst)
 
             # Automatic rho adjustment
             self.update_rho(k, r, s)
@@ -542,7 +542,7 @@ class ADMM(with_metaclass(_NestedClassFix, object)):
 
 
 
-    def display_status(self, fmtstr, k, itst):
+    def display_status(self, fmtstr, itst):
         """Display current iteration status as selection of fields from
         iteration stats tuple.
         """
