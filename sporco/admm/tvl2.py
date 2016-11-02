@@ -200,7 +200,7 @@ class TVL2Denoise(admm.ADMM):
             # If initial Y is non-zero, initial U is chosen so that
             # the relevant dual optimality criterion (see (3.10) in
             # boyd-2010-distributed) is satisfied.
-            Yss = np.sqrt(np.sum(self.Y**2, axis=S.ndim, keepdims=True))
+            Yss = np.sqrt(np.sum(self.Y**2, axis=self.S.ndim, keepdims=True))
             return (self.lmbda/self.rho)*sl.zdivide(self.Y,Yss)
 
 
@@ -513,7 +513,7 @@ class TVL2Deconv(admm.ADMM):
             # If initial Y is non-zero, initial U is chosen so that
             # the relevant dual optimality criterion (see (3.10) in
             # boyd-2010-distributed) is satisfied.
-            Yss = np.sqrt(np.sum(self.Y**2, axis=S.ndim, keepdims=True))
+            Yss = np.sqrt(np.sum(self.Y**2, axis=self.S.ndim, keepdims=True))
             return (self.lmbda/self.rho)*sl.zdivide(self.Y,Yss)
 
 

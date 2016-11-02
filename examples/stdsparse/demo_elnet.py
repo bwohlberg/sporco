@@ -14,7 +14,6 @@ from builtins import range
 
 import numpy as np
 
-from sporco import util
 from sporco import plot
 from sporco.admm import bpdn
 

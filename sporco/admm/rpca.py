@@ -130,7 +130,7 @@ class RobustPCA(admm.ADMM):
         if opt is None:
             opt = RobustPCA.Options()
 
-       # Set default lambda value if not specified
+        # Set default lambda value if not specified
         if lmbda is None:
             self.lmbda = 1.0 / np.sqrt(S.shape[0])
         else:

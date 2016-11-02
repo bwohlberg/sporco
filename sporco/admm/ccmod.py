@@ -488,7 +488,6 @@ class ConvCnstrMOD(admm.ADMMEqual):
             setattr(self, attr, getattr(cri, attr))
 
         # Call parent class __init__
-        Nx = self.M*self.N
         super(ConvCnstrMOD, self).__init__(cri.shpD, S.dtype, opt)
 
         # Reshape S to standard layout (A, i.e. X in cbpdn, is assumed
@@ -520,7 +519,7 @@ class ConvCnstrMOD(admm.ADMMEqual):
         if A is not None:
             self.setcoef(A)
 
-       # Increment `runtime` to reflect object initialisation
+        # Increment `runtime` to reflect object initialisation
         # time. The timer object is reset to avoid double-counting of
         # elapsed time if a similar increment is applied in a derived
         # class __init__.
