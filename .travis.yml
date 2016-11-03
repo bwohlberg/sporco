@@ -40,7 +40,11 @@ install:
     - python setup.py install
 
 script:
-    - coverage run --source sporco -m py.test
+    - if [[ "$TRAVIS_PYTHON_VERSION" == "2.7" ]]; then
+      coverage run --source sporco -m py.test
+    else
+      python setup.py test
+    fi
 
 after_success:
   codecov
