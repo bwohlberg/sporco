@@ -18,8 +18,10 @@ SParse Optimization Research COde (SPORCO)
     :target: https://badge.fury.io/py/sporco
     :alt: PyPi Release
 .. image:: https://img.shields.io/pypi/pyversions/sporco.svg
+    :target: https://github.com/bwohlberg/sporco
     :alt: Supported Python Versions
-.. image:: https://img.shields.io/pypi/l/sporco.svg 
+.. image:: https://img.shields.io/pypi/l/sporco.svg
+    :target: https://github.com/bwohlberg/sporco
     :alt: Package License
 
 
