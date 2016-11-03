@@ -11,6 +11,9 @@ SParse Optimization Research COde (SPORCO)
 .. image:: https://readthedocs.org/projects/sporco/badge/?version=latest
     :target: http://sporco.readthedocs.io/en/latest/?badge=latest
     :alt: Documentation Status
+.. image:: https://codecov.io/gh/bwohlberg/sporco/branch/master/graph/badge.svg
+    :target: https://codecov.io/gh/bwohlberg/sporco
+    :alt: Test Coverage
 .. image:: https://badge.fury.io/py/sporco.svg
     :target: https://badge.fury.io/py/sporco
     :alt: PyPi Release
