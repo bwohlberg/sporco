@@ -36,10 +36,14 @@ install:
     - conda install --yes python=$TRAVIS_PYTHON_VERSION
     - conda install --yes future numpy scipy matplotlib pytest
     - pip install pyfftw
+    - pip install codecov
     - python setup.py install
 
 script:
     - python setup.py test
+
+after_success:
+  codecov
 
 deploy:
   provider: pypi
