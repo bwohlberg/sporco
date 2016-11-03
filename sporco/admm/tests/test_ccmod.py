@@ -28,6 +28,7 @@ class TestSet01(object):
         rho = 1e1
         opt = ccmod.ConvCnstrMOD.Options({'Verbose' : False,
                                           'MaxMainIter' : 500,
+                                          'LinSolveCheck' : True,
                                           'RelStopTol' : 1e-3, 'rho' : rho,
                                           'AutoRho' : {'Enabled' : False}})
         Xr = X.reshape(X.shape[0:2] + (1,1,) + X.shape[2:])

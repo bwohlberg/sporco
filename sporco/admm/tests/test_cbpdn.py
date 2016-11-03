@@ -126,6 +126,7 @@ class TestSet01(object):
         rho = 1e-1
         opt = cbpdn.ConvBPDN.Options({'Verbose' : False, 'MaxMainIter' : 500,
                                       'RelStopTol' : 1e-3, 'rho' : rho,
+                                      'LinSolveCheck' : True,
                                       'AutoRho' : {'Enabled' : False}})
         b = cbpdn.ConvBPDN(D, S, lmbda, opt)
         b.solve()
