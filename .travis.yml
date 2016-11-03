@@ -41,13 +41,15 @@ install:
 
 script:
     - if [[ "$TRAVIS_PYTHON_VERSION" == "2.7" ]]; then
-      coverage run --source sporco -m py.test
-    else
-      python setup.py test
-    fi
+        coverage run --source sporco -m py.test
+      else
+        python setup.py test
+      fi
 
 after_success:
-  codecov
+    - if [[ "$TRAVIS_PYTHON_VERSION" == "2.7" ]]; then
+        codecov
+      fi
 
 deploy:
   provider: pypi
