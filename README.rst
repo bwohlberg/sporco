@@ -17,7 +17,10 @@ SParse Optimization Research COde (SPORCO)
 .. image:: https://badge.fury.io/py/sporco.svg
     :target: https://badge.fury.io/py/sporco
     :alt: PyPi Release
-
+.. image:: https://img.shields.io/pypi/pyversions/sporco.svg
+    :alt: Supported Python Versions
+.. image:: https://img.shields.io/pypi/l/sporco.svg 
+    :alt: Package License
 
 
 SPORCO is a Python package for solving optimisation problems with
