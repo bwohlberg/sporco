@@ -37,13 +37,14 @@ install:
     - conda install --yes future numpy scipy matplotlib pytest
     - pip install pyfftw
     - pip install codecov
+    - rm -f sporco/tests/test_plot.py
     - python setup.py install
 
 script:
     - if [[ "$TRAVIS_PYTHON_VERSION" == "2.7" ]]; then
         coverage run --source sporco -m py.test;
       else
-        py.test -k 'not sporco/tests/test_plot.py' sporco
+        python setup.py test;
       fi
 
 after_success:
