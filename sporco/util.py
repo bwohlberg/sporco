@@ -351,6 +351,8 @@ def grid_search(fn, grd, fmin=True, nproc=None):
     fprm = itertools.product(*grd)
     pool = mp.Pool(processes=nproc)
     fval = pool.map(fn, fprm)
+    pool.close()
+    pool.join()
     if isinstance(fval[0], (tuple, list, np.ndarray)):
         nfnv = len(fval[0])
         fvmx = np.reshape(fval, [a.size for a in grd] + [nfnv,])
