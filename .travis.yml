@@ -43,7 +43,7 @@ script:
     - if [[ "$TRAVIS_PYTHON_VERSION" == "2.7" ]]; then
         coverage run --source sporco -m py.test;
       else
-        python setup.py test;
+        py.test -k 'not sporco/tests/test_plot.py' sporco
       fi
 
 after_success:
