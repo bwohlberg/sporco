@@ -18,7 +18,8 @@ class TestSet01(object):
         N = 64
         M = 4
         Nd = 8
-        D0 = ccmod.normalise(np.random.randn(Nd, Nd, M), dimN=2)
+        D0 = ccmod.normalise(ccmod.zeromean(
+            np.random.randn(Nd, Nd, M), (Nd, Nd, M), dimN=2), dimN=2)
         X = np.zeros((N, N, M))
         xr = np.random.randn(N, N, M)
         xp = np.abs(xr) > 3
@@ -29,6 +30,7 @@ class TestSet01(object):
         opt = ccmod.ConvCnstrMOD.Options({'Verbose' : False,
                                           'MaxMainIter' : 500,
                                           'LinSolveCheck' : True,
+                                          'ZeroMean' : True,
                                           'RelStopTol' : 1e-3, 'rho' : rho,
                                           'AutoRho' : {'Enabled' : False}})
         Xr = X.reshape(X.shape[0:2] + (1,1,) + X.shape[2:])
@@ -47,6 +49,19 @@ class TestSet01(object):
         S = np.random.randn(N, N, 1)
         try:
             c = ccmod.ConvCnstrMOD(X, S, (Nd, Nd, M))
+            c.solve()
+        except Exception as e:
+            print(e)
+            assert(0)
+
+
+    def test_03(self):
+        N = 16
+        M = 8
+        X = np.random.randn(N, N, 1, 1, M)
+        S = np.random.randn(N, N, 1)
+        try:
+            c = ccmod.ConvCnstrMOD(X, S, ((4, 4, 4),(8, 8, 4)))
             c.solve()
         except Exception as e:
             print(e)
