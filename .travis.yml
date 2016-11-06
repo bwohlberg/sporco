@@ -37,7 +37,7 @@ install:
     - conda install --yes future numpy scipy matplotlib pytest
     - pip install pyfftw
     - pip install codecov
-    - rm -f sporco/tests/test_plot.py
+    - sed -i "5iimport matplotlib\nmatplotlib.use('Agg')\n" sporco/__init__.py
     - python setup.py install
 
 script:
