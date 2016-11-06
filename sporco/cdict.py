@@ -296,33 +296,30 @@ class ConstrainedDict(dict):
 
 
 
-    @staticmethod
-    def keycmp(a, b, pth=()):
-        """Recurse down the tree of nested dicts b, at each level checking
-        that it does not have any keys that are not also at the same
-        level in a. The key path is recorded in pth. If an unknown key
-        is encountered in b, an UnknownKeyError exception is
-        raised. If a non-dict value is encountered in b for which the
-        corresponding value in a is a dict, an InvalidValueError
-        exception is raised."""
+def keycmp(a, b, pth=()):
+    """Recurse down the tree of nested dicts b, at each level checking
+    that it does not have any keys that are not also at the same
+    level in a. The key path is recorded in pth. If an unknown key
+    is encountered in b, an UnknownKeyError exception is
+    raised. If a non-dict value is encountered in b for which the
+    corresponding value in a is a dict, an InvalidValueError
+    exception is raised."""
 
-        akey = list(a.keys())
-        # Iterate over all keys in b
-        for key in list(b.keys()):
-            # If a key is encountered that is not in a, raise an
-            # UnknownKeyError exception.
-            if key not in akey:
-                raise UnknownKeyError(pth + (key,))
-            else:
-                # If corresponding values in a and b for the same key
-                # are both dicts, recursively call this method for
-                # those values. If the value in a is a dict and the
-                # value in b is not, raise an InvalidValueError
-                # exception.
-                if isinstance(a[key], dict):
-                    if isinstance(b[key], dict):
-                        ConstrainedDict.keycmp(a[key], b[key], pth + (key,))
-                    else:
-                        raise InvalidValueError(pth + (key,))
-
-        return None
+    akey = list(a.keys())
+    # Iterate over all keys in b
+    for key in list(b.keys()):
+        # If a key is encountered that is not in a, raise an
+        # UnknownKeyError exception.
+        if key not in akey:
+            raise UnknownKeyError(pth + (key,))
+        else:
+            # If corresponding values in a and b for the same key
+            # are both dicts, recursively call this method for
+            # those values. If the value in a is a dict and the
+            # value in b is not, raise an InvalidValueError
+            # exception.
+            if isinstance(a[key], dict):
+                if isinstance(b[key], dict):
+                    keycmp(a[key], b[key], pth + (key,))
+                else:
+                    raise InvalidValueError(pth + (key,))

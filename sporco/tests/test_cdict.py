@@ -38,12 +38,14 @@ class TestSet01(object):
         assert(self.a['A'] == 'a')
 
     def test_02(self):
-        with pytest.raises(cdict.UnknownKeyError):
+        with pytest.raises(cdict.UnknownKeyError) as e:
             self.a['Ax'] = 'a'
+        assert('Unknown dictionary key: ' in str(e))
 
     def test_03(self):
-        with pytest.raises(cdict.InvalidValueError):
+        with pytest.raises(cdict.InvalidValueError) as e:
             self.a['C', 'CA'] = 'ca'
+        assert('Invalid dictionary value for key: ' in str(e))
 
     def test_04(self):
         assert(self.a['C','CA','CAA'] == 'caa')
@@ -70,3 +72,20 @@ class TestSet01(object):
 
     def test_11(self):
         assert(self.c['C', 'CA', 'CAB'] == 'cab')
+
+    def test_12(self):
+        a = {'A' : {'B' : {'C' : 1, 'CC' : 3}}, 'AA' : 2}
+        b = {'A' : {'B' : {'C' : 1, 'CC' : 3}}, 'AA' : 2}
+        try:
+            cdict.keycmp(a,b)
+        except Exception as e:
+            print(e)
+            assert(0)
+
+    def test_13(self):
+        a = {'A' : {'B' : {'C' : 1, 'CC' : 3}}, 'AA' : 2}
+        b = {'A' : {'B' : {'C' : 1, 'CCC' : 3}}, 'AA' : 2}
+        try:
+            cdict.keycmp(a,b)
+        except Exception as e:
+            assert(e.args[0] == ('A', 'B', 'CCC'))
