@@ -536,12 +536,14 @@ def lu_factor(A, rho):
     """
 
     N, M = A.shape
-    # If N < M it is cheaper to factorise A*A^T' + rho*I and then use the
+    # If N < M it is cheaper to factorise A*A^T + rho*I and then use the
     # matrix inversion lemma to compute the inverse of A^T*A + rho*I
     if N >= M:
-        lu, piv = linalg.lu_factor(A.T.dot(A) + rho*np.identity(M))
+        lu, piv = linalg.lu_factor(A.T.dot(A) + rho*np.identity(M,
+                        dtype=A.dtype))
     else:
-        lu, piv = linalg.lu_factor(A.dot(A.T) + rho*np.identity(N))
+        lu, piv = linalg.lu_factor(A.dot(A.T) + rho*np.identity(N,
+                        dtype=A.dtype))
     return lu, piv
 
 
@@ -686,7 +688,6 @@ def GTax(x, ax):
 
 
 
-
 def shrink1(x, alpha):
     """
     Scalar shrinkage/soft thresholding function
@@ -711,10 +712,10 @@ def shrink1(x, alpha):
 
     if have_numexpr:
         return ne.evaluate(
-        'where(abs(x)-alpha > 0, where(x >= 0, 1.0, -1.0) * (abs(x)-alpha), 0)'
+            'where(abs(x)-alpha > 0, where(x >= 0, 1, -1) * (abs(x)-alpha), 0)'
         )
     else:
-        return np.sign(x) * (np.clip(np.abs(x) - alpha, 0.0, float('Inf')))
+        return np.sign(x) * (np.clip(np.abs(x) - alpha, 0, float('Inf')))
 
 
 
@@ -838,7 +839,53 @@ def proj_l2ball(b, s, r, axes=None):
 
     d = np.sqrt(np.sum((b - s)**2, axis=axes, keepdims=True))
     p = zdivide(b - s, d)
-    return (d <= r) * b + (d > r) * (s + r*p)
+    return np.asarray((d <= r) * b + (d > r) * (s + r*p), b.dtype)
+
+
+
+def promote16(u, fn=None, *args, **kwargs):
+    """
+    Utility function for use with functions that do not support arrays
+    of dtype np.float16. This function has two distinct modes of
+    operation. If called with only the `u` parameter specified, the
+    returned value is either `u` itself if u is not of dtype
+    np.float16, or `u` promoted to np.float32 dtype if it is. If the
+    function parameter `fn` is specified then `u` is conditionally
+    promoted as described above, passed as the first argument to
+    function `fn`, and the returned values are converted back to dtype
+    np.float16 if u is of that dtype.
+
+    Parameters
+    ----------
+    u : array_like
+      Array to be promoted to np.float32 if it is of dtype np.float16
+    fn : function or None, optional (default None)
+      Function to be called with promoted `u` as first parameter and
+      *args and **kwargs as additional parameters
+    *args
+      Variable length list of arguments for function `fn`
+    **kwargs
+      Keyword arguments for function `fn`
+
+    Returns
+    -------
+    up : ndarray
+      Conditionally dtype-promoted version of `u` if `fn` is None,
+      or value(s) returned by `fn`, converted to the same dtype as `u`,
+      if `fn` is a function
+    """
+
+    dtype = np.float32 if u.dtype == np.float16 else u.dtype
+    up = np.asarray(u, dtype=dtype)
+    if fn is None:
+        return up
+    else:
+        v = fn(up, *args, **kwargs)
+        if isinstance(v, tuple):
+            vp = tuple([np.asarray(vk, dtype=u.dtype) for vk in v])
+        else:
+            vp = np.asarray(v, dtype=u.dtype)
+        return vp
 
 
 
