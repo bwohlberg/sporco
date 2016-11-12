@@ -861,7 +861,7 @@ def promote16(u, fn=None, *args, **kwargs):
       Array to be promoted to np.float32 if it is of dtype np.float16
     fn : function or None, optional (default None)
       Function to be called with promoted `u` as first parameter and
-      *args and **kwargs as additional parameters
+      \*args and \*\*kwargs as additional parameters
     *args
       Variable length list of arguments for function `fn`
     **kwargs
