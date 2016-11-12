@@ -15,7 +15,6 @@ from builtins import range
 import numpy as np
 from scipy import linalg
 import copy
-import collections
 from types import MethodType
 import pprint
 

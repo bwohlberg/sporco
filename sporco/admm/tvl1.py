@@ -15,7 +15,6 @@ from builtins import range
 import numpy as np
 from scipy import linalg
 import copy
-import collections
 
 from sporco.admm import admm
 import sporco.linalg as sl

@@ -14,7 +14,6 @@ from builtins import range
 import numpy as np
 from scipy import linalg
 import copy
-import collections
 import pprint
 
 from sporco.admm import admm
