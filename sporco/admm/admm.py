@@ -22,6 +22,8 @@ import sys
 
 from sporco import cdict
 from sporco import util
+from sporco.util import u
+
 
 __author__ = """Brendt Wohlberg <brendt@ieee.org>"""
 
@@ -60,18 +62,25 @@ def _module_name_nested(cls, nstnm='Options'):
 
 
 
-class _NestedClassFix(type):
-    """Metaclass that applies module_name_nested to class definitions."""
+class _ADMM_Meta(type):
+    """Metaclass for ADMM class that handles intialisation of IterationStats
+    namedtuple and applies module_name_nested to class definitions to fix
+    problems with lookup of nested class definitions when using pickle.
+    """
 
     def __init__(self, *args):
-        """Apply _module_name_nested function to class after creation"""
+
+        # Initialise named tuple type for recording ADMM iteration statistics
+        self.IterationStats = collections.namedtuple('IterationStats',
+                                self.itstat_fields())
+        # Apply _module_name_nested function to class after creation
         _module_name_nested(self)
 
 
 
 
 
-class ADMM(with_metaclass(_NestedClassFix, object)):
+class ADMM(with_metaclass(_ADMM_Meta, object)):
     """Base class for Alternating Direction Method of Multipliers (ADMM)
     algorithms :cite:`boyd-2010-distributed`.
 
@@ -192,24 +201,23 @@ class ADMM(with_metaclass(_NestedClassFix, object)):
 
 
 
-
-
-    IterationStats = collections.namedtuple('IterationStats',
-                ['Iter', 'ObjFun', 'FVal', 'GVal', 'PrimalRsdl', 'DualRsdl',
-                 'EpsPrimal', 'EpsDual', 'Rho', 'Time'])
-    """Named tuple type for recording ADMM iteration statistics"""
-
     fwiter = 4
     """Field width for iteration count display column"""
     fpothr = 2
     """Field precision for other display columns"""
-    hdrtxt = ['Itn', 'Fnc', 'f', 'g', 'r', 's', 'rho']
-    """Display column header text. NB: The display_start function assumes
-    that the first entry is the iteration count and the last is the
-    rho value"""
-    hdrval = {'Itn' : 'Iter', 'Fnc' : 'ObjFun', 'f' : 'FVal', 'g' : 'GVal',
-              'r' : 'PrimalRsdl', 's' : 'DualRsdl', 'rho' : 'Rho'}
-    """Dictionary mapping display column headers to IterationStats entries"""
+
+    itstat_fields_objfn = ('ObjFun', 'FVal', 'GVal')
+    """Fields in IterationStats associated with the objective function;
+    see :meth:`eval_objfun`"""
+    itstat_fields_extra = ()
+    """Non-standard fields in IterationStats; see :meth:`itstat_extra`"""
+
+    hdrtxt_objfn = ('Fnc', 'f', 'g')
+    """Display column headers associated with the objective function;
+    see :meth:`eval_objfun`"""
+    hdrval_objfun = {'Fnc' : 'ObjFun', 'f' : 'FVal', 'g' : 'GVal'}
+    """Dictionary mapping display column headers in :attr:`hdrtxt_objfn`
+    to IterationStats entries"""
 
 
 
@@ -250,16 +258,19 @@ class ADMM(with_metaclass(_NestedClassFix, object)):
 
         # DataType option overrides data type inferred from __init__
         # parameters of derived class
-        if opt['DataType'] is None:
-            self.dtype = dtype
-        else:
-            self.dtype = opt['DataType']
+        self.set_dtype(opt, dtype)
 
-        # Initialise penalty parameter
-        if opt['rho'] is None:
-            self.rho = self.dtype.type(self.rhoinit())
-        else:
-            self.rho = self.dtype.type(opt['rho'])
+        # Initialise attributes representing penalty parameter and other
+        # parameters
+        self.set_attr('rho', opt['rho'], dval=1.0, dtype=self.dtype)
+        self.set_attr('rho_tau', opt['AutoRho', 'Scaling'], dval=2.0,
+                      dtype=self.dtype)
+        self.set_attr('rho_mu', opt['AutoRho', 'RsdlRatio'], dval=10.0,
+                      dtype=self.dtype)
+        self.set_attr('rho_xi', opt['AutoRho', 'RsdlTarget'], dval=1.0,
+                      dtype=self.dtype)
+        self.set_attr('rlx', opt['RelaxParam'], dval=1.0, dtype=self.dtype)
+
 
         # Initialise working variable Y
         if  self.opt['Y0'] is None:
@@ -279,10 +290,64 @@ class ADMM(with_metaclass(_NestedClassFix, object)):
 
 
 
-    def rhoinit(self):
-        """Return initialiser for penalty parameter"""
+    def set_dtype(self, opt, dtype):
+        """Set the `dtype` attribute. If opt['DataType'] has a value other
+        than None, it overrides the `dtype` parameter of this method. No
+        changes are made if the `dtype` attribute already exists and has a
+        value other than 'None'.
 
-        return 1.0
+        Parameters
+        ----------
+        opt : :class:`ADMM.Options` object
+          Algorithm options
+        dtype : data-type
+          Data type for working variables (overridden by 'DataType' option)
+        """
+
+        # Take no action of self.dtype exists has is not None
+        if not hasattr(self, 'dtype') or self.dtype is None:
+            # DataType option overrides explicitly specified data type
+            if opt['DataType'] is None:
+                self.dtype = dtype
+            else:
+                self.dtype = np.dtype(opt['DataType'])
+
+
+
+    def set_attr(self, name, val, dval=None, dtype=None, reset=False):
+        """Set an object attribute.
+
+        Parameters
+        ----------
+        name : string
+          Attribute name
+        val : any
+          Primary attribute value
+        dval : any
+          Default attribute value in case `val` is None
+        dtype : data-type, optional (default None)
+          If the `dtype` parameter is not None, the attribute `name` is
+          set to `val` after conversion to the specified type.
+          self.dtype
+        reset : bool, optional (default False)
+          Flag indicating whether attribute assignment should be conditional
+          on the attribute not existing or having value None. If False,
+          an attribute value other than None will not be not overwritten.
+        """
+
+        # If `val` is None and `dval` is not, replace it with dval
+        if dval is not None and val is None:
+            val = dval
+
+        # If val is flagged as numeric, convert it to type self.dtype
+        if dtype is not None and val is not None:
+            val = self.dtype.type(val)
+
+        # Set attribute value depending on reset flag and whether the
+        # attribute exists and is None
+        if reset or not hasattr(self, name) or \
+           (hasattr(self, name) and getattr(self, name) is None):
+            setattr(self, name, val)
 
 
 
@@ -404,7 +469,7 @@ class ADMM(with_metaclass(_NestedClassFix, object)):
         # We need to keep the non-relaxed version of AX since it is
         # required for computation of primal residual r
         self.AXnr = self.cnst_A(self.X)
-        if self.opt['RelaxParam'] == 1.0:
+        if self.rlx == 1.0:
             # If RelaxParam option is 1.0 there is no relaxation
             self.AX = self.AXnr
         else:
@@ -413,7 +478,7 @@ class ADMM(with_metaclass(_NestedClassFix, object)):
             if not hasattr(self, 'c'):
                 self.c = self.cnst_c()
             # Compute relaxed version of AX
-            alpha = self.opt['RelaxParam']
+            alpha = self.rlx
             self.AX = alpha*self.AXnr - (1-alpha)*(self.cnst_B(self.Y) - self.c)
 
 
@@ -443,6 +508,38 @@ class ADMM(with_metaclass(_NestedClassFix, object)):
                 self.opt['RelStopTol']
 
         return r, s, epri, edua
+
+
+
+    @classmethod
+    def itstat_fields(cls):
+        """Construct tuple of field names used to initialise IterationStats
+        named tuple.
+        """
+
+        return ('Iter',) + cls.itstat_fields_objfn + ('PrimalRsdl', 'DualRsdl',
+        'EpsPrimal', 'EpsDual', 'Rho') +  cls.itstat_fields_extra + ('Time',)
+
+
+
+    @classmethod
+    def hdrtxt(cls):
+        """Construct tuple of status display column title"""
+
+        return ('Itn',) + cls.hdrtxt_objfn + ('r', 's', u('ρ'))
+
+
+
+    @classmethod
+    def hdrval(cls):
+        """Construct dictionary mapping display column title to
+        IterationStats entries.
+        """
+
+        dict = {'Itn' : 'Iter'}
+        dict.update(cls.hdrval_objfun)
+        dict.update({'r' : 'PrimalRsdl', 's' : 'DualRsdl', u('ρ') : 'Rho'})
+        return dict
 
 
 
@@ -494,9 +591,9 @@ class ADMM(with_metaclass(_NestedClassFix, object)):
         """Automatic rho adjustment."""
 
         if self.opt['AutoRho', 'Enabled']:
-            tau = self.opt['AutoRho', 'Scaling']
-            mu = self.opt['AutoRho', 'RsdlRatio']
-            xi = self.opt['AutoRho', 'RsdlTarget']
+            tau = self.rho_tau
+            mu = self.rho_mu
+            xi = self.rho_xi
             if k != 0 and scipy.mod(k+1, self.opt['AutoRho', 'Period']) == 0:
                 if self.opt['AutoRho', 'AutoScaling']:
                     if s == 0.0 or r == 0.0:
@@ -512,7 +609,7 @@ class ADMM(with_metaclass(_NestedClassFix, object)):
                     rsf = rhomlt
                 elif s > (mu/xi)*r:
                     rsf = 1.0/rhomlt
-                self.rho = rsf*self.rho
+                self.rho = self.dtype.type(rsf*self.rho)
                 self.U = self.U/rsf
                 if rsf != 1.0:
                     self.rhochange()
@@ -520,14 +617,17 @@ class ADMM(with_metaclass(_NestedClassFix, object)):
 
 
     def display_start(self):
-        """Set up status display if option selected."""
+        """Set up status display if option selected. NB: this method assumes
+        that the first entry is the iteration count and the last is
+        the rho value.
+        """
 
         if self.opt['Verbose']:
             # If AutoRho option enabled rho is included in iteration status
             if self.opt['AutoRho', 'Enabled']:
-                hdrtxt = type(self).hdrtxt
+                hdrtxt = type(self).hdrtxt()
             else:
-                hdrtxt = type(self).hdrtxt[0:-1]
+                hdrtxt = type(self).hdrtxt()[0:-1]
             # Call utility function to construct status display formatting
             hdrstr, fmtstr, nsep = util.solve_status_str(hdrtxt,
                                 type(self).fwiter, type(self).fpothr)
@@ -548,8 +648,9 @@ class ADMM(with_metaclass(_NestedClassFix, object)):
         """
 
         if self.opt['Verbose']:
-            itdsp = tuple([getattr(itst, type(self).hdrval[col]) for col in
-                           type(self).hdrtxt])
+            hdrtxt = type(self).hdrtxt()
+            hdrval = type(self).hdrval()
+            itdsp = tuple([getattr(itst, hdrval[col]) for col in hdrtxt])
             if not self.opt['AutoRho','Enabled']:
                 itdsp = itdsp[0:-1]
 
@@ -968,20 +1069,17 @@ class ADMMTwoBlockCnstrnt(ADMM):
 
 
 
-    IterationStats = collections.namedtuple('IterationStats',
-                ['Iter', 'ObjFun', 'FVal', 'G0Val', 'G1Val',
-                 'PrimalRsdl', 'DualRsdl', 'EpsPrimal', 'EpsDual',
-                 'Rho', 'Time'])
-    """Named tuple type for recording ADMM iteration statistics"""
+    itstat_fields_objfn = ('ObjFun', 'FVal', 'G0Val', 'G1Val')
+    """Fields in IterationStats associated with the objective function;
+    see :meth:`eval_objfun`"""
 
-    hdrtxt = ['Itn', 'Fnc', 'f', 'g0', 'g1', 'r', 's', 'rho']
-    """Display column header text. NB: The display_start function assumes
-    that the first entry is the iteration count and the last is the
-    rho value"""
-    hdrval = {'Itn' : 'Iter', 'Fnc' : 'ObjFun', 'f' : 'FVal',
-              'g0' : 'G0Val', 'g1' : 'G1Val', 'r' : 'PrimalRsdl',
-              's' : 'DualRsdl', 'rho' : 'Rho'}
-    """Dictionary mapping display column headers to IterationStats entries"""
+    hdrtxt_objfn = ('Fnc', 'f', 'g0', 'g1')
+    """Display column headers associated with the objective function;
+    see :meth:`eval_objfun`"""
+    hdrval_objfun = {'Fnc' : 'ObjFun', 'f' : 'FVal',
+                     'g0' : 'G0Val', 'g1' : 'G1Val'}
+    """Dictionary mapping display column headers in :attr:`hdrtxt_objfn`
+    to IterationStats entries"""
 
 
 

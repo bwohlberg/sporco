@@ -405,18 +405,10 @@ class ConvCnstrMOD(admm.ADMMEqual):
 
 
 
-
-    IterationStats = collections.namedtuple('IterationStats',
-            ['Iter', 'DFid', 'Cnstr', 'PrimalRsdl', 'DualRsdl',
-             'EpsPrimal', 'EpsDual', 'Rho', 'XSlvRelRes', 'XSlvCGIt',
-             'Time'])
-    """Named tuple type for recording ADMM iteration statistics"""
-
-    hdrtxt = ['Itn', 'DFid', 'Cnstr', 'r', 's', 'rho']
-    """Display column header text"""
-    hdrval = {'Itn' : 'Iter', 'DFid' : 'DFid', 'Cnstr' : 'Cnstr',
-              'r' : 'PrimalRsdl', 's' : 'DualRsdl', 'rho' : 'Rho'}
-    """Dictionary mapping display column headers to IterationStats entries"""
+    itstat_fields_objfn = ('DFid', 'Cnstr')
+    itstat_fields_extra = ('XSlvRelRes', 'CGIt')
+    hdrtxt_objfn = ('DFid', 'Cnstr')
+    hdrval_objfun = {'DFid' : 'DFid', 'Cnstr' : 'Cnstr'}
 
 
 
@@ -490,6 +482,9 @@ class ConvCnstrMOD(admm.ADMMEqual):
         # Call parent class __init__
         super(ConvCnstrMOD, self).__init__(cri.shpD, S.dtype, opt)
 
+        # Set penalty parameter
+        self.set_attr('rho', opt['rho'], dval=self.K, dtype=self.dtype)
+
         # Reshape S to standard layout (A, i.e. X in cbpdn, is assumed
         # to be taken from cbpdn, and therefore already in standard
         # form). If the dictionary has a single channel but the input
@@ -502,6 +497,7 @@ class ConvCnstrMOD(admm.ADMMEqual):
             self.S = S.reshape(self.Nv + (1,) + (self.C*self.K,) + (1,))
         else:
             self.S = S.reshape(cri.shpS)
+        self.S = np.asarray(self.S, dtype=self.dtype)
 
         # Compute signal S in DFT domain
         self.Sf = sl.rfftn(self.S, None, self.axisN)
@@ -514,7 +510,7 @@ class ConvCnstrMOD(admm.ADMMEqual):
         xfshp = list(self.Y.shape)
         xfshp[dimN-1] = xfshp[dimN-1]//2 + 1
         self.Xf = sl.pyfftw_empty_aligned(xfshp,
-                        dtype=sl.complex_dtype(self.dtype))
+                            dtype=sl.complex_dtype(self.dtype))
 
         if A is not None:
             self.setcoef(A)
@@ -524,13 +520,6 @@ class ConvCnstrMOD(admm.ADMMEqual):
         # elapsed time if a similar increment is applied in a derived
         # class __init__.
         self.runtime += self.timer.elapsed(reset=True)
-
-
-
-    def rhoinit(self):
-        """Return initialiser for penalty parameter"""
-
-        return self.K
 
 
 
@@ -550,8 +539,6 @@ class ConvCnstrMOD(admm.ADMMEqual):
     def setcoef(self, A):
         """Set coefficient array."""
 
-        self.timer.start()
-
         # If the dictionary has a single channel but the input (and
         # therefore also the coefficient map array) has multiple
         # channels, the channel index and multiple image index have
@@ -562,11 +549,11 @@ class ConvCnstrMOD(admm.ADMMEqual):
             self.A = A.reshape(self.Nv + (1,) + (self.Cx*self.K,) + (self.M,))
         else:
             self.A = A
+        self.A = np.asarray(A, dtype=self.dtype)
 
         self.Af = sl.rfftn(self.A, self.Nv, self.axisN)
-        # Compute D^H S
+        # Compute X^H S
         self.ASf = np.sum(np.conj(self.Af) * self.Sf, self.axisK, keepdims=True)
-        self.runtime += self.timer.elapsed()
 
 
 
@@ -773,7 +760,7 @@ def zeromean(v, dsz, dimN=2):
 
     Returns
     -------
-    vz : array_like
+    vz : ndarray
       Dictionary array with filter means subtracted
     """
 
@@ -819,7 +806,7 @@ def zeromean(v, dsz, dimN=2):
 def normalise(v, dimN=2):
     """Normalise vectors, corresponding to slices along specified number
     of initial spatial dimensions of an array, to have unit
-    :math:`\ell^2` norm. The remaining axes enumerate the distinct
+    :math:`\ell_2` norm. The remaining axes enumerate the distinct
     vectors to be normalised.
 
     Parameters
@@ -831,14 +818,14 @@ def normalise(v, dimN=2):
 
     Returns
     -------
-    vp : array_like
+    vnrm : ndarray
       Normalised array
     """
 
     axisN = tuple(range(0,dimN))
     vn = np.sqrt(np.sum(v**2, axisN, keepdims=True))
     vn[vn == 0] = 1.0
-    return v / vn
+    return np.asarray(v / vn, dtype=v.dtype)
 
 
 
@@ -855,11 +842,11 @@ def zpad(v, Nv):
 
     Returns
     -------
-    vp : array_like
+    vp : ndarray
       Padded array
     """
 
-    vp = np.zeros(Nv + v.shape[len(Nv):])
+    vp = np.zeros(Nv + v.shape[len(Nv):], dtype=v.dtype)
     axnslc = tuple([slice(0, x) for x in v.shape])
     vp[axnslc] = v
     return vp
@@ -953,7 +940,7 @@ def bcrop(v, dsz, dimN=2):
 
     Returns
     -------
-    vc : array_like
+    vc : ndarray
       Cropped dictionary array
     """
 
@@ -967,7 +954,8 @@ def bcrop(v, dsz, dimN=2):
                     maxsz = np.maximum(maxsz, dsz[mb][cb][0:dimN])
             else:
                 maxsz = np.maximum(maxsz, dsz[mb][0:dimN])
-        vc = np.zeros(tuple(maxsz) + v.shape[dimN:])  # Init. cropped array
+        # Init. cropped array
+        vc = np.zeros(tuple(maxsz) + v.shape[dimN:], dtype=v.dtype)
         m0 = 0  # Initial index of current block of equi-sized filters
         # Iterate over distinct filter sizes
         for mb in range(0, len(dsz)):

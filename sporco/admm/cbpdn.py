@@ -21,6 +21,8 @@ import pprint
 
 from sporco.admm import admm
 import sporco.linalg as sl
+from sporco.util import u
+
 
 __author__ = """Brendt Wohlberg <brendt@ieee.org>"""
 
@@ -309,17 +311,10 @@ class GenericConvBPDN(admm.ADMMEqual):
 
 
 
-    IterationStats = collections.namedtuple('IterationStats',
-                ['Iter', 'ObjFun', 'DFid', 'Reg', 'PrimalRsdl', 'DualRsdl',
-                 'EpsPrimal', 'EpsDual', 'Rho', 'XSlvRelRes', 'Time'])
-    """Named tuple type for recording ADMM iteration statistics"""
-
-    hdrtxt = ['Itn', 'Fnc', 'DFid', 'Reg', 'r', 's', 'rho']
-    """Display column header text"""
-    hdrval = {'Itn' : 'Iter', 'Fnc' : 'ObjFun', 'DFid' : 'DFid',
-              'Reg' : 'Reg', 'r' : 'PrimalRsdl', 's' : 'DualRsdl',
-              'rho' : 'Rho'}
-    """Dictionary mapping display column headers to IterationStats entries"""
+    itstat_fields_objfn = ('ObjFun', 'DFid', 'Reg')
+    itstat_fields_extra = ('XSlvRelRes',)
+    hdrtxt_objfn = ('Fnc', 'DFid', 'Reg')
+    hdrval_objfun = {'Fnc' : 'ObjFun', 'DFid' : 'DFid', 'Reg' : 'Reg'}
 
 
 
@@ -370,8 +365,8 @@ class GenericConvBPDN(admm.ADMMEqual):
         super(GenericConvBPDN, self).__init__(cri.shpX, S.dtype, opt)
 
         # Reshape D and S to standard layout
-        self.D = D.reshape(cri.shpD)
-        self.S = S.reshape(cri.shpS)
+        self.D = np.asarray(D.reshape(cri.shpD), dtype=self.dtype)
+        self.S = np.asarray(S.reshape(cri.shpS), dtype=self.dtype)
 
         # Compute signal in DFT domain
         self.Sf = sl.rfftn(self.S, None, self.axisN)
@@ -381,7 +376,7 @@ class GenericConvBPDN(admm.ADMMEqual):
         xfshp = list(self.Y.shape)
         xfshp[dimN-1] = xfshp[dimN-1]//2 + 1
         self.Xf = sl.pyfftw_empty_aligned(xfshp,
-                                          dtype=sl.complex_dtype(self.dtype))
+                            dtype=sl.complex_dtype(self.dtype))
 
         self.setdict()
 
@@ -409,7 +404,7 @@ class GenericConvBPDN(admm.ADMMEqual):
         """Set dictionary array."""
 
         if D is not None:
-            self.D = D
+            self.D = np.asarray(D, dtype=self.dtype)
         self.Df = sl.rfftn(self.D, self.Nv, self.axisN)
         # Compute D^H S
         self.DSf = np.conj(self.Df) * self.Sf
@@ -656,17 +651,9 @@ class ConvBPDN(GenericConvBPDN):
 
 
 
-    IterationStats = collections.namedtuple('IterationStats',
-                ['Iter', 'ObjFun', 'DFid', 'RegL1', 'PrimalRsdl', 'DualRsdl',
-                 'EpsPrimal', 'EpsDual', 'Rho', 'XSlvRelRes', 'Time'])
-    """Named tuple type for recording ADMM iteration statistics"""
-
-    hdrtxt = ['Itn', 'Fnc', 'DFid', 'l1', 'r', 's', 'rho']
-    """Display column header text"""
-    hdrval = {'Itn' : 'Iter', 'Fnc' : 'ObjFun', 'DFid' : 'DFid',
-              'l1' : 'RegL1', 'r' : 'PrimalRsdl', 's' : 'DualRsdl',
-              'rho' : 'Rho'}
-    """Dictionary mapping display column headers to IterationStats entries"""
+    itstat_fields_objfn = ('ObjFun', 'DFid', 'RegL1')
+    hdrtxt_objfn = ('Fnc', 'DFid', u('Regℓ1'))
+    hdrval_objfun = {'Fnc' : 'ObjFun', 'DFid' : 'DFid', u('Regℓ1') : 'RegL1'}
 
 
 
@@ -711,30 +698,32 @@ class ConvBPDN(GenericConvBPDN):
         else:
             opt = copy.deepcopy(opt)
 
+        # Set dtype attribute based on S.dtype and opt['DataType']
+        self.set_dtype(opt, S.dtype)
+
         # Set default lambda value if not specified
         if lmbda is None:
             cri = ConvRepIndexing(D, S, dimK=dimK, dimN=dimN)
             Df = sl.rfftn(D.reshape(cri.shpD), cri.Nv, axes=cri.axisN)
             Sf = sl.rfftn(S.reshape(cri.shpS), axes=cri.axisN)
             b = np.conj(Df) * Sf
-            self.lmbda = 0.1*abs(b).max()
-        else:
-            self.lmbda = lmbda
+            lmbda = 0.1*abs(b).max()
 
-        # Set default option 'AutoRho','RsdlTarget' if necessary
-        if opt['AutoRho','RsdlTarget'] is None:
-            opt['AutoRho','RsdlTarget'] = 1.0 + \
-                  (18.3)**(np.log10(self.lmbda)+1.0)
+        # Set l1 term scaling and weight array
+        self.lmbda = self.dtype.type(lmbda)
+        self.wl1 = np.asarray(opt['L1Weight'], dtype=self.dtype)
+
+        # Set penalty parameter
+        self.set_attr('rho', opt['rho'], dval=(50.0*self.lmbda + 1.0),
+                      dtype=self.dtype)
+
+        # Set rho_xi attribute
+        self.set_attr('rho_xi', opt['AutoRho','RsdlTarget'],
+                      dval=(1.0 + (18.3)**(np.log10(self.lmbda)+1.0)),
+                      dtype=self.dtype)
 
         # Call parent class __init__
         super(ConvBPDN, self).__init__(D, S, opt, dimK, dimN)
-
-
-
-    def rhoinit(self):
-        """Return initialiser for penalty parameter"""
-
-        return 50.0*self.lmbda + 1.0
 
 
 
@@ -754,9 +743,9 @@ class ConvBPDN(GenericConvBPDN):
     def ystep(self):
         """Minimise Augmented Lagrangian with respect to y."""
 
-        self.Y = sl.shrink1(self.AX + self.U,
-                            (self.lmbda/self.rho) * self.opt['L1Weight'])
+        self.Y = sl.shrink1(self.AX + self.U, (self.lmbda/self.rho) * self.wl1)
         super(ConvBPDN, self).ystep()
+
 
 
     def obfn_reg(self):
@@ -764,7 +753,7 @@ class ConvBPDN(GenericConvBPDN):
         function.
         """
 
-        rl1 = linalg.norm((self.opt['L1Weight'] * self.obfn_gvar()).ravel(), 1)
+        rl1 = linalg.norm((self.wl1 * self.obfn_gvar()).ravel(), 1)
         return (self.lmbda*rl1, rl1)
 
 
@@ -830,18 +819,11 @@ class ConvBPDNJoint(ConvBPDN):
     """
 
 
-    IterationStats = collections.namedtuple('IterationStats',
-                ['Iter', 'ObjFun', 'DFid', 'RegL1', 'RegL21',
-                 'PrimalRsdl', 'DualRsdl', 'EpsPrimal', 'EpsDual',
-                 'Rho', 'XSlvRelRes', 'Time'])
-    """Named tuple type for recording ADMM iteration statistics"""
 
-    hdrtxt = ['Itn', 'Fnc', 'DFid', 'l1', 'l21', 'r', 's', 'rho']
-    """Display column header text"""
-    hdrval = {'Itn' : 'Iter', 'Fnc' : 'ObjFun', 'DFid' : 'DFid',
-              'l1' : 'RegL1', 'l21' : 'RegL21', 'r' : 'PrimalRsdl',
-              's' : 'DualRsdl', 'rho' : 'Rho'}
-    """Dictionary mapping display column headers to IterationStats entries"""
+    itstat_fields_objfn = ('ObjFun', 'DFid', 'RegL1', 'RegL21')
+    hdrtxt_objfn = ('Fnc', 'DFid', u('Regℓ1'), u('Regℓ2,1'))
+    hdrval_objfun = {'Fnc' : 'ObjFun', 'DFid' : 'DFid',
+                     u('Regℓ1') : 'RegL1', u('Regℓ2,1') : 'RegL21'}
 
 
 
@@ -870,17 +852,16 @@ class ConvBPDNJoint(ConvBPDN):
 
         if opt is None:
             opt = ConvBPDN.Options()
-        self.mu = mu
         super(ConvBPDNJoint, self).__init__(D, S, lmbda, opt, dimK=dimK,
                                             dimN=dimN)
+        self.mu = self.dtype.type(mu)
 
 
 
     def ystep(self):
         """Minimise Augmented Lagrangian with respect to y."""
 
-        self.Y = sl.shrink12(self.AX + self.U,
-                             (self.lmbda/self.rho)*self.opt['L1Weight'],
+        self.Y = sl.shrink12(self.AX + self.U, (self.lmbda/self.rho)*self.wl1,
                              self.mu/self.rho, axis=self.axisC)
         GenericConvBPDN.ystep(self)
 
@@ -892,7 +873,7 @@ class ConvBPDNJoint(ConvBPDN):
         :math:`\| Y \|_{2,1}`.
         """
 
-        rl1 = linalg.norm((self.opt['L1Weight'] * self.obfn_gvar()).ravel(), 1)
+        rl1 = linalg.norm((self.wl1 * self.obfn_gvar()).ravel(), 1)
         rl21 = np.sum(np.sqrt(np.sum(self.obfn_gvar()**2, axis=self.axisC)))
         return (self.lmbda*rl1 + self.mu*rl21, rl1, rl21)
 
@@ -955,19 +936,12 @@ class ConvElasticNet(ConvBPDN):
        ``Time`` : Cumulative run time
     """
 
-    IterationStats = collections.namedtuple('IterationStats',
-                ['Iter', 'ObjFun', 'DFid', 'RegL1', 'RegL2',
-                 'PrimalRsdl', 'DualRsdl', 'EpsPrimal', 'EpsDual',
-                  'Rho', 'XSlvRelRes', 'Time'])
-    """Named tuple type for recording ADMM iteration statistics"""
 
-    hdrtxt = ['Itn', 'Fnc', 'DFid', 'l1', 'l2', 'r', 's', 'rho']
-    """Display column header text"""
 
-    hdrval = {'Itn' : 'Iter', 'Fnc' : 'ObjFun', 'DFid' : 'DFid',
-              'l1' : 'RegL1', 'l2' : 'RegL2', 'r' : 'PrimalRsdl',
-              's' : 'DualRsdl', 'rho' : 'Rho'}
-    """Dictionary mapping display column headers to IterationStats entries"""
+    itstat_fields_objfn = ('ObjFun', 'DFid', 'RegL1', 'RegL2')
+    hdrtxt_objfn = ('Fnc', 'DFid', u('Regℓ1'), u('Regℓ2'))
+    hdrval_objfun = {'Fnc' : 'ObjFun', 'DFid' : 'DFid',
+                     u('Regℓ1') : 'RegL1', u('Regℓ2') : 'RegL2'}
 
 
 
@@ -996,10 +970,9 @@ class ConvElasticNet(ConvBPDN):
 
         if opt is None:
             opt = ConvBPDN.Options()
-        self.mu = mu
         super(ConvElasticNet, self).__init__(D, S, lmbda, opt, dimK=dimK,
                                              dimN=dimN)
-
+        self.mu = self.dtype.type(mu)
 
 
 
@@ -1007,7 +980,7 @@ class ConvElasticNet(ConvBPDN):
         """Set dictionary array."""
 
         if D is not None:
-            self.D = D
+            self.D = np.asarray(D, dtype=self.dtype)
         self.Df = sl.rfftn(self.D, self.Nv, self.axisN)
         # Compute D^H S
         self.DSf = np.conj(self.Df) * self.Sf
@@ -1051,7 +1024,7 @@ class ConvElasticNet(ConvBPDN):
         function.
         """
 
-        rl1 = linalg.norm((self.opt['L1Weight'] * self.obfn_gvar()).ravel(), 1)
+        rl1 = linalg.norm((self.wl1 * self.obfn_gvar()).ravel(), 1)
         rl2 = 0.5*linalg.norm(self.obfn_gvar())**2
         return (self.lmbda*rl1 + self.mu*rl2, rl1, rl2)
 
@@ -1145,19 +1118,11 @@ class ConvBPDNGradReg(ConvBPDN):
             ConvBPDN.Options.__init__(self, opt)
 
 
-    IterationStats = collections.namedtuple('IterationStats',
-                ['Iter', 'ObjFun', 'DFid', 'RegL1', 'RegGrad',
-                 'PrimalRsdl', 'DualRsdl', 'EpsPrimal', 'EpsDual',
-                  'Rho', 'XSlvRelRes', 'Time'])
-    """Named tuple type for recording ADMM iteration statistics"""
 
-    hdrtxt = ['Itn', 'Fnc', 'DFid', 'l1', 'grd', 'r', 's', 'rho']
-    """Display column header text"""
-
-    hdrval = {'Itn' : 'Iter', 'Fnc' : 'ObjFun', 'DFid' : 'DFid',
-              'l1' : 'RegL1', 'grd' : 'RegGrad', 'r' : 'PrimalRsdl',
-              's' : 'DualRsdl', 'rho' : 'Rho'}
-    """Dictionary mapping display column headers to IterationStats entries"""
+    itstat_fields_objfn = ('ObjFun', 'DFid', 'RegL1', 'RegGrad')
+    hdrtxt_objfn = ('Fnc', 'DFid', u('Regℓ1'), u('Regℓ2∇'))
+    hdrval_objfun = {'Fnc' : 'ObjFun', 'DFid' : 'DFid',
+                     u('Regℓ1') : 'RegL1', u('Regℓ2∇') : 'RegGrad'}
 
 
 
@@ -1186,13 +1151,17 @@ class ConvBPDNGradReg(ConvBPDN):
 
         if opt is None:
             opt = ConvBPDNGradReg.Options()
-        self.mu = mu
-        if hasattr(opt['GradWeight'], 'ndim'):
-            self.Wgrd = opt['GradWeight'].reshape((1,)*(dimN+2) +
-                                                  opt['GradWeight'].shape)
-        else:
-            self.Wgrd = opt['GradWeight']
+
+        # Set dtype attribute based on S.dtype and opt['DataType']
+        self.set_dtype(opt, S.dtype)
+
         self.GHGf = None
+        self.mu = self.dtype.type(mu)
+        if hasattr(opt['GradWeight'], 'ndim'):
+            self.Wgrd = np.asarray(opt['GradWeight'].reshape((1,)*(dimN+2) +
+                                    opt['GradWeight'].shape), dtype=self.dtype)
+        else:
+            self.Wgrd = np.asarray(opt['GradWeight'], dtype=self.dtype)
 
         super(ConvBPDNGradReg, self).__init__(D, S, lmbda, opt, dimK=dimK,
                                               dimN=dimN)
@@ -1219,7 +1188,7 @@ class ConvBPDNGradReg(ConvBPDN):
             self.make_GhGf()
 
         if D is not None:
-            self.D = D
+            self.D = np.asarray(D, dtype=self.dtype)
         self.Df = sl.rfftn(self.D, self.Nv, self.axisN)
         # Compute D^H S
         self.DSf = np.conj(self.Df) * self.Sf
@@ -1265,7 +1234,7 @@ class ConvBPDNGradReg(ConvBPDN):
         """
 
         fvf = self.obfn_fvarf()
-        rl1 = linalg.norm((self.opt['L1Weight'] * self.obfn_gvar()).ravel(), 1)
+        rl1 = linalg.norm((self.wl1 * self.obfn_gvar()).ravel(), 1)
         rgr = sl.rfl2norm2(np.sqrt(self.GHGf*np.conj(fvf)*fvf), self.Nv,
                            self.axisN)/2.0
         return (self.lmbda*rl1 + self.mu*rgr, rl1, rgr)
@@ -1333,20 +1302,11 @@ class ConvTwoBlockCnstrnt(admm.ADMMTwoBlockCnstrnt):
             admm.ADMMTwoBlockCnstrnt.Options.__init__(self, opt)
 
 
-    IterationStats = collections.namedtuple('IterationStats',
-                ['Iter', 'ObjFun', 'G0Val', 'G1Val', 'PrimalRsdl',
-                 'DualRsdl', 'EpsPrimal', 'EpsDual', 'Rho',  'XSlvRelRes',
-                 'Time'])
-    """Named tuple type for recording ADMM iteration statistics"""
 
-    hdrtxt = ['Itn', 'Fnc', 'g0', 'g1', 'r', 's', 'rho']
-    """Display column header text. NB: The display_start function assumes
-    that the first entry is the iteration count and the last is the
-    rho value"""
-    hdrval = {'Itn' : 'Iter', 'Fnc' : 'ObjFun', 'g0' : 'G0Val',
-              'g1' : 'G1Val', 'r' : 'PrimalRsdl', 's' : 'DualRsdl',
-              'rho' : 'Rho'}
-    """Dictionary mapping display column headers to IterationStats entries"""
+    itstat_fields_objfn = ('ObjFun', 'G0Val', 'G1Val')
+    itstat_fields_extra = ('XSlvRelRes',)
+    hdrtxt_objfn = ('Fnc', 'g0', 'g1')
+    hdrval_objfun = {'Fnc' : 'ObjFun', 'g0' : 'G0Val', 'g1' : 'G1Val'}
 
 
 
@@ -1383,8 +1343,8 @@ class ConvTwoBlockCnstrnt(admm.ADMMTwoBlockCnstrnt):
                                                   S.dtype, opt)
 
         # Reshape D and S to standard layout
-        self.D = D.reshape(cri.shpD)
-        self.S = S.reshape(cri.shpS)
+        self.D = np.asarray(D.reshape(cri.shpD), dtype=self.dtype)
+        self.S = np.asarray(S.reshape(cri.shpS), dtype=self.dtype)
 
         # Initialise byte-aligned arrays for pyfftw
         self.YU = sl.pyfftw_empty_aligned(self.Y.shape, dtype=self.dtype)
@@ -1407,7 +1367,7 @@ class ConvTwoBlockCnstrnt(admm.ADMMTwoBlockCnstrnt):
         """Set dictionary array."""
 
         if D is not None:
-            self.D = D
+            self.D = np.asarray(D, dtype=self.dtype)
         self.Df = sl.rfftn(self.D, self.Nv, self.axisN)
         if self.opt['HighMemSolve'] and self.Cd == 1:
             self.c = sl.solvedbi_sm_c(self.Df, np.conj(self.Df), 1.0,
@@ -1466,14 +1426,14 @@ class ConvTwoBlockCnstrnt(admm.ADMMTwoBlockCnstrnt):
         """Implement relaxation if option ``RelaxParam`` != 1.0."""
 
         self.AXnr = self.cnst_A(self.X, self.Xf)
-        if self.opt['RelaxParam'] == 1.0:
+        if self.rlx == 1.0:
             self.AX = self.AXnr
         else:
             if not hasattr(self, 'c0'):
                 self.c0 = self.cnst_c0()
             if not hasattr(self, 'c1'):
                 self.c1 = self.cnst_c1()
-            alpha = self.opt['RelaxParam']
+            alpha = self.rlx
             self.AX = alpha*self.cnst_A(self.X, self.Xf) + \
                       (1-alpha)*self.block_cat(self.var_y0() + self.c0,
                                                self.var_y1() + self.c1)
@@ -1700,16 +1660,10 @@ class ConvBPDNMaskDcpl(ConvTwoBlockCnstrnt):
             ConvTwoBlockCnstrnt.Options.__init__(self, opt)
 
 
-    IterationStats = ConvBPDN.IterationStats
-    """Named tuple type for recording ADMM iteration statistics"""
 
-    hdrtxt = ['Itn', 'Fnc', 'DFid', 'l1', 'r', 's', 'rho']
-    """Display column header text"""
-
-    hdrval = {'Itn' : 'Iter', 'Fnc' : 'ObjFun', 'DFid' : 'DFid',
-              'l1' : 'RegL1', 'r' : 'PrimalRsdl',
-              's' : 'DualRsdl', 'rho' : 'Rho'}
-    """Dictionary mapping display column headers to IterationStats entries"""
+    itstat_fields_objfn = ('ObjFun', 'DFid', 'RegL1')
+    hdrtxt_objfn = ('Fnc', 'DFid', u('Regℓ1'))
+    hdrval_objfun = {'Fnc' : 'ObjFun', 'DFid' : 'DFid', u('Regℓ1') : 'RegL1'}
 
 
 
@@ -1738,13 +1692,14 @@ class ConvBPDNMaskDcpl(ConvTwoBlockCnstrnt):
 
         if opt is None:
             opt = ConvBPDNMaskDcpl.Options()
-        if W is None:
-            W = np.array([1.0], dtype=np.float32)
 
         super(ConvBPDNMaskDcpl, self).__init__(D, S, opt, dimK=dimK, dimN=dimN)
 
-        self.lmbda = lmbda
-        self.W = sl.atleast_nd(self.S.ndim, W)
+        self.lmbda = self.dtype.type(lmbda)
+        if W is None:
+            W = np.array([1.0], dtype=self.dtype)
+        self.W = np.asarray(sl.atleast_nd(self.S.ndim, W), dtype=self.dtype)
+        self.wl1 = np.asarray(opt['L1Weight'], dtype=self.dtype)
 
 
 
@@ -1768,8 +1723,7 @@ class ConvBPDNMaskDcpl(ConvTwoBlockCnstrnt):
 
         AXU = self.AX + self.U
         Y0 = (self.rho*(self.block_sep0(AXU) - self.S)) / (self.W**2 + self.rho)
-        Y1 = sl.shrink1(self.block_sep1(AXU),
-                        (self.lmbda/self.rho)*self.opt['L1Weight'])
+        Y1 = sl.shrink1(self.block_sep1(AXU), (self.lmbda/self.rho)*self.wl1)
         self.Y = self.block_cat(Y0, Y1)
 
         super(ConvBPDNMaskDcpl, self).ystep()
@@ -1790,7 +1744,7 @@ class ConvBPDNMaskDcpl(ConvTwoBlockCnstrnt):
         function.
         """
 
-        return linalg.norm((self.opt['L1Weight']*self.obfn_g1var()).ravel(), 1)
+        return linalg.norm((self.wl1*self.obfn_g1var()).ravel(), 1)
 
 
 

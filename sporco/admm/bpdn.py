@@ -107,17 +107,9 @@ class GenericBPDN(admm.ADMMEqual):
 
 
 
-    IterationStats = collections.namedtuple('IterationStats',
-                ['Iter', 'ObjFun', 'DFid', 'Reg', 'PrimalRsdl', 'DualRsdl',
-                 'EpsPrimal', 'EpsDual', 'Rho', 'Time'])
-    """Named tuple type for recording ADMM iteration statistics"""
-
-    hdrtxt = ['Itn', 'Fnc', 'DFid', 'Reg', 'r', 's', u('ρ')]
-    """Display column header text"""
-    hdrval = {'Itn' : 'Iter', 'Fnc' : 'ObjFun', 'DFid' : 'DFid',
-              'Reg' : 'Reg', 'r' : 'PrimalRsdl', 's' : 'DualRsdl',
-              u('ρ') : 'Rho'}
-    """Dictionary mapping display column headers to IterationStats entries"""
+    itstat_fields_objfn = ('ObjFun', 'DFid', 'Reg')
+    hdrtxt_objfn = ('Fnc', 'DFid', 'Reg')
+    hdrval_objfun = {'Fnc' : 'ObjFun', 'DFid' : 'DFid', 'Reg' : 'Reg'}
 
 
 
@@ -141,7 +133,7 @@ class GenericBPDN(admm.ADMMEqual):
             opt = GenericBPDN.Options()
         super(GenericBPDN, self).__init__((Nc, Nm), S.dtype, opt)
 
-        self.S = S
+        self.S = np.asarray(S, dtype=self.dtype)
         self.setdict(D)
 
         # Increment `runtime` to reflect object initialisation
@@ -155,10 +147,11 @@ class GenericBPDN(admm.ADMMEqual):
     def setdict(self, D):
         """Set dictionary array."""
 
-        self.D = D
-        self.DTS = D.T.dot(self.S)
+        self.D = np.asarray(D, dtype=self.dtype)
+        self.DTS = self.D.T.dot(self.S)
         # Factorise dictionary for efficient solves
-        self.lu, self.piv = sl.lu_factor(D, self.rho)
+        self.lu, self.piv = sl.lu_factor(self.D, self.rho)
+        self.lu = np.asarray(self.lu, dtype=self.dtype)
 
 
 
@@ -172,8 +165,9 @@ class GenericBPDN(admm.ADMMEqual):
     def xstep(self):
         """Minimise Augmented Lagrangian with respect to x."""
 
-        self.X = sl.lu_solve_ATAI(self.D, self.rho, self.DTS +
-                    self.rho*(self.Y - self.U), self.lu, self.piv)
+        self.X = np.asarray(sl.lu_solve_ATAI(self.D, self.rho, self.DTS +
+                        self.rho*(self.Y - self.U), self.lu, self.piv),
+                        dtype=self.dtype)
 
 
 
@@ -225,6 +219,7 @@ class GenericBPDN(admm.ADMMEqual):
         """Re-factorise matrix when rho changes."""
 
         self.lu, self.piv = sl.lu_factor(self.D, self.rho)
+        self.lu = np.asarray(self.lu, dtype=self.dtype)
 
 
 
@@ -314,17 +309,9 @@ class BPDN(GenericBPDN):
 
 
 
-    IterationStats = collections.namedtuple('IterationStats',
-                ['Iter', 'ObjFun', 'DFid', 'RegL1', 'PrimalRsdl', 'DualRsdl',
-                 'EpsPrimal', 'EpsDual', 'Rho', 'Time'])
-    """Named tuple type for recording ADMM iteration statistics"""
-
-    hdrtxt = ['Itn', 'Fnc', 'DFid', u('ℓ1'), 'r', 's', u('ρ')]
-    """Display column header text"""
-    hdrval = {'Itn' : 'Iter', 'Fnc' : 'ObjFun', 'DFid' : 'DFid',
-              u('ℓ1') : 'RegL1', 'r' : 'PrimalRsdl', 's' : 'DualRsdl',
-              u('ρ') : 'Rho'}
-    """Dictionary mapping display column headers to IterationStats entries"""
+    itstat_fields_objfn = ('ObjFun', 'DFid', 'RegL1')
+    hdrtxt_objfn = ('Fnc', 'DFid', u('Regℓ1'))
+    hdrval_objfun = {'Fnc' : 'ObjFun', 'DFid' : 'DFid', u('Regℓ1') : 'RegL1'}
 
 
 
@@ -350,26 +337,28 @@ class BPDN(GenericBPDN):
         else:
             opt = copy.deepcopy(opt)
 
+        # Set dtype attribute based on S.dtype and opt['DataType']
+        self.set_dtype(opt, S.dtype)
+
         # Set default lambda value if not specified
         if lmbda is None:
             DTS = D.T.dot(S)
-            self.lmbda = 0.1*abs(DTS).max()
-        else:
-            self.lmbda = lmbda
+            lmbda = 0.1*abs(DTS).max()
 
-        # Set default option 'AutoRho','RsdlTarget' if necessary
-        if opt['AutoRho','RsdlTarget'] is None:
-            opt['AutoRho','RsdlTarget'] = 1.0 + \
-                  (18.3)**(np.log10(self.lmbda)+1.0)
+        # Set l1 term scaling and weight array
+        self.lmbda = self.dtype.type(lmbda)
+        self.wl1 = np.asarray(opt['L1Weight'], dtype=self.dtype)
+
+        # Set penalty parameter
+        self.set_attr('rho', opt['rho'], dval=(50.0*self.lmbda + 1.0),
+                      dtype=self.dtype)
+
+        # Set rho_xi attribute
+        self.set_attr('rho_xi', opt['AutoRho','RsdlTarget'],
+                      dval=(1.0 + (18.3)**(np.log10(self.lmbda)+1.0)),
+                      dtype=self.dtype)
 
         super(BPDN, self).__init__(D, S, opt)
-
-
-
-    def rhoinit(self):
-        """Return initialiser for penalty parameter"""
-
-        return 50.0*self.lmbda + 1.0
 
 
 
@@ -389,8 +378,9 @@ class BPDN(GenericBPDN):
     def ystep(self):
         """Minimise Augmented Lagrangian with respect to y."""
 
-        self.Y = sl.shrink1(self.AX + self.U,
-                            (self.lmbda/self.rho)*self.opt['L1Weight'])
+        self.Y = np.asarray(sl.shrink1(self.AX + self.U,
+                            (self.lmbda/self.rho)*self.wl1),
+                            dtype=self.dtype)
         super(BPDN, self).ystep()
 
 
@@ -400,7 +390,7 @@ class BPDN(GenericBPDN):
         function.
         """
 
-        rl1 = linalg.norm((self.opt['L1Weight'] * self.obfn_gvar()).ravel(), 1)
+        rl1 = linalg.norm((self.wl1 * self.obfn_gvar()).ravel(), 1)
         return (self.lmbda*rl1, rl1)
 
 
@@ -454,18 +444,11 @@ class BPDNJoint(BPDN):
     """
 
 
-    IterationStats = collections.namedtuple('IterationStats',
-                ['Iter', 'ObjFun', 'DFid', 'RegL1', 'RegL21',
-                 'PrimalRsdl', 'DualRsdl', 'EpsPrimal', 'EpsDual',
-                 'Rho', 'Time'])
-    """Named tuple type for recording ADMM iteration statistics"""
 
-    hdrtxt = ['Itn', 'Fnc', 'DFid', u('ℓ1'), u('ℓ2,1'), 'r', 's', u('ρ')]
-    """Display column header text"""
-    hdrval = {'Itn' : 'Iter', 'Fnc' : 'ObjFun', 'DFid' : 'DFid',
-              u('ℓ1') : 'RegL1', u('ℓ2,1') : 'RegL21', 'r' : 'PrimalRsdl',
-              's' : 'DualRsdl', u('ρ') : 'Rho'}
-    """Dictionary mapping display column headers to IterationStats entries"""
+    itstat_fields_objfn = ('ObjFun', 'DFid', 'RegL1', 'RegL21')
+    hdrtxt_objfn = ('Fnc', 'DFid', u('Regℓ1'), u('Regℓ2,1'))
+    hdrval_objfun = {'Fnc' : 'ObjFun', 'DFid' : 'DFid',
+                     u('Regℓ1') : 'RegL1', u('Regℓ2,1') : 'RegL21'}
 
 
 
@@ -489,17 +472,16 @@ class BPDNJoint(BPDN):
 
         if opt is None:
             opt = BPDN.Options()
-        self.mu = mu
         super(BPDNJoint, self).__init__(D, S, lmbda, opt)
-
+        self.mu = self.dtype.type(mu)
 
 
     def ystep(self):
         """Minimise Augmented Lagrangian with respect to y."""
 
-        self.Y = sl.shrink12(self.AX + self.U,
-                             (self.lmbda/self.rho)*self.opt['L1Weight'],
-                             self.mu/self.rho)
+        self.Y = np.asarray(sl.shrink12(self.AX + self.U,
+                            (self.lmbda/self.rho)*self.wl1, self.mu/self.rho),
+                            dtype=self.dtype)
         GenericBPDN.ystep(self)
 
 
@@ -510,7 +492,7 @@ class BPDNJoint(BPDN):
         :math:`\| Y \|_{2,1}`.
         """
 
-        rl1 = linalg.norm((self.opt['L1Weight'] * self.obfn_gvar()).ravel(), 1)
+        rl1 = linalg.norm((self.wl1 * self.obfn_gvar()).ravel(), 1)
         rl21 = np.sum(np.sqrt(np.sum(self.obfn_gvar()**2, axis=1)))
         return (self.lmbda*rl1 + self.mu*rl21, rl1, rl21)
 
@@ -570,18 +552,11 @@ class ElasticNet(BPDN):
     """
 
 
-    IterationStats = collections.namedtuple('IterationStats',
-                ['Iter', 'ObjFun', 'DFid', 'RegL1', 'RegL2',
-                 'PrimalRsdl', 'DualRsdl', 'EpsPrimal', 'EpsDual',
-                 'Rho', 'Time'])
-    """Named tuple type for recording ADMM iteration statistics"""
 
-    hdrtxt = ['Itn', 'Fnc', 'DFid', 'l1', 'l2', 'r', 's', 'rho']
-    """Display column header text"""
-    hdrval = {'Itn' : 'Iter', 'Fnc' : 'ObjFun', 'DFid' : 'DFid',
-              'l1' : 'RegL1', 'l2' : 'RegL2', 'r' : 'PrimalRsdl',
-              's' : 'DualRsdl', 'rho' : 'Rho'}
-    """Dictionary mapping display column headers to IterationStats entries"""
+    itstat_fields_objfn = ('ObjFun', 'DFid', 'RegL1', 'RegL2')
+    hdrtxt_objfn = ('Fnc', 'DFid', u('Regℓ1'), u('Regℓ2'))
+    hdrval_objfun = {'Fnc' : 'ObjFun', 'DFid' : 'DFid',
+                     u('Regℓ1') : 'RegL1', u('Regℓ2') : 'RegL2'}
 
 
 
@@ -605,27 +580,33 @@ class ElasticNet(BPDN):
 
         if opt is None:
             opt = BPDN.Options()
-        self.mu = mu
-        super(ElasticNet, self).__init__(D, S, lmbda, opt)
 
+        # Set dtype attribute based on S.dtype and opt['DataType']
+        self.set_dtype(opt, S.dtype)
+
+        self.mu = self.dtype.type(mu)
+
+        super(ElasticNet, self).__init__(D, S, lmbda, opt)
 
 
 
     def setdict(self, D):
         """Set dictionary array."""
 
-        self.D = D
-        self.DTS = D.T.dot(self.S)
+        self.D = np.asarray(D)
+        self.DTS = self.D.T.dot(self.S)
         # Factorise dictionary for efficient solves
-        self.lu, self.piv = sl.lu_factor(D, self.mu + self.rho)
+        self.lu, self.piv = sl.lu_factor(self.D, self.mu + self.rho)
+        self.lu = np.asarray(self.lu, dtype=self.dtype)
 
 
 
     def xstep(self):
         """Minimise Augmented Lagrangian with respect to x."""
 
-        self.X = sl.lu_solve_ATAI(self.D, self.mu + self.rho, self.DTS +
-                                  self.rho*(self.Y - self.U), self.lu, self.piv)
+        self.X = np.asarray(sl.lu_solve_ATAI(self.D, self.mu + self.rho,
+                    self.DTS + self.rho*(self.Y - self.U), self.lu, self.piv),
+                    dtype=self.dtype)
 
 
 
@@ -634,7 +615,7 @@ class ElasticNet(BPDN):
         function.
         """
 
-        rl1 = linalg.norm((self.opt['L1Weight'] * self.obfn_gvar()).ravel(), 1)
+        rl1 = linalg.norm((self.wl1 * self.obfn_gvar()).ravel(), 1)
         rl2 = 0.5*linalg.norm(self.obfn_gvar())**2
         return (self.lmbda*rl1 + self.mu*rl2, rl1, rl2)
 
@@ -644,3 +625,4 @@ class ElasticNet(BPDN):
         """Re-factorise matrix when rho changes."""
 
         self.lu, self.piv = sl.lu_factor(self.D, self.mu + self.rho)
+        self.lu = np.asarray(self.lu, dtype=self.dtype)

@@ -125,17 +125,11 @@ class TVL2Denoise(admm.ADMM):
 
 
 
-    IterationStats = collections.namedtuple('IterationStats',
-                ['Iter', 'ObjFun', 'DFid', 'RegTV', 'PrimalRsdl', 'DualRsdl',
-                 'EpsPrimal', 'EpsDual', 'Rho', 'GSIter', 'GSRelRes', 'Time'])
-    """Named tuple type for recording ADMM iteration statistics"""
+    itstat_fields_objfn = ('ObjFun', 'DFid', 'RegTV')
+    itstat_fields_extra = ('GSIter', 'GSRelRes')
+    hdrtxt_objfn = ('Fnc', 'DFid', 'RegTV')
+    hdrval_objfun = {'Fnc' : 'ObjFun', 'DFid' : 'DFid', 'RegTV' : 'RegTV'}
 
-    hdrtxt = ['Itn', 'Fnc', 'DFid', 'TV', 'r', 's', 'rho']
-    """Display column header text"""
-    hdrval = {'Itn' : 'Iter', 'Fnc' : 'ObjFun', 'DFid' : 'DFid',
-              'TV' : 'RegTV', 'r' : 'PrimalRsdl', 's' : 'DualRsdl',
-              'rho' : 'Rho'}
-    """Dictionary mapping display column headers to IterationStats entries"""
 
 
     def __init__(self, S, lmbda, opt=None, axes=(0,1)):
@@ -157,37 +151,37 @@ class TVL2Denoise(admm.ADMM):
         if opt is None:
             opt = TVL2Denoise.Options()
 
-        self.S = S
+        # Set dtype attribute based on S.dtype and opt['DataType']
+        self.set_dtype(opt, S.dtype)
+
+        self.S = np.asarray(S, dtype=self.dtype)
         self.axes = axes
-        self.lmbda = lmbda
+        self.lmbda = self.dtype.type(lmbda)
+
+        # Set penalty parameter
+        self.set_attr('rho', opt['rho'], dval=(2.0*self.lmbda + 0.1),
+                      dtype=self.dtype)
 
         yshape = S.shape + (len(axes),)
         super(TVL2Denoise, self).__init__(S.size, yshape, yshape, S.dtype, opt)
 
-        self.Wdf = self.opt['DFidWeight']
+        self.Wdf = np.asarray(self.opt['DFidWeight'], dtype=self.dtype)
         self.Wdf2 = self.Wdf**2
         self.lcw = self.LaplaceCentreWeight()
-        self.Wtv = self.opt['TVWeight']
+        self.Wtv = np.asarray(self.opt['TVWeight'], dtype=self.dtype)
         if hasattr(self.Wtv, 'ndim') and self.Wtv.ndim == S.ndim:
             self.Wtvna = self.Wtv[...,np.newaxis]
         else:
             self.Wtvna = self.Wtv
 
         # Need to initialise X because of Gauss-Seidel in xstep
-        self.X = S
+        self.X = self.S
 
         # Increment `runtime` to reflect object initialisation
         # time. The timer object is reset to avoid double-counting of
         # elapsed time if a similar increment is applied in a derived
         # class __init__.
         self.runtime += self.timer.elapsed(reset=True)
-
-
-
-    def rhoinit(self):
-        """Return initialiser for penalty parameter"""
-
-        return 2.0*self.lmbda + 0.1
 
 
 
@@ -201,7 +195,7 @@ class TVL2Denoise(admm.ADMM):
             # the relevant dual optimality criterion (see (3.10) in
             # boyd-2010-distributed) is satisfied.
             Yss = np.sqrt(np.sum(self.Y**2, axis=self.S.ndim, keepdims=True))
-            return (self.lmbda/self.rho)*sl.zdivide(self.Y,Yss)
+            return (self.lmbda/self.rho)*sl.zdivide(self.Y, Yss)
 
 
 
@@ -227,8 +221,9 @@ class TVL2Denoise(admm.ADMM):
     def ystep(self):
         """Minimise Augmented Lagrangian with respect to y."""
 
-        self.Y = sl.shrink2(self.AX + self.U, (self.lmbda/self.rho)*self.Wtvna)
-
+        self.Y = np.asarray(sl.shrink2(self.AX + self.U,
+                            (self.lmbda/self.rho)*self.Wtvna),
+                            dtype=self.dtype)
 
 
 
@@ -314,7 +309,7 @@ class TVL2Denoise(admm.ADMM):
         sz = [1,] * self.S.ndim
         for ax in self.axes:
             sz[ax] = self.S.shape[ax]
-        lcw = 2.0*len(self.axes)*np.ones(sz, dtype=np.float32)
+        lcw = 2*len(self.axes)*np.ones(sz, dtype=self.dtype)
         for ax in self.axes:
             lcw[(slice(None),)*ax + ((0,-1),)] -= 1.0
         return lcw
@@ -324,7 +319,7 @@ class TVL2Denoise(admm.ADMM):
     def GaussSeidelStep(self, S, X, ATYU, rho, lcw, W2):
         """Gauss-Seidel step for linear system in TV problem"""
 
-        Xss = np.zeros_like(S)
+        Xss = np.zeros_like(S, dtype=self.dtype)
         for ax in self.axes:
             Xss += sl.zpad(X[(slice(None),)*ax + (slice(0,-1),)], (1,0), ax)
             Xss += sl.zpad(X[(slice(None),)*ax + (slice(1,None),)], (0,1), ax)
@@ -427,17 +422,11 @@ class TVL2Deconv(admm.ADMM):
 
 
 
-    IterationStats = collections.namedtuple('IterationStats',
-                ['Iter', 'ObjFun', 'DFid', 'RegTV', 'PrimalRsdl', 'DualRsdl',
-                 'EpsPrimal', 'EpsDual', 'Rho', 'XSlvRelRes', 'Time'])
-    """Named tuple type for recording ADMM iteration statistics"""
+    itstat_fields_objfn = ('ObjFun', 'DFid', 'RegTV')
+    itstat_fields_extra = ('XSlvRelRes',)
+    hdrtxt_objfn = ('Fnc', 'DFid', 'RegTV')
+    hdrval_objfun = {'Fnc' : 'ObjFun', 'DFid' : 'DFid', 'RegTV' : 'RegTV'}
 
-    hdrtxt = ['Itn', 'Fnc', 'DFid', 'TV', 'r', 's', 'rho']
-    """Display column header text"""
-    hdrval = {'Itn' : 'Iter', 'Fnc' : 'ObjFun', 'DFid' : 'DFid',
-              'TV' : 'RegTV', 'r' : 'PrimalRsdl', 's' : 'DualRsdl',
-              'rho' : 'Rho'}
-    """Dictionary mapping display column headers to IterationStats entries"""
 
 
     def __init__(self, A, S, lmbda, opt=None, axes=(0,1)):
@@ -461,9 +450,16 @@ class TVL2Deconv(admm.ADMM):
         if opt is None:
             opt = TVL2Deconv.Options()
 
-        self.S = S
+        # Set dtype attribute based on S.dtype and opt['DataType']
+        self.set_dtype(opt, S.dtype)
+
+        self.S = np.asarray(S, dtype=self.dtype)
         self.axes = axes
-        self.lmbda = lmbda
+        self.lmbda = self.dtype.type(lmbda)
+
+        # Set penalty parameter
+        self.set_attr('rho', opt['rho'], dval=(2.0*self.lmbda + 0.1),
+                      dtype=self.dtype)
 
         yshape = S.shape + (len(axes),)
         super(TVL2Deconv, self).__init__(S.size, yshape, yshape, S.dtype, opt)
@@ -471,11 +467,11 @@ class TVL2Deconv(admm.ADMM):
         self.axshp = [S.shape[k] for k in axes]
         self.A = sl.atleast_nd(S.ndim, A.astype(self.dtype))
         self.Af = sl.rfftn(self.A, self.axshp, axes=axes)
-        self.Sf = sl.rfftn(S, axes=axes)
+        self.Sf = sl.rfftn(self.S, axes=axes)
         self.AHAf = np.conj(self.Af)*self.Af
         self.AHSf = np.conj(self.Af)*self.Sf
 
-        self.Wtv = self.opt['TVWeight']
+        self.Wtv = np.asarray(self.opt['TVWeight'], dtype=self.dtype)
         if hasattr(self.Wtv, 'ndim') and self.Wtv.ndim == S.ndim:
             self.Wtvna = self.Wtv[...,np.newaxis]
         else:
@@ -494,13 +490,6 @@ class TVL2Deconv(admm.ADMM):
         # elapsed time if a similar increment is applied in a derived
         # class __init__.
         self.runtime += self.timer.elapsed(reset=True)
-
-
-
-    def rhoinit(self):
-        """Return initialiser for penalty parameter"""
-
-        return 2.0*self.lmbda + 0.1
 
 
 

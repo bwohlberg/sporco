@@ -16,6 +16,8 @@ import collections
 
 from sporco.admm import admm
 import sporco.linalg as sl
+from sporco.util import u
+
 
 __author__ = """Brendt Wohlberg <brendt@ieee.org>"""
 
@@ -100,17 +102,11 @@ class RobustPCA(admm.ADMM):
 
 
 
-    IterationStats = collections.namedtuple('IterationStats',
-                ['Iter', 'ObjFun', 'NrmNuc', 'NrmL1', 'Cnstr', 'PrimalRsdl',
-                 'DualRsdl', 'EpsPrimal', 'EpsDual', 'Rho', 'Time'])
-    """Named tuple type for recording ADMM iteration statistics"""
+    itstat_fields_objfn = ('ObjFun', 'NrmNuc', 'NrmL1', 'Cnstr')
+    hdrtxt_objfn = ('Fnc', 'NrmNuc', u('Nrmℓ1'), 'Cnstr')
+    hdrval_objfun = {'Fnc' : 'ObjFun', 'NrmNuc' : 'NrmNuc',
+                     u('Nrmℓ1') : 'NrmL1', 'Cnstr' : 'Cnstr'}
 
-    hdrtxt = ['Itn', 'Fnc', 'Nuc', 'L1', 'Cnstr', 'r', 's', 'rho']
-    """Display column header text"""
-    hdrval = {'Itn' : 'Iter', 'Fnc' : 'ObjFun', 'Nuc' : 'NrmNuc',
-              'L1' : 'NrmL1', 'Cnstr' : 'Cnstr', 'r' :
-              'PrimalRsdl', 's' : 'DualRsdl', 'rho' : 'Rho'}
-    """Dictionary mapping display column headers to IterationStats entries"""
 
 
     def __init__(self, S, lmbda=None, opt=None):
@@ -130,29 +126,28 @@ class RobustPCA(admm.ADMM):
         if opt is None:
             opt = RobustPCA.Options()
 
+        # Set dtype attribute based on S.dtype and opt['DataType']
+        self.set_dtype(opt, S.dtype)
+
         # Set default lambda value if not specified
         if lmbda is None:
-            self.lmbda = 1.0 / np.sqrt(S.shape[0])
-        else:
-            self.lmbda = lmbda
+            lmbda = 1.0 / np.sqrt(S.shape[0])
+        self.lmbda = self.dtype.type(lmbda)
+
+        # Set penalty parameter
+        self.set_attr('rho', opt['rho'], dval=(2.0*self.lmbda + 0.1),
+                      dtype=self.dtype)
 
         Nx = S.size
         super(RobustPCA, self).__init__(Nx, S.shape, S.shape, S.dtype, opt)
 
-        self.S = S
+        self.S = np.asarray(S, dtype=self.dtype)
 
         # Increment `runtime` to reflect object initialisation
         # time. The timer object is reset to avoid double-counting of
         # elapsed time if a similar increment is applied in a derived
         # class __init__.
         self.runtime += self.timer.elapsed(reset=True)
-
-
-
-    def rhoinit(self):
-        """Return initialiser for penalty parameter"""
-
-        return 2.0*self.lmbda + 0.1
 
 
 
@@ -180,14 +175,15 @@ class RobustPCA(admm.ADMM):
     def xstep(self):
         """Minimise Augmented Lagrangian with respect to x."""
 
-        self.X, self.ss = shrinksv(self.S - self.Y - self.U, 1.0 / self.rho)
+        self.X, self.ss = shrinksv(self.S - self.Y - self.U, 1 / self.rho)
 
 
 
     def ystep(self):
         """Minimise Augmented Lagrangian with respect to y."""
 
-        self.Y = sl.shrink1(self.S - self.AX - self.U, self.lmbda/self.rho)
+        self.Y = np.asarray(sl.shrink1(self.S - self.AX - self.U,
+                            self.lmbda/self.rho), dtype=self.dtype)
 
 
 
@@ -268,11 +264,11 @@ class RobustPCA(admm.ADMM):
 
 
 
-def shrinksv(x, alpha):
+def shrinksv(v, alpha):
     """Shrinkage of singular values"""
 
-    U, s, V = np.linalg.svd(x, full_matrices=False)
-    ss = np.maximum(0.0, s - alpha)
+    U, s, V = sl.promote16(v, fn=np.linalg.svd, full_matrices=False)
+    ss = np.maximum(0, s - alpha)
     return np.dot(U, np.dot(np.diag(ss), V)), ss
 
 
@@ -280,5 +276,4 @@ def shrinksv(x, alpha):
 def nucnorm(x):
     """Nuclear norm"""
 
-    s = np.linalg.svd(x, compute_uv=False)
-    return np.sum(s)
+    return np.sum(np.linalg.svd(sl.promote16(x), compute_uv=False))

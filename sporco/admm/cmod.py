@@ -108,16 +108,9 @@ class CnstrMOD(admm.ADMMEqual):
 
 
 
-    IterationStats = collections.namedtuple('IterationStats',
-                ['Iter', 'DFid', 'Cnstr', 'PrimalRsdl', 'DualRsdl',
-                 'EpsPrimal', 'EpsDual', 'Rho', 'Time'])
-    """Named tuple type for recording ADMM iteration statistics"""
-
-    hdrtxt = ['Itn', 'DFid', 'Cnstr', 'r', 's', 'rho']
-    """Display column header text"""
-    hdrval = {'Itn' : 'Iter', 'DFid' : 'DFid', 'Cnstr' : 'Cnstr',
-              'r' : 'PrimalRsdl', 's' : 'DualRsdl', 'rho' : 'Rho'}
-    """Dictionary mapping display column headers to IterationStats entries"""
+    itstat_fields_objfn = ('DFid', 'Cnstr')
+    hdrtxt_objfn = ('DFid', 'Cnstr')
+    hdrval_objfun = {'DFid' : 'DFid', 'Cnstr' : 'Cnstr'}
 
 
 
@@ -140,7 +133,6 @@ class CnstrMOD(admm.ADMMEqual):
         if opt is None:
             opt = CnstrMOD.Options()
 
-        self.S = S
         Nc = S.shape[0]
         # If A not specified, get dictionary size from dsz
         if A is None:
@@ -148,6 +140,12 @@ class CnstrMOD(admm.ADMMEqual):
         else:
             Nm = A.shape[0]
         super(CnstrMOD, self).__init__((Nc,Nm), S.dtype, opt)
+
+        # Set penalty parameter
+        self.set_attr('rho', opt['rho'], dval=S.shape[1] / 500.0,
+                      dtype=self.dtype)
+
+        self.S = np.asarray(S, dtype=self.dtype)
 
         # Create constraint set projection function
         self.Pcn = getPcn(opt['ZeroMean'])
@@ -186,10 +184,11 @@ class CnstrMOD(admm.ADMMEqual):
     def setcoef(self, A):
         """Set coefficient array."""
 
-        self.A = A
+        self.A = np.asarray(A, dtype=self.dtype)
         self.SAT = self.S.dot(A.T)
         # Factorise dictionary for efficient solves
         self.lu, self.piv = sl.lu_factor(A, self.rho)
+        self.lu = np.asarray(self.lu, dtype=self.dtype)
 
 
 
@@ -203,9 +202,9 @@ class CnstrMOD(admm.ADMMEqual):
     def xstep(self):
         """Minimise Augmented Lagrangian with respect to x."""
 
-        self.X = sl.lu_solve_AATI(self.A, self.rho, self.SAT +
-                                  self.rho*(self.Y - self.U),
-                                  self.lu, self.piv,)
+        self.X = np.asarray(sl.lu_solve_AATI(self.A, self.rho, self.SAT +
+                            self.rho*(self.Y - self.U), self.lu, self.piv,),
+                            dtype=self.dtype)
 
 
 
@@ -249,12 +248,24 @@ class CnstrMOD(admm.ADMMEqual):
         """Re-factorise matrix when rho changes"""
 
         self.lu, self.piv = sl.lu_factor(self.A, self.rho)
-
+        self.lu = np.asarray(self.lu, dtype=self.dtype)
 
 
 
 def getPcn(zm):
-    """Construct constraint set projection function"""
+    """Construct constraint set projection function.
+
+    Parameters
+    ----------
+    zm : bool
+      Flag indicating whether the projection function should include
+      column mean subtraction
+
+    Returns
+    -------
+    fn : function
+      Constraint set projection function
+    """
 
     if zm:
         return lambda x: normalise(zeromean(x))
@@ -264,15 +275,37 @@ def getPcn(zm):
 
 
 def zeromean(v):
-    """Subtract mean of each column of matrix."""
+    """Subtract mean of each column of matrix.
+
+    Parameters
+    ----------
+    v : array_like
+      Input dictionary array
+
+    Returns
+    -------
+    vz : ndarray
+      Dictionary array with column means subtracted
+    """
 
     return v - np.mean(v, 0)
 
 
 
 def normalise(v):
-    """Normalise columns of matrix."""
+    """Normalise columns of matrix.
+
+    Parameters
+    ----------
+    v : array_like
+      Array with columns to be normalised
+
+    Returns
+    -------
+    vnrm : ndarray
+      Normalised array
+    """
 
     vn = np.sqrt(np.sum(v**2, 0))
     vn[vn == 0] = 1.0
-    return v / vn
+    return np.asarray(v / vn, dtype=v.dtype)

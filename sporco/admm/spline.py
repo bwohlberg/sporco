@@ -116,17 +116,11 @@ class SplineL1(admm.ADMM):
 
 
 
-    IterationStats = collections.namedtuple('IterationStats',
-                ['Iter', 'ObjFun', 'DFid', 'Reg', 'PrimalRsdl', 'DualRsdl',
-                 'EpsPrimal', 'EpsDual', 'Rho', 'XSlvRelRes', 'Time'])
-    """Named tuple type for recording ADMM iteration statistics"""
+    itstat_fields_objfn = ('ObjFun', 'DFid', 'Reg')
+    itstat_fields_extra = ('XSlvRelRes',)
+    hdrtxt_objfn = ('Fnc', 'DFid', 'Reg')
+    hdrval_objfun = {'Fnc' : 'ObjFun', 'DFid' : 'DFid', 'Reg' : 'Reg'}
 
-    hdrtxt = ['Itn', 'Fnc', 'DFid', 'Reg', 'r', 's', 'rho']
-    """Display column header text"""
-    hdrval = {'Itn' : 'Iter', 'Fnc' : 'ObjFun', 'DFid' : 'DFid',
-              'Reg' : 'Reg', 'r' : 'PrimalRsdl', 's' : 'DualRsdl',
-              'rho' : 'Rho'}
-    """Dictionary mapping display column headers to IterationStats entries"""
 
 
     def __init__(self, S, lmbda, opt=None, axes=(0,1)):
@@ -148,14 +142,21 @@ class SplineL1(admm.ADMM):
         if opt is None:
             opt = SplineL1.Options()
 
+        # Set dtype attribute based on S.dtype and opt['DataType']
+        self.set_dtype(opt, S.dtype)
+
         self.axes = axes
-        self.lmbda = lmbda
+        self.lmbda = self.dtype.type(lmbda)
+
+       # Set penalty parameter
+        self.set_attr('rho', opt['rho'], dval=(2.0*self.lmbda + 0.1),
+                      dtype=self.dtype)
 
         Nx = S.size
         super(SplineL1, self).__init__(Nx, S.shape, S.shape, S.dtype, opt)
 
-        self.S = S
-        self.Wdf = self.opt['DFidWeight']
+        self.S = np.asarray(S, dtype=self.dtype)
+        self.Wdf = np.asarray(self.opt['DFidWeight'], dtype=self.dtype)
 
         ashp = [1,] * S.ndim
         for ax in axes:
@@ -173,13 +174,6 @@ class SplineL1(admm.ADMM):
         # elapsed time if a similar increment is applied in a derived
         # class __init__.
         self.runtime += self.timer.elapsed(reset=True)
-
-
-
-    def rhoinit(self):
-        """Return initialiser for penalty parameter"""
-
-        return 2.0*self.lmbda + 0.1
 
 
 
