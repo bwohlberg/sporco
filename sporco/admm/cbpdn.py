@@ -970,9 +970,14 @@ class ConvElasticNet(ConvBPDN):
 
         if opt is None:
             opt = ConvBPDN.Options()
+
+        # Set dtype attribute based on S.dtype and opt['DataType']
+        self.set_dtype(opt, S.dtype)
+
+        self.mu = self.dtype.type(mu)
+
         super(ConvElasticNet, self).__init__(D, S, lmbda, opt, dimK=dimK,
                                              dimN=dimN)
-        self.mu = self.dtype.type(mu)
 
 
 

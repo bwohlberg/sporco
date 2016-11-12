@@ -546,9 +546,7 @@ class ConvCnstrMOD(admm.ADMMEqual):
         # simplest way to handle this is to just reshape so that the
         # channels also appear on the multiple image index.
         if self.Cd == 1 and self.C > 1:
-            self.A = A.reshape(self.Nv + (1,) + (self.Cx*self.K,) + (self.M,))
-        else:
-            self.A = A
+            A = A.reshape(self.Nv + (1,) + (self.Cx*self.K,) + (self.M,))
         self.A = np.asarray(A, dtype=self.dtype)
 
         self.Af = sl.rfftn(self.A, self.Nv, self.axisN)
