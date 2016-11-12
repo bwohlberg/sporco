@@ -1,7 +1,7 @@
 Dictionary Learning
 ===================
 
-This module includes the :class:`.DictLearn` class that supports
+The :mod:`.dictlrn` module includes the :class:`.DictLearn` class that supports
 dictionary learning via alternation between user-specified sparse
 coding and dictionary update steps, each of which is based on an ADMM
 algorithm. The standard dictionary learning classes in :mod:`.admm.bpdndl`

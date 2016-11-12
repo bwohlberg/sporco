@@ -16,7 +16,7 @@ This module includes the following classes:
 * :class:`.ConvBPDNJoint`
 
   Solve the Convolutional BPDN problem with joint sparsity over
-  multiple signal channels via an :math:`\ell^{2,1}` norm term
+  multiple signal channels via an :math:`\ell_{2,1}` norm term
 
   .. math::
        \mathrm{argmin}_\mathbf{x} \;
@@ -28,7 +28,7 @@ This module includes the following classes:
 * :class:`.ConvElasticNet`
 
   Solve the Convolutional Elastic Net (i.e. Convolutional BPDN with an
-  additional :math:`\ell^2` penalty on the coefficient maps)
+  additional :math:`\ell_2` penalty on the coefficient maps)
 
   .. math::
      \mathrm{argmin}_\mathbf{x} \;
@@ -39,7 +39,7 @@ This module includes the following classes:
 
 * :class:`.ConvBPDNGradReg`
 
-  Solve Convolutional BPDN with an additional :math:`\ell^2` penalty
+  Solve Convolutional BPDN with an additional :math:`\ell_2` penalty
   on the gradient of the coefficient maps
 
   .. math::

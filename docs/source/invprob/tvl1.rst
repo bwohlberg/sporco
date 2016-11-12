@@ -5,7 +5,7 @@ This module includes the following classes:
 
 * :class:`.TVL1Denoise`
 
-  Solve the :math:`\ell^1`-TV denoising problem
+  Solve the :math:`\ell_1`-TV denoising problem
 
   .. math::
      \mathrm{argmin}_\mathbf{x} \;
@@ -15,7 +15,7 @@ This module includes the following classes:
 
 * :class:`.TVL1Deconv`
 
-  Solve the :math:`\ell^1`-TV deconvolution problem
+  Solve the :math:`\ell_1`-TV deconvolution problem
 
   .. math::
      \mathrm{argmin}_\mathbf{x} \;

@@ -14,7 +14,7 @@ This module includes the following classes:
 
 * :class:`.BPDNJoint`
 
-  Solve the BPDN problem with an additional :math:`\ell^{2,1}` norm
+  Solve the BPDN problem with an additional :math:`\ell_{2,1}` norm
   term to promote joint sparsity
 
   .. math::

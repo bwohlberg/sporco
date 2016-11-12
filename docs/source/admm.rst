@@ -197,3 +197,9 @@ prior to variable splitting.
 
 See :class:`.ConvBPDNMaskDcpl` as an example of a class derived from
 :class:`.ConvTwoBlockCnstrnt`.
+
+
+.. toctree::
+   :hidden:
+
+   notes
