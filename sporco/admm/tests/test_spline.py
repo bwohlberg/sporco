@@ -26,7 +26,7 @@ class TestSet01(object):
         lmbda = 0.1
         opt = spline.SplineL1.Options({'Verbose' : False, 'gEvalY' : False,
                               'MaxMainIter' : 250, 'RelStopTol' : 5e-4,
-                              'DFidWeight' : V == 0, 
+                              'DFidWeight' : V == 0,
                               'AutoRho' : {'Enabled' : True}})
         b = spline.SplineL1(D, lmbda, opt)
         X = b.solve()
@@ -44,3 +44,31 @@ class TestSet01(object):
         except Exception as e:
             print(e)
             assert(0)
+
+
+    def test_03(self):
+        N = 8
+        D = np.random.randn(N, N)
+        lmbda = 0.1
+        dt = np.float32
+        opt = spline.SplineL1.Options({'Verbose' : False, 'MaxMainIter' : 20,
+                              'AutoRho' : {'Enabled' : True}, 'DataType' : dt})
+        b = spline.SplineL1(D, lmbda, opt=opt)
+        b.solve()
+        assert(b.X.dtype == dt)
+        assert(b.Y.dtype == dt)
+        assert(b.U.dtype == dt)
+
+
+    def test_03(self):
+        N = 8
+        D = np.random.randn(N, N)
+        lmbda = 0.1
+        dt = np.float64
+        opt = spline.SplineL1.Options({'Verbose' : False, 'MaxMainIter' : 20,
+                              'AutoRho' : {'Enabled' : True}, 'DataType' : dt})
+        b = spline.SplineL1(D, lmbda, opt=opt)
+        b.solve()
+        assert(b.X.dtype == dt)
+        assert(b.Y.dtype == dt)
+        assert(b.U.dtype == dt)

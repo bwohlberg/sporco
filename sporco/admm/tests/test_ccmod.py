@@ -38,7 +38,7 @@ class TestSet01(object):
         c = ccmod.ConvCnstrMOD(Xr, Sr, D0.shape, opt)
         c.solve()
         D1 = ccmod.bcrop(c.Y, D0.shape).squeeze()
-        assert(sl.rrs(D0,D1) < 1e-5) 
+        assert(sl.rrs(D0,D1) < 1e-5)
 
 
     def test_02(self):
@@ -66,3 +66,39 @@ class TestSet01(object):
         except Exception as e:
             print(e)
             assert(0)
+
+
+    def test_04(self):
+        N = 16
+        M = 4
+        Nd = 8
+        X = np.random.randn(N, N, 1, 1, M)
+        S = np.random.randn(N, N, 1)
+        dt = np.float32
+        opt = ccmod.ConvCnstrMOD.Options(
+            {'Verbose' : False, 'MaxMainIter' : 20,
+             'AutoRho' : {'Enabled' : True},
+             'DataType' : dt})
+        c = ccmod.ConvCnstrMOD(X, S, (Nd, Nd, M), opt=opt)
+        c.solve()
+        assert(c.X.dtype == dt)
+        assert(c.Y.dtype == dt)
+        assert(c.U.dtype == dt)
+
+
+    def test_05(self):
+        N = 16
+        M = 4
+        Nd = 8
+        X = np.random.randn(N, N, 1, 1, M)
+        S = np.random.randn(N, N, 1)
+        dt = np.float64
+        opt = ccmod.ConvCnstrMOD.Options(
+            {'Verbose' : False, 'MaxMainIter' : 20,
+             'AutoRho' : {'Enabled' : True},
+             'DataType' : dt})
+        c = ccmod.ConvCnstrMOD(X, S, (Nd, Nd, M), opt=opt)
+        c.solve()
+        assert(c.X.dtype == dt)
+        assert(c.Y.dtype == dt)
+        assert(c.U.dtype == dt)

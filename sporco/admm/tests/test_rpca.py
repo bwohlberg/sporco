@@ -42,3 +42,42 @@ class TestSet01(object):
         except Exception as e:
             print(e)
             assert(0)
+
+
+    def test_03(self):
+        N = 8
+        D = np.random.randn(N, N)
+        dt = np.float16
+        opt = rpca.RobustPCA.Options({'Verbose' : False, 'MaxMainIter' : 20,
+                            'AutoRho' : {'Enabled' : True}, 'DataType' : dt})
+        b = rpca.RobustPCA(D, opt=opt)
+        b.solve()
+        assert(b.X.dtype == dt)
+        assert(b.Y.dtype == dt)
+        assert(b.U.dtype == dt)
+
+
+    def test_04(self):
+        N = 8
+        D = np.random.randn(N, N)
+        dt = np.float32
+        opt = rpca.RobustPCA.Options({'Verbose' : False, 'MaxMainIter' : 20,
+                            'AutoRho' : {'Enabled' : True}, 'DataType' : dt})
+        b = rpca.RobustPCA(D, opt=opt)
+        b.solve()
+        assert(b.X.dtype == dt)
+        assert(b.Y.dtype == dt)
+        assert(b.U.dtype == dt)
+
+
+    def test_05(self):
+        N = 8
+        D = np.random.randn(N, N)
+        dt = np.float64
+        opt = rpca.RobustPCA.Options({'Verbose' : False, 'MaxMainIter' : 20,
+                            'AutoRho' : {'Enabled' : True}, 'DataType' : dt})
+        b = rpca.RobustPCA(D, opt=opt)
+        b.solve()
+        assert(b.X.dtype == dt)
+        assert(b.Y.dtype == dt)
+        assert(b.U.dtype == dt)

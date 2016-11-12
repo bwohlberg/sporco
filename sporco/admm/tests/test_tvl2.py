@@ -37,6 +37,67 @@ class TestSet01(object):
             assert(0)
 
 
+    def test_03(self):
+        lmbda = 3
+        dt = np.float16
+        opt = tvl2.TVL2Denoise.Options({'Verbose' : False, 'MaxMainIter' : 20,
+                            'AutoRho' : {'Enabled' : True}, 'DataType' : dt})
+        b = tvl2.TVL2Denoise(self.D, lmbda, opt=opt)
+        b.solve()
+        assert(b.X.dtype == dt)
+        assert(b.Y.dtype == dt)
+        assert(b.U.dtype == dt)
+
+
+    def test_04(self):
+        lmbda = 3
+        dt = np.float32
+        opt = tvl2.TVL2Denoise.Options({'Verbose' : False, 'MaxMainIter' : 20,
+                            'AutoRho' : {'Enabled' : True}, 'DataType' : dt})
+        b = tvl2.TVL2Denoise(self.D, lmbda, opt=opt)
+        b.solve()
+        assert(b.X.dtype == dt)
+        assert(b.Y.dtype == dt)
+        assert(b.U.dtype == dt)
+
+
+    def test_05(self):
+        lmbda = 3
+        dt = np.float64
+        opt = tvl2.TVL2Denoise.Options({'Verbose' : False, 'MaxMainIter' : 20,
+                            'AutoRho' : {'Enabled' : True}, 'DataType' : dt})
+        b = tvl2.TVL2Denoise(self.D, lmbda, opt=opt)
+        b.solve()
+        assert(b.X.dtype == dt)
+        assert(b.Y.dtype == dt)
+        assert(b.U.dtype == dt)
+
+
+    def test_06(self):
+        lmbda = 3
+        dt = np.float32
+        opt = tvl2.TVL2Deconv.Options({'Verbose' : False, 'MaxMainIter' : 20,
+                            'AutoRho' : {'Enabled' : True}, 'DataType' : dt})
+        b = tvl2.TVL2Deconv(np.ones((1,1)), self.D, lmbda, opt=opt)
+        b.solve()
+        assert(b.X.dtype == dt)
+        assert(b.Y.dtype == dt)
+        assert(b.U.dtype == dt)
+
+
+    def test_07(self):
+        lmbda = 3
+        dt = np.float64
+        opt = tvl2.TVL2Deconv.Options({'Verbose' : False, 'MaxMainIter' : 20,
+                            'AutoRho' : {'Enabled' : True}, 'DataType' : dt})
+        b = tvl2.TVL2Deconv(np.ones((1,1)), self.D, lmbda, opt=opt)
+        b.solve()
+        assert(b.X.dtype == dt)
+        assert(b.Y.dtype == dt)
+        assert(b.U.dtype == dt)
+
+
+
 
 
 class TestSet02(object):

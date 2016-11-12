@@ -5,6 +5,7 @@ from builtins import object
 import pytest
 import numpy as np
 from scipy import linalg
+import pickle
 
 from sporco.admm import bpdn
 import sporco.linalg as sl
@@ -44,6 +45,69 @@ class TestSet01(object):
 
 
     def test_03(self):
+        N = 8
+        M = 16
+        D = np.random.randn(N, M)
+        s = np.random.randn(N, 1)
+        try:
+            opt = bpdn.BPDN.Options({'Verbose' : True, 'MaxMainIter' : 20,
+                                     'AutoRho' : {'StdResiduals' : True}})
+            b = bpdn.BPDN(D, s, lmbda=1.0, opt=opt)
+            b.solve()
+        except Exception as e:
+            print(e)
+            assert(0)
+
+
+    def test_04(self):
+        N = 8
+        M = 16
+        D = np.random.randn(N, M)
+        s = np.random.randn(N, 1)
+        dt = np.float16
+        opt = bpdn.BPDN.Options({'Verbose' : False, 'MaxMainIter' : 20,
+                                 'AutoRho' : {'Enabled' : True},
+                                 'DataType' : dt})
+        b = bpdn.BPDN(D, s, lmbda=1.0, opt=opt)
+        b.solve()
+        assert(b.X.dtype == dt)
+        assert(b.Y.dtype == dt)
+        assert(b.U.dtype == dt)
+
+
+    def test_05(self):
+        N = 8
+        M = 16
+        D = np.random.randn(N, M)
+        s = np.random.randn(N, 1)
+        dt = np.float32
+        opt = bpdn.BPDN.Options({'Verbose' : False, 'MaxMainIter' : 20,
+                                 'AutoRho' : {'Enabled' : True},
+                                 'DataType' : dt})
+        b = bpdn.BPDN(D, s, lmbda=1.0, opt=opt)
+        b.solve()
+        assert(b.X.dtype == dt)
+        assert(b.Y.dtype == dt)
+        assert(b.U.dtype == dt)
+
+
+    def test_06(self):
+        N = 8
+        M = 16
+        D = np.random.randn(N, M)
+        s = np.random.randn(N, 1)
+        dt = np.float64
+        opt = bpdn.BPDN.Options({'Verbose' : False, 'MaxMainIter' : 20,
+                                 'AutoRho' : {'Enabled' : True},
+                                 'DataType' : dt})
+        b = bpdn.BPDN(D, s, lmbda=1.0, opt=opt)
+        b.solve()
+        assert(b.X.dtype == dt)
+        assert(b.Y.dtype == dt)
+        assert(b.U.dtype == dt)
+
+
+    def test_07(self):
         N = 64
         M = 2*N
         L = 4
@@ -65,7 +129,7 @@ class TestSet01(object):
         assert(linalg.norm(x1-x0) < 1e-3)
 
 
-    def test_04(self):
+    def test_08(self):
         N = 8
         M = 16
         D = np.random.randn(N, M)
@@ -80,7 +144,23 @@ class TestSet01(object):
             assert(0)
 
 
-    def test_05(self):
+    def test_09(self):
+        N = 8
+        M = 16
+        D = np.random.randn(N, M)
+        s = np.random.randn(N, 1)
+        dt = np.float16
+        opt = bpdn.BPDNJoint.Options({'Verbose' : False, 'MaxMainIter' : 20,
+                                 'AutoRho' : {'Enabled' : True},
+                                 'DataType' : dt})
+        b = bpdn.BPDNJoint(D, s, lmbda=1.0, mu=0.1, opt=opt)
+        b.solve()
+        assert(b.X.dtype == dt)
+        assert(b.Y.dtype == dt)
+        assert(b.U.dtype == dt)
+
+
+    def test_10(self):
         N = 8
         M = 16
         D = np.random.randn(N, M)
@@ -93,3 +173,34 @@ class TestSet01(object):
         except Exception as e:
             print(e)
             assert(0)
+
+
+    def test_11(self):
+        N = 8
+        M = 16
+        D = np.random.randn(N, M)
+        s = np.random.randn(N, 1)
+        dt = np.float16
+        opt = bpdn.ElasticNet.Options({'Verbose' : False, 'MaxMainIter' : 20,
+                                 'AutoRho' : {'Enabled' : True},
+                                 'DataType' : dt})
+        b = bpdn.ElasticNet(D, s, lmbda=1.0, mu=0.1, opt=opt)
+        b.solve()
+        assert(b.X.dtype == dt)
+        assert(b.Y.dtype == dt)
+        assert(b.U.dtype == dt)
+
+
+    def test_16(self):
+        N = 8
+        M = 16
+        D = np.random.randn(N, M)
+        s = np.random.randn(N, 1)
+        lmbda = 1e-1
+        opt = bpdn.BPDN.Options({'Verbose' : False, 'MaxMainIter' : 10})
+        b = bpdn.BPDN(D, s, lmbda, opt)
+        bp = pickle.dumps(b)
+        c = pickle.loads(bp)
+        Xb = b.solve()
+        Xc = c.solve()
+        assert(linalg.norm(Xb-Xc)==0.0)

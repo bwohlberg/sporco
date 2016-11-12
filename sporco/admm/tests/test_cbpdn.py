@@ -3,6 +3,7 @@ from builtins import object
 
 import pytest
 import numpy as np
+import pickle
 
 from sporco.admm import cbpdn
 import sporco.linalg as sl
@@ -85,6 +86,44 @@ class TestSet01(object):
     def test_06(self):
         N = 16
         Nd = 5
+        K = 2
+        M = 4
+        D = np.random.randn(Nd, Nd, M)
+        s = np.random.randn(N, N, K)
+        dt = np.float32
+        opt = cbpdn.ConvBPDN.Options({'Verbose' : False, 'MaxMainIter' : 20,
+                                 'AutoRho' : {'Enabled' : True},
+                                 'DataType' : dt})
+        lmbda = 1e-1
+        b = cbpdn.ConvBPDN(D, s, lmbda, opt=opt)
+        b.solve()
+        assert(b.X.dtype == dt)
+        assert(b.Y.dtype == dt)
+        assert(b.U.dtype == dt)
+
+
+    def test_07(self):
+        N = 16
+        Nd = 5
+        K = 2
+        M = 4
+        D = np.random.randn(Nd, Nd, M)
+        s = np.random.randn(N, N, K)
+        dt = np.float64
+        opt = cbpdn.ConvBPDN.Options({'Verbose' : False, 'MaxMainIter' : 20,
+                                 'AutoRho' : {'Enabled' : True},
+                                 'DataType' : dt})
+        lmbda = 1e-1
+        b = cbpdn.ConvBPDN(D, s, lmbda, opt=opt)
+        b.solve()
+        assert(b.X.dtype == dt)
+        assert(b.Y.dtype == dt)
+        assert(b.U.dtype == dt)
+
+
+    def test_08(self):
+        N = 16
+        Nd = 5
         M = 4
         D = np.random.randn(Nd, Nd, M)
         s = np.random.randn(N, N)
@@ -97,7 +136,7 @@ class TestSet01(object):
             assert(0)
 
 
-    def test_07(self):
+    def test_09(self):
         N = 16
         Nd = 5
         M = 4
@@ -111,7 +150,7 @@ class TestSet01(object):
             assert(0)
 
 
-    def test_08(self):
+    def test_10(self):
         N = 64
         M = 4
         Nd = 8
@@ -136,7 +175,7 @@ class TestSet01(object):
         assert(sl.rrs(S,Sr) < 1e-4)
 
 
-    def test_09(self):
+    def test_11(self):
         N = 63
         M = 4
         Nd = 8
@@ -160,7 +199,7 @@ class TestSet01(object):
         assert(sl.rrs(S,Sr) < 1e-4)
 
 
-    def test_10(self):
+    def test_12(self):
         N = 16
         Nd = 5
         Cs = 3
@@ -176,7 +215,7 @@ class TestSet01(object):
             assert(0)
 
 
-    def test_11(self):
+    def test_13(self):
         N = 16
         Nd = 5
         Cs = 3
@@ -192,7 +231,27 @@ class TestSet01(object):
             assert(0)
 
 
-    def test_12(self):
+    def test_14(self):
+        N = 16
+        Nd = 5
+        K = 2
+        M = 4
+        D = np.random.randn(Nd, Nd, M)
+        s = np.random.randn(N, N, K)
+        dt = np.float32
+        opt = cbpdn.ConvBPDNJoint.Options({'Verbose' : False,
+                        'MaxMainIter' : 20, 'AutoRho' : {'Enabled' : True},
+                        'DataType' : dt})
+        lmbda = 1e-1
+        mu = 1e-2
+        b = cbpdn.ConvBPDNJoint(D, s, lmbda, mu, opt=opt)
+        b.solve()
+        assert(b.X.dtype == dt)
+        assert(b.Y.dtype == dt)
+        assert(b.U.dtype == dt)
+
+
+    def test_15(self):
         N = 16
         Nd = 5
         M = 4
@@ -208,7 +267,27 @@ class TestSet01(object):
             assert(0)
 
 
-    def test_13(self):
+    def test_16(self):
+        N = 16
+        Nd = 5
+        K = 2
+        M = 4
+        D = np.random.randn(Nd, Nd, M)
+        s = np.random.randn(N, N, K)
+        dt = np.float32
+        opt = cbpdn.ConvElasticNet.Options({'Verbose' : False,
+                        'MaxMainIter' : 20, 'AutoRho' : {'Enabled' : True},
+                        'DataType' : dt})
+        lmbda = 1e-1
+        mu = 1e-2
+        b = cbpdn.ConvElasticNet(D, s, lmbda, mu, opt=opt)
+        b.solve()
+        assert(b.X.dtype == dt)
+        assert(b.Y.dtype == dt)
+        assert(b.U.dtype == dt)
+
+
+    def test_17(self):
         N = 16
         Nd = 5
         M = 4
@@ -224,7 +303,27 @@ class TestSet01(object):
             assert(0)
 
 
-    def test_15(self):
+    def test_18(self):
+        N = 16
+        Nd = 5
+        K = 2
+        M = 4
+        D = np.random.randn(Nd, Nd, M)
+        s = np.random.randn(N, N, K)
+        dt = np.float32
+        opt = cbpdn.ConvBPDNGradReg.Options({'Verbose' : False,
+                        'MaxMainIter' : 20, 'AutoRho' : {'Enabled' : True},
+                        'DataType' : dt})
+        lmbda = 1e-1
+        mu = 1e-2
+        b = cbpdn.ConvBPDNGradReg(D, s, lmbda, mu, opt=opt)
+        b.solve()
+        assert(b.X.dtype == dt)
+        assert(b.Y.dtype == dt)
+        assert(b.U.dtype == dt)
+
+
+    def test_21(self):
         N = 16
         Nd = 5
         M = 4
@@ -239,7 +338,26 @@ class TestSet01(object):
             assert(0)
 
 
-    def test_16(self):
+    def test_22(self):
+        N = 16
+        Nd = 5
+        K = 2
+        M = 4
+        D = np.random.randn(Nd, Nd, M)
+        s = np.random.randn(N, N, K)
+        dt = np.float32
+        opt = cbpdn.ConvBPDNMaskDcpl.Options({'Verbose' : False,
+                    'MaxMainIter' : 20, 'AutoRho' : {'Enabled' : True},
+                    'DataType' : dt})
+        lmbda = 1e-1
+        b = cbpdn.ConvBPDNMaskDcpl(D, s, lmbda, opt=opt)
+        b.solve()
+        assert(b.X.dtype == dt)
+        assert(b.Y.dtype == dt)
+        assert(b.U.dtype == dt)
+
+
+    def test_23(self):
         N = 16
         Nd = 5
         M = 4
@@ -254,3 +372,37 @@ class TestSet01(object):
             print(e)
             assert(0)
 
+
+    def test_24(self):
+        N = 16
+        Nd = 5
+        M = 4
+        D = np.random.randn(Nd, Nd, M)
+        s = np.random.randn(N, N)
+        w = np.ones(s.shape)
+        dt = np.float32
+        opt = cbpdn.ConvBPDN.Options({'Verbose' : False, 'MaxMainIter' : 20,
+                                 'AutoRho' : {'Enabled' : True},
+                                 'DataType' : dt})
+        lmbda = 1e-1
+        b = cbpdn.AddMaskSim(cbpdn.ConvBPDN, D, s, w, lmbda, opt=opt)
+        b.solve()
+        assert(b.cbpdn.X.dtype == dt)
+        assert(b.cbpdn.Y.dtype == dt)
+        assert(b.cbpdn.U.dtype == dt)
+
+
+    def test_26(self):
+        N = 16
+        Nd = 5
+        M = 4
+        D = np.random.randn(Nd, Nd, M)
+        s = np.random.randn(N, N)
+        lmbda = 1e-1
+        opt = cbpdn.ConvBPDN.Options({'Verbose' : False, 'MaxMainIter' : 10})
+        b = cbpdn.ConvBPDN(D, s, lmbda, opt)
+        bp = pickle.dumps(b)
+        c = pickle.loads(bp)
+        Xb = b.solve()
+        Xc = c.solve()
+        assert(np.linalg.norm(Xb-Xc)==0.0)

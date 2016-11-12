@@ -41,3 +41,55 @@ class TestSet01(object):
         except Exception as e:
             print(e)
             assert(0)
+
+
+    def test_03(self):
+        N = 16
+        M = 4
+        K = 8
+        X = np.random.randn(M, K)
+        S = np.random.randn(N, K)
+        dt = np.float16
+        opt = cmod.CnstrMOD.Options({'Verbose' : False, 'MaxMainIter' : 20,
+                                     'AutoRho' : {'Enabled' : True},
+                                     'DataType' : dt})
+        b = cmod.CnstrMOD(X, S, opt=opt)
+        b.solve()
+        assert(b.X.dtype == dt)
+        assert(b.Y.dtype == dt)
+        assert(b.U.dtype == dt)
+
+
+    def test_04(self):
+        N = 16
+        M = 4
+        K = 8
+        X = np.random.randn(M, K)
+        S = np.random.randn(N, K)
+        dt = np.float32
+        opt = cmod.CnstrMOD.Options({'Verbose' : False, 'MaxMainIter' : 20,
+                                     'AutoRho' : {'Enabled' : True},
+                                     'DataType' : dt})
+        b = cmod.CnstrMOD(X, S, opt=opt)
+        b.solve()
+        assert(b.X.dtype == dt)
+        assert(b.Y.dtype == dt)
+        assert(b.U.dtype == dt)
+
+
+    def test_05(self):
+        N = 16
+        M = 4
+        K = 8
+        X = np.random.randn(M, K)
+        S = np.random.randn(N, K)
+        dt = np.float64
+        opt = cmod.CnstrMOD.Options({'Verbose' : False, 'MaxMainIter' : 20,
+                                     'AutoRho' : {'Enabled' : True},
+                                     'DataType' : dt})
+        b = cmod.CnstrMOD(X, S, opt=opt)
+        b.solve()
+        assert(b.X.dtype == dt)
+        assert(b.Y.dtype == dt)
+        assert(b.U.dtype == dt)
+
