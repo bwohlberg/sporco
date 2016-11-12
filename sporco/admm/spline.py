@@ -147,7 +147,7 @@ class SplineL1(admm.ADMM):
         self.axes = axes
         self.lmbda = self.dtype.type(lmbda)
 
-       # Set penalty parameter
+        # Set penalty parameter
         self.set_attr('rho', opt['rho'], dval=(2.0*self.lmbda + 0.1),
                       dtype=self.dtype)
 
