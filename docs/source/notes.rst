@@ -22,3 +22,8 @@ Notes
 
       export PYTHONIOENCODING=utf-8
 
+
+.. toctree::
+   :hidden:
+
+   modules
