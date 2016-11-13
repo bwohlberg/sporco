@@ -29,7 +29,7 @@ This module includes the following classes:
   .. math::
      \mathrm{argmin}_\mathbf{x} \;
      (1/2) \| D \mathbf{x} - \mathbf{s} \|_2^2 + \lambda \| \mathbf{x} \|_1
-                                                 + (\mu/2) \| \mathbf{x} \|_2^2
+     + (\mu/2) \| \mathbf{x} \|_2^2
 
 
 
