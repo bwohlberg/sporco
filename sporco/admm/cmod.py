@@ -160,13 +160,6 @@ class CnstrMOD(admm.ADMMEqual):
 
 
 
-    def rhoinit(self):
-        """Return initialiser for penalty parameter"""
-
-        return self.S.shape[1] / 500.0
-
-
-
     def uinit(self, ushape):
         """Return initialiser for working variable U"""
 
