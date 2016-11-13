@@ -71,6 +71,21 @@ class TestSet01(object):
     def test_04(self):
         N = 16
         M = 4
+        Nc = 3
+        Nd = 8
+        X = np.random.randn(N, N, Nc, 1, M)
+        S = np.random.randn(N, N, Nc)
+        try:
+            c = ccmod.ConvCnstrMOD(X, S, (Nd, Nd, 1, M), dimK=0)
+            c.solve()
+        except Exception as e:
+            print(e)
+            assert(0)
+
+
+    def test_05(self):
+        N = 16
+        M = 4
         Nd = 8
         X = np.random.randn(N, N, 1, 1, M)
         S = np.random.randn(N, N, 1)
@@ -86,7 +101,7 @@ class TestSet01(object):
         assert(c.U.dtype == dt)
 
 
-    def test_05(self):
+    def test_06(self):
         N = 16
         M = 4
         Nd = 8

@@ -58,7 +58,7 @@ print("     reconstruction PSNR: %.2fdB\n" % spl.psnr(img, imgr))
 # Display representation and reconstructed image
 fig1 = plot.figure(1, figsize=(21,7))
 plot.subplot(1,3,1)
-plot.imview(np.sum(abs(X), axis=b.axisM).squeeze(), fgrf=fig1,
+plot.imview(np.sum(abs(X), axis=b.cri.axisM).squeeze(), fgrf=fig1,
             cmap=plot.cm.Blues, title='Representation')
 plot.subplot(1,3,2)
 plot.imview(imgr, fgrf=fig1, title='Reconstructed image')

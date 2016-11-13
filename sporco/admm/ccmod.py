@@ -473,16 +473,16 @@ class ConvCnstrMOD(admm.ADMMEqual):
             opt = ConvCnstrMOD.Options()
 
         # Infer problem dimensions and set relevant attributes of self
-        cri = ConvRepIndexing(dsz, S, dimK=dimK, dimN=dimN)
-        for attr in ['dimN', 'dimC', 'dimK', 'C', 'Cd', 'Cx', 'K', 'M',
-                     'Nv', 'N', 'axisN', 'axisC', 'axisK', 'axisM', 'dsz']:
-            setattr(self, attr, getattr(cri, attr))
+        self.cri = ConvRepIndexing(dsz, S, dimK=dimK, dimN=dimN)
+        #for attr in ['dimN', 'dimC', 'dimK', 'C', 'Cd', 'Cx', 'K', 'M',
+        #             'Nv', 'N', 'axisN', 'axisC', 'axisK', 'axisM', 'dsz']:
+        #    setattr(self, attr, getattr(cri, attr))
 
         # Call parent class __init__
-        super(ConvCnstrMOD, self).__init__(cri.shpD, S.dtype, opt)
+        super(ConvCnstrMOD, self).__init__(self.cri.shpD, S.dtype, opt)
 
         # Set penalty parameter
-        self.set_attr('rho', opt['rho'], dval=self.K, dtype=self.dtype)
+        self.set_attr('rho', opt['rho'], dval=self.cri.K, dtype=self.dtype)
 
         # Reshape S to standard layout (A, i.e. X in cbpdn, is assumed
         # to be taken from cbpdn, and therefore already in standard
@@ -492,17 +492,18 @@ class ConvCnstrMOD(admm.ADMMEqual):
         # the same behaviour in the dictionary update equation: the
         # simplest way to handle this is to just reshape so that the
         # channels also appear on the multiple image index.
-        if self.Cd == 1 and self.C > 1:
-            self.S = S.reshape(self.Nv + (1,) + (self.C*self.K,) + (1,))
+        if self.cri.Cd == 1 and self.cri.C > 1:
+            self.S = S.reshape(self.cri.Nv + (1,) +
+                               (self.cri.C*self.cri.K,) + (1,))
         else:
-            self.S = S.reshape(cri.shpS)
+            self.S = S.reshape(self.cri.shpS)
         self.S = np.asarray(self.S, dtype=self.dtype)
 
         # Compute signal S in DFT domain
-        self.Sf = sl.rfftn(self.S, None, self.axisN)
+        self.Sf = sl.rfftn(self.S, None, self.cri.axisN)
 
         # Create constraint set projection function
-        self.Pcn = getPcn(opt['ZeroMean'], dsz, self.Nv, self.dimN)
+        self.Pcn = getPcn(opt['ZeroMean'], dsz, self.cri.Nv, self.cri.dimN)
 
         # Create byte aligned arrays for FFT calls
         self.YU = sl.pyfftw_empty_aligned(self.Y.shape, dtype=self.dtype)
@@ -544,20 +545,22 @@ class ConvCnstrMOD(admm.ADMMEqual):
         # the same behaviour in the dictionary update equation: the
         # simplest way to handle this is to just reshape so that the
         # channels also appear on the multiple image index.
-        if self.Cd == 1 and self.C > 1:
-            A = A.reshape(self.Nv + (1,) + (self.Cx*self.K,) + (self.M,))
+        if self.cri.Cd == 1 and self.cri.C > 1:
+            A = A.reshape(self.cri.Nv + (1,) + (self.cri.Cx*self.cri.K,) +
+                          (self.cri.M,))
         self.A = np.asarray(A, dtype=self.dtype)
 
-        self.Af = sl.rfftn(self.A, self.Nv, self.axisN)
+        self.Af = sl.rfftn(self.A, self.cri.Nv, self.cri.axisN)
         # Compute X^H S
-        self.ASf = np.sum(np.conj(self.Af) * self.Sf, self.axisK, keepdims=True)
+        self.ASf = np.sum(np.conj(self.Af) * self.Sf, self.cri.axisK,
+                          keepdims=True)
 
 
 
     def getdict(self):
         """Get final dictionary."""
 
-        return bcrop(self.Y, self.dsz)
+        return bcrop(self.Y, self.cri.dsz)
 
 
 
@@ -568,22 +571,23 @@ class ConvCnstrMOD(admm.ADMMEqual):
 
         self.YU[:] = self.Y - self.U
 
-        b = self.ASf + self.rho*sl.rfftn(self.YU, None, self.axisN)
+        b = self.ASf + self.rho*sl.rfftn(self.YU, None, self.cri.axisN)
         if self.opt['LinSolve'] == 'SM':
-            self.Xf[:] = sl.solvemdbi_ism(self.Af, self.rho, b, self.axisM,
-                                self.axisK)
+            self.Xf[:] = sl.solvemdbi_ism(self.Af, self.rho, b, self.cri.axisM,
+                                self.cri.axisK)
         else:
             self.Xf[:], cgit = sl.solvemdbi_cg(self.Af, self.rho, b,
-                                self.axisM, self.axisK,
+                                self.cri.axisM, self.cri.axisK,
                                 self.opt['CG', 'StopTol'],
                                 self.opt['CG', 'MaxIter'], self.Xf)
             self.cgit = cgit
 
-        self.X = sl.irfftn(self.Xf, self.Nv, self.axisN)
+        self.X = sl.irfftn(self.Xf, self.cri.Nv, self.cri.axisN)
 
         if self.opt['LinSolveCheck']:
-            Aop = lambda x: np.sum(self.Af * x, axis=self.axisM, keepdims=True)
-            AHop = lambda x: np.sum(np.conj(self.Af) * x, axis=self.axisK,
+            Aop = lambda x: np.sum(self.Af * x, axis=self.cri.axisM,
+                                   keepdims=True)
+            AHop = lambda x: np.sum(np.conj(self.Af) * x, axis=self.cri.axisK,
                                     keepdims=True)
             ax = AHop(Aop(self.Xf)) + self.rho*self.Xf
             self.xrrs = sl.rrs(ax, b)
@@ -605,7 +609,7 @@ class ConvCnstrMOD(admm.ADMMEqual):
         """
 
         return self.Xf if self.opt['fEvalX'] else \
-            sl.rfftn(self.Y, None, self.axisN)
+            sl.rfftn(self.Y, None, self.cri.axisN)
 
 
 
@@ -625,9 +629,9 @@ class ConvCnstrMOD(admm.ADMMEqual):
         \mathbf{x}_m - \mathbf{s} \|_2^2`.
         """
 
-        Ef = np.sum(self.Af * self.obfn_fvarf(), axis=self.axisM,
+        Ef = np.sum(self.Af * self.obfn_fvarf(), axis=self.cri.axisM,
                     keepdims=True) - self.Sf
-        return sl.rfl2norm2(Ef, self.S.shape, axis=self.axisN) / 2.0
+        return sl.rfl2norm2(Ef, self.S.shape, axis=self.cri.axisN) / 2.0
 
 
 
@@ -731,8 +735,8 @@ def getPcn(zm, dsz, Nv, dimN=2, dimC=1):
     """
 
     if zm:
-        return lambda x: normalise(zeromean(zpad(bcrop(x, dsz, dimN), Nv), dsz),
-                                   dimN+dimC)
+        return lambda x: normalise(zeromean(zpad(bcrop(x, dsz, dimN), Nv),
+                                            dsz), dimN+dimC)
     else:
         return lambda x: normalise(zpad(bcrop(x, dsz, dimN), Nv), dimN+dimC)
 

@@ -64,7 +64,7 @@ plot.subplot(2,2,1)
 plot.imview(b.Y[...,0].squeeze(), fgrf=fig1, cmap=plot.cm.Blues,
             title='Lowpass component')
 plot.subplot(2,2,2)
-plot.imview(np.sum(abs(b.Y[...,1:]), axis=b.axisM).squeeze(), fgrf=fig1,
+plot.imview(np.sum(abs(b.Y[...,1:]), axis=b.cri.axisM).squeeze(), fgrf=fig1,
             cmap=plot.cm.Blues, title='Main representation')
 plot.subplot(2,2,3)
 plot.imview(imgr, fgrf=fig1, title='Reconstructed image')

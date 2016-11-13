@@ -25,8 +25,8 @@ class TestSet01(object):
         s = np.random.randn(N, N, Cs)
         lmbda = 1e-1
         b = cbpdn.ConvBPDN(D, s, lmbda, dimK=0)
-        assert(b.dimC == 1)
-        assert(b.dimK == 0)
+        assert(b.cri.dimC == 1)
+        assert(b.cri.dimK == 0)
 
 
     def test_02(self):
@@ -39,8 +39,8 @@ class TestSet01(object):
         s = np.random.randn(N, N, Cs, K)
         lmbda = 1e-1
         b = cbpdn.ConvBPDN(D, s, lmbda)
-        assert(b.dimC == 1)
-        assert(b.dimK == 1)
+        assert(b.cri.dimC == 1)
+        assert(b.cri.dimK == 1)
 
 
     def test_03(self):
@@ -52,8 +52,8 @@ class TestSet01(object):
         s = np.random.randn(N, N, Cd)
         lmbda = 1e-1
         b = cbpdn.ConvBPDN(D, s, lmbda)
-        assert(b.dimC == 1)
-        assert(b.dimK == 0)
+        assert(b.cri.dimC == 1)
+        assert(b.cri.dimK == 0)
 
 
     def test_04(self):
@@ -66,8 +66,8 @@ class TestSet01(object):
         s = np.random.randn(N, N, Cd, K)
         lmbda = 1e-1
         b = cbpdn.ConvBPDN(D, s, lmbda)
-        assert(b.dimC == 1)
-        assert(b.dimK == 1)
+        assert(b.cri.dimC == 1)
+        assert(b.cri.dimK == 1)
 
 
     def test_05(self):
@@ -79,8 +79,8 @@ class TestSet01(object):
         s = np.random.randn(N, N, K)
         lmbda = 1e-1
         b = cbpdn.ConvBPDN(D, s, lmbda)
-        assert(b.dimC == 0)
-        assert(b.dimK == 1)
+        assert(b.cri.dimC == 0)
+        assert(b.cri.dimK == 1)
 
 
     def test_06(self):
