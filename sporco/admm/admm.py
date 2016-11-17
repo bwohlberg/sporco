@@ -475,11 +475,12 @@ class ADMM(with_metaclass(_ADMM_Meta, object)):
         else:
             # Avoid calling cnst_c() more than once in case it is expensive
             # (e.g. due to allocation of a large block of memory)
-            if not hasattr(self, 'c'):
-                self.c = self.cnst_c()
+            if not hasattr(self, '_cnst_c'):
+                self._cnst_c = self.cnst_c()
             # Compute relaxed version of AX
             alpha = self.rlx
-            self.AX = alpha*self.AXnr - (1-alpha)*(self.cnst_B(self.Y) - self.c)
+            self.AX = alpha*self.AXnr - (1-alpha)*(self.cnst_B(self.Y) -
+                                self._cnst_c)
 
 
 
@@ -582,8 +583,7 @@ class ADMM(with_metaclass(_ADMM_Meta, object)):
         else:
             return type(self).IterationStats(
                 *[[self.itstat[k][l] for k in range(len(self.itstat))]
-                  for l in range(len(self.itstat[0]))]
-            )
+                  for l in range(len(self.itstat[0]))])
 
 
 
@@ -769,9 +769,9 @@ class ADMM(with_metaclass(_ADMM_Meta, object)):
 
         # Avoid calling cnst_c() more than once in case it is expensive
         # (e.g. due to allocation of a large block of memory)
-        if not hasattr(self, 'c'):
-            self.c = self.cnst_c()
-        return AX + self.cnst_B(Y) - self.c
+        if not hasattr(self, '_cnst_c'):
+            self._cnst_c = self.cnst_c()
+        return AX + self.cnst_B(Y) - self._cnst_c
 
 
 
@@ -797,9 +797,10 @@ class ADMM(with_metaclass(_ADMM_Meta, object)):
 
         # Avoid computing the norm of the value returned by cnst_c()
         # more than once
-        if not hasattr(self, 'nc'):
-            self.nc = linalg.norm(self.cnst_c())
-        return max((linalg.norm(AX), linalg.norm(self.cnst_B(Y)), self.nc))
+        if not hasattr(self, '_nrm_cnst_c'):
+            self._nrm_cnst_c = linalg.norm(self.cnst_c())
+        return max((linalg.norm(AX), linalg.norm(self.cnst_B(Y)),
+                    self._nrm_cnst_c))
 
 
 
@@ -908,10 +909,10 @@ class ADMMEqual(ADMM):
         """Implement relaxation if option ``RelaxParam`` != 1.0."""
 
         self.AXnr = self.X
-        if self.opt['RelaxParam'] == 1.0:
+        if self.rlx == 1.0:
             self.AX = self.X
         else:
-            alpha = self.opt['RelaxParam']
+            alpha = self.rlx
             self.AX = alpha*self.X + (1-alpha)*self.Y
 
 
@@ -1164,17 +1165,17 @@ class ADMMTwoBlockCnstrnt(ADMM):
         """Implement relaxation if option ``RelaxParam`` != 1.0."""
 
         self.AXnr = self.cnst_A(self.X)
-        if self.opt['RelaxParam'] == 1.0:
+        if self.rlx == 1.0:
             self.AX = self.AXnr
         else:
-            if not hasattr(self, 'c0'):
-                self.c0 = self.cnst_c0()
-            if not hasattr(self, 'c1'):
-                self.c1 = self.cnst_c1()
-            alpha = self.opt['RelaxParam']
+            if not hasattr(self, '_cnst_c0'):
+                self._cnst_c0 = self.cnst_c0()
+            if not hasattr(self, '_cnst_c1'):
+                self._cnst_c1 = self.cnst_c1()
+            alpha = self.rlx
             self.AX = alpha*self.cnst_A(self.X) + \
-                      (1-alpha)*self.block_cat(self.var_y0() + self.c0,
-                                               self.var_y1() + self.c1)
+                      (1-alpha)*self.block_cat(self.var_y0() + self._cnst_c0,
+                                               self.var_y1() + self._cnst_c1)
 
 
 
@@ -1381,12 +1382,12 @@ class ADMMTwoBlockCnstrnt(ADMM):
         overridden.
         """
 
-        if not hasattr(self, 'c0'):
-            self.c0 = self.cnst_c0()
-        if not hasattr(self, 'c1'):
-            self.c1 = self.cnst_c1()
-        return AX - self.block_cat(self.var_y0() + self.c0,
-                                   self.var_y1() + self.c1)
+        if not hasattr(self, '_cnst_c0'):
+            self._cnst_c0 = self.cnst_c0()
+        if not hasattr(self, '_cnst_c1'):
+            self._cnst_c1 = self.cnst_c1()
+        return AX - self.block_cat(self.var_y0() + self._cnst_c0,
+                                   self.var_y1() + self._cnst_c1)
 
 
 
@@ -1410,10 +1411,10 @@ class ADMMTwoBlockCnstrnt(ADMM):
         overridden.
         """
 
-        if not hasattr(self, 'nc'):
-            self.nc = np.sqrt(linalg.norm(self.cnst_c0())**2 +
+        if not hasattr(self, '_cnst_nrm_c'):
+            self._cnst_nrm_c = np.sqrt(linalg.norm(self.cnst_c0())**2 +
                               linalg.norm(self.cnst_c1())**2)
-        return max((linalg.norm(AX), linalg.norm(Y), self.nc))
+        return max((linalg.norm(AX), linalg.norm(Y), self._cnst_nrm_c))
 
 
 
