@@ -474,9 +474,6 @@ class ConvCnstrMOD(admm.ADMMEqual):
 
         # Infer problem dimensions and set relevant attributes of self
         self.cri = ConvRepIndexing(dsz, S, dimK=dimK, dimN=dimN)
-        #for attr in ['dimN', 'dimC', 'dimK', 'C', 'Cd', 'Cx', 'K', 'M',
-        #             'Nv', 'N', 'axisN', 'axisC', 'axisK', 'axisM', 'dsz']:
-        #    setattr(self, attr, getattr(cri, attr))
 
         # Call parent class __init__
         super(ConvCnstrMOD, self).__init__(self.cri.shpD, S.dtype, opt)
