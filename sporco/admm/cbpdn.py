@@ -692,8 +692,6 @@ class ConvBPDN(GenericConvBPDN):
         # Set default options if none specified
         if opt is None:
             opt = ConvBPDN.Options()
-        else:
-            opt = copy.deepcopy(opt)
 
         # Set dtype attribute based on S.dtype and opt['DataType']
         self.set_dtype(opt, S.dtype)
@@ -1175,7 +1173,7 @@ class ConvBPDNGradReg(ConvBPDN):
         """Construct gradient operators in frequency domain."""
 
         g = np.zeros((2,)*self.cri.dimN + (1,)*3 + (self.cri.dimN,),
-                     self.opt['DataType'])
+                     dtype=self.dtype)
         for k in self.cri.axisN:
             g[(0,)*k +(slice(None),)+(0,)*(g.ndim-2-k)+(k,)] = [1,-1]
         self.Gf = sl.rfftn(g, self.cri.Nv, axes=self.cri.axisN)

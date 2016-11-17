@@ -333,8 +333,6 @@ class BPDN(GenericBPDN):
         # Set default options if necessary
         if opt is None:
             opt = BPDN.Options()
-        else:
-            opt = copy.deepcopy(opt)
 
         # Set dtype attribute based on S.dtype and opt['DataType']
         self.set_dtype(opt, S.dtype)
