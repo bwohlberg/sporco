@@ -16,6 +16,7 @@ from builtins import object
 
 import numpy as np
 from scipy import misc
+import scipy.ndimage.interpolation as sni
 from timeit import default_timer as timer
 import os
 import glob
@@ -406,7 +407,7 @@ def convdicts():
 class ExampleImages(object):
     """Access a set of example images"""
 
-    def __init__(self, scaled=False):
+    def __init__(self, scaled=False, dtype=None, zoom=None):
         """Initialise an ExampleImages object.
 
         Parameters
@@ -415,9 +416,16 @@ class ExampleImages(object):
           Flag indicating whether images should be on the range [0,...,255]
           with np.uint8 dtype (False), or on the range [0,...,1] with
           np.float32 dtype (True)
+        dtype : data-type or None, optional (default None)
+          Desired data type of images. If `scaled` is True and `dtype` is an
+          integer type, the output data type is np.float32
+        zoom : float or None, optional (default None)
+          Optional support rescaling factor to apply to the images
         """
 
         self.scaled = scaled
+        self.dtype = dtype
+        self.zoom = zoom
         self.bpth = os.path.join(os.path.dirname(__file__), 'data')
         flst = glob.glob(os.path.join(self.bpth, '') + '*.png')
         self.nlist = []
@@ -438,7 +446,7 @@ class ExampleImages(object):
 
 
 
-    def image(self, name, scaled=None):
+    def image(self, name, scaled=None, dtype=None, zoom=None):
         """Get named image.
 
         Parameters
@@ -451,6 +459,16 @@ class ExampleImages(object):
           np.float32 dtype (True). If the value is None, scaling behaviour
           is determined by the `scaling` parameter passed to the object
           initializer, otherwise that selection is overridden.
+        dtype : data-type or None, optional (default None)
+          Desired data type of images. If `scaled` is True and `dtype` is an
+          integer type, the output data type is np.float32. If the value is
+          None, the data type is determined by the `dtype` parameter passed to
+          the object initializer, otherwise that selection is overridden.
+        zoom : float or None, optional (default None)
+          Optional rescaling factor to apply to the images. If the value is
+          None, support rescaling behaviour is determined by the `zoom`
+          parameter passed to the object initializer, otherwise that selection
+          is overridden.
 
         Returns
         -------
@@ -465,16 +483,29 @@ class ExampleImages(object):
 
         if scaled is None:
             scaled = self.scaled
+        if dtype is None:
+            if self.dtype is None:
+                dtype = np.uint8
+            else:
+                dtype = self.dtype
+        if scaled and np.issubdtype(dtype, np.integer):
+            dtype = np.float32
+        if zoom is None:
+            zoom = self.zoom
         pth = os.path.join(self.bpth, name) + '.png'
 
         try:
-            img = misc.imread(pth)
+            img = np.asarray(misc.imread(pth), dtype=dtype)
         except IOError:
             raise IOError('Could not access image with name ' + name)
 
-
         if scaled:
-            img = np.float32(img) / 255.0
+            img /= 255.0
+        if zoom is not None:
+            if img.ndim == 2:
+                img = sni.zoom(img, zoom)
+            else:
+                img = sni.zoom(img, (zoom,)*2 + (1,)*(img.ndim-2))
 
         return img
 
