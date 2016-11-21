@@ -26,6 +26,7 @@ h0 = np.zeros((11,11), dtype=np.float32)
 h0[5,5] = 1.0
 h = ndimage.filters.gaussian_filter(h0, 2.0)
 imgc = np.real(np.fft.ifft2(np.fft.fft2(h, img.shape) * np.fft.fft2(img)))
+np.random.seed(12345)
 imgcn = imgc + np.random.normal(0.0, 0.01, img.shape)
 
 # Set up TVDeconv options
