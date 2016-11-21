@@ -1173,7 +1173,7 @@ class ADMMTwoBlockCnstrnt(ADMM):
             if not hasattr(self, '_cnst_c1'):
                 self._cnst_c1 = self.cnst_c1()
             alpha = self.rlx
-            self.AX = alpha*self.cnst_A(self.X) + \
+            self.AX = alpha*self.AXnr + \
                       (1-alpha)*self.block_cat(self.var_y0() + self._cnst_c0,
                                                self.var_y1() + self._cnst_c1)
 
@@ -1346,7 +1346,7 @@ class ADMMTwoBlockCnstrnt(ADMM):
 
     def cnst_A0T(self, X):
         """Compute :math:`A_0^T \mathbf{x}` where :math:`A_0 \mathbf{x}` is a
-        component of ADMM problem constraint. Unless overridden,
+        component of the ADMM problem constraint. Unless overridden,
         :math:`A_0 \mathbf{x} = \mathbf{x}`, i.e. :math:`A_0 = I`.
         """
 
@@ -1366,7 +1366,7 @@ class ADMMTwoBlockCnstrnt(ADMM):
 
     def cnst_A1T(self, X):
         """Compute :math:`A_1^T \mathbf{x}` where :math:`A_1 \mathbf{x}` is a
-        component of ADMM problem constraint. Unless overridden,
+        component of the ADMM problem constraint. Unless overridden,
         :math:`A_1 \mathbf{x} = \mathbf{x}`, i.e. :math:`A_1 = I`.
         """
 
