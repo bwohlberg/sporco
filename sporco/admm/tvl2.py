@@ -477,12 +477,8 @@ class TVL2Deconv(admm.ADMM):
             self.Wtvna = self.Wtv
 
         # Construct gradient operators in frequency domain
-        g = np.zeros([2 if k in axes else 1 for k in range(S.ndim)] +
-                     [len(axes),], self.dtype)
-        for k in axes:
-            g[(0,)*k +(slice(None),)+(0,)*(g.ndim-2-k)+(k,)] = [1,-1]
-        self.Gf = sl.rfftn(g, self.axshp, axes=axes)
-        self.GHGf = np.sum(np.conj(self.Gf)*self.Gf, axis=self.Y.ndim-1)
+        self.Gf, self.GHGf = sl.GradientFilters(S.ndim, axes, self.axshp,
+                                                dtype=self.dtype)
 
         # Increment `runtime` to reflect object initialisation
         # time. The timer object is reset to avoid double-counting of

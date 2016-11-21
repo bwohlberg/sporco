@@ -355,7 +355,8 @@ class GenericConvBPDN(admm.ADMMEqual):
             opt = GenericConvBPDN.Options()
 
         # Infer problem dimensions and set relevant attributes of self
-        self.cri = ConvRepIndexing(D, S, dimK=dimK, dimN=dimN)
+        if not hasattr(self, 'cri'):
+            self.cri = ConvRepIndexing(D, S, dimK=dimK, dimN=dimN)
 
         # Call parent class __init__
         super(GenericConvBPDN, self).__init__(self.cri.shpX, S.dtype, opt)
@@ -1153,10 +1154,11 @@ class ConvBPDNGradReg(ConvBPDN):
         if opt is None:
             opt = ConvBPDNGradReg.Options()
 
+        self.cri = ConvRepIndexing(D, S, dimK=dimK, dimN=dimN)
+
         # Set dtype attribute based on S.dtype and opt['DataType']
         self.set_dtype(opt, S.dtype)
 
-        self.GHGf = None
         self.mu = self.dtype.type(mu)
         if hasattr(opt['GradWeight'], 'ndim'):
             self.Wgrd = np.asarray(opt['GradWeight'].reshape((1,)*(dimN+2) +
@@ -1164,29 +1166,17 @@ class ConvBPDNGradReg(ConvBPDN):
         else:
             self.Wgrd = np.asarray(opt['GradWeight'], dtype=self.dtype)
 
+        self.Gf, GHGf = sl.GradientFilters(self.cri.dimN+3, self.cri.axisN,
+                                           self.cri.Nv, dtype=self.dtype)
+        self.GHGf = self.Wgrd * GHGf
+
         super(ConvBPDNGradReg, self).__init__(D, S, lmbda, opt, dimK=dimK,
                                               dimN=dimN)
 
 
 
-    def make_GhGf(self):
-        """Construct gradient operators in frequency domain."""
-
-        g = np.zeros((2,)*self.cri.dimN + (1,)*3 + (self.cri.dimN,),
-                     dtype=self.dtype)
-        for k in self.cri.axisN:
-            g[(0,)*k +(slice(None),)+(0,)*(g.ndim-2-k)+(k,)] = [1,-1]
-        self.Gf = sl.rfftn(g, self.cri.Nv, axes=self.cri.axisN)
-        self.GHGf = self.Wgrd * np.sum(np.conj(self.Gf)*self.Gf,
-                                       axis=self.cri.dimN+3)
-
-
-
     def setdict(self, D=None):
         """Set dictionary array."""
-
-        if self.GHGf is None:
-            self.make_GhGf()
 
         if D is not None:
             self.D = np.asarray(D, dtype=self.dtype)
@@ -1434,7 +1424,7 @@ class ConvTwoBlockCnstrnt(admm.ADMMTwoBlockCnstrnt):
             if not hasattr(self, 'c1'):
                 self.c1 = self.cnst_c1()
             alpha = self.rlx
-            self.AX = alpha*self.cnst_A(self.X, self.Xf) + \
+            self.AX = alpha*self.AXnr + \
                       (1-alpha)*self.block_cat(self.var_y0() + self.c0,
                                                self.var_y1() + self.c1)
 
@@ -1681,7 +1671,7 @@ class ConvBPDNMaskDcpl(ConvTwoBlockCnstrnt):
           Regularisation parameter
         W : array_like
           Mask array
-        opt : :class:`ConvBPDNGradReg.Options` object
+        opt : :class:`ConvBPDNMaskDcpl.Options` object
           Algorithm options
         dimK : 0, 1, or None, optional (default None)
           Number of dimensions in input signal corresponding to multiple

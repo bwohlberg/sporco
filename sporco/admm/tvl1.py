@@ -504,12 +504,8 @@ class TVL1Deconv(admm.ADMM):
         else:
             self.Wtvna = self.Wtv
 
-        g = np.zeros([2 if k in axes else 1 for k in range(S.ndim)] +
-                     [len(axes),], self.dtype)
-        for k in axes:
-            g[(0,)*k +(slice(None),)+(0,)*(g.ndim-2-k)+(k,)] = [1,-1]
-        self.Gf = sl.rfftn(g, self.axshp, axes=axes)
-        self.GHGf = np.sum(np.conj(self.Gf)*self.Gf, axis=self.Y.ndim-1)
+        self.Gf, self.GHGf = sl.GradientFilters(S.ndim, axes, self.axshp,
+                                                dtype=self.dtype)
         self.GAf = np.concatenate((self.Gf, self.Af[...,np.newaxis]),
                                   axis=self.Gf.ndim-1)
 

@@ -688,6 +688,43 @@ def GTax(x, ax):
 
 
 
+def GradientFilters(ndim, axes, axshp, dtype=None):
+    """
+    Construct a set of filters for computing gradients in the frequency
+    domain.
+
+    Parameters
+    ----------
+    ndim : integer
+      Total number of dimensions in array in which gradients are to be
+      computed
+    axes : tuple of integers
+      Axes on which gradients are to be computed
+    axshp : tuple of integers
+      Shape of axes on which gradients are to be computed
+    dtype : dtype
+      Data type of output arrays
+
+    Returns
+    -------
+    Gf : ndarray
+      Frequency domain gradient operators :math:`\hat{G}_i`
+    GHGf : ndarray
+      Sum of products :math:`\sum_i \hat{G}_i^H \hat{G}_i`
+    """
+
+    if dtype is None:
+        dtype = np.float32
+    g = np.zeros([2 if k in axes else 1 for k in range(ndim)] +
+                 [len(axes),], dtype)
+    for k in axes:
+        g[(0,)*k +(slice(None),)+(0,)*(g.ndim-2-k)+(k,)] = [1,-1]
+    Gf = rfftn(g, axshp, axes=axes)
+    GHGf = np.sum(np.conj(Gf)*Gf, axis=-1)
+    return Gf, GHGf
+
+
+
 def shrink1(x, alpha):
     """
     Scalar shrinkage/soft thresholding function
