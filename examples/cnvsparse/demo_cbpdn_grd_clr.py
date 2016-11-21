@@ -13,7 +13,6 @@ from builtins import input
 from builtins import range
 
 import numpy as np
-from scipy.ndimage.interpolation import zoom
 
 from sporco import util
 from sporco import plot
@@ -22,7 +21,7 @@ import sporco.linalg as spl
 
 
 # Load demo image
-img = zoom(util.ExampleImages().image('lena', scaled=True), (0.5, 0.5, 1.0))
+img = util.ExampleImages().image('lena', scaled=True, zoom=0.5)
 
 
 # Load dictionary

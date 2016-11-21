@@ -13,7 +13,6 @@ from builtins import input
 from builtins import range
 
 import numpy as np
-from scipy.ndimage.interpolation import zoom
 
 from sporco.admm import cbpdn
 from sporco.admm import ccmod
@@ -21,21 +20,13 @@ from sporco import util
 from sporco import plot
 
 
-# Training images
-exim = util.ExampleImages(scaled=True)
-img1 = exim.image('lena.grey')
-img2 = exim.image('barbara.grey')
-img3 = exim.image('kiel.grey')
-img4 = util.rgb2gray(exim.image('mandrill'))
-img5 = exim.image('man.grey')[100:612, 100:612]
-
-
-# Reduce images size to speed up demo script
-S1 = zoom(img1, 0.5)
-S2 = zoom(img2, 0.5)
-S3 = zoom(img3, 0.5)
-S4 = zoom(img4, 0.5)
-S5 = zoom(img5, 0.5)
+# Training images (size reduced to speed up demo script)
+exim = util.ExampleImages(scaled=True, zoom=0.5)
+S1 = exim.image('lena.grey')
+S2 = exim.image('barbara.grey')
+S3 = exim.image('kiel.grey')
+S4 = util.rgb2gray(exim.image('mandrill'))
+S5 = exim.image('man.grey')[50:306, 50:306]
 S = np.dstack((S1,S2,S3,S4,S5))
 
 

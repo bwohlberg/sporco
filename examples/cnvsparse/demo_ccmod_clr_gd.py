@@ -15,7 +15,6 @@ from builtins import input
 from builtins import range
 
 import numpy as np
-from scipy.ndimage.interpolation import zoom
 
 from sporco.admm import cbpdn
 from sporco.admm import ccmod
@@ -24,10 +23,10 @@ from sporco import plot
 
 
 # Training images
-exim = util.ExampleImages(scaled=True)
-img1 = zoom(exim.image('lena'), (0.125, 0.125, 1.0))
-img2 = zoom(exim.image('mandrill'), (0.125, 0.125, 1.0))
-S = np.concatenate((img1[:,:,:,np.newaxis], img2[:,:,:,np.newaxis]), axis=3)
+exim = util.ExampleImages(scaled=True, zoom=0.125)
+img1 = exim.image('lena')
+img2 = exim.image('mandrill')
+S = np.concatenate((img1[...,np.newaxis], img2[...,np.newaxis]), axis=3)
 
 
 # Highpass filter test images
