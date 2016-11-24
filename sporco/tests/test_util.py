@@ -60,3 +60,11 @@ class TestSet01(object):
     def test_09(self):
         D = util.convdicts()['G:12x12x72']
         assert(D.shape == (12,12,72))
+
+
+    def test_10(self):
+        ei = util.ExampleImages()
+        nm = ei.names()
+        assert(len(nm) > 0)
+        im = ei.image('barbara')
+        assert(im.shape == (576,720,3))

@@ -407,7 +407,7 @@ def convdicts():
 class ExampleImages(object):
     """Access a set of example images"""
 
-    def __init__(self, scaled=False, dtype=None, zoom=None):
+    def __init__(self, scaled=False, dtype=None, zoom=None, pth=None, ext=None):
         """Initialise an ExampleImages object.
 
         Parameters
@@ -421,16 +421,32 @@ class ExampleImages(object):
           integer type, the output data type is np.float32
         zoom : float or None, optional (default None)
           Optional support rescaling factor to apply to the images
+        pth : string or None (default None)
+          Path to directory containing image files. If the value is None the
+          path points to a set of example images downloaded when the package
+          is built.
+        ext : tuple of strings or None (default None)
+          A tuple of strings corresponding to file extensions corresponding
+          to image types desired to be included in the image set. If the value
+          is None the tuple is set to `('.png',)` for PNG format images only.
         """
 
         self.scaled = scaled
         self.dtype = dtype
         self.zoom = zoom
-        self.bpth = os.path.join(os.path.dirname(__file__), 'data')
-        flst = glob.glob(os.path.join(self.bpth, '') + '*.png')
-        self.nlist = []
-        for pth in flst:
-            self.nlist.append(os.path.basename(os.path.splitext(pth)[0]))
+        if pth is None:
+            self.bpth = os.path.join(os.path.dirname(__file__), 'data')
+        else:
+            self.bpth = pth
+        if ext is None:
+            ext = ('.png',)
+        flst = []
+        for e in ext:
+            flst.extend(glob.glob(os.path.join(self.bpth, '*' + e)))
+        self.ndict = {}
+        for f in flst:
+            self.ndict[os.path.basename(os.path.splitext(f)[0])] = f
+
 
 
     def names(self):
@@ -442,7 +458,7 @@ class ExampleImages(object):
           A list of names of available images
         """
 
-        return self.nlist
+        return self.ndict.keys()
 
 
 
@@ -492,7 +508,7 @@ class ExampleImages(object):
             dtype = np.float32
         if zoom is None:
             zoom = self.zoom
-        pth = os.path.join(self.bpth, name) + '.png'
+        pth = self.ndict[name]
 
         try:
             img = np.asarray(misc.imread(pth), dtype=dtype)
