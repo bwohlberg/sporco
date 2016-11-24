@@ -34,7 +34,7 @@ before_install:
 install:
     - conda install --yes nomkl
     - conda install --yes python=$TRAVIS_PYTHON_VERSION
-    - conda install --yes future numpy scipy matplotlib pytest
+    - conda install --yes future numpy PIL scipy matplotlib pytest
     - pip install pyfftw
     - pip install codecov
     - sed -i "5iimport matplotlib\nmatplotlib.use('Agg')\n" sporco/__init__.py
