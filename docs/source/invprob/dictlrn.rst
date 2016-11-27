@@ -19,7 +19,7 @@ Usage Examples
 
         :class:`.DictLearn` usage (BPDN)
 
-    .. literalinclude:: ../../examples/stdsparse/demo_dictlrn_bpdn.py
+    .. literalinclude:: ../../../examples/stdsparse/demo_dictlrn_bpdn.py
        :language: python
        :lines: 14-
 
@@ -30,7 +30,7 @@ Usage Examples
 
         :class:`.DictLearn` usage (ConvBPDN, greyscale images)
 
-    .. literalinclude:: ../../examples/cnvsparse/demo_dictlrn_cbpdn_gry.py
+    .. literalinclude:: ../../../examples/cnvsparse/demo_dictlrn_cbpdn_gry.py
        :language: python
        :lines: 14-
 
@@ -42,7 +42,7 @@ Usage Examples
         :class:`.DictLearn` usage (ConvBPDNJoint, colour images,
 	greyscale dictionary)
 
-    .. literalinclude:: ../../examples/cnvsparse/demo_dictlrn_cbpdnjnt_clr.py
+    .. literalinclude:: ../../../examples/cnvsparse/demo_dictlrn_cbpdnjnt_clr.py
        :language: python
        :lines: 14-
 
@@ -53,6 +53,6 @@ Usage Examples
 
         :class:`.DictLearn` usage (ConvBPDN, colour images, colour dictionary)
 
-    .. literalinclude:: ../../examples/cnvsparse/demo_dictlrn_cbpdn_clr.py
+    .. literalinclude:: ../../../examples/cnvsparse/demo_dictlrn_cbpdn_clr.py
        :language: python
        :lines: 14-
