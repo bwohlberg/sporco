@@ -380,6 +380,21 @@ def rmsection(filename, pattern):
 
 # See https://github.com/rtfd/readthedocs.org/issues/1139
 def run_apidoc(_):
+
+    # Import the sporco.admm modules and undo the effect of
+    # sporco.admm._module_name_nested so that docs for Options
+    # classes appear in the correct locations
+    import inspect
+    import sporco
+    for mnm, mod in inspect.getmembers(sporco.admm, inspect.ismodule):
+        for cnm, cls in inspect.getmembers(mod, inspect.isclass):
+            if hasattr(cls, 'Options') and inspect.isclass(getattr(cls,
+                                                'Options')):
+                optcls = getattr(cls, 'Options')
+                if optcls.__name__ != 'Options':
+                    delattr(mod, optcls.__name__)
+                    optcls.__name__ = 'Options'
+
     import sphinx.apidoc
     module = '../../sporco' if on_rtd else 'sporco'
     cpath = os.path.abspath(os.path.dirname(__file__))
