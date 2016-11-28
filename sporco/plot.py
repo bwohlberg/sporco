@@ -252,8 +252,13 @@ def imview(img, title=None, block=False, cmap=None, fgrf=None, fgnm=None,
     if cmap is None and img.ndim == 2:
         cmap = cm.Greys_r
 
-    if img.dtype.type == np.uint16 or img.dtype.type == np.int16:
-        imgd = np.float16(imgd)
+    if np.issubdtype(img.dtype, np.float) and img.ndim > 2:
+        imgd = np.clip(imgd, 0.0, 1.0)
+    elif img.dtype == np.uint16:
+        imgd = np.float16(imgd) / np.iinfo(np.uint16).max
+    elif img.dtype == np.int16:
+        imgd = np.float16(imgd) - imgd().min()
+        imgd /= imgd.max()
 
     if fgrf is None:
         fig = plt.figure(num=fgnm, figsize=fgsz)
@@ -274,7 +279,6 @@ def imview(img, title=None, block=False, cmap=None, fgrf=None, fgnm=None,
     if cbar:
         orient = 'vertical' if img.shape[0] >= img.shape[1] else 'horizontal'
         plt.colorbar(orientation=orient, shrink=0.8)
-
 
     def format_coord(x, y):
         nr, nc = imgd.shape[0:2]
