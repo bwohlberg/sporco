@@ -6,7 +6,7 @@
 # and user license can be found in the 'LICENSE.txt' file distributed
 # with the package.
 
-"""Basic tvl2.TVL2Denoise usage example"""
+"""Basic tvl2.TVL2Denoise usage example (colour image)"""
 
 from __future__ import print_function
 from builtins import input
