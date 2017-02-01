@@ -129,7 +129,7 @@ def surf(z, x=None, y=None, title=None, xlbl=None, ylbl=None, zlbl=None,
     x : array_like, optional (default=None)
         Values for x-axis of the plot
     y : array_like, optional (default=None)
-        Values for x-axis of the plot
+        Values for y-axis of the plot
     title : string, optional (default=None)
         Figure title
     xlbl : string, optional (default=None)
@@ -308,3 +308,21 @@ def imview(img, title=None, block=False, cmap=None, fgrf=None, fgnm=None,
         plt.show(block=block)
 
     return fig, ax
+
+
+
+def close(fgrf=None):
+    """
+    Close figure(s).
+
+    Parameters
+    ----------
+    fgrf : figure object reference or integer or None, optional (default=None)
+        If a figure object reference or figure number is provided, close the
+        specified figure, otherwise close all figures.
+    """
+
+    if fgrf is None:
+        plt.close("all")
+    else:
+        plt.close(fgrf)

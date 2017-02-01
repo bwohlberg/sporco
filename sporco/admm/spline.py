@@ -190,7 +190,7 @@ class SplineL1(admm.ADMM):
 
 
     def xstep(self):
-        """Minimise Augmented Lagrangian with respect to x."""
+        """Minimise Augmented Lagrangian with respect to :math:`\mathbf{x}`."""
 
         self.X = sl.idctii(self.Gamma*sl.dctii(self.Y + self.S - self.U,
                                          axes=self.axes), axes=self.axes)
@@ -204,7 +204,7 @@ class SplineL1(admm.ADMM):
 
 
     def ystep(self):
-        """Minimise Augmented Lagrangian with respect to y."""
+        """Minimise Augmented Lagrangian with respect to :math:`\mathbf{y}`."""
 
         self.Y = sl.shrink1(self.AX - self.S + self.U, self.Wdf / self.rho)
 

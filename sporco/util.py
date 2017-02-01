@@ -22,6 +22,7 @@ import os
 import glob
 import multiprocessing as mp
 import itertools
+import collections
 
 import sporco.linalg as sla
 import sporco.plot as spl
@@ -56,6 +57,51 @@ else:
     def u(x):
         """Python 2/3 compatible definition of utf8 literals"""
         return x
+
+
+
+
+def ntpl2array(ntpl):
+    """
+    Convert a :func:`collections.namedtuple` object to a :class:`numpy.ndarray`
+    object that can be saved using :func:`numpy.savez`.
+
+    Parameters
+    ----------
+    ntpl : collections.namedtuple object
+      Named tuple object to be converted to ndarray
+
+    Returns
+    -------
+    arr : ndarray
+      Array representation of input named tuple
+    """
+
+    return np.asarray((np.vstack([col for col in ntpl]), ntpl._fields,
+                       ntpl.__class__.__name__))
+
+
+
+def array2ntpl(arr):
+    """
+    Convert a :class:`numpy.ndarray` object constructed by :func:`ntpl2array`
+    back to the original :func:`collections.namedtuple` representation.
+
+   Parameters
+    ----------
+    arr : ndarray
+      Array representation of named tuple constructed by :func:`ntpl2array`
+
+    Returns
+    -------
+    ntpl : collections.namedtuple object
+      Named tuple object with the same name and fields as the original named
+      typle object provided to :func:`ntpl2array`
+    """
+
+    cls = collections.namedtuple(arr[2], arr[1])
+    return cls(*tuple(arr[0]))
+
 
 
 
@@ -213,16 +259,17 @@ def rgb2gray(rgb):
     Parameters
     ----------
     rgb : ndarray
-      RGB image as Nr x Nc x 3 array
+      RGB image as Nr x Nc x 3 or Nr x Nc x 3 x K array
 
     Returns
     -------
     gry : ndarray
-      Grayscale image as Nr x Nc array
+      Grayscale image as Nr x Nc or Nr x Nc x K array
     """
 
-    return np.dot(rgb[...,:3], np.array([0.299, 0.587, 0.144],
-                    dtype=np.float32))
+    w = sla.atleast_nd(rgb.ndim, np.array([0.299, 0.587, 0.144],
+                        dtype=rgb.dtype, ndmin=3))
+    return np.sum(w * rgb, axis=2)
 
 
 

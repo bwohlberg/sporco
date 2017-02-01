@@ -562,7 +562,7 @@ class ConvCnstrMOD(admm.ADMMEqual):
 
 
     def xstep(self):
-        """Minimise Augmented Lagrangian with respect to x."""
+        """Minimise Augmented Lagrangian with respect to :math:`\mathbf{x}`."""
 
         self.cgit = None
 
@@ -594,7 +594,8 @@ class ConvCnstrMOD(admm.ADMMEqual):
 
 
     def ystep(self):
-        """Minimise Augmented Lagrangian with respect to y."""
+        """Minimise Augmented Lagrangian with respect to :math:`\mathbf{y}`.
+        """
 
         self.Y = self.Pcn(self.AX + self.U)
 

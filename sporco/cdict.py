@@ -54,7 +54,7 @@ class ConstrainedDict(dict):
     """Base class for a dict subclass that constrains the allowed dict
     keys, including those of nested dicts, and also initialises the
     dict with default content on instantiation. The default content is
-    specified by the defaults class attribute, and the allowed keys are
+    specified by the `defaults` class attribute, and the allowed keys are
     determined from the same attribute.
     """
 
@@ -66,12 +66,12 @@ class ConstrainedDict(dict):
     def __init__(self, d=None, pth=(), dflt=None):
         """Initialise a ConstrainedDict object. The object is first created
         with default content, which is then overwritten with the
-        content of parameter d. When a subdicts is initialised via
+        content of parameter `d`. When a subdict is initialised via
         this constructor, the key path from the root to this subdict
         (i.e. the set of keys, in sequence, that select the subdict
         starting from the top-level dict) should be passed as a tuple
-        via the pth parameter, and the defaults dict should be passed
-        via the dflt parameter.
+        via the `pth` parameter, and the defaults dict should be passed
+        via the `dflt` parameter.
 
         Parameters
         ----------
@@ -124,7 +124,7 @@ class ConstrainedDict(dict):
 
     def __setitem__(self, key, value):
         """Set value corresponding to key. If key is a tuple, interpret it as
-        a sequence of keys in a # tree of nested dicts.
+        a sequence of keys in a tree of nested dicts.
 
         Parameters
         ----------
@@ -250,7 +250,7 @@ class ConstrainedDict(dict):
     @staticmethod
     def getparent(d, pth):
         """Get the parent node of a subdict as specified by the key path in
-        pth.
+        `pth`.
 
         Parameters
         ----------
@@ -274,7 +274,7 @@ class ConstrainedDict(dict):
 
     @staticmethod
     def getnode(d, pth):
-        """Get the node of a subdict specified by the key path in pth.
+        """Get the node of a subdict specified by the key path in `pth`.
 
         Parameters
         ----------
@@ -297,12 +297,12 @@ class ConstrainedDict(dict):
 
 
 def keycmp(a, b, pth=()):
-    """Recurse down the tree of nested dicts b, at each level checking
+    """Recurse down the tree of nested dicts `b`, at each level checking
     that it does not have any keys that are not also at the same
-    level in a. The key path is recorded in pth. If an unknown key
-    is encountered in b, an UnknownKeyError exception is
-    raised. If a non-dict value is encountered in b for which the
-    corresponding value in a is a dict, an InvalidValueError
+    level in `a`. The key path is recorded in `pth`. If an unknown key
+    is encountered in `b`, an `UnknownKeyError` exception is
+    raised. If a non-dict value is encountered in `b` for which the
+    corresponding value in `a` is a dict, an `InvalidValueError`
     exception is raised."""
 
     akey = list(a.keys())

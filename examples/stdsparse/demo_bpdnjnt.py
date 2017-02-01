@@ -85,6 +85,9 @@ fig1.show()
 its = b.getitstat()
 fig2 = plot.figure(2, figsize=(14,14))
 ax = fig2.add_subplot(2, 2, 1, projection='3d')
+ax.xaxis._axinfo['label']['space_factor'] = 1.8
+ax.yaxis._axinfo['label']['space_factor'] = 1.8
+ax.zaxis._axinfo['label']['space_factor'] = 1.8
 plot.surf(fvmx, x=np.log10(mrng), y=np.log10(lrng), xlbl='log($\mu$)',
           ylbl='log($\lambda$)', zlbl='Error', fgrf=fig2, axrf=ax)
 plot.subplot(2,2,2)

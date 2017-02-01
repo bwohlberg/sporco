@@ -131,7 +131,7 @@ class TVL2Denoise(admm.ADMM):
 
 
 
-    def __init__(self, S, lmbda, opt=None, axes=(0,1)):
+    def __init__(self, S, lmbda, opt=None, axes=(0,1), caxis=None):
         """
         Initialise a TVL2Denoise object with problem parameters.
 
@@ -145,6 +145,11 @@ class TVL2Denoise(admm.ADMM):
           Algorithm options
         axes : tuple or list
           Axes on which TV regularisation is to be applied
+        caxis : int or None, optional (default None)
+          Axis on which channels of a multi-channel image are stacked.
+          If None, TV regularisation is applied indepdendently to each
+          channel, otherwise Vector TV :cite:`blomgren-1998-color`
+          regularisation is applied jointly to all channels.
         """
 
         if opt is None:
@@ -155,6 +160,10 @@ class TVL2Denoise(admm.ADMM):
 
         self.S = np.asarray(S, dtype=self.dtype)
         self.axes = axes
+        if caxis is None:
+            self.saxes = (-1,)
+        else:
+            self.saxes = (caxis,-1)
         self.lmbda = self.dtype.type(lmbda)
 
         # Set penalty parameter
@@ -199,7 +208,7 @@ class TVL2Denoise(admm.ADMM):
 
 
     def xstep(self):
-        """Minimise Augmented Lagrangian with respect to x."""
+        """Minimise Augmented Lagrangian with respect to :math:`\mathbf{x}`."""
 
         ngsit = 0
         gsrrs = np.inf
@@ -218,11 +227,11 @@ class TVL2Denoise(admm.ADMM):
 
 
     def ystep(self):
-        """Minimise Augmented Lagrangian with respect to y."""
+        """Minimise Augmented Lagrangian with respect to :math:`\mathbf{y}`."""
 
         self.Y = np.asarray(sl.shrink2(self.AX + self.U,
-                            (self.lmbda/self.rho)*self.Wtvna),
-                            dtype=self.dtype)
+                    (self.lmbda/self.rho)*self.Wtvna, axis=self.saxes),
+                    dtype=self.dtype)
 
 
 
@@ -248,7 +257,7 @@ class TVL2Denoise(admm.ADMM):
 
         dfd = 0.5*(linalg.norm(self.Wdf * (self.X - self.S))**2)
         reg = np.sum(self.Wtv * np.sqrt(np.sum(self.obfn_gvar()**2,
-                                               axis=self.Y.ndim-1)))
+                                               axis=self.saxes)))
         obj = dfd + self.lmbda*reg
         return (obj, dfd, reg)
 
@@ -335,15 +344,16 @@ class TVL2Deconv(admm.ADMM):
 
     .. math::
        \mathrm{argmin}_\mathbf{x} \;
-       (1/2) \| \mathbf{h} * \mathbf{x} - \mathbf{s} \|_2^2 +
+       (1/2) \| H \mathbf{x} - \mathbf{s} \|_2^2 +
              \lambda \\left\| W_{\mathrm{tv}} \sqrt{(G_r \mathbf{x})^2 +
-             (G_c \mathbf{x})^2} \\right\|_1
+             (G_c \mathbf{x})^2} \\right\|_1 \;\;,
 
-    via the ADMM problem
+    where :math:`H` denotes the linear operator corresponding to a
+    convolution, via the ADMM problem
 
     .. math::
        \mathrm{argmin}_{\mathbf{x},\mathbf{y}_r,\mathbf{y}_c} \;
-       (1/2) \| \mathbf{h} * \mathbf{x} - \mathbf{s} \|_2^2 +
+       (1/2) \| H \mathbf{x} - \mathbf{s} \|_2^2 +
              \lambda \\left\| W_{\mathrm{tv}} \sqrt{(\mathbf{y}_r)^2 +
              (\mathbf{y}_c)^2} \\right\|_1 \;\\text{such that}\;
        \\left( \\begin{array}{c} G_r \\\\ G_c \\end{array} \\right) \mathbf{x}
@@ -360,7 +370,7 @@ class TVL2Deconv(admm.ADMM):
        ``ObjFun`` : Objective function value
 
        ``DFid`` :  Value of data fidelity term \
-       :math:`(1/2) \| \mathbf{h} * \mathbf{x} - \mathbf{s} \|_2^2`
+       :math:`(1/2) \| H \mathbf{x} - \mathbf{s} \|_2^2`
 
        ``RegTV`` : Value of regularisation term \
        :math:`\| W_{\mathrm{tv}} \sqrt{(G_r \mathbf{x})^2 +
@@ -428,14 +438,14 @@ class TVL2Deconv(admm.ADMM):
 
 
 
-    def __init__(self, A, S, lmbda, opt=None, axes=(0,1)):
+    def __init__(self, A, S, lmbda, opt=None, axes=(0,1), caxis=None):
         """
         Initialise a TVL2Deconv object with problem parameters.
 
         Parameters
         ----------
         A : array_like
-          Filter kernel (see :math:`\mathbf{h}` above)
+          Filter kernel corresponding to operator :math:`H` above
         S : array_like
           Signal vector or matrix
         lmbda : float
@@ -444,6 +454,11 @@ class TVL2Deconv(admm.ADMM):
           Algorithm options
         axes : tuple or list
           Axes on which TV regularisation is to be applied
+        caxis : int or None, optional (default None)
+          Axis on which channels of a multi-channel image are stacked.
+          If None, TV regularisation is applied indepdendently to each
+          channel, otherwise Vector TV :cite:`blomgren-1998-color`
+          regularisation is applied jointly to all channels.
         """
 
         if opt is None:
@@ -454,6 +469,10 @@ class TVL2Deconv(admm.ADMM):
 
         self.S = np.asarray(S, dtype=self.dtype)
         self.axes = axes
+        if caxis is None:
+            self.saxes = (-1,)
+        else:
+            self.saxes = (caxis,-1)
         self.lmbda = self.dtype.type(lmbda)
 
         # Set penalty parameter
@@ -503,7 +522,7 @@ class TVL2Deconv(admm.ADMM):
 
 
     def xstep(self):
-        """Minimise Augmented Lagrangian with respect to x."""
+        """Minimise Augmented Lagrangian with respect to :math:`\mathbf{x}`."""
 
         b = self.AHSf + self.rho*np.sum(np.conj(self.Gf)*
                     sl.rfftn(self.Y-self.U, axes=self.axes), axis=self.Y.ndim-1)
@@ -519,9 +538,10 @@ class TVL2Deconv(admm.ADMM):
 
 
     def ystep(self):
-        """Minimise Augmented Lagrangian with respect to y."""
+        """Minimise Augmented Lagrangian with respect to :math:`\mathbf{y}`."""
 
-        self.Y = sl.shrink2(self.AX + self.U, (self.lmbda/self.rho)*self.Wtvna)
+        self.Y = sl.shrink2(self.AX + self.U, (self.lmbda/self.rho)*self.Wtvna,
+                            axis=self.saxes)
 
 
 
@@ -540,7 +560,7 @@ class TVL2Deconv(admm.ADMM):
     def eval_objfn(self):
         """Compute components of objective function as well as total
         contribution to objective function. Data fidelity term is
-        :math:`(1/2) \| \mathbf{h} * \mathbf{x} - \mathbf{s} \|_2^2` and
+        :math:`(1/2) \| H \mathbf{x} - \mathbf{s} \|_2^2` and
         regularisation term is :math:`\| W_{\mathrm{tv}}
         \sqrt{(G_r \mathbf{x})^2 + (G_c \mathbf{x})^2}\|_1`.
         """
@@ -548,7 +568,7 @@ class TVL2Deconv(admm.ADMM):
         Ef = self.Af * self.Xf - self.Sf
         dfd = sl.rfl2norm2(Ef, self.S.shape, axis=self.axes) / 2.0
         reg = np.sum(self.Wtv * np.sqrt(np.sum(self.obfn_gvar()**2,
-                     axis=self.Y.ndim-1)))
+                     axis=self.saxes)))
         obj = dfd + self.lmbda*reg
         return (obj, dfd, reg)
 

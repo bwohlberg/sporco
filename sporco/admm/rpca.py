@@ -172,14 +172,14 @@ class RobustPCA(admm.ADMM):
 
 
     def xstep(self):
-        """Minimise Augmented Lagrangian with respect to x."""
+        """Minimise Augmented Lagrangian with respect to :math:`\mathbf{x}`."""
 
         self.X, self.ss = shrinksv(self.S - self.Y - self.U, 1 / self.rho)
 
 
 
     def ystep(self):
-        """Minimise Augmented Lagrangian with respect to y."""
+        """Minimise Augmented Lagrangian with respect to :math:`\mathbf{y}`."""
 
         self.Y = np.asarray(sl.shrink1(self.S - self.AX - self.U,
                             self.lmbda/self.rho), dtype=self.dtype)

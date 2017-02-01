@@ -423,7 +423,7 @@ class GenericConvBPDN(admm.ADMMEqual):
 
 
     def xstep(self):
-        """Minimise Augmented Lagrangian with respect to x."""
+        """Minimise Augmented Lagrangian with respect to :math:`\mathbf{x}`."""
 
         self.YU[:] = self.Y - self.U
 
@@ -450,9 +450,9 @@ class GenericConvBPDN(admm.ADMMEqual):
 
 
     def ystep(self):
-        """Minimise Augmented Lagrangian with respect to y. If this
-        method is not overridden, the problem is solved without any
-        regularisation other than the option enforcement of
+        """Minimise Augmented Lagrangian with respect to :math:`\mathbf{y}`.
+        If this method is not overridden, the problem is solved without
+        any regularisation other than the option enforcement of
         non-negativity of the solution and filter boundary crossing
         supression. When it is overridden, it should be explicitly
         called at the end of the overriding method.
@@ -714,8 +714,11 @@ class ConvBPDN(GenericConvBPDN):
                       dtype=self.dtype)
 
         # Set rho_xi attribute
-        self.set_attr('rho_xi', opt['AutoRho','RsdlTarget'],
-                      dval=(1.0 + (18.3)**(np.log10(self.lmbda)+1.0)),
+        if self.lmbda != 0.0:
+            rho_xi = (1.0 + (18.3)**(np.log10(self.lmbda)+1.0))
+        else:
+            rho_xi = 1.0
+        self.set_attr('rho_xi', opt['AutoRho','RsdlTarget'], dval=rho_xi,
                       dtype=self.dtype)
 
         # Call parent class __init__
@@ -737,7 +740,7 @@ class ConvBPDN(GenericConvBPDN):
 
 
     def ystep(self):
-        """Minimise Augmented Lagrangian with respect to y."""
+        """Minimise Augmented Lagrangian with respect to :math:`\mathbf{y}`."""
 
         self.Y = sl.shrink1(self.AX + self.U, (self.lmbda/self.rho) * self.wl1)
         super(ConvBPDN, self).ystep()
@@ -855,7 +858,7 @@ class ConvBPDNJoint(ConvBPDN):
 
 
     def ystep(self):
-        """Minimise Augmented Lagrangian with respect to y."""
+        """Minimise Augmented Lagrangian with respect to :math:`\mathbf{y}`."""
 
         self.Y = sl.shrink12(self.AX + self.U, (self.lmbda/self.rho)*self.wl1,
                              self.mu/self.rho, axis=self.cri.axisC)
@@ -996,7 +999,7 @@ class ConvElasticNet(ConvBPDN):
 
 
     def xstep(self):
-        """Minimise Augmented Lagrangian with respect to x."""
+        """Minimise Augmented Lagrangian with respect to :math:`\mathbf{x}`."""
 
         self.YU[:] = self.Y - self.U
 
@@ -1019,6 +1022,7 @@ class ConvElasticNet(ConvBPDN):
             self.xrrs = sl.rrs(ax, b)
         else:
             self.xrrs = None
+
 
 
     def obfn_reg(self):
@@ -1194,7 +1198,7 @@ class ConvBPDNGradReg(ConvBPDN):
 
 
     def xstep(self):
-        """Minimise Augmented Lagrangian with respect to x."""
+        """Minimise Augmented Lagrangian with respect to :math:`\mathbf{x}`."""
 
         self.YU[:] = self.Y - self.U
 
@@ -1251,6 +1255,16 @@ class ConvTwoBlockCnstrnt(admm.ADMMTwoBlockCnstrnt):
        \\left( \\begin{array}{c} D \\\\ I \\end{array} \\right) \mathbf{x}
        - \\left( \\begin{array}{c} \mathbf{y}_0 \\\\ \mathbf{y}_1 \\end{array}
        \\right) = \\left( \\begin{array}{c} \mathbf{s} \\\\
+       \mathbf{0} \\end{array} \\right) \;\;.
+
+    In this case the ADMM constraint is :math:`A\mathbf{x} + B\mathbf{y} =
+    \mathbf{c}` where
+
+    .. math::
+       A = \\left( \\begin{array}{c} D \\\\ I \\end{array} \\right)
+       \\qquad B = -I \\qquad \mathbf{y} = \\left( \\begin{array}{c}
+       \mathbf{y}_0 \\\\ \mathbf{y}_1 \\end{array} \\right) \\qquad
+       \mathbf{c} = \\left( \\begin{array}{c} \mathbf{s} \\\\
        \mathbf{0} \\end{array} \\right) \;\;.
 
     This class specialises class :class:`.ADMMTwoBlockCnstrnt`, but remains a
@@ -1312,7 +1326,7 @@ class ConvTwoBlockCnstrnt(admm.ADMMTwoBlockCnstrnt):
           Dictionary array
         S : array_like
           Signal array
-        opt : :class:`ADMMTwoBlockCnstrnt.Options` object
+        opt : :class:`ConvTwoBlockCnstrnt.Options` object
           Algorithm options
         dimK : 0, 1, or None, optional (default None)
           Number of dimensions in input signal corresponding to multiple
@@ -1367,7 +1381,7 @@ class ConvTwoBlockCnstrnt(admm.ADMMTwoBlockCnstrnt):
 
 
     def xstep(self):
-        """Minimise Augmented Lagrangian with respect to x."""
+        """Minimise Augmented Lagrangian with respect to :math:`\mathbf{x}`."""
 
         self.YU[:] = self.Y - self.U
         self.block_sep0(self.YU)[:] += self.S
@@ -1399,7 +1413,7 @@ class ConvTwoBlockCnstrnt(admm.ADMMTwoBlockCnstrnt):
 
 
     def ystep(self):
-        """Minimise Augmented Lagrangian with respect to y."""
+        """Minimise Augmented Lagrangian with respect to :math:`\mathbf{y}`."""
 
         if self.opt['NonNegCoef'] or self.opt['NoBndryCross']:
             Y1 = self.block_sep1(self.Y)
@@ -1431,8 +1445,9 @@ class ConvTwoBlockCnstrnt(admm.ADMMTwoBlockCnstrnt):
 
 
     def block_sep0(self, Y):
-        """Separate variable into component corresponding to Y0 in Y. The
-        method from parent class ADMMTwoBlockCnstrnt is overridden
+        """Separate variable into component corresponding to
+        :math:`\mathbf{y}_0` in :math:`\mathbf{y}\;\;`. The method
+        from parent class :class:`.ADMMTwoBlockCnstrnt` is overridden
         here to allow swapping of C (channel) and M (filter) axes in
         block 0 so that it can be concatenated on axis M with block
         1. This is necessary because block 0 has the dimensions of S
@@ -1446,8 +1461,9 @@ class ConvTwoBlockCnstrnt(admm.ADMMTwoBlockCnstrnt):
 
 
     def block_cat(self, Y0, Y1):
-        """Concatenate components corresponding to Y0 and Y1 blocks into
-        Y. The method from parent class ADMMTwoBlockCnstrnt is
+        """Concatenate components corresponding to :math:`\mathbf{y}_0` and
+        :math:`\mathbf{y}_1` to form :math:`\mathbf{y}\;\;`.
+        The method from parent class :class:`.ADMMTwoBlockCnstrnt` is
         overridden here to allow swapping of C (channel) and M
         (filter) axes in block 0 so that it can be concatenated on
         axis M with block 1. This is necessary because block 0 has the
@@ -1471,7 +1487,7 @@ class ConvTwoBlockCnstrnt(admm.ADMMTwoBlockCnstrnt):
 
     def obfn_g0var(self):
         """Variable to be evaluated in computing
-        :meth:`ConvTwoBlockCnstrnt.obfn_g0`, depending on the ``AuxVarObj``
+        :meth:`.ADMMTwoBlockCnstrnt.obfn_g0`, depending on the ``AuxVarObj``
         option value.
         """
 
@@ -1495,23 +1511,23 @@ class ConvTwoBlockCnstrnt(admm.ADMMTwoBlockCnstrnt):
 
 
 
-    def cnst_A0T(self, X):
-        """Compute :math:`A_0^T \mathbf{x}` where :math:`A_0 \mathbf{x}` is a
-        component of ADMM problem constraint.
+    def cnst_A0T(self, Y0):
+        """Compute :math:`A_0^T \mathbf{y}_0` component of
+        :math:`A^T \mathbf{y}` (see :meth:`.ADMMTwoBlockCnstrnt.cnst_AT`).
         """
 
         # This calculation involves non-negligible computational cost. It
         # should be possible to disable relevant diagnostic information
         # (dual residual) to avoid this cost.
-        Xf = sl.rfftn(X, None, self.cri.axisN)
-        return sl.irfftn(np.sum(np.conj(self.Df) * Xf, axis=self.cri.axisC,
+        Y0f = sl.rfftn(Y0, None, self.cri.axisN)
+        return sl.irfftn(np.sum(np.conj(self.Df) * Y0f, axis=self.cri.axisC,
                                 keepdims=True), self.cri.Nv, self.cri.axisN)
 
 
 
     def cnst_c0(self):
-        """Compute constant component :math:`\mathbf{c}_0` of ADMM problem
-        constraint.
+        """Compute constant component :math:`\mathbf{c}_0` of
+        :math:`\mathbf{c}` in the ADMM problem constraint.
         """
 
         return self.S
@@ -1709,7 +1725,7 @@ class ConvBPDNMaskDcpl(ConvTwoBlockCnstrnt):
 
 
     def ystep(self):
-        """Minimise Augmented Lagrangian with respect to y."""
+        """Minimise Augmented Lagrangian with respect to :math:`\mathbf{y}`."""
 
         AXU = self.AX + self.U
         Y0 = (self.rho*(self.block_sep0(AXU) - self.S)) / (self.W**2 + self.rho)
@@ -1892,6 +1908,7 @@ class AddMaskSim(object):
         Sf = np.sum(self.cbpdn.Df[...,0:-self.cri.C] * Xf, axis=self.cri.axisM)
         # Transform to spatial domain and return result
         return sl.irfftn(Sf, self.cri.Nv, self.cri.axisN)
+
 
 
     def getitstat(self):

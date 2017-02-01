@@ -82,7 +82,7 @@ class ConvBPDNDictLearn(dictlrn.DictLearn):
 
           ``Verbose`` : Flag determining whether iteration status is displayed.
 
-          ``StatusHeader`` : Flag determining whether status header and \
+          ``StatusHeader`` : Flag determining whether status header and
           separator are dislayed
 
           ``MaxMainIter`` : Maximum main iterations

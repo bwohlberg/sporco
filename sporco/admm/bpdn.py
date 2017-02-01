@@ -162,7 +162,7 @@ class GenericBPDN(admm.ADMMEqual):
 
 
     def xstep(self):
-        """Minimise Augmented Lagrangian with respect to x."""
+        """Minimise Augmented Lagrangian with respect to :math:`\mathbf{x}`."""
 
         self.X = np.asarray(sl.lu_solve_ATAI(self.D, self.rho, self.DTS +
                         self.rho*(self.Y - self.U), self.lu, self.piv),
@@ -171,9 +171,9 @@ class GenericBPDN(admm.ADMMEqual):
 
 
     def ystep(self):
-        """Minimise Augmented Lagrangian with respect to y. If this
-        method is not overridden, the problem is solved without any
-        regularisation other than the option enforcement of
+        """Minimise Augmented Lagrangian with respect to :math:`\mathbf{y}`.
+        If this method is not overridden, the problem is solved without
+        any regularisation other than the option enforcement of
         non-negativity of the solution. When it is overridden, it
         should be explicitly called at the end of the overriding
         method.
@@ -373,7 +373,7 @@ class BPDN(GenericBPDN):
 
 
     def ystep(self):
-        """Minimise Augmented Lagrangian with respect to y."""
+        """Minimise Augmented Lagrangian with respect to :math:`\mathbf{y}`."""
 
         self.Y = np.asarray(sl.shrink1(self.AX + self.U,
                             (self.lmbda/self.rho)*self.wl1),
@@ -474,7 +474,7 @@ class BPDNJoint(BPDN):
 
 
     def ystep(self):
-        """Minimise Augmented Lagrangian with respect to y."""
+        """Minimise Augmented Lagrangian with respect to :math:`\mathbf{y}`."""
 
         self.Y = np.asarray(sl.shrink12(self.AX + self.U,
                             (self.lmbda/self.rho)*self.wl1, self.mu/self.rho),
@@ -599,7 +599,7 @@ class ElasticNet(BPDN):
 
 
     def xstep(self):
-        """Minimise Augmented Lagrangian with respect to x."""
+        """Minimise Augmented Lagrangian with respect to :math:`\mathbf{x}`."""
 
         self.X = np.asarray(sl.lu_solve_ATAI(self.D, self.mu + self.rho,
                     self.DTS + self.rho*(self.Y - self.U), self.lu, self.piv),

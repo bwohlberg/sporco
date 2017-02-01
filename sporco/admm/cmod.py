@@ -192,7 +192,7 @@ class CnstrMOD(admm.ADMMEqual):
 
 
     def xstep(self):
-        """Minimise Augmented Lagrangian with respect to x."""
+        """Minimise Augmented Lagrangian with respect to :math:`\mathbf{x}`."""
 
         self.X = np.asarray(sl.lu_solve_AATI(self.A, self.rho, self.SAT +
                             self.rho*(self.Y - self.U), self.lu, self.piv,),
@@ -201,7 +201,7 @@ class CnstrMOD(admm.ADMMEqual):
 
 
     def ystep(self):
-        """Minimise Augmented Lagrangian with respect to y."""
+        """Minimise Augmented Lagrangian with respect to :math:`\mathbf{y}`."""
 
         self.Y = self.Pcn(self.AX + self.U)
 
