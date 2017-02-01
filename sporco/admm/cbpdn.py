@@ -1380,6 +1380,13 @@ class ConvTwoBlockCnstrnt(admm.ADMMTwoBlockCnstrnt):
 
 
 
+    def getcoef(self):
+        """Get final coefficient array."""
+
+        return self.X
+
+
+
     def xstep(self):
         """Minimise Augmented Lagrangian with respect to :math:`\mathbf{x}`."""
 
@@ -1874,6 +1881,13 @@ class AddMaskSim(object):
         self.itstat = self.cbpdn.itstat
         # Return result of inner cbpdn object with AMS component removed
         return Xi[self.index_primary()]
+
+
+
+    def getcoef(self):
+        """Get final coefficient array."""
+
+        return self.cbpdn.getcoef()[self.index_primary()]
 
 
 
