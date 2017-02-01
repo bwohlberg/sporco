@@ -40,7 +40,8 @@ create an object representing the desired algorithm options
 
 ::
 
-   opt = bpdn.BPDN.Options({'Verbose' : True, 'MaxMainIter' : 500, 'RelStopTol' : 1e-6, 'AutoRho' : {'Enabled' : True}})
+   opt = bpdn.BPDN.Options({'Verbose' : True, 'MaxMainIter' : 500,
+               'RelStopTol' : 1e-6, 'AutoRho' : {'Enabled' : True}})
 
 then initialise the solver object
 

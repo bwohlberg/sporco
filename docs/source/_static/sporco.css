@@ -22,6 +22,12 @@ body {
 }
 */
 
+h2, h3, h4, h5, h6 {
+ padding-bottom: 5px;
+ border-bottom: 1px solid #d0d0d0;
+ margin-bottom: 16px;
+}
+
 /* Some definitions copied from scipy.css */
 
 table.field-list {
@@ -56,7 +62,7 @@ td.field-body blockquote {
     padding-left: 30px;
 }
 
-.class, .function {
+.class, .function, .exception {
   margin-bottom: 4em;
   background-color: #f8f8f8;
   padding: 5px 10px;
@@ -78,6 +84,15 @@ dl.function {
   border-width: 1px;
   border-color: #909090;
 }
+
+dl.exception {
+  margin-top: 1em;
+  margin-bottom: 1em;
+  border-style: solid;
+  border-width: 1px;
+  border-color: #909090;
+}
+
 
 div.highlight pre {
   border-radius: 4px;

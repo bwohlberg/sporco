@@ -19,7 +19,7 @@ This module includes the following classes:
 
   .. math::
      \mathrm{argmin}_\mathbf{x} \;
-     \| A * \mathbf{x} - \mathbf{s} \|_1 +
+     \| W_{\mathrm{df}} (H \mathbf{x} - \mathbf{s}) \|_1 +
      \lambda \left \| W_{\mathrm{tv}} \sqrt{(G_r \mathbf{x})^2 +
      (G_c \mathbf{x})^2} \right \|_1
 
@@ -32,9 +32,20 @@ Usage Examples
 
     .. container:: header
 
-        :class:`.TVL1Denoise` usage
+        :class:`.TVL1Denoise` usage (greyscale image)
 
-    .. literalinclude:: ../../../examples/misc/demo_tvl1denoise.py
+    .. literalinclude:: ../../../examples/misc/demo_tvl1den_gry.py
+       :language: python
+       :lines: 9-
+
+
+.. container:: toggle
+
+    .. container:: header
+
+        :class:`.TVL1Denoise` usage (colour image)
+
+    .. literalinclude:: ../../../examples/misc/demo_tvl1den_clr.py
        :language: python
        :lines: 9-
 
@@ -45,7 +56,7 @@ Usage Examples
 
         :class:`.TVL1Deconv` usage (denoising problem)
 
-    .. literalinclude:: ../../../examples/misc/demo_tvl1deconv_den.py
+    .. literalinclude:: ../../../examples/misc/demo_tvl1dcn_den.py
        :language: python
        :lines: 9-
 
@@ -54,8 +65,19 @@ Usage Examples
 
     .. container:: header
 
-        :class:`.TVL1Deconv` usage (deconvolution problem)
+        :class:`.TVL1Deconv` usage (deconvolution problem, greyscale image)
 
-    .. literalinclude:: ../../../examples/misc/demo_tvl1deconv_dcn.py
+    .. literalinclude:: ../../../examples/misc/demo_tvl1dcn_dcn_gry.py
+       :language: python
+       :lines: 9-
+
+
+.. container:: toggle
+
+    .. container:: header
+
+        :class:`.TVL1Deconv` usage (deconvolution problem, colour image)
+
+    .. literalinclude:: ../../../examples/misc/demo_tvl1dcn_dcn_clr.py
        :language: python
        :lines: 9-
