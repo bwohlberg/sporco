@@ -6,46 +6,48 @@
 # and user license can be found in the 'LICENSE.txt' file distributed
 # with the package.
 
-"""Basic tvl1.TVL1Deconv usage example (deconvolution problem)"""
+"""Basic tvl2.TVL2Denoise usage example"""
 
 from __future__ import print_function
 from builtins import input
 from builtins import range
 
 import numpy as np
-from scipy import ndimage
 
 from sporco import util
 from sporco import plot
-from sporco.admm import tvl1
+from sporco.admm import tvl2
 
 
-# Load demo image
+# Load reference image
 img = util.ExampleImages().image('lena.grey', scaled=True)
-h0 = np.zeros((11,11), dtype=np.float32)
-h0[5,5] = 1.0
-h = ndimage.filters.gaussian_filter(h0, 2.0)
-imgc = np.real(np.fft.ifft2(np.fft.fft2(h, img.shape) * np.fft.fft2(img)))
+
+
+# Construct test image
 np.random.seed(12345)
-imgcn = util.spnoise(imgc, 0.2)
-
-# Set up TVDeconv options
-lmbda = 1e-2
-opt = tvl1.TVL1Deconv.Options({'Verbose' : True, 'MaxMainIter' : 200,
-                               'rho' : 2e0, 'gEvalY' : False})
-
-# Initialise and run TVL1Deconv object
-b = tvl1.TVL1Deconv(h, imgcn, lmbda, opt)
-b.solve()
-print("TVL1Deconv solve time: %.2fs" % b.runtime)
+imgn = img + np.random.normal(0.0, 0.04, img.shape)
 
 
-# Display input and result image
-fig1 = plot.figure(1, figsize=(14,7))
-plot.subplot(1,2,1)
-plot.imview(imgcn, fgrf=fig1, title='Blurred/Noisy')
-plot.subplot(1,2,2)
-plot.imview(b.X, fgrf=fig1, title='l1-TV Result')
+# Set up TVL2Denoise options
+lmbda = 0.04
+opt = tvl2.TVL2Denoise.Options({'Verbose' : True, 'MaxMainIter' : 200,
+                'gEvalY' : False, 'AutoRho' : {'Enabled' : True}})
+
+
+# Initialise and run TVL2Denoise object
+b = tvl2.TVL2Denoise(imgn, lmbda, opt)
+imgr = b.solve()
+print("TVL2Denoise solve time: %.2fs" % b.runtime)
+
+
+# Display test images
+fig1 = plot.figure(1, figsize=(21,7))
+plot.subplot(1,3,1)
+plot.imview(img, fgrf=fig1, title='Reference')
+plot.subplot(1,3,2)
+plot.imview(imgn, fgrf=fig1, title='Blurred/Noisy')
+plot.subplot(1,3,3)
+plot.imview(imgr, fgrf=fig1, title='l2-TV Result')
 fig1.show()
 
 

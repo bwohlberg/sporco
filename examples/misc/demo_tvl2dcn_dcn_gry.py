@@ -20,32 +20,50 @@ from sporco import plot
 from sporco.admm import tvl2
 
 
-# Load demo image and set up blurred and noisy test image
+# Utility functions
+n = 13
+n2 = n // 2
+spad = lambda x : np.pad(x, n, mode='symmetric')
+crop = lambda x : x[n+n2:-n+n2,n+n2:-n+n2]
+conv = lambda h, x : np.fft.ifft2(np.fft.fft2(h, x.shape)*np.fft.fft2(x)).real
+
+
+# Load reference image
 img = util.ExampleImages().image('lena.grey', scaled=True)
-h0 = np.zeros((11,11), dtype=np.float32)
-h0[5,5] = 1.0
+
+
+# Construct smoothing filter
+h0 = np.zeros((13,13), dtype=np.float32)
+h0[6,6] = 1.0
 h = ndimage.filters.gaussian_filter(h0, 2.0)
-imgc = np.real(np.fft.ifft2(np.fft.fft2(h, img.shape) * np.fft.fft2(img)))
+
+
+# Construct test image
+imgc = crop(conv(h, spad(img)))
 np.random.seed(12345)
 imgcn = imgc + np.random.normal(0.0, 0.01, img.shape)
+
 
 # Set up TVDeconv options
 lmbda = 5e-3
 opt = tvl2.TVL2Deconv.Options({'Verbose' : True, 'MaxMainIter' : 200,
-                               'gEvalY' : False})
+                        'gEvalY' : False, 'AutoRho' : {'RsdlTarget' : 5e-1}})
+
 
 # Initialise and run TVL2Deconv object
-b = tvl2.TVL2Deconv(h, imgcn, lmbda, opt)
-b.solve()
+b = tvl2.TVL2Deconv(h, spad(imgcn), lmbda, opt)
+imgr = b.solve()[n-n2:-n-n2,n-n2:-n-n2]
 print("TVL2Deconv solve time: %.2fs" % b.runtime)
 
 
-# Display input and result image
-fig1 = plot.figure(1, figsize=(14,7))
-plot.subplot(1,2,1)
+# Display test images
+fig1 = plot.figure(1, figsize=(21,7))
+plot.subplot(1,3,1)
+plot.imview(img, fgrf=fig1, title='Reference')
+plot.subplot(1,3,2)
 plot.imview(imgcn, fgrf=fig1, title='Blurred/Noisy')
-plot.subplot(1,2,2)
-plot.imview(b.X, fgrf=fig1, title='l2-TV Result')
+plot.subplot(1,3,3)
+plot.imview(imgr, fgrf=fig1, title='l2-TV Result')
 fig1.show()
 
 

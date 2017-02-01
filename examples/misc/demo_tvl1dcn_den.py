@@ -6,7 +6,7 @@
 # and user license can be found in the 'LICENSE.txt' file distributed
 # with the package.
 
-"""Basic tvl2.TVL2Denoise usage example"""
+"""Basic tvl1.TVL1Deconv usage example (denoising problem)"""
 
 from __future__ import print_function
 from builtins import input
@@ -16,31 +16,38 @@ import numpy as np
 
 from sporco import util
 from sporco import plot
-from sporco.admm import tvl2
+from sporco.admm import tvl1
 
 
-# Load demo image and construct noisy test image
+# Load reference image
 img = util.ExampleImages().image('lena.grey', scaled=True)
+
+
+# Construct test image
 np.random.seed(12345)
-imgn = img + np.random.normal(0.0, 0.04, img.shape)
-
-# Set up TVL2Denoise options
-lmbda = 0.04
-opt = tvl2.TVL2Denoise.Options({'Verbose' : True, 'MaxMainIter' : 200,
-                                'gEvalY' : False})
-
-# Initialise and run TVL2Denoise object
-b = tvl2.TVL2Denoise(imgn, lmbda, opt)
-b.solve()
-print("TVL2Denoise solve time: %.2fs" % b.runtime)
+imgn = util.spnoise(img, 0.2)
 
 
-# Display input and result image
-fig1 = plot.figure(1, figsize=(14,7))
-plot.subplot(1,2,1)
+# Set up TVL1Deconv options
+lmbda = 8e-1
+opt = tvl1.TVL1Deconv.Options({'Verbose' : True, 'MaxMainIter' : 200,
+        'RelStopTol' : 1e-3, 'gEvalY' : False, 'AutoRho' : {'Enabled' : True}})
+
+
+# Initialise and run TVDeconv object
+b = tvl1.TVL1Deconv(np.ones((1,1)), imgn, lmbda, opt)
+imgr = b.solve()
+print("TVL1Deconv solve time: %.2fs" % b.runtime)
+
+
+# Display test images
+fig1 = plot.figure(1, figsize=(21,7))
+plot.subplot(1,3,1)
+plot.imview(img, fgrf=fig1, title='Reference')
+plot.subplot(1,3,2)
 plot.imview(imgn, fgrf=fig1, title='Noisy')
-plot.subplot(1,2,2)
-plot.imview(b.X, fgrf=fig1, title='l2-TV Result')
+plot.subplot(1,3,3)
+plot.imview(imgr, fgrf=fig1, title='l1-TV Result')
 fig1.show()
 
 
