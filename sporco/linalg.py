@@ -1026,7 +1026,7 @@ def fl2norm2(xf, axis=(0,1)):
     """
 
     xfs = xf.shape
-    return 0.5*(linalg.norm(xf)**2)/np.prod(np.array([xfs[k] for k in axis]))
+    return (linalg.norm(xf)**2)/np.prod(np.array([xfs[k] for k in axis]))
 
 
 

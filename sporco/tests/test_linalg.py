@@ -212,3 +212,60 @@ class TestSet01(object):
         Dslv, cgit = linalg.solvemdbi_cg(X, rho, XHop(S)+rho*Z, 4, 3, tol=1e-6)
 
         assert(linalg.rrs(XHop(Xop(Dslv)) + rho*Dslv, XHop(S) + rho*Z) <= 1e-6)
+
+
+
+    def test_12(self):
+        b = np.array([0.0,0.0,2.0])
+        s = np.array([0.0,0.0,0.0])
+        r = 1.0
+        p = linalg.proj_l2ball(b, s, r)
+        assert(linalg.rrs(p, np.array([0.0,0.0,1.0])) < 1e-14)
+
+
+
+    def test_14(self):
+        u = np.array([[0,1],[2,3]])
+        v = linalg.roll(u, [1, 1])
+        assert(v[0,0] == 3)
+
+
+
+    def test_15(self):
+        u0 = np.array([[0,1],[2,3]])
+        u1 = np.array([[4,5],[6,7]])
+        C = linalg.blockcirculant((u0,u1))
+        assert(C[3,0] == 6)
+        assert(C[3,3] == 3)
+
+
+
+    def test_16(self):
+        x = np.random.randn(16,8)
+        xf = linalg.fftn(x, axes=(0,))
+        n1 = np.linalg.norm(x)**2
+        n2 = linalg.fl2norm2(xf, axis=(0,))
+        assert(np.abs(n1-n2) < 1e-12)
+
+
+
+    def test_17(self):
+        x = np.random.randn(16,8)
+        xf = linalg.rfftn(x, axes=(0,))
+        n1 = np.linalg.norm(x)**2
+        n2 = linalg.rfl2norm2(xf, xs=x.shape, axis=(0,))
+        assert(np.abs(n1-n2) < 1e-12)
+
+
+
+    def test_18(self):
+        N = 16
+        x = np.random.randn(N)
+        y = x.copy()
+        y[0] = 0
+        xe = np.abs(x[0])
+        e1 = linalg.mae(x, y)
+        e2 = linalg.mse(x, y)
+        assert(np.abs(e1 - xe/N) < 1e-12)
+        assert(np.abs(e2 - (xe**2)/N) < 1e-12)
+
