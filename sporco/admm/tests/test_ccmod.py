@@ -47,6 +47,7 @@ class TestSet01(object):
         Nd = 8
         X = np.random.randn(N, N, 1, 1, M)
         S = np.random.randn(N, N, 1)
+        opt = ccmod.ConvCnstrMOD.Options({'ZeroMean' : True})
         try:
             c = ccmod.ConvCnstrMOD(X, S, (Nd, Nd, M))
             c.solve()
@@ -60,8 +61,9 @@ class TestSet01(object):
         M = 8
         X = np.random.randn(N, N, 1, 1, M)
         S = np.random.randn(N, N, 1)
+        opt = ccmod.ConvCnstrMOD.Options({'ZeroMean' : True})
         try:
-            c = ccmod.ConvCnstrMOD(X, S, ((4, 4, 4),(8, 8, 4)))
+            c = ccmod.ConvCnstrMOD(X, S, ((4, 4, 4),(8, 8, 4)), opt)
             c.solve()
         except Exception as e:
             print(e)
@@ -75,8 +77,9 @@ class TestSet01(object):
         Nd = 8
         X = np.random.randn(N, N, Nc, 1, M)
         S = np.random.randn(N, N, Nc)
+        opt = ccmod.ConvCnstrMOD.Options({'ZeroMean' : True})
         try:
-            c = ccmod.ConvCnstrMOD(X, S, (Nd, Nd, 1, M), dimK=0)
+            c = ccmod.ConvCnstrMOD(X, S, (Nd, Nd, 1, M), opt, dimK=0)
             c.solve()
         except Exception as e:
             print(e)
@@ -84,6 +87,27 @@ class TestSet01(object):
 
 
     def test_05(self):
+        N = 16
+        X = np.random.randn(N, N, 3, 1, 10)
+        S = np.random.randn(N, N, 3)
+        dsz = (
+            (
+                (3, 3, 1, 6),
+                (4, 4, 1, 6),
+                (5, 5, 1, 6)
+            ),
+            (6, 6, 3, 4)
+        )
+        opt = ccmod.ConvCnstrMOD.Options({'ZeroMean' : True})
+        try:
+            c = ccmod.ConvCnstrMOD(X, S, dsz, opt, dimK=0)
+            c.solve()
+        except Exception as e:
+            print(e)
+            assert(0)
+
+
+    def test_06(self):
         N = 16
         M = 4
         Nd = 8
@@ -101,7 +125,7 @@ class TestSet01(object):
         assert(c.U.dtype == dt)
 
 
-    def test_06(self):
+    def test_07(self):
         N = 16
         M = 4
         Nd = 8
