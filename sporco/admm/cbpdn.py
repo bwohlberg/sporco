@@ -1297,7 +1297,7 @@ class ConvTwoBlockCnstrnt(admm.ADMMTwoBlockCnstrnt):
         defaults.update({'AuxVarObj' : False,  'HighMemSolve' : False,
                          'LinSolveCheck' : False, 'NonNegCoef' : False,
                          'NoBndryCross' : False, 'RelaxParam' : 1.8,
-                         'rho' : 1.0, 'ReturnVar' : 'X'})
+                         'rho' : 1.0, 'ReturnVar' : 'Y1'})
 
 
         def __init__(self, opt=None):
@@ -1383,7 +1383,7 @@ class ConvTwoBlockCnstrnt(admm.ADMMTwoBlockCnstrnt):
     def getcoef(self):
         """Get final coefficient array."""
 
-        return self.X
+        return self.getmin()
 
 
 
@@ -1885,7 +1885,7 @@ class AddMaskSim(object):
 
 
     def getcoef(self):
-        """Get final coefficient array."""
+        """Get result of inner cbpdn object with AMS component removed."""
 
         return self.cbpdn.getcoef()[self.index_primary()]
 

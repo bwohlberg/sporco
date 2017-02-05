@@ -432,6 +432,13 @@ class ADMM(with_metaclass(_ADMM_Meta, object)):
         # Print final separator string if Verbose option enabled
         self.display_end(nsep)
 
+        return self.getmin()
+
+
+
+    def getmin(self):
+        """Get minimizer after optimisation."""
+
         return self.X
 
 
@@ -896,10 +903,8 @@ class ADMMEqual(ADMM):
 
 
 
-    def solve(self):
-        """Run optimisation."""
-
-        super(ADMMEqual, self).solve()
+    def getmin(self):
+        """Get minimizer after optimisation."""
 
         return self.X if self.opt['ReturnX'] else self.Y
 
@@ -1127,10 +1132,8 @@ class ADMMTwoBlockCnstrnt(ADMM):
 
 
 
-    def solve(self):
-        """Run optimisation."""
-
-        super(ADMMTwoBlockCnstrnt, self).solve()
+    def getmin(self):
+        """Get minimizer after optimisation."""
 
         if self.opt['ReturnVar'] == 'X':
             return self.var_x()
