@@ -5,7 +5,7 @@ include pytest.ini
 include README.rst
 include LICENSE
 
-recursive-include examples *.py
+recursive-include examples *.py *.ipynb
 recursive-include docs Makefile *.py *.rst *.bib *.css
 
 include sporco/data/*.npz
