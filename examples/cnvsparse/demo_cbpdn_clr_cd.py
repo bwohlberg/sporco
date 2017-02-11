@@ -20,7 +20,7 @@ from sporco.admm import cbpdn
 import sporco.linalg as spl
 
 
-# Load demo image
+# Load test image
 img = util.ExampleImages().image('lena', scaled=True, zoom=0.5)
 
 

@@ -72,7 +72,7 @@ b.solve()
 print("BPDNJoint solve time: %.2fs" % b.runtime)
 
 
-# Plot results
+# Display recovery results
 fig1 = plot.figure(1, figsize=(6,8))
 plot.subplot(1,2,1)
 plot.imview(x0, fgrf=fig1, cmap=plot.cm.Blues, title='Reference')
