@@ -155,6 +155,8 @@ def surf(z, x=None, y=None, title=None, xlbl=None, ylbl=None, zlbl=None,
     -------
     fig : matplotlib.figure.Figure
       Figure object for this figure.
+    ax : matplotlib.axes.Axes
+      Axes for this figure.
     """
 
     if fgrf is None:
