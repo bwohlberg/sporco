@@ -127,7 +127,7 @@ be run from the root directory of the package by, for example
 
 ::
 
-   python examples/demo_bpdn.py
+   python examples/stdsparse/demo_bpdn.py
 
 
 To run these scripts prior to installing the package it will be
