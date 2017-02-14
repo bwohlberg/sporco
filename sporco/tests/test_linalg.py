@@ -255,17 +255,3 @@ class TestSet01(object):
         n1 = np.linalg.norm(x)**2
         n2 = linalg.rfl2norm2(xf, xs=x.shape, axis=(0,))
         assert(np.abs(n1-n2) < 1e-12)
-
-
-
-    def test_18(self):
-        N = 16
-        x = np.random.randn(N)
-        y = x.copy()
-        y[0] = 0
-        xe = np.abs(x[0])
-        e1 = linalg.mae(x, y)
-        e2 = linalg.mse(x, y)
-        assert(np.abs(e1 - xe/N) < 1e-12)
-        assert(np.abs(e2 - (xe**2)/N) < 1e-12)
-

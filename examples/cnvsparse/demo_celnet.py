@@ -17,7 +17,7 @@ import numpy as np
 from sporco import util
 from sporco import plot
 from sporco.admm import cbpdn
-import sporco.linalg as spl
+import sporco.metric as sm
 
 
 # Load demo image
@@ -51,7 +51,7 @@ print("ConvElasticNet solve time: %.2fs" % b.runtime)
 # Reconstruct representation
 shr = b.reconstruct().squeeze()
 imgr = sl + shr
-print("      reconstruction PSNR: %.2fdB\n" % spl.psnr(img, imgr))
+print("      reconstruction PSNR: %.2fdB\n" % sm.psnr(img, imgr))
 
 
 # Display representation and reconstructed image

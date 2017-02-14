@@ -1095,103 +1095,25 @@ def rrs(ax, b):
 
 
 
-def mae(vref, vcmp):
-    """
-    Compute Mean Absolute Error (MAE) between two images.
+import warnings
+import sporco.metric as sm
 
-    Parameters
-    ----------
-    vref : array_like
-      Reference image
-    vcmp : array_like
-      Comparison image
+def mae(*args, **kwargs):
+    warnings.warn("sporco.linalg.mae is deprecated: please use"\
+                  " sporco.metric.mae")
+    return sm.mae(*args, **kwargs)
 
-    Returns
-    -------
-    x : float
-      MAE between `vref` and `vcmp`
-    """
+def mse(*args, **kwargs):
+    warnings.warn("sporco.linalg.mse is deprecated: please use"\
+                  " sporco.metric.mse")
+    return sm.mse(*args, **kwargs)
 
-    r = np.asarray(vref, dtype=np.float64).ravel()
-    c = np.asarray(vcmp, dtype=np.float64).ravel()
-    return np.mean(np.fabs(r - c))
+def snr(*args, **kwargs):
+    warnings.warn("sporco.linalg.snr is deprecated: please use"\
+                  " sporco.metric.snr")
+    return sm.snr(*args, **kwargs)
 
-
-
-def mse(vref, vcmp):
-    """
-    Compute Mean Squared Error (MSE) between two images.
-
-    Parameters
-    ----------
-    vref : array_like
-      Reference image
-    vcmp : array_like
-      Comparison image
-
-    Returns
-    -------
-    x : float
-      MSE between `vref` and `vcmp`
-    """
-
-    r = np.asarray(vref, dtype=np.float64).ravel()
-    c = np.asarray(vcmp, dtype=np.float64).ravel()
-    return np.mean(np.fabs(r - c)**2)
-
-
-
-def snr(vref, vcmp):
-    """
-    Compute Signal to Noise Ratio (SNR) of two images.
-
-    Parameters
-    ----------
-    vref : array_like
-      Reference image
-    vcmp : array_like
-      Comparison image
-
-    Returns
-    -------
-    x : float
-      SNR of `vcmp` with respect to `vref`
-    """
-
-    dv = np.var(vref)
-    with np.errstate(divide='ignore'):
-        rt = dv/mse(vref, vcmp)
-    return 10.0*np.log10(rt)
-
-
-
-def psnr(vref, vcmp, rng=None):
-    """
-    Compute Peak Signal to Noise Ratio (PSNR) of two images. The PSNR
-    calculation defaults to using the less common definition in terms
-    of the actual range (i.e. max minus min) of the reference signal
-    instead of the maximum possible range for the data type
-    (i.e. :math:`2^b-1` for a :math:`b` bit representation).
-
-    Parameters
-    ----------
-    vref : array_like
-      Reference image
-    vcmp : array_like
-      Comparison image
-    rng : None or int, optional (default None)
-      Signal range, either the value to use (e.g. 255 for 8 bit samples) or
-      None, in which case the actual range of the reference signal is used
-
-    Returns
-    -------
-    x : float
-      PSNR of `vcmp` with respect to `vref`
-    """
-
-    if rng is None:
-        rng = vref.max() - vref.min()
-    dv = (rng + 0.0)**2
-    with np.errstate(divide='ignore'):
-        rt = dv/mse(vref, vcmp)
-    return 10.0*np.log10(rt)
+def psnr(*args, **kwargs):
+    warnings.warn("sporco.linalg.psnr is deprecated: please use"\
+                  " sporco.metric.psnr")
+    return sm.psnr(*args, **kwargs)

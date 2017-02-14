@@ -16,7 +16,7 @@ import numpy as np
 
 from sporco import plot
 from sporco.admm import cbpdn
-import sporco.linalg as spl
+import sporco.metric as sm
 
 
 # Construct image, mask, and dictionary. The example is such that the
@@ -52,7 +52,7 @@ print("ConvBPDNMaskDcpl solve time: %.2fs" % b.runtime)
 
 # Reconstruct representation
 Sr = b.reconstruct().squeeze()
-print("        reconstruction PSNR: %.2fdB\n" % spl.psnr(S, Sr))
+print("        reconstruction PSNR: %.2fdB\n" % sm.psnr(S, Sr))
 
 
 # Display representation and reconstructed image
