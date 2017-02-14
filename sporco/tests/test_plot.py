@@ -15,6 +15,7 @@ class TestSet01(object):
         x = np.linspace(-1,1,20)
         y = x**2
         plot.plot(y, title='Plot Test', xlbl='x', ylbl='y', lgnd=('Legend'))
+        plot.close()
 
 
     def test_02(self):
@@ -22,6 +23,7 @@ class TestSet01(object):
         y = x**2
         fig = plot.figure()
         plot.plot(y, x=x, title='Plot Test', xlbl='x', ylbl='y', fgrf=fig)
+        plot.close()
 
 
     def test_03(self):
@@ -30,6 +32,7 @@ class TestSet01(object):
         z = np.sqrt(x**2 + y**2)
         fig = plot.figure()
         plot.surf(z, title='Surf Test', xlbl='x', ylbl='y', zlbl='z')
+        plot.close()
 
 
     def test_04(self):
@@ -39,6 +42,7 @@ class TestSet01(object):
         fig = plot.figure()
         plot.surf(z, x=x, y=y, title='Surf Test', xlbl='x',
                   ylbl='y', zlbl='z', fgrf=fig)
+        plot.close()
 
 
     def test_05(self):
@@ -46,6 +50,7 @@ class TestSet01(object):
         y = np.linspace(-1,1,20)[:,np.newaxis]
         z = np.sqrt(x**2 + y**2)
         plot.imview(np.asarray(z, np.float16), title='Imview Test', cbar=True)
+        plot.close()
 
 
     def test_06(self):
@@ -54,6 +59,7 @@ class TestSet01(object):
         z = np.sqrt(x**2 + y**2)
         fig = plot.figure()
         plot.imview(z, title='Imview Test', fgrf=fig)
+        plot.close()
 
 
     def test_07(self):
@@ -63,4 +69,5 @@ class TestSet01(object):
         z3 = np.dstack((z,2*z,3*z))
         fig = plot.figure()
         plot.imview(z3, title='Imview Test', fgrf=fig)
+        plot.close()
 
