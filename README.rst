@@ -143,6 +143,12 @@ shell
 from the root directory of the package.
 
 
+`Jupyter Notebook <http://jupyter.org/>`_ versions of some of the
+demos in ``examples`` are also available in the same directories as
+the corresponding demo scripts.
+
+
+
 Documentation
 -------------
 
