@@ -6,8 +6,8 @@
 # and user license can be found in the 'LICENSE.txt' file distributed
 # with the package.
 
-"""Basic dictlrn.DictLearn usage example (colour images,
-greyscale dictionary)
+"""Basic dictlrn.DictLearn usage example (colour images, greyscale
+dictionary, sparse coding update is ConvBPDNJoint)
 """
 
 from __future__ import division
