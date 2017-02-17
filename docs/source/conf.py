@@ -399,6 +399,12 @@ def run_apidoc(_):
     module = '../../sporco' if on_rtd else 'sporco'
     cpath = os.path.abspath(os.path.dirname(__file__))
     opath = cpath
+    rst = os.path.join(cpath, 'sporco.rst')
+    if os.path.exists(rst):
+        os.remove(rst)
+    rst = os.path.join(cpath, 'sporco.admm.rst')
+    if os.path.exists(rst):
+        os.remove(rst)
     print("Running sphinx-apidoc with output path " + opath)
     sys.stdout.flush()
     sphinx.apidoc.main(['sphinx-apidoc', '-e', '-d', '2', '-o', opath, module])
