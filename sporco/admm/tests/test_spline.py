@@ -4,7 +4,7 @@ import pytest
 import numpy as np
 
 from sporco.admm import spline
-import sporco.linalg as sl
+import sporco.metric as sm
 
 
 class TestSet01(object):
@@ -31,7 +31,7 @@ class TestSet01(object):
         b = spline.SplineL1(D, lmbda, opt)
         X = b.solve()
         assert(np.abs(b.itstat[-1].ObjFun - 0.333606246) < 1e-6)
-        assert(sl.mse(U,X) < 1e-6)
+        assert(sm.mse(U,X) < 1e-6)
 
 
     def test_02(self):

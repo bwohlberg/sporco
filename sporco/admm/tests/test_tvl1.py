@@ -6,7 +6,7 @@ import pytest
 import numpy as np
 
 from sporco.admm import tvl1
-import sporco.linalg as sl
+import sporco.metric as sm
 
 
 class TestSet01(object):
@@ -148,7 +148,7 @@ class TestSet02(object):
         b = tvl1.TVL1Denoise(self.D, lmbda, opt)
         X = b.solve()
         assert(np.abs(b.itstat[-1].ObjFun - 447.78101756451662) < 1e-6)
-        assert(sl.mse(self.U,X) < 1e-6)
+        assert(sm.mse(self.U,X) < 1e-6)
 
 
     def test_02(self):
@@ -158,7 +158,7 @@ class TestSet02(object):
         b = tvl1.TVL1Deconv(np.ones((1,1)), self.D, lmbda, opt)
         X = b.solve()
         assert(np.abs(b.itstat[-1].ObjFun - 831.88219947939172) < 1e-5)
-        assert(sl.mse(self.U,X) < 1e-4)
+        assert(sm.mse(self.U,X) < 1e-4)
 
 
 
@@ -184,7 +184,7 @@ class TestSet03(object):
         b = tvl1.TVL1Denoise(self.D, lmbda, opt, axes=(0,1))
         X = b.solve()
         assert(np.abs(b.itstat[-1].ObjFun - 6219.3241727233126) < 1e-6)
-        assert(sl.mse(self.U,X) < 1e-6)
+        assert(sm.mse(self.U,X) < 1e-6)
 
 
     def test_02(self):
@@ -194,7 +194,7 @@ class TestSet03(object):
         b = tvl1.TVL1Deconv(np.ones((1,1)), self.D, lmbda, opt, axes=(0,1))
         X = b.solve()
         assert(np.abs(b.itstat[-1].ObjFun - 12364.029061174046) < 1e-5)
-        assert(sl.mse(self.U,X) < 1e-4)
+        assert(sm.mse(self.U,X) < 1e-4)
 
 
 
@@ -220,7 +220,7 @@ class TestSet04(object):
         b = tvl1.TVL1Denoise(self.D, lmbda, opt, axes=(0,1,2))
         X = b.solve()
         assert(np.abs(b.itstat[-1].ObjFun - 6219.6209699337605) < 1e-6)
-        assert(sl.mse(self.U,X) < 1e-6)
+        assert(sm.mse(self.U,X) < 1e-6)
 
 
     def test_02(self):
@@ -230,4 +230,4 @@ class TestSet04(object):
         b = tvl1.TVL1Deconv(np.ones((1,1)), self.D, lmbda, opt, axes=(0,1,2))
         X = b.solve()
         assert(np.abs(b.itstat[-1].ObjFun - 12363.969118576981) < 1e-5)
-        assert(sl.mse(self.U,X) < 1e-4)
+        assert(sm.mse(self.U,X) < 1e-4)

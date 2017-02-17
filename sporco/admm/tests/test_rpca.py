@@ -4,7 +4,7 @@ import pytest
 import numpy as np
 
 from sporco.admm import rpca
-import sporco.linalg as sl
+import sporco.metric as sm
 
 
 class TestSet01(object):
@@ -29,8 +29,8 @@ class TestSet01(object):
         b = rpca.RobustPCA(D, None, opt)
         X, Y = b.solve()
         assert(np.abs(b.itstat[-1].ObjFun - 321.493968419) < 1e-6)
-        assert(sl.mse(U,X) < 5e-6)
-        assert(sl.mse(V,Y) < 1e-8)
+        assert(sm.mse(U,X) < 5e-6)
+        assert(sm.mse(V,Y) < 1e-8)
 
 
     def test_02(self):
