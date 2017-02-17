@@ -6,8 +6,13 @@
 # and user license can be found in the 'LICENSE.txt' file distributed
 # with the package.
 
-"""Basic dictlrn.DictLearn usage example (colour images, colour
-dictionary, sparse coding update is ConvBPDN)
+"""Example demonstrating the use of dictlrn.DictLearn to construct a
+dictionary learning algorithm with the flexibility of choosing the
+sparse coding and dictionary update classes. In this case they are
+ConvBPDN and ConvCnstrMOD respectively, so the resulting dictionary
+learning algorithm is equivalent to cbpdndl.ConvBPDNDictLearn (see
+usage example 'demo_cbpdndl_clr_ssd.py'). This example uses colour
+input images and a colour dictionary.
 """
 
 from __future__ import division
