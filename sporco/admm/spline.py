@@ -34,8 +34,7 @@ class SplineL1(admm.ADMM):
 
     where :math:`D = \\left( \\begin{array}{ccc} -1 & 1 & & & \\\\
     1 & -2 & 1 & & \\\\ & \\ddots & \\ddots & \ddots &  \\\\
-    & & 1 & -2 & 1 \\\\ & & & 1 & -1 \\end{array} \\right)`,
-
+    & & 1 & -2 & 1 \\\\ & & & 1 & -1 \\end{array} \\right)\;`,
     via the ADMM problem
 
     .. math::
