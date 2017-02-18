@@ -1817,13 +1817,13 @@ class AddMaskSim(object):
         # Construct impulse filter (or filters for the multi-channel
         # case) and append to dictionary
         if self.cri.C == 1:
-            imp = np.zeros(D.shape[0:dimN] + (1,))
-            imp[(0,)*dimN] = 1.0
+            self.imp = np.zeros(D.shape[0:dimN] + (1,))
+            self.imp[(0,)*dimN] = 1.0
         else:
-            imp = np.zeros(D.shape[0:dimN] + (self.cri.C,)*2)
+            self.imp = np.zeros(D.shape[0:dimN] + (self.cri.C,)*2)
             for c in range(0, self.cri.C):
-                imp[(0,)*dimN+(c,c,)] = 1.0
-        Di = np.concatenate((D, imp), axis=D.ndim-1)
+                self.imp[(0,)*dimN+(c,c,)] = 1.0
+        Di = np.concatenate((D, self.imp), axis=D.ndim-1)
 
         # Construct inner cbpdn object
         self.cbpdn = cbpdnclass(Di, S, *args, **kwargs)
@@ -1881,6 +1881,15 @@ class AddMaskSim(object):
         self.itstat = self.cbpdn.itstat
         # Return result of inner cbpdn object with AMS component removed
         return Xi[self.index_primary()]
+
+
+
+    def setdict(self, D=None):
+        """Set dictionary array."""
+
+        Di = np.concatenate((D, sl.atleast_nd(D.ndim, self.imp)),
+                            axis=D.ndim-1)
+        self.cbpdn.setdict(Di)
 
 
 
