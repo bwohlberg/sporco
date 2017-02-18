@@ -1681,8 +1681,7 @@ class ConvBPDNMaskDcpl(ConvTwoBlockCnstrnt):
 
 
     def __init__(self, D, S, lmbda, W=None, opt=None, dimK=None, dimN=2):
-        """
-        Initialise a ConvBPDNMaskDcpl object with problem parameters.
+        """Initialise a ConvBPDNMaskDcpl object with problem parameters.
 
         Parameters
         ----------
@@ -1693,7 +1692,11 @@ class ConvBPDNMaskDcpl(ConvTwoBlockCnstrnt):
         lmbda : float
           Regularisation parameter
         W : array_like
-          Mask array
+          Mask array. The array shape must be such that the array is
+          compatible for multiplication with the *internal* shape of
+          input array S (see :class:`.ConvRepIndexing` for a discussion
+          of the distinction between *external* and *internal* data
+          layouts).
         opt : :class:`ConvBPDNMaskDcpl.Options` object
           Algorithm options
         dimK : 0, 1, or None, optional (default None)
