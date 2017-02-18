@@ -1775,8 +1775,7 @@ class AddMaskSim(object):
     """
 
     def __init__(self, cbpdnclass, D, S, W, *args, **kwargs):
-        """
-        Initialise an AddMaskSim object with problem parameters.
+        """Initialise an AddMaskSim object with problem parameters.
 
         Parameters
         ----------
@@ -1788,7 +1787,11 @@ class AddMaskSim(object):
         S : array_like
           Signal array
         W : array_like
-          Mask array
+          Mask array. The array shape must be such that the array is
+          compatible for multiplication with the *internal* shape of
+          input array S (see :class:`.ConvRepIndexing` for a discussion
+          of the distinction between *external* and *internal* data
+          layouts).
         *args
           Variable length list of arguments for constructor of internal
           cbpdn object
@@ -1811,12 +1814,6 @@ class AddMaskSim(object):
         # Infer problem dimensions
         self.cri = ConvRepIndexing(D, S, dimK=dimK, dimN=dimN)
 
-        # Mask matrix
-        if W.ndim > dimN:
-            self.W = W.reshape(W.shape[0:dimN] + (1,1,) + W.shape[-1:])
-        else:
-            self.W = W
-
         # Construct impulse filter (or filters for the multi-channel
         # case) and append to dictionary
         if self.cri.C == 1:
@@ -1830,6 +1827,10 @@ class AddMaskSim(object):
 
         # Construct inner cbpdn object
         self.cbpdn = cbpdnclass(Di, S, *args, **kwargs)
+
+        # Mask matrix
+        self.W = np.asarray(sl.atleast_nd(self.cri.dimN+3, W),
+                            dtype=self.cbpdn.dtype)
 
         # Record ystep method of inner cbpdn object
         self.inner_ystep = self.cbpdn.ystep
