@@ -5,7 +5,8 @@ This module includes the following classes:
 
 * :class:`.ConvBPDN`
 
-  Solve the basic Convolutional BPDN problem
+  Solve the basic Convolutional BPDN problem (see
+  :cite:`wohlberg-2016-efficient`)
 
   .. math::
      \mathrm{argmin}_\mathbf{x} \;
@@ -17,6 +18,7 @@ This module includes the following classes:
 
   Solve the Convolutional BPDN problem with joint sparsity over
   multiple signal channels via an :math:`\ell_{2,1}` norm term
+  (see :cite:`wohlberg-2016-convolutional`)
 
   .. math::
        \mathrm{argmin}_\mathbf{x} \;
@@ -40,7 +42,8 @@ This module includes the following classes:
 * :class:`.ConvBPDNGradReg`
 
   Solve Convolutional BPDN with an additional :math:`\ell_2` penalty
-  on the gradient of the coefficient maps
+  on the gradient of the coefficient maps (see
+  :cite:`wohlberg-2016-convolutional2`)
 
   .. math::
      \mathrm{argmin}_\mathbf{x} \;
@@ -54,7 +57,8 @@ This module includes the following classes:
 
 * :class:`.ConvBPDNMaskDcpl`
 
-  Solve Convolutional BPDN with Mask Decoupling
+  Solve Convolutional BPDN with Mask Decoupling (see
+  :cite:`heide-2015-fast` :cite:`wohlberg-2016-boundary`)
 
     .. math::
        \mathrm{argmin}_\mathbf{x} \;
@@ -65,7 +69,7 @@ This module includes the following classes:
   where :math:`W` is a mask array.
 
 
-* :class:`.AddMaskSim`
+* :class:`.AddMaskSim` (see :cite:`wohlberg-2016-boundary`)
 
   A wrapper class for applying the Additive Mask Simulation boundary
   handling technique to any of the other :mod:`.cbpdn` classes.

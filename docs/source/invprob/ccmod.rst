@@ -22,7 +22,8 @@ Usage Examples
 
     .. container:: header
 
-        :class:`.ConvCnstrMOD` usage (greyscale images)
+        :class:`.ConvCnstrMOD` usage (greyscale images, as in
+        :cite:`wohlberg-2016-efficient`)
 
     .. literalinclude:: ../../../examples/cnvsparse/demo_ccmod_gry.py
        :language: python
@@ -33,7 +34,8 @@ Usage Examples
 
     .. container:: header
 
-        :class:`.ConvCnstrMOD` usage (colour images, greyscale dictionary)
+        :class:`.ConvCnstrMOD` usage (colour images, greyscale
+	dictionary, as in :cite:`wohlberg-2016-convolutional`)
 
     .. literalinclude:: ../../../examples/cnvsparse/demo_ccmod_clr_gd.py
        :language: python
@@ -44,7 +46,8 @@ Usage Examples
 
     .. container:: header
 
-        :class:`.ConvCnstrMOD` usage (colour images, colour dictionary)
+        :class:`.ConvCnstrMOD` usage (colour images, colour
+        dictionary, as in :cite:`wohlberg-2016-convolutional`)
 
     .. literalinclude:: ../../../examples/cnvsparse/demo_ccmod_clr_cd.py
        :language: python

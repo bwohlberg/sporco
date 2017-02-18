@@ -20,7 +20,7 @@ Usage Examples
     .. container:: header
 
         :class:`.ConvBPDNDictLearn` usage (greyscale images,
-        single-scale dictionary)
+        single-scale dictionary, as in :cite:`wohlberg-2016-efficient`)
 
     .. literalinclude:: ../../../examples/cnvsparse/demo_cbpdndl_gry_ssd.py
        :language: python
@@ -31,7 +31,7 @@ Usage Examples
     .. container:: header
 
         :class:`.ConvBPDNDictLearn` usage (greyscale images,
-	multi-scale dictionary)
+	multi-scale dictionary, as in :cite:`wohlberg-2016-efficient`)
 
     .. literalinclude:: ../../../examples/cnvsparse/demo_cbpdndl_gry_msd.py
        :language: python
@@ -42,7 +42,8 @@ Usage Examples
     .. container:: header
 
         :class:`.ConvBPDNDictLearn` usage (colour images,
-        single-scale colour dictionary)
+        single-scale colour dictionary, as in
+	:cite:`wohlberg-2016-convolutional`)
 
     .. literalinclude:: ../../../examples/cnvsparse/demo_cbpdndl_clr_ssd.py
        :language: python
@@ -53,7 +54,8 @@ Usage Examples
     .. container:: header
 
         :class:`.ConvBPDNDictLearn` usage (colour images,
-        multi-scale colour dictionary)
+        multi-scale colour dictionary, as in
+	:cite:`wohlberg-2016-convolutional`)
 
     .. literalinclude:: ../../../examples/cnvsparse/demo_cbpdndl_clr_msd.py
        :language: python
