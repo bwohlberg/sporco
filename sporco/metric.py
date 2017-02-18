@@ -5,7 +5,25 @@
 # and user license can be found in the 'LICENSE.txt' file distributed
 # with the package.
 
-"""Image quality metrics and related functions"""
+"""Image quality metrics and related functions
+
+Note that the well-known SSIM metric is not implemented here as it is
+available in a number of other Python packages, including:
+
+  - `scikit-image <https://github.com/scikit-image/scikit-image>`_
+  - `PyMetrikz <https://bitbucket.org/kuraiev/pymetrikz>`_
+  - `Video Quality Metrics <https://github.com/aizvorski/video-quality>`_
+  - `pyssim <https://github.com/jterrace/pyssim>`_
+
+Some implementations are also available in unpackaged collections of
+Python code:
+
+  - `src <https://github.com/helderc/src>`_
+  - `python <https://github.com/mubeta06/python>`_
+
+|
+
+"""
 
 from __future__ import division
 from builtins import range
