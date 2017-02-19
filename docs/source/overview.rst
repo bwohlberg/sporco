@@ -16,55 +16,27 @@ of Multipliers (ADMM) :cite:`boyd-2010-distributed`.
 
 
 
-Usage
------
-
-Each optimisation algorithm is implemented as a separate
-class. Solving a problem is straightforward, as illustrated in the
-following example for solving
-
-   .. math::
-       \mathrm{argmin}_\mathbf{x} \;
-       (1/2) \| D \mathbf{x} - \mathbf{s} \|_2^2 + \;
-       \lambda \| \mathbf{x} \|_1 \quad . \;
-
-Assume that :math:`D` and :math:`\mathbf{s}` are existing numpy arrays
-representing the dictionary matrix and the signal vector to be
-decomposed. After importing the appropriate module
-
-::
-
-   from sporco.admm import bpdn
-
-create an object representing the desired algorithm options
-
-::
-
-   opt = bpdn.BPDN.Options({'Verbose' : True, 'MaxMainIter' : 500,
-               'RelStopTol' : 1e-6, 'AutoRho' : {'Enabled' : True}})
-
-then initialise the solver object
-
-::
-
-  lmbda = 25.0
-  b = bpdn.BPDN(D, s, lmbda, opt)
-
-and call the ``solve`` method
-
-::
-
-  x = b.solve()
-
-leaving the result in ``x``.
-
-
-
 Usage Examples
 --------------
 
-Scripts illustrating usage of the package in more detail can be found
-in the ``examples`` directory of the source distribution. These
+Usage of the package is illustrated in the following examples:
+
+* :doc:`Standard sparse coding <examples/demo_bpdn>`
+* :doc:`Standard sparse coding with joint sparsity <examples/demo_bpdnjnt>`
+* :doc:`Convolutional sparse coding (greyscale image)
+  <examples/demo_cbpdn_gry>`
+* :doc:`Convolutional sparse coding (colour image, greyscale dictionary)
+  <examples/demo_cbpdn_clr_gd>`
+* :doc:`Convolutional sparse coding (colour image, colour dictionary)
+  <examples/demo_cbpdn_clr_cd>`
+
+
+
+Example Scripts
+^^^^^^^^^^^^^^^
+
+A large collection of scripts illustrating usage of the package can be
+found in the ``examples`` directory of the source distribution. These
 examples can be run from the root directory of the package by, for
 example
 
@@ -83,8 +55,13 @@ shell
    export PYTHONPATH=$PYTHONPATH:`pwd`
 
 
-from the root directory of the package.
+from the root directory of the package. If SPORCO has been installed
+via ``pip``, the examples can be found in the directory in which ``pip``
+installs documentation, e.g. ``/usr/local/share/doc/sporco-x.y.z/examples/``.
 
+
+Jupyter Notebooks
+^^^^^^^^^^^^^^^^^
 
 `Jupyter Notebook <http://jupyter.org/>`_ versions of some of the
 demos in ``examples`` are also available in the same directories as
@@ -130,3 +107,16 @@ Acknowledgments
 
 Thanks to Aric Hagberg for valuable advice on python packaging,
 documentation, and related issues.
+
+
+
+
+.. toctree::
+   :hidden:
+
+   install
+   examples/demo_bpdn
+   examples/demo_bpdnjnt
+   examples/demo_cbpdn_gry
+   examples/demo_cbpdn_clr_gd
+   examples/demo_cbpdn_clr_cd
