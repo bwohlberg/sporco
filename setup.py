@@ -5,6 +5,7 @@ from __future__ import print_function
 from builtins import next
 from builtins import filter
 from future import standard_library
+
 standard_library.install_aliases()
 import os
 from glob import glob
@@ -102,7 +103,7 @@ if on_rtd:
     print("Building on ReadTheDocs")
     install_requires = ['future', 'numpy', 'scipy']
 else:
-    install_requires = ['future', 'numpy', 'scipy', 'pyfftw']
+    install_requires = ['future', 'numpy', 'scipy', 'pyfftw', 'matplotlib']
 
 
 setup(
@@ -124,8 +125,8 @@ setup(
     package_data     = {'sporco': ['data/*.png']},
     data_files       = data,
     include_package_data = True,
-    setup_requires   = ['pytest-runner'],
-    tests_require    = ['pytest'],
+    setup_requires   = ['future', 'numpy', 'scipy'],
+    tests_require    = ['pytest-runner', 'pytest'],
     install_requires = install_requires,
     extras_require = {
         'numexpr':  ['numexpr'],
