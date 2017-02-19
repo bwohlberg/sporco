@@ -84,7 +84,8 @@ docdirbase  = 'share/doc/%s-%s' % (name, version)
 data = [(docdirbase, glob("*.txt"))]
 dd = os.path.join(docdirbase,'examples')
 pp = os.path.join('examples')
-data.append((dd, glob(os.path.join(pp ,"*/*.py"))))
+data.append((dd, glob(os.path.join(pp ,"*/*.py")) +
+                 glob(os.path.join(pp ,"*/*.ipynb"))))
 
 
 longdesc = \
