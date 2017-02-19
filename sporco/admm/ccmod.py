@@ -87,9 +87,9 @@ class DictionarySize(object):
 
 
 class ConvRepIndexing(object):
-    """Manage the inference of problem dimensions and the roles of ndarray
-    indices for convolutional representations as in :class:`.ConvBPDN`
-    and related classes.
+    """Manage the inference of problem dimensions and the roles of
+    :class:`numpy.ndarray` indices for convolutional representations
+    as in :class:`.ConvBPDN` and related classes.
     """
 
     def __init__(self, dsz, S, dimK=None, dimN=2):
@@ -135,7 +135,7 @@ class ConvRepIndexing(object):
           dimensions then it is a single-channel dictionary, and input
           `S` is also assumed to be single-channel, with the
           additional index in `S` assigned as a signal index
-          (i.e. dimK = 1).  Conversely, if input `dsz` specified
+          (i.e. `dimK` = 1).  Conversely, if input `dsz` specified
           `dimN` + 2 dimensions it is a multi-channel dictionary, and
           the additional index in `S` is assigned as a channel index
           (i.e. dimC = 1).
@@ -174,7 +174,7 @@ class ConvRepIndexing(object):
         * K is the number of signals in S
         * M is the number of filters in D
 
-        It should be emphasised that dimC and dimK may take on values
+        It should be emphasised that dimC and `dimK` may take on values
         0 or 1, and represent the number of channel and signal
         dimensions respectively *in input S*. In the internal layout
         of S there is always a dimension allocated for channels and
