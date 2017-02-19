@@ -125,8 +125,8 @@ setup(
     package_data     = {'sporco': ['data/*.png']},
     data_files       = data,
     include_package_data = True,
-    setup_requires   = ['future', 'numpy', 'scipy'],
-    tests_require    = ['pytest-runner', 'pytest'],
+    setup_requires   = ['future', 'pytest-runner', 'numpy', 'scipy'],
+    tests_require    = ['pytest'],
     install_requires = install_requires,
     extras_require = {
         'numexpr':  ['numexpr'],
