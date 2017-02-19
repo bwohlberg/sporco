@@ -202,4 +202,4 @@ See :class:`.ConvBPDNMaskDcpl` as an example of a class derived from
 .. toctree::
    :hidden:
 
-   notes
+   util

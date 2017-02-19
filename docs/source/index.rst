@@ -8,6 +8,7 @@ SPORCO Documentation
    install
    invprob
    admm
+   util
    notes
    modules
    zreferences
