@@ -1831,6 +1831,11 @@ class AddMaskSim(object):
         # Mask matrix
         self.W = np.asarray(sl.atleast_nd(self.cri.dimN+3, W),
                             dtype=self.cbpdn.dtype)
+        # If mask has a non-singleton channel dimension, swap that
+        # axis onto the dictionary filter index dimension (where the
+        # multiple-channel impulse filters are located)
+        if self.W.shape[self.cri.dimN] > 1:
+            self.W = np.swapaxes(self.W, self.cri.axisC, self.cri.axisM)
 
         # Record ystep method of inner cbpdn object
         self.inner_ystep = self.cbpdn.ystep
