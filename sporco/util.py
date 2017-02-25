@@ -19,6 +19,8 @@ from scipy import misc
 import scipy.ndimage.interpolation as sni
 from timeit import default_timer as timer
 import os
+import urllib.request, urllib.error
+import io
 import glob
 import multiprocessing as mp
 import itertools
@@ -448,6 +450,43 @@ def convdicts():
     for k in list(npz.keys()):
         cdd[k] = npz[k]
     return cdd
+
+
+
+def netgetdata(url, maxtry=3, timeout=10):
+    """
+    Get content of a file via a URL.
+
+    Parameters
+    ----------
+    url : string
+      URL of the file to be downloaded
+    maxtry : int, optional (default 3)
+      Maximum number of download retries
+    timeout : int, optional (default 10)
+      Timeout in seconds for blocking operations
+
+    Returns
+    -------
+    str : io.BytesIO
+      Buffered I/O stream
+
+    Raises
+    ------
+    urllib.error.URLError
+      If the file cannot be downloaded
+    """
+
+    ntry = 0
+    while ntry < maxtry:
+        try:
+            rspns = urllib.request.urlopen(url, timeout=timeout)
+            cntnt = rspns.read()
+            return io.BytesIO(cntnt)
+        except urllib.error.URLError as e:
+            ntry += 1
+            print(type(e))
+    return None
 
 
 
