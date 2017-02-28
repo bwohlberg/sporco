@@ -5,8 +5,8 @@ from __future__ import print_function
 from builtins import next
 from builtins import filter
 from future import standard_library
-
 standard_library.install_aliases()
+
 import os
 from glob import glob
 from setuptools import setup
