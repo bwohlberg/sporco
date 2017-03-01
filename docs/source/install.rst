@@ -53,8 +53,9 @@ directory of the source distribition (i.e. prior to installation) do
 
    bin/sporco_get_images --libdest
 
-To download the images as part of a package that has already been
-installed, do
+after setting the ``PYTHONPATH`` environment variable as described in
+:ref:`example-scripts-section`.  To download the images as part of a
+package that has already been installed, do
 
 ::
 

@@ -32,6 +32,7 @@ Usage of the package is illustrated in the following examples:
   <examples/demo_cbpdn_clr_cd>`
 
 
+.. _example-scripts-section:
 
 Example Scripts
 ^^^^^^^^^^^^^^^
