@@ -4,6 +4,9 @@ from builtins import object
 import pytest
 
 import numpy as np
+from scipy import misc
+import os
+import tempfile
 import collections
 
 from sporco import util
@@ -95,9 +98,19 @@ class TestSet01(object):
 
 
     def test_14(self):
-        ei = util.ExampleImages()
-        nm = ei.names()
-        assert(len(nm) > 0)
-        im = ei.image('barbara')
-        assert(im.shape == (576,720,3))
-        im = ei.image('barbara', scaled=True, dtype=np.float32, zoom=0.5)
+        bpth = tempfile.mkdtemp()
+        os.mkdir(os.path.join(bpth, 'a'))
+        ipth = os.path.join(bpth, 'a', 'b.png')
+        img = np.ones((32,32))
+        misc.imsave(ipth, img)
+        ei = util.ExampleImages(pth=bpth)
+        im = ei.images()
+        assert(len(im) > 0)
+        gp = ei.groups()
+        assert(len(gp) > 0)
+        img = ei.image('a', 'b.png')
+        assert(img.shape == (32,32))
+        im = ei.image('a', 'b.png', scaled=True, dtype=np.float32, zoom=0.5)
+        os.remove(ipth)
+        os.rmdir(os.path.join(bpth, 'a'))
+        os.rmdir(bpth)

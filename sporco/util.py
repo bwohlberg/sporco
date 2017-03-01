@@ -21,6 +21,7 @@ from scipy import misc
 import scipy.ndimage.interpolation as sni
 from timeit import default_timer as timer
 import os
+import imghdr
 import urllib.request, urllib.error
 import io
 import glob
@@ -487,15 +488,17 @@ def netgetdata(url, maxtry=3, timeout=10):
             return io.BytesIO(cntnt)
         except urllib.error.URLError as e:
             ntry += 1
-            print(type(e))
-    return None
+            if ntry < maxtry:
+                print(e)
+            else:
+                raise
 
 
 
 class ExampleImages(object):
     """Access a set of example images"""
 
-    def __init__(self, scaled=False, dtype=None, zoom=None, pth=None, ext=None):
+    def __init__(self, scaled=False, dtype=None, zoom=None, pth=None):
         """Initialise an ExampleImages object.
 
         Parameters
@@ -511,12 +514,8 @@ class ExampleImages(object):
           Optional support rescaling factor to apply to the images
         pth : string or None (default None)
           Path to directory containing image files. If the value is None the
-          path points to a set of example images downloaded when the package
-          is built.
-        ext : tuple of strings or None (default None)
-          A tuple of strings corresponding to file extensions corresponding
-          to image types desired to be included in the image set. If the value
-          is None the tuple is set to `('.png',)` for PNG format images only.
+          path points to a set of example images that can be downloaded using
+          a script provided with the package.
         """
 
         self.scaled = scaled
@@ -526,19 +525,25 @@ class ExampleImages(object):
             self.bpth = os.path.join(os.path.dirname(__file__), 'data')
         else:
             self.bpth = pth
-        if ext is None:
-            ext = ('.png',)
-        flst = []
-        for e in ext:
-            flst.extend(glob.glob(os.path.join(self.bpth, '*' + e)))
-        self.ndict = {}
-        for f in flst:
-            self.ndict[os.path.basename(os.path.splitext(f)[0])] = f
+        self.imglst = []
+        self.grpimg = {}
+        for dirpath, dirnames, filenames in  os.walk(self.bpth):
+            # It would be more robust and portable to use
+            # pathlib.PurePath.relative_to
+            prnpth = dirpath[len(self.bpth)+1:]
+            for f in filenames:
+                fpth = os.path.join(dirpath, f)
+                if imghdr.what(fpth) is not None:
+                    gpth = os.path.join(prnpth, f)
+                    self.imglst.append(gpth)
+                    if not prnpth in self.grpimg:
+                        self.grpimg[prnpth] = []
+                    self.grpimg[prnpth].append(gpth)
 
 
 
-    def names(self):
-        """Get list of available names.
+    def images(self):
+        """Get list of available images.
 
         Returns
         -------
@@ -546,17 +551,51 @@ class ExampleImages(object):
           A list of names of available images
         """
 
-        return self.ndict.keys()
+        return self.imglst
 
 
 
-    def image(self, name, scaled=None, dtype=None, zoom=None):
+    def groups(self):
+        """Get list of available image groups.
+
+        Returns
+        -------
+        grp : list
+          A list of names of available image groups
+        """
+
+        return list(self.grpimg.keys())
+
+
+
+    def groupimages(self, grp):
+        """Get list of available images in specified group.
+
+        Parameters
+        ----------
+        grp : str
+          Name of image group
+
+        Returns
+        -------
+        nlst : list
+          A list of names of available images in the specified group
+        """
+
+        return self.grpimg[grp]
+
+
+
+    def image(self, group, fname, scaled=None, dtype=None, idxexp=None,
+              zoom=None):
         """Get named image.
 
         Parameters
         ----------
-        name : string
-          Name of required image
+        group : string
+          Name of image group
+        fname : string
+          Filename of image
         scaled : bool or None, optional
           Flag indicating whether images should be on the range [0,...,255]
           with np.uint8 dtype (False), or on the range [0,...,1] with
@@ -568,6 +607,11 @@ class ExampleImages(object):
           integer type, the output data type is np.float32. If the value is
           None, the data type is determined by the `dtype` parameter passed to
           the object initializer, otherwise that selection is overridden.
+        idxexp :  index expression or None, optional (default None)
+          An index expression selecting, for example, a cropped region of
+          the requested image. This selection is applied *before* any
+          `zoom` rescaling so the expression does not need to be modified when
+          the zoom factor is changed.
         zoom : float or None, optional (default None)
           Optional rescaling factor to apply to the images. If the value is
           None, support rescaling behaviour is determined by the `zoom`
@@ -582,7 +626,7 @@ class ExampleImages(object):
         Raises
         ------
         IOError
-          If the named image is not accessible
+          If the image is not accessible
         """
 
         if scaled is None:
@@ -596,15 +640,18 @@ class ExampleImages(object):
             dtype = np.float32
         if zoom is None:
             zoom = self.zoom
-        pth = self.ndict[name]
+        pth = os.path.join(self.bpth, group, fname)
 
         try:
             img = np.asarray(misc.imread(pth), dtype=dtype)
         except IOError:
-            raise IOError('Could not access image with name ' + name)
+            raise IOError('Could not access image %s in group %s' %
+                          (fname, group))
 
         if scaled:
             img /= 255.0
+        if idxexp is not None:
+            img = img[idxexp]
         if zoom is not None:
             if img.ndim == 2:
                 img = sni.zoom(img, zoom)
