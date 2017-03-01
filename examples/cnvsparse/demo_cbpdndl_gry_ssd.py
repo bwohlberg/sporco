@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 #-*- coding: utf-8 -*-
-# Copyright (C) 2015-2016 by Brendt Wohlberg <brendt@ieee.org>
+# Copyright (C) 2015-2017 by Brendt Wohlberg <brendt@ieee.org>
 # All rights reserved. BSD 3-clause License.
 # This file is part of the SPORCO package. Details of the copyright
 # and user license can be found in the 'LICENSE.txt' file distributed
 # with the package.
 
-"""Basic cbpdndl.ConvBPDNDictLearn usage example (greyscale images,
+"""Usage example: cbpdndl.ConvBPDNDictLearn (greyscale images,
 single-scale dictionary).
 """
 
@@ -23,11 +23,12 @@ from sporco import plot
 
 # Training images (size reduced to speed up demo script)
 exim = util.ExampleImages(scaled=True, zoom=0.25)
-S1 = exim.image('lena.grey')
-S2 = exim.image('barbara.grey')
-S3 = exim.image('kiel.grey')
-S4 = util.rgb2gray(exim.image('mandrill'))
-S5 = exim.image('man.grey')[25:153, 25:153]
+S1 = exim.image('standard', 'lena.grey.png')
+S2 = exim.image('standard', 'barbara.grey.png')
+S3 = util.rgb2gray(exim.image('standard', 'monarch.png',
+                                idxexp=np.s_[:,160:672]))
+S4 = util.rgb2gray(exim.image('standard', 'mandrill.png'))
+S5 = exim.image('standard', 'man.grey.png', idxexp=np.s_[100:612, 100:612])
 S = np.dstack((S1,S2,S3,S4,S5))
 
 

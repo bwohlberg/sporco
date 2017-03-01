@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 #-*- coding: utf-8 -*-
-# Copyright (C) 2015-2016 by Brendt Wohlberg <brendt@ieee.org>
+# Copyright (C) 2015-2017 by Brendt Wohlberg <brendt@ieee.org>
 # All rights reserved. BSD 3-clause License.
 # This file is part of the SPORCO package. Details of the copyright
 # and user license can be found in the 'LICENSE.txt' file distributed
 # with the package.
 
-"""Basic bpdn.ElasticNet usage example"""
+"""Usage example: bpdn.ElasticNet"""
 
 from __future__ import print_function
 from builtins import input
@@ -61,8 +61,7 @@ plot.plot(np.hstack((x0, b.Y)), fgnm=1, title='Sparse representation',
 its = b.getitstat()
 fig2 = plot.figure(2, figsize=(21,7))
 plot.subplot(1,3,1)
-plot.plot(its.ObjFun, fgrf=fig2, ptyp='semilogy', xlbl='Iterations',
-          ylbl='Functional')
+plot.plot(its.ObjFun, fgrf=fig2, xlbl='Iterations', ylbl='Functional')
 plot.subplot(1,3,2)
 plot.plot(np.vstack((its.PrimalRsdl, its.DualRsdl)).T, fgrf=fig2,
           ptyp='semilogy', xlbl='Iterations', ylbl='Residual',

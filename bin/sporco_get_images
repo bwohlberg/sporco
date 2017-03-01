@@ -1,0 +1,194 @@
+#!/usr/bin/env python
+#-*- coding: utf-8 -*-
+# Copyright (C) 2017 by Brendt Wohlberg <brendt@ieee.org>
+# All rights reserved. BSD 3-clause License.
+# This file is part of the SPORCO package. Details of the copyright
+# and user license can be found in the 'LICENSE.txt' file distributed
+# with the package.
+
+"""
+Download standard test images for use with the SPORCO package.
+"""
+
+from __future__ import print_function
+from builtins import next
+from builtins import filter
+
+import io
+import os
+import sys
+import argparse
+import scipy.misc
+
+import sporco
+import sporco.util as util
+
+
+
+def getimage(url, dst, dstroot, vrbs=False):
+    """Download and save an image from a specified URL
+
+    Parameters
+    ----------
+    url : string
+      URL of the file to be downloaded
+    dst : string
+      Filename to which image file should be written
+    dstroot : string
+      Path to which image filename is to be appended
+    vrbs : bool, optional (default False)
+      Flag determining verbose operation
+    """
+
+    # Construct destination path from root and dst components
+    dstpth = os.path.join(dstroot, dst)
+    # Do not download the file if it already exists
+    if not os.path.isfile(dstpth):
+        # Split file path into main part and extension
+        spxt = os.path.splitext(dst)
+        # Display message if verbose mode requested
+        if vrbs:
+            print('Getting %s from %s' % (dst, url))
+        # URL handling depends on dst file extension
+        if spxt[1] == '.jpg' or spxt[1] == '.png':
+            # If extension is .jpg or .png, just download and save the file
+            img = util.netgetdata(url)
+            f = open(dstpth, 'w')
+            f.write(img.read())
+            f.close()
+        else:
+            # For other extensions, read the file as an image and then
+            # save it as the type specified by the destination
+            # extension
+            img = scipy.misc.imread(util.netgetdata(url))
+            scipy.misc.imsave(dstpth, img)
+
+
+
+def getgroup(imdict, grpname, dstroot, vrbs=False):
+    """Download a specified group of images
+
+    Parameters
+    ----------
+    imdict : dict
+      A dict mapping group names to sub-dicts mapping image filenames to URLs
+    grpname : string
+      The name of a group in imdict
+    dstroot : string
+      Path to which image filename is to be appended
+    vrbs : bool, optional (default False)
+      Flag determining verbose operation
+    """
+
+    # Path for this group is concatenation of destination root and
+    # group name
+    grppth = os.path.join(dstroot, grpname)
+    # Make directory for this group if it doesn't exist
+    if not os.path.isdir(grppth):
+        os.mkdir(grppth)
+    # Iterate over keys in group imdict
+    for fnm in imdict:
+        # Download URL for current image
+        url = imdict[fnm]
+        # Get current image
+        getimage(url, fnm, grppth, vrbs)
+
+
+
+if __name__ == "__main__":
+
+    # Dict specifying image groups and download URLs for images in
+    # each group
+    groups = {'standard' :
+              {'lena.png' :
+                'http://sipi.usc.edu/database/misc/4.2.04.tiff',
+              'lena.grey.png' :
+                'http://web.archive.org/web/20070328214632/'
+                'http://decsai.ugr.es/~javier/denoise/lena.png',
+              'barbara.png' :
+                'http://www.hlevkin.com/TestImages/barbara.bmp',
+              'barbara.grey.png' :
+                'http://web.archive.org/web/20070209141039/'
+                'http://decsai.ugr.es/~javier/denoise/barbara.png',
+              'mandrill.png' :
+                'http://sipi.usc.edu/database/misc/4.2.03.tiff',
+              'man.grey.png' :
+                'http://sipi.usc.edu/database/misc/5.3.01.tiff',
+              'kiel.grey.png' :
+                'http://www.hlevkin.com/TestImages/kiel.bmp',
+               'monarch.png' :
+                'http://homepages.cae.wisc.edu/~ece533/images/monarch.png'},
+            'kodak' :
+              {'kodim%02d.png' % n:
+              'http://r0k.us/graphics/kodak/kodak/kodim%02d.png' % n
+              for n in range(1,25)},
+            'bigkodak' :
+              {'kodim%02d.png' % n:
+              'http://scarlet.stanford.edu/scien/images/labsite/k%02d.bmp' % n
+              for n in range(1,25)}
+          }
+
+
+    # Parse command line arguments
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--group', action='store',
+                        help="Image group name")
+    parser.add_argument('--allgroup', action='store_true',
+                        help="Download all groups")
+    parser.add_argument('--destpth', action='store', default=None,
+                        help="Destination path")
+    parser.add_argument('--libdest', action='store_true',
+                        help="Save images to SPORCO install path")
+    parser.add_argument('--verbose', action='store_true',
+                        help="Verbose operation")
+    args = parser.parse_args()
+
+
+    # Check command line arguments
+    if args.allgroup and args.group is not None:
+        sys.exit("error: cannot use --allgroup and --group")
+
+    if args.libdest and args.destpth is not None:
+        sys.exit("error: cannot use --libdest and --destpth")
+
+
+    # Select destination root path
+    if args.libdest:
+        # Destination root is the 'data' subdirectory of the SPORCO package
+        # (either a pre-installation source package, or the post-installation
+        # system package)
+        dstroot = os.path.join(os.path.dirname(sporco.__file__), 'data')
+    else:
+        if args.destpth is None:
+            # Default destination root if none specified: if current
+            # directory is the root directory of the SPORCO source
+            # package, download to the library data directory,
+            # otherwise download to a directory 'images'
+            if os.path.isdir('sporco/data'):
+                dstroot = 'sporco/data'
+            else:
+                dstroot = 'images'
+            if not os.path.isdir(dstroot):
+                os.mkdir(dstroot)
+        else:
+            dstroot = args.destpth
+    if not os.path.isdir(dstroot):
+        sys.exit("error: destination path %s does not exist" % dstroot)
+
+
+    # Select image groups and download
+    if args.allgroup:
+        for gnm in groups:
+            getgroup(groups[gnm], gnm, dstroot, args.verbose)
+    else:
+        gnm = args.group
+        if args.group is None:
+            for gnm in ['standard', 'kodak']:
+                getgroup(groups[gnm], gnm, dstroot, args.verbose)
+            else:
+                if gnm not in groups:
+                    sys.exit("error: group %s not recognized" % gnm)
+                getgroup(groups[gnm], gnm, dstroot, args.verbose)
+
+
+    exit(0)

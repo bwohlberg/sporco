@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 #-*- coding: utf-8 -*-
-# Copyright (C) 2015-2016 by Brendt Wohlberg <brendt@ieee.org>
+# Copyright (C) 2015-2017 by Brendt Wohlberg <brendt@ieee.org>
 # All rights reserved. BSD 3-clause License.
 # This file is part of the SPORCO package. Details of the copyright
 # and user license can be found in the 'LICENSE.txt' file distributed
 # with the package.
 
-"""Basic ccmod.ConvCnstrMOD usage example (colour images, colour dictionary)"""
+"""Usage example: ccmod.ConvCnstrMOD (colour images, colour dictionary)"""
 
 from __future__ import print_function
 from builtins import input
@@ -22,8 +22,8 @@ from sporco import plot
 
 # Training images
 exim = util.ExampleImages(scaled=True, zoom=0.5)
-img1 = exim.image('lena')
-img2 = exim.image('mandrill')
+img1 = exim.image('standard', 'lena.png')
+img2 = exim.image('standard', 'mandrill.png')
 S = np.concatenate((img1[...,np.newaxis], img2[...,np.newaxis]), axis=3)
 
 

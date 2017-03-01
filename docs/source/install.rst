@@ -41,6 +41,29 @@ The procedure for installing from a source package downloaded from `PyPI
 
 
 
+Test Images
+-----------
+
+The :ref:`usage examples <usage-section>` make use of a number of
+standard test images, which can be installed using the
+``sporco_get_images``. To download these images from the root
+directory of the source distribition (i.e. prior to installation) do
+
+::
+
+   bin/sporco_get_images --libdest
+
+To download the images as part of a package that has already been
+installed, do
+
+::
+
+  sporco_get_images --libdest
+
+which will usually have to be performed with root privileges.
+
+
+
 Requirements
 ------------
 
@@ -70,7 +93,7 @@ or Python 3
 ::
 
    sudo apt-get install python3-numpy python3-scipy python3-numexpr
-   sudo apt-get install python3-matplotlib python3-pip libfftw3-dev 
+   sudo apt-get install python3-matplotlib python3-pip libfftw3-dev
    sudo pip3 install future
    sudo pip3 install pyfftw
 

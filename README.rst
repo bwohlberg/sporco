@@ -63,7 +63,7 @@ or Python 3
 ::
 
    sudo apt-get install python3-numpy python3-scipy python3-numexpr
-   sudo apt-get install python3-matplotlib python3-pip libfftw3-dev 
+   sudo apt-get install python3-matplotlib python3-pip libfftw3-dev
    sudo pip3 install future
    sudo pip3 install pyfftw
 
@@ -115,7 +115,31 @@ followed by
    python setup.py build
    python setup.py install
 
-The install command will usually have to be performed with root permissions.
+The install commands will usually have to be performed with root privileges.
+
+
+
+Test Images
+-----------
+
+The usage examples, described below, make use of a number of standard
+test images, which can be installed using the
+``sporco_get_images``. To download these images from the root
+directory of the source distribition (i.e. prior to installation) do
+
+::
+
+   bin/sporco_get_images --libdest
+
+To download the images as part of a package that has already been
+installed, do
+
+::
+
+  sporco_get_images --libdest
+
+which will usually have to be performed with root privileges.
+
 
 
 Usage

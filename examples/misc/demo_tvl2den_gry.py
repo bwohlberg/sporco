@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 #-*- coding: utf-8 -*-
-# Copyright (C) 2015-2016 by Brendt Wohlberg <brendt@ieee.org>
+# Copyright (C) 2015-2017 by Brendt Wohlberg <brendt@ieee.org>
 # All rights reserved. BSD 3-clause License.
 # This file is part of the SPORCO package. Details of the copyright
 # and user license can be found in the 'LICENSE.txt' file distributed
 # with the package.
 
-"""Basic tvl2.TVL2Denoise usage example (greyscale image)"""
+"""Usage example: tvl2.TVL2Denoise (greyscale image)"""
 
 from __future__ import print_function
 from builtins import input
@@ -20,12 +20,13 @@ from sporco.admm import tvl2
 
 
 # Load reference image
-img = util.ExampleImages().image('lena.grey', scaled=True)
+img = util.rgb2gray(util.ExampleImages().image('standard', 'monarch.png',
+                                               scaled=True))[:,160:672]
 
 
 # Construct test image
 np.random.seed(12345)
-imgn = img + np.random.normal(0.0, 0.04, img.shape)
+imgn = img + np.random.normal(0.0, 0.05, img.shape)
 
 
 # Set up TVL2Denoise options
@@ -45,7 +46,7 @@ fig1 = plot.figure(1, figsize=(21,7))
 plot.subplot(1,3,1)
 plot.imview(img, fgrf=fig1, title='Reference')
 plot.subplot(1,3,2)
-plot.imview(imgn, fgrf=fig1, title='Blurred/Noisy')
+plot.imview(imgn, fgrf=fig1, title='Noisy')
 plot.subplot(1,3,3)
 plot.imview(imgr, fgrf=fig1, title='l2-TV Result')
 fig1.show()

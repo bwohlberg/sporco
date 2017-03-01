@@ -1,19 +1,18 @@
 #!/usr/bin/env python
 #-*- coding: utf-8 -*-
-# Copyright (C) 2015-2016 by Brendt Wohlberg <brendt@ieee.org>
+# Copyright (C) 2015-2017 by Brendt Wohlberg <brendt@ieee.org>
 # All rights reserved. BSD 3-clause License.
 # This file is part of the SPORCO package. Details of the copyright
 # and user license can be found in the 'LICENSE.txt' file distributed
 # with the package.
 
-"""Basic cmod.CnstrMOD usage example"""
+"""Usage example: cmod.CnstrMOD"""
 
 from __future__ import print_function
 from builtins import input
 from builtins import range
 
 import numpy as np
-from scipy.ndimage.interpolation import zoom
 
 from sporco.admm import bpdn
 from sporco.admm import cmod
@@ -22,20 +21,13 @@ from sporco import plot
 
 
 # Training images
-exim = util.ExampleImages(scaled=True)
-img1 = exim.image('lena.grey')
-img2 = exim.image('barbara.grey')
-img3 = exim.image('kiel.grey')
-img4 = util.rgb2gray(exim.image('mandrill'))
-img5 = exim.image('man.grey')[100:612, 100:612]
-
-
-# Reduce images size to speed up demo script
-S1 = zoom(img1, 0.5)
-S2 = zoom(img2, 0.5)
-S3 = zoom(img3, 0.5)
-S4 = zoom(img4, 0.5)
-S5 = zoom(img5, 0.5)
+exim = util.ExampleImages(scaled=True, zoom=0.25)
+S1 = exim.image('standard', 'lena.grey.png')
+S2 = exim.image('standard', 'barbara.grey.png')
+S3 = util.rgb2gray(exim.image('standard', 'monarch.png',
+                                idxexp=np.s_[:,160:672]))
+S4 = util.rgb2gray(exim.image('standard', 'mandrill.png'))
+S5 = exim.image('standard', 'man.grey.png', idxexp=np.s_[100:612, 100:612])
 
 
 # Extract all 8x8 image blocks, reshape, and subtract block means
@@ -51,15 +43,16 @@ D0 = np.reshape(D0, (np.prod(D0.shape[0:2]), D0.shape[2]))
 
 # Compute sparse representation on current dictionary
 lmbda = 0.1
-opt = bpdn.BPDN.Options({'Verbose' : True, 'MaxMainIter' : 200, 'RelStopTol' : 1e-3})
+opt = bpdn.BPDN.Options({'Verbose' : True, 'MaxMainIter' : 200,
+                         'RelStopTol' : 1e-3})
 b = bpdn.BPDN(D0, S, lmbda, opt)
 b.solve()
-print("BPDN solve time: %.2fs" % b.runtime)
+print("BPDN solve time: %.2fs\n" % b.runtime)
 
 
 # Update dictionary for training set S
-opt = cmod.CnstrMOD.Options({'Verbose' : True, 'MaxMainIter' : 500,
-                             'RelStopTol' : 1e-5})
+opt = cmod.CnstrMOD.Options({'Verbose' : True, 'MaxMainIter' : 100,
+                             'RelStopTol' : 1e-3, 'rho' : 4e2})
 c = cmod.CnstrMOD(b.Y, S, None, opt)
 c.solve()
 print("CMOD solve time: %.2fs" % c.runtime)
@@ -80,8 +73,7 @@ fig1.show()
 its = c.getitstat()
 fig2 = plot.figure(2, figsize=(21,7))
 plot.subplot(1,3,1)
-plot.plot(its.DFid, fgrf=fig2, ptyp='semilogy', xlbl='Iterations',
-          ylbl='Functional')
+plot.plot(its.DFid, fgrf=fig2, xlbl='Iterations', ylbl='Functional')
 plot.subplot(1,3,2)
 plot.plot(np.vstack((its.PrimalRsdl, its.DualRsdl)).T, fgrf=fig2,
           ptyp='semilogy', xlbl='Iterations', ylbl='Residual',

@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 #-*- coding: utf-8 -*-
-# Copyright (C) 2015-2016 by Brendt Wohlberg <brendt@ieee.org>
+# Copyright (C) 2015-2017 by Brendt Wohlberg <brendt@ieee.org>
 # All rights reserved. BSD 3-clause License.
 # This file is part of the SPORCO package. Details of the copyright
 # and user license can be found in the 'LICENSE.txt' file distributed
 # with the package.
 
-"""Basic cbpdn.ConvBPDNGradReg usage example (colour images)"""
+"""Usage example: cbpdn.ConvBPDNGradReg (colour images)"""
 
 from __future__ import print_function
 from builtins import input
@@ -21,7 +21,8 @@ import sporco.metric as sm
 
 
 # Load demo image
-img = util.ExampleImages().image('lena', scaled=True, zoom=0.5)
+img = util.ExampleImages().image('standard', 'barbara.png', scaled=True,
+                                 zoom=0.5)[27:283,55:311]
 
 
 # Load dictionary
@@ -42,14 +43,14 @@ wgr[0:3] = 1.0
 # Set up ConvBPDNGradReg options
 lmbda = 1e-2
 mu = 5e-1
-opt = cbpdn.ConvBPDNGradReg.Options({'Verbose' : True, 'MaxMainIter' : 100,
+opt = cbpdn.ConvBPDNGradReg.Options({'Verbose' : True, 'MaxMainIter' : 200,
                     'HighMemSolve' : True, 'LinSolveCheck' : True,
-                    'RelStopTol' : 1e-3, 'AuxVarObj' : False,
+                    'RelStopTol' : 1e-2, 'AuxVarObj' : False,
                     'rho' : 1e0, 'AutoRho' : {'Enabled' : True,
-                                              'RsdlTarget' : 0.02},
+                    'Period' : 10,  'RsdlTarget' : 0.04},
                     'L1Weight' : wl1, 'GradWeight' : wgr})
 
-# Initialise and run ConvBPDNcopyright@ivmsp2016.org object
+# Initialise and run ConvBPDNGradReg object
 b = cbpdn.ConvBPDNGradReg(D, img, lmbda, mu, opt)
 X = b.solve()
 print("ConvBPDNGradReg solve time: %.2fs" % b.runtime)
@@ -70,7 +71,8 @@ plot.imview(np.sum(abs(b.Y[...,3:]), axis=b.cri.axisM).squeeze(), fgrf=fig1,
 plot.subplot(2,2,3)
 plot.imview(imgr, fgrf=fig1, title='Reconstructed image')
 plot.subplot(2,2,4)
-plot.imview(imgr - img, fgrf=fig1, title='Reconstruction difference')
+plot.imview(imgr - img, fgrf=fig1, fltscl=True,
+            title='Reconstruction difference')
 fig1.show()
 
 

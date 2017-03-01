@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 #-*- coding: utf-8 -*-
-# Copyright (C) 2015-2016 by Brendt Wohlberg <brendt@ieee.org>
+# Copyright (C) 2015-2017 by Brendt Wohlberg <brendt@ieee.org>
 # All rights reserved. BSD 3-clause License.
 # This file is part of the SPORCO package. Details of the copyright
 # and user license can be found in the 'LICENSE.txt' file distributed
 # with the package.
 
-"""Basic cbpdn.ConvBPDNGradReg usage example (greyscale images)"""
+"""Usage example: cbpdn.ConvBPDNGradReg (greyscale images)"""
 
 from __future__ import print_function
 from builtins import input
@@ -21,7 +21,7 @@ import sporco.metric as sm
 
 
 # Load demo image
-img = util.ExampleImages().image('lena.grey', scaled=True)
+img = util.ExampleImages().image('standard', 'barbara.grey.png', scaled=True)
 
 
 # Load dictionary
@@ -41,11 +41,11 @@ wgr[0] = 1.0
 # Set up ConvBPDNGradReg options
 lmbda = 1e-2
 mu = 1e1
-opt = cbpdn.ConvBPDNGradReg.Options({'Verbose' : True, 'MaxMainIter' : 100,
+opt = cbpdn.ConvBPDNGradReg.Options({'Verbose' : True, 'MaxMainIter' : 200,
                     'HighMemSolve' : True, 'LinSolveCheck' : True,
-                    'RelStopTol' : 1e-3, 'AuxVarObj' : False,
+                    'RelStopTol' : 1e-2, 'AuxVarObj' : False,
                     'rho' : 1e0, 'AutoRho' : {'Enabled' : True,
-                    'Period' : 10, 'RsdlTarget' : 0.02},
+                    'Period' : 10, 'RsdlTarget' : 0.04},
                     'L1Weight' : wl1, 'GradWeight' : wgr})
 
 # Initialise and run ConvBPDNGradReg object

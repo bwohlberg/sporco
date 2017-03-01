@@ -15,6 +15,7 @@ optimisation algorithms are based on the Alternating Direction Method
 of Multipliers (ADMM) :cite:`boyd-2010-distributed`.
 
 
+.. _usage-section:
 
 Usage Examples
 --------------

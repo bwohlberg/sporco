@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 #-*- coding: utf-8 -*-
-# Copyright (C) 2015-2016 by Brendt Wohlberg <brendt@ieee.org>
+# Copyright (C) 2015-2017 by Brendt Wohlberg <brendt@ieee.org>
 # All rights reserved. BSD 3-clause License.
 # This file is part of the SPORCO package. Details of the copyright
 # and user license can be found in the 'LICENSE.txt' file distributed
 # with the package.
 
-"""Basic bpdndl.BPDNDictLearn usage example"""
+"""Usage example: bpdndl.BPDNDictLearn"""
 
 from __future__ import division
 from __future__ import print_function
@@ -14,7 +14,6 @@ from builtins import input
 from builtins import range
 
 import numpy as np
-from scipy.ndimage.interpolation import zoom
 
 from sporco.admm import bpdndl
 from sporco import util
@@ -22,20 +21,13 @@ from sporco import plot
 
 
 # Training images
-exim = util.ExampleImages(scaled=True)
-img1 = exim.image('lena.grey')
-img2 = exim.image('barbara.grey')
-img3 = exim.image('kiel.grey')
-img4 = util.rgb2gray(exim.image('mandrill'))
-img5 = exim.image('man.grey')[100:612, 100:612]
-
-
-# Reduce images size to speed up demo script
-S1 = zoom(img1, 0.25)
-S2 = zoom(img2, 0.25)
-S3 = zoom(img3, 0.25)
-S4 = zoom(img4, 0.25)
-S5 = zoom(img5, 0.25)
+exim = util.ExampleImages(scaled=True, zoom=0.25)
+S1 = exim.image('standard', 'lena.grey.png')
+S2 = exim.image('standard', 'barbara.grey.png')
+S3 = util.rgb2gray(exim.image('standard', 'monarch.png',
+                                idxexp=np.s_[:,160:672]))
+S4 = util.rgb2gray(exim.image('standard', 'mandrill.png'))
+S5 = exim.image('standard', 'man.grey.png', idxexp=np.s_[100:612, 100:612])
 
 
 # Extract all 8x8 image blocks, reshape, and subtract block means

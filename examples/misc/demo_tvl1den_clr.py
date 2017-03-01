@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 #-*- coding: utf-8 -*-
-# Copyright (C) 2015-2016 by Brendt Wohlberg <brendt@ieee.org>
+# Copyright (C) 2015-2017 by Brendt Wohlberg <brendt@ieee.org>
 # All rights reserved. BSD 3-clause License.
 # This file is part of the SPORCO package. Details of the copyright
 # and user license can be found in the 'LICENSE.txt' file distributed
 # with the package.
 
-"""Basic tvl1.TVL1Denoise usage example (colour image)"""
+"""Usage example: tvl1.TVL1Denoise (colour image)"""
 
 from __future__ import print_function
 from builtins import input
@@ -20,7 +20,8 @@ from sporco.admm import tvl1
 
 
 # Load reference image
-img = util.ExampleImages().image('lena', scaled=True)
+img = util.ExampleImages().image('standard', 'monarch.png',
+                                 scaled=True)[:,160:672]
 
 
 # Construct test image
@@ -31,7 +32,7 @@ imgn = util.spnoise(img, 0.2)
 # Set up TVL1Denoise options
 lmbda = 8e-1
 opt = tvl1.TVL1Denoise.Options({'Verbose' : True, 'MaxMainIter' : 200,
-                                'RelStopTol' : 1e-3, 'gEvalY' : False})
+                                'RelStopTol' : 5e-3, 'gEvalY' : False})
 
 
 # Initialise and run TVL1Denoise object

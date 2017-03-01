@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 #-*- coding: utf-8 -*-
-# Copyright (C) 2015-2016 by Brendt Wohlberg <brendt@ieee.org>
+# Copyright (C) 2015-2017 by Brendt Wohlberg <brendt@ieee.org>
 # All rights reserved. BSD 3-clause License.
 # This file is part of the SPORCO package. Details of the copyright
 # and user license can be found in the 'LICENSE.txt' file distributed
 # with the package.
 
-"""Basic tvl2.TVL2Deconv usage example (deconvolution problem, colour image)"""
+"""Usage example: tvl2.TVL2Deconv (deconvolution problem, colour image)"""
 
 from __future__ import print_function
 from builtins import input
@@ -30,7 +30,8 @@ conv = lambda h, x : np.fft.ifft2(np.fft.fft2(h, s=x.shape[0:2], axes=(0,1))
 
 
 # Load reference image
-img = util.ExampleImages().image('lena', scaled=True)
+img = util.ExampleImages().image('standard', 'monarch.png',
+                                 scaled=True)[:,160:672]
 
 
 # Construct smoothing filter
@@ -42,13 +43,13 @@ h = ndimage.filters.gaussian_filter(h0, 2.0)
 # Construct test image
 imgc = crop(conv(h, spad(img)))
 np.random.seed(12345)
-imgcn = imgc + np.random.normal(0.0, 0.01, img.shape)
+imgcn = imgc + np.random.normal(0.0, 0.02, img.shape)
 
 
 # Set up TVDeconv options
-lmbda = 1e-3
+lmbda = 5e-3
 opt = tvl2.TVL2Deconv.Options({'Verbose' : True, 'MaxMainIter' : 200,
-                               'gEvalY' : False})
+                               'gEvalY' : False, 'RelStopTol' : 5e-3})
 
 
 # Initialise and run TVL2Deconv object
