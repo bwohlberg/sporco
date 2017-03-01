@@ -13,7 +13,6 @@ from builtins import input
 from builtins import range
 
 import numpy as np
-import urllib2
 import os.path
 import tempfile
 import sys
@@ -32,10 +31,9 @@ from sporco import plot
 pth = os.path.join(tempfile.gettempdir(), 'foreman_qcif_mono.y4m')
 if not os.path.isfile(pth):
     url = 'https://media.xiph.org/video/derf/y4m/foreman_qcif_mono.y4m'
-    response = urllib2.urlopen(url, timeout=5)
-    content = response.read()
-    f = open(pth, 'w')
-    f.write(content)
+    vid = util.netgetdata(url)
+    f = open(pth, 'wb')
+    f.write(vid.read())
     f.close()
 
 

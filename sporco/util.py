@@ -1,5 +1,5 @@
 #-*- coding: utf-8 -*-
-# Copyright (C) 2015-2016 by Brendt Wohlberg <brendt@ieee.org>
+# Copyright (C) 2015-2017 by Brendt Wohlberg <brendt@ieee.org>
 # All rights reserved. BSD 3-clause License.
 # This file is part of the SPORCO package. Details of the copyright
 # and user license can be found in the 'LICENSE.txt' file distributed
@@ -13,8 +13,6 @@ from __future__ import print_function
 from future.utils import PY2
 from builtins import range
 from builtins import object
-from future import standard_library
-standard_library.install_aliases()
 
 import numpy as np
 from scipy import misc
@@ -22,11 +20,17 @@ import scipy.ndimage.interpolation as sni
 from timeit import default_timer as timer
 import os
 import imghdr
-import urllib.request, urllib.error
 import io
 import multiprocessing as mp
 import itertools
 import collections
+import socket
+if PY2:
+    import urllib2 as urlrequest
+    import urllib2 as urlerror
+else:
+    import urllib.request as urlrequest
+    import urllib.error as urlerror
 
 import sporco.linalg as sla
 import sporco.plot as spl
@@ -475,22 +479,23 @@ def netgetdata(url, maxtry=3, timeout=10):
 
     Raises
     ------
-    urllib.error.URLError
+    urlerror.URLError (urllib2.URLError in Python 2,
+                       urllib.error.URLError in Python 3)
       If the file cannot be downloaded
     """
 
-    ntry = 0
-    while ntry < maxtry:
+    for ntry in range(maxtry):
         try:
-            rspns = urllib.request.urlopen(url, timeout=timeout)
+            rspns = urlrequest.urlopen(url, timeout=timeout)
             cntnt = rspns.read()
-            return io.BytesIO(cntnt)
-        except urllib.error.URLError as e:
-            ntry += 1
-            if ntry < maxtry:
-                print(e)
-            else:
+            break
+        except urlerror.URLError as e:
+            if not isinstance(e.reason, socket.timeout):
                 raise
+    else:
+        raise e
+
+    return io.BytesIO(cntnt)
 
 
 
