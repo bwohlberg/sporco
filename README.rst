@@ -123,16 +123,17 @@ Test Images
 -----------
 
 The usage examples, described below, make use of a number of standard
-test images, which can be installed using the
-``sporco_get_images``. To download these images from the root
-directory of the source distribition (i.e. prior to installation) do
+test images, which can be installed using the ``sporco_get_images``
+script. To download these images from the root directory of the source
+distribition (i.e. prior to installation) do
 
 ::
 
    bin/sporco_get_images --libdest
 
-To download the images as part of a package that has already been
-installed, do
+after setting the ``PYTHONPATH`` environment variable as described
+below. To download the images as part of a package that has already
+been installed, do
 
 ::
 
