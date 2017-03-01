@@ -24,7 +24,6 @@ import os
 import imghdr
 import urllib.request, urllib.error
 import io
-import glob
 import multiprocessing as mp
 import itertools
 import collections
@@ -536,7 +535,7 @@ class ExampleImages(object):
                 if imghdr.what(fpth) is not None:
                     gpth = os.path.join(prnpth, f)
                     self.imglst.append(gpth)
-                    if not prnpth in self.grpimg:
+                    if prnpth not in self.grpimg:
                         self.grpimg[prnpth] = []
                     self.grpimg[prnpth].append(gpth)
 
