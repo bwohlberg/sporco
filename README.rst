@@ -45,7 +45,8 @@ The primary requirements are Python itself, and modules `numpy
 <https://github.com/pydata/numexpr>`_ is not required, but some
 functions will be faster if it is installed. If module `mpldatacursor
 <https://github.com/joferkington/mpldatacursor>`_ is installed,
-function plot.plot will support the data cursor that it provides.
+functions plot.plot and plot.imview will support the data cursor that
+it provides.
 
 Installation of these requirements is system dependent. Under a recent
 version of Ubuntu Linux, the following commands should be sufficient
