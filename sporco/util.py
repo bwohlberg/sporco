@@ -480,7 +480,7 @@ def netgetdata(url, maxtry=3, timeout=10):
     Raises
     ------
     urlerror.URLError (urllib2.URLError in Python 2,
-                       urllib.error.URLError in Python 3)
+    urllib.error.URLError in Python 3)
       If the file cannot be downloaded
     """
 
@@ -500,7 +500,7 @@ def netgetdata(url, maxtry=3, timeout=10):
 
 
 class ExampleImages(object):
-    """Access a set of example images"""
+    """Access a set of example images."""
 
     def __init__(self, scaled=False, dtype=None, zoom=None, pth=None):
         """Initialise an ExampleImages object.
