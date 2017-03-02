@@ -35,7 +35,7 @@ Load test image and compute lowpass and highpass components.
 .. code:: ipython3
 
     # Load test image
-    img = util.ExampleImages().image('kodim23', scaled=True)[160:416,60:316]
+    img = util.ExampleImages().image('kodak', 'kodim23.png', scaled=True)[160:416,60:316]
     
     # Highpass filter test image
     npd = 16
