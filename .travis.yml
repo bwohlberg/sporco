@@ -42,11 +42,13 @@ install:
     - python setup.py install
 
 script:
+    - 'echo "backend: Agg" > matplotlibrc'
     - if [[ "$TRAVIS_PYTHON_VERSION" == "2.7" ]]; then
         coverage run --source sporco -m py.test;
       else
         python setup.py test;
       fi
+    - rm -f matplotlibrc
 
 after_success:
     - if [[ "$TRAVIS_PYTHON_VERSION" == "2.7" ]]; then
