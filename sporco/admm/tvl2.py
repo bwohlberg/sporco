@@ -24,7 +24,8 @@ __author__ = """Brendt Wohlberg <brendt@ieee.org>"""
 
 class TVL2Denoise(admm.ADMM):
     """ADMM algorithm for :math:`\ell_2`-TV denoising problem
-    :cite:`rudin-1992-nonlinear`, :cite:`goldstein-2009-split`.
+    :cite:`rudin-1992-nonlinear`, :cite:`goldstein-2009-split`,
+    :cite:`blomgren-1998-color`.
 
     Solve the optimisation problem
 
