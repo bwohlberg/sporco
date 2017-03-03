@@ -38,7 +38,6 @@ install:
     - pip install pillow
     - pip install pyfftw
     - pip install codecov
-    - sed -i "5iimport matplotlib\nmatplotlib.use('Agg')\n" sporco/__init__.py
     - python setup.py build
     - python setup.py install
 
