@@ -1816,7 +1816,7 @@ class AddMaskSim(object):
 
         # Construct impulse filter (or filters for the multi-channel
         # case) and append to dictionary
-        if self.cri.C == 1:
+        if self.cri.Cd == 1:
             self.imp = np.zeros(D.shape[0:dimN] + (1,))
             self.imp[(0,)*dimN] = 1.0
         else:
