@@ -67,7 +67,8 @@ Jupyter Notebooks
 
 `Jupyter Notebook <http://jupyter.org/>`_ versions of some of the
 demos in ``examples`` are also available in the same directories as
-the corresponding demo scripts.
+the corresponding demo scripts, or can be viewed online via `nbviewer
+<https://nbviewer.jupyter.org/github/bwohlberg/sporco/blob/master/examples/index.ipynb>`_.
 
 
 
