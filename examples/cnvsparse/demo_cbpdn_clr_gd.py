@@ -51,7 +51,7 @@ print("ConvBPDN solve time: %.2fs" % b.runtime)
 # Reconstruct representation
 shr = b.reconstruct().squeeze()
 imgr = sl + shr
-print("reconstruction PSNR: %.2fdB\n" % sm.psnr(img, imgr))
+print("     reconstruction PSNR: %.2fdB\n" % sm.psnr(img, imgr))
 
 
 # Display representation and reconstructed image
@@ -64,7 +64,7 @@ plot.imview(np.sum(abs(X), axis=b.cri.axisM).squeeze(), fgrf=fig1,
 plot.subplot(2,2,3)
 plot.imview(imgr, fgrf=fig1, title='Reconstructed image')
 plot.subplot(2,2,4)
-plot.imview(imgr - img, fgrf=fig1, fltscl=True, 
+plot.imview(imgr - img, fgrf=fig1, fltscl=True,
             title='Reconstruction difference')
 fig1.show()
 

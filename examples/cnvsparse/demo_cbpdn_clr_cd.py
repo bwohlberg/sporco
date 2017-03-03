@@ -20,7 +20,7 @@ from sporco.admm import cbpdn
 import sporco.metric as sm
 
 
-# Load test image
+# Load demo image
 img = util.ExampleImages().image('standard', 'barbara.png', scaled=True,
                                  zoom=0.5)[27:283,55:311]
 
@@ -51,7 +51,7 @@ print("ConvBPDN solve time: %.2fs" % b.runtime)
 # Reconstruct representation
 shr = b.reconstruct().squeeze()
 imgr = sl + shr
-print("reconstruction PSNR: %.2fdB\n" % sm.psnr(img, imgr))
+print("     reconstruction PSNR: %.2fdB\n" % sm.psnr(img, imgr))
 
 
 # Display representation and reconstructed image

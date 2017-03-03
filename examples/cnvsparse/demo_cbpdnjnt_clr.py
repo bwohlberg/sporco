@@ -56,14 +56,16 @@ print("     reconstruction PSNR: %.2fdB\n" % sm.psnr(img, imgr))
 
 
 # Display representation and reconstructed image
-fig1 = plot.figure(1, figsize=(21,7))
-plot.subplot(1,3,1)
+fig1 = plot.figure(1, figsize=(14,14))
+plot.subplot(2,2,1)
+plot.imview(sl, fgrf=fig1, title='Lowpass component')
+plot.subplot(2,2,2)
 plot.imview(np.sum(abs(X), axis=b.cri.axisM).squeeze(), fgrf=fig1,
-            cmap=plot.cm.Blues, title='Representation')
-plot.subplot(1,3,2)
+            fltscl=True, title='Main representation')
+plot.subplot(2,2,3)
 plot.imview(imgr, fgrf=fig1, title='Reconstructed image')
-plot.subplot(1,3,3)
-plot.imview(imgr - img, fgrf=fig1, fltscl=True,
+plot.subplot(2,2,4)
+plot.imview(imgr - img, fgrf=fig1, fltscl=True, 
             title='Reconstruction difference')
 fig1.show()
 
