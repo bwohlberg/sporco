@@ -1207,7 +1207,7 @@ class ConvBPDNGradReg(ConvBPDN):
             self.Xf[:] = sl.solvedbi_sm(self.Df, self.mu*self.GHGf + self.rho,
                                         b, self.c, self.cri.axisM)
         else:
-            self.Xf[:] = sl.solvemdbi_ism(self.Df, self.mu*self.GHGf +self.rho,
+            self.Xf[:] = sl.solvemdbi_ism(self.Df, self.mu*self.GHGf + self.rho,
                                           b, self.cri.axisM, self.cri.axisC)
 
         self.X = sl.irfftn(self.Xf, None, self.cri.axisN)
@@ -1820,8 +1820,8 @@ class AddMaskSim(object):
             self.imp = np.zeros(D.shape[0:dimN] + (1,))
             self.imp[(0,)*dimN] = 1.0
         else:
-            self.imp = np.zeros(D.shape[0:dimN] + (self.cri.C,)*2)
-            for c in range(0, self.cri.C):
+            self.imp = np.zeros(D.shape[0:dimN] + (self.cri.Cd,)*2)
+            for c in range(0, self.cri.Cd):
                 self.imp[(0,)*dimN+(c,c,)] = 1.0
         Di = np.concatenate((D, self.imp), axis=D.ndim-1)
 
@@ -1831,10 +1831,11 @@ class AddMaskSim(object):
         # Mask matrix
         self.W = np.asarray(sl.atleast_nd(self.cri.dimN+3, W),
                             dtype=self.cbpdn.dtype)
-        # If mask has a non-singleton channel dimension, swap that
-        # axis onto the dictionary filter index dimension (where the
+        # If Cd > 1 (i.e. a multi-channel dictionary) and mask has a
+        # non-singleton channel dimension, swap that axis onto the
+        # dictionary filter index dimension (where the
         # multiple-channel impulse filters are located)
-        if self.W.shape[self.cri.dimN] > 1:
+        if self.cri.Cd > 1 and self.W.shape[self.cri.dimN] > 1:
             self.W = np.swapaxes(self.W, self.cri.axisC, self.cri.axisM)
 
         # Record ystep method of inner cbpdn object
@@ -1914,7 +1915,7 @@ class AddMaskSim(object):
         (inner) component of the main variables X, Y, etc.
         """
 
-        return np.s_[...,0:-self.cri.C]
+        return np.s_[...,0:-self.cri.Cd]
 
 
 
@@ -1922,7 +1923,7 @@ class AddMaskSim(object):
         """Return an index expression appropriate for extracting the
         additive mask (outer) component of the main variables X, Y, etc."""
 
-        return np.s_[...,-self.cri.C:]
+        return np.s_[...,-self.cri.Cd:]
 
 
 
@@ -1937,7 +1938,7 @@ class AddMaskSim(object):
         Xf = sl.rfftn(X, None, self.cri.axisN)
         # Multiply in frequency domain with non-impulse component of
         # dictionary
-        Sf = np.sum(self.cbpdn.Df[...,0:-self.cri.C] * Xf, axis=self.cri.axisM)
+        Sf = np.sum(self.cbpdn.Df[...,0:-self.cri.Cd] * Xf, axis=self.cri.axisM)
         # Transform to spatial domain and return result
         return sl.irfftn(Sf, self.cri.Nv, self.cri.axisN)
 
