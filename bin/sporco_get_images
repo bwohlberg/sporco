@@ -53,7 +53,7 @@ def getimage(url, dst, dstroot, vrbs=False):
         if spxt[1] == '.jpg' or spxt[1] == '.png':
             # If extension is .jpg or .png, just download and save the file
             img = util.netgetdata(url)
-            f = open(dstpth, 'w')
+            f = open(dstpth, 'wb')
             f.write(img.read())
             f.close()
         else:
