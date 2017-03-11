@@ -484,16 +484,18 @@ def netgetdata(url, maxtry=3, timeout=10):
       If the file cannot be downloaded
     """
 
+    err = ValueError('maxtry parameter should be greater than zero')
     for ntry in range(maxtry):
         try:
             rspns = urlrequest.urlopen(url, timeout=timeout)
             cntnt = rspns.read()
             break
         except urlerror.URLError as e:
+            err = e
             if not isinstance(e.reason, socket.timeout):
                 raise
     else:
-        raise e
+        raise err
 
     return io.BytesIO(cntnt)
 
