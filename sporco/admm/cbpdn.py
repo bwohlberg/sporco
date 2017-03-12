@@ -1875,7 +1875,15 @@ class AddMaskSim(object):
         additional steps necessary for the AMS method.
         """
 
-        return self.inner_obfn_gvar()[self.index_primary()]
+        # Get inner cbpdn object gvar
+        gv = self.inner_obfn_gvar().copy()
+        # Set slice corresponding to the coefficient map of the final
+        # filter (the impulse inserted for the AMS method) to zero so
+        # that it does not affect the results (e.g. l1 norm) computed
+        # from this variable by the inner cbpdn object
+        gv[...,-1] = 0
+
+        return gv
 
 
 
