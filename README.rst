@@ -48,15 +48,15 @@ functions will be faster if it is installed. If module `mpldatacursor
 functions plot.plot and plot.imview will support the data cursor that
 it provides.
 
-Installation of these requirements is system dependent. Under a recent
-version of Ubuntu Linux, the following commands should be sufficient
+Installation of these requirements is system dependent. For example,
+under Ubuntu Linux 16.04, the following commands should be sufficient
 for Python 2
 
 ::
 
    sudo apt-get install python-numpy python-scipy python-numexpr
-   sudo apt-get install python-matplotlib python-pip libfftw3-dev
-   sudo pip install future
+   sudo apt-get install python-matplotlib python-pip python-future
+   sudo apt-get install libfftw3-dev
    sudo pip install pyfftw
 
 or Python 3
@@ -64,14 +64,14 @@ or Python 3
 ::
 
    sudo apt-get install python3-numpy python3-scipy python3-numexpr
-   sudo apt-get install python3-matplotlib python3-pip libfftw3-dev
-   sudo pip3 install future
+   sudo apt-get install python3-matplotlib python3-pip python3-future
+   sudo apt-get install libfftw3-dev
    sudo pip3 install pyfftw
 
 
 Some additional dependencies are required for running the unit tests
-or building the documentation from the package source. Under a recent
-version of Ubuntu Linux, the following commands should be sufficient
+or building the documentation from the package source. For example,
+under Ubuntu Linux 16.04, the following commands should be sufficient
 for Python 2
 
 ::
