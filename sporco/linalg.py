@@ -319,6 +319,77 @@ def solvedbi_sm_c(ah, a, rho, axis=4):
 
 
 
+def solvedbd_sm(ah, d, b, c=None, axis=4):
+    """
+    Solve a diagonal block linear system with a diagonal term
+    using the Sherman-Morrison equation.
+
+    The solution is obtained by independently solving a set of linear
+    systems of the form (see :cite:`wohlberg-2016-efficient`)
+
+    .. math::
+      (\mathbf{d}  + \mathbf{a} \mathbf{a}^H ) \; \mathbf{x} = \mathbf{b} \;\;.
+
+    In this equation inner products and matrix products are taken along
+    the specified axis of the corresponding multi-dimensional arrays; the
+    solutions are independent over the other axes.
+
+    Parameters
+    ----------
+    ah : array_like
+      Linear system component :math:`\mathbf{a}^H`
+    d : array_like
+      Linear system parameter :math:`\mathbf{d}`
+    b : array_like
+      Linear system component :math:`\mathbf{b}`
+    c : array_like, optional (default None)
+      Solution component :math:`\mathbf{c}` that may be pre-computed using
+      :func:`solvedbd_sm_c` and cached for re-use.
+    axis : int, optional (default 4)
+      Axis along which to solve the linear system
+
+    Returns
+    -------
+    x : ndarray
+      Linear system solution :math:`\mathbf{x}`
+    """
+
+    a = np.conj(ah)
+    if c is None:
+        c = solvedbd_sm_c(ah, a, d, axis)
+    if have_numexpr:
+        cb = np.sum(c * b, axis=axis, keepdims=True)
+        return ne.evaluate('(b - (a * cb)) / d')
+    else:
+        return (b - (a * np.sum(c * b, axis=axis, keepdims=True))) / d
+
+
+
+def solvedbd_sm_c(ah, a, d, axis=4):
+    """
+    Compute cached component used by :func:`solvedbd_sm`.
+
+    Parameters
+    ----------
+    ah : array_like
+      Linear system component :math:`\mathbf{a}^H`
+    a : array_like
+      Linear system component :math:`\mathbf{a}`
+    d : array_like
+      Linear system parameter :math:`\mathbf{d}`
+    axis : int, optional (default 4)
+      Axis along which to solve the linear system
+
+    Returns
+    -------
+    c : ndarray
+      Argument :math:`\mathbf{c}` used by :func:`solvedbd_sm`
+    """
+
+    return (ah / d) / (np.sum(ah * (a / d), axis=axis, keepdims=True) + 1.0)
+
+
+
 def solvemdbi_ism(ah, rho, b, axisM, axisK):
     """
     Solve a multiple diagonal block linear system with a scaled

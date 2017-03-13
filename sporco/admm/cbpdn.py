@@ -440,8 +440,11 @@ class GenericConvBPDN(admm.ADMMEqual):
         if self.opt['LinSolveCheck']:
             Dop = lambda x: np.sum(self.Df * x, axis=self.cri.axisM,
                                    keepdims=True)
-            DHop = lambda x: np.sum(np.conj(self.Df) * x, axis=self.cri.axisC,
-                                    keepdims=True)
+            if self.cri.Cd == 1:
+                DHop = lambda x: np.conj(self.Df) * x
+            else:
+                DHop = lambda x: np.sum(np.conj(self.Df) * x,
+                                        axis=self.cri.axisC, keepdims=True)
             ax = DHop(Dop(self.Xf)) + self.rho*self.Xf
             self.xrrs = sl.rrs(ax, b)
         else:
@@ -1016,8 +1019,11 @@ class ConvElasticNet(ConvBPDN):
         if self.opt['LinSolveCheck']:
             Dop = lambda x: np.sum(self.Df * x, axis=self.cri.axisM,
                                    keepdims=True)
-            DHop = lambda x: np.sum(np.conj(self.Df) * x, axis=self.cri.axisC,
-                                    keepdims=True)
+            if self.cri.Cd == 1:
+                DHop = lambda x: np.conj(self.Df) * x
+            else:
+                DHop = lambda x: np.sum(np.conj(self.Df) * x,
+                                        axis=self.cri.axisC, keepdims=True)
             ax = DHop(Dop(self.Xf)) + (self.mu + self.rho)*self.Xf
             self.xrrs = sl.rrs(ax, b)
         else:
@@ -1166,7 +1172,7 @@ class ConvBPDNGradReg(ConvBPDN):
         self.mu = self.dtype.type(mu)
         if hasattr(opt['GradWeight'], 'ndim'):
             self.Wgrd = np.asarray(opt['GradWeight'].reshape((1,)*(dimN+2) +
-                                    opt['GradWeight'].shape), dtype=self.dtype)
+                                   opt['GradWeight'].shape), dtype=self.dtype)
         else:
             self.Wgrd = np.asarray(opt['GradWeight'], dtype=self.dtype)
 
@@ -1190,7 +1196,7 @@ class ConvBPDNGradReg(ConvBPDN):
         if self.cri.Cd > 1:
             self.DSf = np.sum(self.DSf, axis=self.cri.axisC, keepdims=True)
         if self.opt['HighMemSolve'] and self.cri.Cd == 1:
-            self.c = sl.solvedbi_sm_c(self.Df, np.conj(self.Df),
+            self.c = sl.solvedbd_sm_c(self.Df, np.conj(self.Df),
                         self.mu*self.GHGf + self.rho, self.cri.axisM)
         else:
             self.c = None
@@ -1204,7 +1210,7 @@ class ConvBPDNGradReg(ConvBPDN):
 
         b = self.DSf + self.rho*sl.rfftn(self.YU, None, self.cri.axisN)
         if self.cri.Cd == 1:
-            self.Xf[:] = sl.solvedbi_sm(self.Df, self.mu*self.GHGf + self.rho,
+            self.Xf[:] = sl.solvedbd_sm(self.Df, self.mu*self.GHGf + self.rho,
                                         b, self.c, self.cri.axisM)
         else:
             self.Xf[:] = sl.solvemdbi_ism(self.Df, self.mu*self.GHGf + self.rho,
@@ -1215,8 +1221,11 @@ class ConvBPDNGradReg(ConvBPDN):
         if self.opt['LinSolveCheck']:
             Dop = lambda x: np.sum(self.Df * x, axis=self.cri.axisM,
                                    keepdims=True)
-            DHop = lambda x: np.sum(np.conj(self.Df) * x, axis=self.cri.axisC,
-                                    keepdims=True)
+            if self.cri.Cd == 1:
+                DHop = lambda x: np.conj(self.Df) * x
+            else:
+                DHop = lambda x: np.sum(np.conj(self.Df) * x,
+                                        axis=self.cri.axisC,  keepdims=True)
             ax = DHop(Dop(self.Xf)) + (self.mu*self.GHGf + self.rho)*self.Xf
             self.xrrs = sl.rrs(ax, b)
         else:
@@ -1410,8 +1419,11 @@ class ConvTwoBlockCnstrnt(admm.ADMMTwoBlockCnstrnt):
         if self.opt['LinSolveCheck']:
             Dop = lambda x: np.sum(self.Df * x, axis=self.cri.axisM,
                                    keepdims=True)
-            DHop = lambda x: np.sum(np.conj(self.Df) * x, axis=self.cri.axisC,
-                                    keepdims=True)
+            if self.cri.Cd == 1:
+                DHop = lambda x: np.conj(self.Df) * x
+            else:
+                DHop = lambda x: np.sum(np.conj(self.Df) * x,
+                                        axis=self.cri.axisC, keepdims=True)
             ax = DHop(Dop(self.Xf)) + self.Xf
             self.xrrs = sl.rrs(ax, b)
         else:
