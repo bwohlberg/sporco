@@ -14,6 +14,7 @@ class TestSet01(object):
         np.random.seed(12345)
 
 
+
     def test_01(self):
         rho = 1e-1
         N = 64
@@ -27,6 +28,7 @@ class TestSet01(object):
         Xslv = linalg.lu_solve_ATAI(D, rho, D.T.dot(S) + rho*Z, lu, piv)
         assert(linalg.rrs(D.T.dot(D).dot(Xslv) + rho*Xslv,
                         D.T.dot(S) + rho*Z) < 1e-11)
+
 
 
     def test_02(self):
@@ -44,6 +46,7 @@ class TestSet01(object):
                         D.T.dot(S) + rho*Z) < 1e-14)
 
 
+
     def test_03(self):
         rho = 1e-1
         N = 64
@@ -57,6 +60,7 @@ class TestSet01(object):
         Dslv = linalg.lu_solve_AATI(X, rho, S.dot(X.T) + rho*Z, lu, piv)
         assert(linalg.rrs(Dslv.dot(X).dot(X.T) + rho*Dslv,
                         S.dot(X.T) + rho*Z) < 1e-11)
+
 
 
     def test_04(self):
@@ -74,10 +78,11 @@ class TestSet01(object):
                         S.dot(X.T) + rho*Z) < 1e-11)
 
 
+
     def test_05(self):
         rho = 1e-1
-        N = 64
-        M = 32
+        N = 32
+        M = 16
         K = 8
         D = np.random.randn(N, N, 1, 1, M).astype('complex') + \
             np.random.randn(N, N, 1, 1, M).astype('complex') * 1.0j
@@ -93,9 +98,28 @@ class TestSet01(object):
 
 
     def test_06(self):
+        N = 32
+        M = 16
+        K = 8
+        D = np.random.randn(N, N, 1, 1, M).astype('complex') + \
+            np.random.randn(N, N, 1, 1, M).astype('complex') * 1.0j
+        X = np.random.randn(N, N, 1, K, M).astype('complex') + \
+            np.random.randn(N, N, 1, K, M).astype('complex') * 1.0j
+        S = np.sum(D*X, axis=4, keepdims=True)
+        d = 1e-1 * (np.random.randn(N, N, 1, 1, M).astype('complex') + \
+            np.random.randn(N, N, 1, 1, M).astype('complex') * 1.0j)
+        Z = (D.conj()*np.sum(D*X, axis=4, keepdims=True) + \
+             d*X - D.conj()*S) / d
+        Xslv = linalg.solvedbd_sm(D, d, D.conj()*S + d*Z)
+        assert(linalg.rrs(D.conj()*np.sum(D*Xslv, axis=4, keepdims=True) +
+                        d*Xslv, D.conj()*S + d*Z) < 1e-11)
+
+
+
+    def test_07(self):
         rho = 1e-1
-        N = 64
-        M = 32
+        N = 32
+        M = 16
         K = 8
         D = np.random.randn(N, N, 1, 1, M).astype('complex') + \
             np.random.randn(N, N, 1, 1, M).astype('complex') * 1.0j
@@ -112,7 +136,7 @@ class TestSet01(object):
 
 
 
-    def test_07(self):
+    def test_08(self):
         rho = 1e-1
         N = 32
         M = 16
@@ -133,34 +157,13 @@ class TestSet01(object):
 
 
 
-    def test_08(self):
+    def test_09(self):
         rho = 1e-1
         N = 32
         M = 16
         K = 8
         D = np.random.randn(N, N, 1, 1, M).astype('complex') + \
             np.random.randn(N, N, 1, 1, M).astype('complex') * 1.0j
-        X = np.random.randn(N, N, 1, K, M).astype('complex') + \
-            np.random.randn(N, N, 1, K, M).astype('complex') * 1.0j
-        S = np.sum(D*X, axis=4, keepdims=True)
-
-        Xop = lambda x: np.sum(X * x, axis=4, keepdims=True)
-        XHop = lambda x: np.sum(np.conj(X) * x, axis=3, keepdims=True)
-        Z = (XHop(Xop(D)) + rho*D - XHop(S)) / rho
-        Dslv = linalg.solvemdbi_rsm(X, rho,  XHop(S) + rho*Z, 3)
-
-        assert(linalg.rrs(XHop(Xop(Dslv)) + rho*Dslv, XHop(S) + rho*Z) < 1e-11)
-
-
-
-    def test_09(self):
-        rho = 1e-1
-        N = 64
-        M = 32
-        C = 3
-        K = 8
-        D = np.random.randn(N, N, C, 1, M).astype('complex') + \
-            np.random.randn(N, N, C, 1, M).astype('complex') * 1.0j
         X = np.random.randn(N, N, 1, K, M).astype('complex') + \
             np.random.randn(N, N, 1, K, M).astype('complex') * 1.0j
         S = np.sum(D*X, axis=4, keepdims=True)
@@ -176,6 +179,27 @@ class TestSet01(object):
 
     def test_10(self):
         rho = 1e-1
+        N = 64
+        M = 32
+        C = 3
+        K = 8
+        D = np.random.randn(N, N, C, 1, M).astype('complex') + \
+            np.random.randn(N, N, C, 1, M).astype('complex') * 1.0j
+        X = np.random.randn(N, N, 1, K, M).astype('complex') + \
+            np.random.randn(N, N, 1, K, M).astype('complex') * 1.0j
+        S = np.sum(D*X, axis=4, keepdims=True)
+
+        Xop = lambda x: np.sum(X * x, axis=4, keepdims=True)
+        XHop = lambda x: np.sum(np.conj(X) * x, axis=3, keepdims=True)
+        Z = (XHop(Xop(D)) + rho*D - XHop(S)) / rho
+        Dslv = linalg.solvemdbi_rsm(X, rho,  XHop(S) + rho*Z, 3)
+
+        assert(linalg.rrs(XHop(Xop(Dslv)) + rho*Dslv, XHop(S) + rho*Z) < 1e-11)
+
+
+
+    def test_11(self):
+        rho = 1e-1
         N = 32
         M = 16
         K = 8
@@ -194,7 +218,7 @@ class TestSet01(object):
 
 
 
-    def test_11(self):
+    def test_12(self):
         rho = 1e-1
         N = 64
         M = 32
@@ -215,7 +239,7 @@ class TestSet01(object):
 
 
 
-    def test_12(self):
+    def test_13(self):
         b = np.array([0.0,0.0,2.0])
         s = np.array([0.0,0.0,0.0])
         r = 1.0
