@@ -23,6 +23,9 @@ SParse Optimization Research COde (SPORCO)
 .. image:: https://img.shields.io/pypi/l/sporco.svg
     :target: https://github.com/bwohlberg/sporco
     :alt: Package License
+.. image:: http://mybinder.org/badge.svg
+    :target: http://mybinder.org:/repo/bwohlberg/sporco
+    :alt: Binder
 
 
 SPORCO is a Python package for solving optimisation problems with
