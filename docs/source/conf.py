@@ -266,6 +266,8 @@ intersphinx_mapping = {'http://docs.python.org/': None,
                        'http://matplotlib.sourceforge.net/': None,
                        'http://hgomersall.github.io/pyFFTW/': None
                       }
+# Added timeout due to periodic scipy.org down time
+#intersphinx_timeout = 30
 
 numpydoc_show_class_members = False
 
