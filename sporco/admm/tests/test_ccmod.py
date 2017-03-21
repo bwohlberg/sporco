@@ -141,3 +141,17 @@ class TestSet01(object):
         assert(c.X.dtype == dt)
         assert(c.Y.dtype == dt)
         assert(c.U.dtype == dt)
+
+
+    def test_09(self):
+        opt = ccmod.ConvCnstrMOD.Options({'AuxVarObj' : False})
+        assert(opt['fEvalX'] is True and opt['gEvalY'] is False)
+        opt['AuxVarObj'] = True
+        assert(opt['fEvalX'] is False and opt['gEvalY'] is True)
+
+
+    def test_10(self):
+        opt = ccmod.ConvCnstrMOD.Options({'AuxVarObj' : True})
+        assert(opt['fEvalX'] is False and opt['gEvalY'] is True)
+        opt['AuxVarObj'] = False
+        assert(opt['fEvalX'] is True and opt['gEvalY'] is False)

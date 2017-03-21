@@ -301,12 +301,22 @@ class GenericConvBPDN(admm.ADMMEqual):
                 opt = {}
             admm.ADMMEqual.Options.__init__(self, opt)
 
-            if self['AuxVarObj']:
-                self['fEvalX'] = False
-                self['gEvalY'] = True
-            else:
-                self['fEvalX'] = True
-                self['gEvalY'] = False
+
+
+        def __setitem__(self, key, value):
+            """Set options 'fEvalX' and 'gEvalY' appropriately when option
+            'AuxVarObj' is set.
+            """
+
+            admm.ADMMEqual.Options.__setitem__(self, key, value)
+
+            if key == 'AuxVarObj':
+                if value is True:
+                    self['fEvalX'] = False
+                    self['gEvalY'] = True
+                else:
+                    self['fEvalX'] = True
+                    self['gEvalY'] = False
 
 
 

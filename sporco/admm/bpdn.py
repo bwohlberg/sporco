@@ -97,12 +97,22 @@ class GenericBPDN(admm.ADMMEqual):
                 opt = {}
             admm.ADMMEqual.Options.__init__(self, opt)
 
-            if self['AuxVarObj']:
-                self['fEvalX'] = False
-                self['gEvalY'] = True
-            else:
-                self['fEvalX'] = True
-                self['gEvalY'] = False
+
+
+        def __setitem__(self, key, value):
+            """Set options 'fEvalX' and 'gEvalY' appropriately when option
+            'AuxVarObj' is set.
+            """
+
+            admm.ADMMEqual.Options.__setitem__(self, key, value)
+
+            if key == 'AuxVarObj':
+                if value is True:
+                    self['fEvalX'] = False
+                    self['gEvalY'] = True
+                else:
+                    self['fEvalX'] = True
+                    self['gEvalY'] = False
 
 
 
@@ -249,6 +259,7 @@ class BPDN(GenericBPDN):
        (1/2) \| D X - S \|_F^2 + \lambda \| X \|_1
 
     is also supported.
+
 
     After termination of the :meth:`solve` method, attribute
     :attr:`itstat` is a list of tuples representing statistics of each

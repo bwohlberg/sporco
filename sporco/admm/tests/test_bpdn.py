@@ -204,3 +204,17 @@ class TestSet01(object):
         Xb = b.solve()
         Xc = c.solve()
         assert(linalg.norm(Xb-Xc)==0.0)
+
+
+    def test_17(self):
+        opt = bpdn.GenericBPDN.Options({'AuxVarObj' : False})
+        assert(opt['fEvalX'] is True and opt['gEvalY'] is False)
+        opt['AuxVarObj'] = True
+        assert(opt['fEvalX'] is False and opt['gEvalY'] is True)
+
+
+    def test_18(self):
+        opt = bpdn.GenericBPDN.Options({'AuxVarObj' : True})
+        assert(opt['fEvalX'] is False and opt['gEvalY'] is True)
+        opt['AuxVarObj'] = False
+        assert(opt['fEvalX'] is True and opt['gEvalY'] is False)
