@@ -78,16 +78,12 @@ class ConvBPDNDictLearn(dictlrn.DictLearn):
     class Options(dictlrn.DictLearn.Options):
         """CBPDN dictionary learning algorithm options.
 
-        Options:
+        Options include all of those defined in
+        :class:`sporco.admm.dictlrn.DictLearn.Options`, together with
+        additional options:
 
-          ``Verbose`` : Flag determining whether iteration status is displayed.
 
-          ``StatusHeader`` : Flag determining whether status header and
-          separator are dislayed
-
-          ``MaxMainIter`` : Maximum main iterations
-
-          ``DictSize`` : Dictionary size vector
+          ``DictSize`` : Dictionary size vector.
 
           ``CBPDN`` : Options :class:`sporco.admm.cbpdn.ConvBPDN.Options`
 
@@ -133,7 +129,9 @@ class ConvBPDNDictLearn(dictlrn.DictLearn):
         opt : :class:`ConvBPDNDictLearn.Options` object
           Algorithm options
         dimK : int, optional (default 1)
-          Number of signal dimensions
+          Number of signal dimensions. If there is only a single input
+          signal (e.g. if `S` is a 2D array representing a single image)
+          `dimK` must be set to 0.
         dimN : int, optional (default 2)
           Number of spatial/temporal dimensions
         """

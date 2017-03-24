@@ -1,5 +1,5 @@
 #-*- coding: utf-8 -*-
-# Copyright (C) 2015-2016 by Brendt Wohlberg <brendt@ieee.org>
+# Copyright (C) 2015-2017 by Brendt Wohlberg <brendt@ieee.org>
 # All rights reserved. BSD 3-clause License.
 # This file is part of the SPORCO package. Details of the copyright
 # and user license can be found in the 'LICENSE.txt' file distributed
@@ -76,11 +76,12 @@ class GenericBPDN(admm.ADMMEqual):
         :class:`sporco.admm.admm.ADMMEqual.Options`, together with
         additional options:
 
-        ``AuxVarObj`` : Flag indicating whether the objective function \
-        should be evaluated using variable X  (``False``) or Y (``True``) \
-        as its argument.
+          ``AuxVarObj`` : Flag indicating whether the objective
+          function should be evaluated using variable X (``False``) or
+          Y (``True``) as its argument. Setting this flag to ``True``
+          often gives a better estimate of the objective function.
 
-        ``NonNegCoef`` : If ``True``, force solution to be non-negative.
+          ``NonNegCoef`` : If ``True``, force solution to be non-negative.
         """
 
         defaults = copy.deepcopy(admm.ADMMEqual.Options.defaults)
@@ -298,12 +299,12 @@ class BPDN(GenericBPDN):
         :class:`.GenericBPDN.Options`, together with additional
         options:
 
-        ``L1Weight`` : An array of weights for the :math:`\ell_1`
-        norm. The array shape must be such that the array is
-        compatible for multiplication with the X/Y variables. If this
-        option is defined, the regularization term is :math:`\lambda \|
-        \mathbf{w} \odot \mathbf{x} \|_1` where :math:`\mathbf{w}`
-        denotes the weighting array.
+          ``L1Weight`` : An array of weights for the :math:`\ell_1`
+          norm. The array shape must be such that the array is
+          compatible for multiplication with the X/Y variables. If this
+          option is defined, the regularization term is :math:`\lambda \|
+          \mathbf{w} \odot \mathbf{x} \|_1` where :math:`\mathbf{w}`
+          denotes the weighting array.
         """
 
         defaults = copy.deepcopy(GenericBPDN.Options.defaults)

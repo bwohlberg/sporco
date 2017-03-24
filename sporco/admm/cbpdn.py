@@ -1,5 +1,5 @@
 #-*- coding: utf-8 -*-
-# Copyright (C) 2015-2016 by Brendt Wohlberg <brendt@ieee.org>
+# Copyright (C) 2015-2017 by Brendt Wohlberg <brendt@ieee.org>
 # All rights reserved. BSD 3-clause License.
 # This file is part of the SPORCO package. Details of the copyright
 # and user license can be found in the 'LICENSE.txt' file distributed
@@ -266,22 +266,24 @@ class GenericConvBPDN(admm.ADMMEqual):
         :class:`sporco.admm.admm.ADMMEqual.Options`, together with
         additional options:
 
-        ``AuxVarObj`` : Flag indicating whether the objective function
-        should be evaluated using variable X  (``False``) or Y (``True``)
-        as its argument.
+          ``AuxVarObj`` : Flag indicating whether the objective
+          function should be evaluated using variable X (``False``) or
+          Y (``True``) as its argument. Setting this flag to ``True``
+          often gives a better estimate of the objective function, but
+          at additional computational cost.
 
-        ``LinSolveCheck`` : Flag indicating whether to compute
-        relative residual of X step solver.
+          ``LinSolveCheck`` : Flag indicating whether to compute
+          relative residual of X step solver.
 
-        ``HighMemSolve`` : Flag indicating whether to use a slightly
-        faster algorithm at the expense of higher memory usage.
+          ``HighMemSolve`` : Flag indicating whether to use a slightly
+          faster algorithm at the expense of higher memory usage.
 
-        ``NonNegCoef`` : Flag indicating whether to force solution to
-        be non-negative.
+          ``NonNegCoef`` : Flag indicating whether to force solution to
+          be non-negative.
 
-        ``NoBndryCross`` : Flag indicating whether all solution
-        coefficients corresponding to filters crossing the image
-        boundary should be forced to zero.
+          ``NoBndryCross`` : Flag indicating whether all solution
+          coefficients corresponding to filters crossing the image
+          boundary should be forced to zero.
         """
 
         defaults = copy.deepcopy(admm.ADMMEqual.Options.defaults)
@@ -641,12 +643,13 @@ class ConvBPDN(GenericConvBPDN):
         :class:`sporco.admm.admm.ADMMEqual.Options`, together with
         additional options:
 
-        ``L1Weight`` : An array of weights for the :math:`\ell_1`
-        norm. The array shape must be such that the array is
-        compatible for multiplication with the X/Y variables. If this
-        option is defined, the regularization term is :math:`\lambda  \sum_m
-        \| \mathbf{w}_m \odot \mathbf{x}_m \|_1` where :math:`\mathbf{w}_m`
-        denotes slices of the weighting array on the filter index axis.
+          ``L1Weight`` : An array of weights for the :math:`\ell_1`
+          norm. The array shape must be such that the array is
+          compatible for multiplication with the X/Y variables. If this
+          option is defined, the regularization term is :math:`\lambda
+          \sum_m \| \mathbf{w}_m \odot \mathbf{x}_m \|_1` where
+          :math:`\mathbf{w}_m` denotes slices of the weighting array on
+          the filter index axis.
         """
 
         defaults = copy.deepcopy(GenericConvBPDN.Options.defaults)
@@ -1119,13 +1122,13 @@ class ConvBPDNGradReg(ConvBPDN):
         :class:`sporco.admm.cbpdn.ConvBPDN.Options`, together with
         additional options:
 
-        ``GradWeight`` : An array of weights :math:`w_m` for the term
-        penalising the gradient of the coefficient maps. If this
-        option is defined, the regularization term is :math:`\sum_i
-        \sum_m w_m \| G_i \mathbf{x}_m \|_2^2` where :math:`w_m` is
-        the weight for filter index :math:`m`. The array should be an
-        :math:`M`-vector where :math:`M` is the number of filters in
-        the dictionary.
+          ``GradWeight`` : An array of weights :math:`w_m` for the term
+          penalising the gradient of the coefficient maps. If this
+          option is defined, the regularization term is :math:`\sum_i
+          \sum_m w_m \| G_i \mathbf{x}_m \|_2^2` where :math:`w_m` is
+          the weight for filter index :math:`m`. The array should be an
+          :math:`M`-vector where :math:`M` is the number of filters in
+          the dictionary.
         """
 
         defaults = copy.deepcopy(ConvBPDN.Options.defaults)
@@ -1298,18 +1301,18 @@ class ConvTwoBlockCnstrnt(admm.ADMMTwoBlockCnstrnt):
         :class:`.ADMMTwoBlockCnstrnt.Options`, together with
         additional options:
 
-        ``LinSolveCheck`` : Flag indicating whether to compute
-        relative residual of X step solver.
+          ``LinSolveCheck`` : Flag indicating whether to compute
+          relative residual of X step solver.
 
-        ``HighMemSolve`` : Flag indicating whether to use a slightly
-        faster algorithm at the expense of higher memory usage.
+          ``HighMemSolve`` : Flag indicating whether to use a slightly
+          faster algorithm at the expense of higher memory usage.
 
-        ``NonNegCoef`` : Flag indicating whether to force solution to
-        be non-negative.
+          ``NonNegCoef`` : Flag indicating whether to force solution
+          to be non-negative.
 
-        ``NoBndryCross`` : Flag indicating whether all solution
-        coefficients corresponding to filters crossing the image
-        boundary should be forced to zero.
+          ``NoBndryCross`` : Flag indicating whether all solution
+          coefficients corresponding to filters crossing the image
+          boundary should be forced to zero.
         """
 
         defaults = copy.deepcopy(admm.ADMMEqual.Options.defaults)
@@ -1675,12 +1678,13 @@ class ConvBPDNMaskDcpl(ConvTwoBlockCnstrnt):
         :class:`sporco.admm.cbpdn.ConvTwoBlockCnstrnt.Options`, together with
         additional options:
 
-        ``L1Weight`` : An array of weights for the :math:`\ell_1`
-        norm. The array shape must be such that the array is
-        compatible for multiplication with the X/Y variables. If this
-        option is defined, the regularization term is :math:`\lambda  \sum_m
-        \| \mathbf{w}_m \odot \mathbf{x}_m \|_1` where :math:`\mathbf{w}_m`
-        denotes slices of the weighting array on the filter index axis.
+          ``L1Weight`` : An array of weights for the :math:`\ell_1`
+          norm. The array shape must be such that the array is
+          compatible for multiplication with the X/Y variables. If this
+          option is defined, the regularization term is :math:`\lambda
+          \sum_m \| \mathbf{w}_m \odot \mathbf{x}_m \|_1` where
+          :math:`\mathbf{w}_m` denotes slices of the weighting array on
+          the filter index axis.
         """
 
         defaults = copy.deepcopy(ConvTwoBlockCnstrnt.Options.defaults)

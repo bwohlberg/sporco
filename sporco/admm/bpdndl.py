@@ -1,5 +1,5 @@
 #-*- coding: utf-8 -*-
-# Copyright (C) 2015-2016 by Brendt Wohlberg <brendt@ieee.org>
+# Copyright (C) 2015-2017 by Brendt Wohlberg <brendt@ieee.org>
 # All rights reserved. BSD 3-clause License.
 # This file is part of the SPORCO package. Details of the copyright
 # and user license can be found in the 'LICENSE.txt' file distributed
@@ -71,14 +71,9 @@ class BPDNDictLearn(dictlrn.DictLearn):
     class Options(dictlrn.DictLearn.Options):
         """BPDN dictionary learning algorithm options.
 
-        Options:
-
-          ``Verbose`` : Flag determining whether iteration status is displayed.
-
-          ``StatusHeader`` : Flag determining whether status header and
-          separator are dislayed
-
-          ``MaxMainIter`` : Maximum main iterations
+        Options include all of those defined in
+        :class:`sporco.admm.dictlrn.DictLearn.Options`, together with
+        additional options:
 
           ``BPDN`` : Options :class:`sporco.admm.bpdn.BPDN.Options`
 

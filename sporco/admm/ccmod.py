@@ -1,5 +1,5 @@
 #-*- coding: utf-8 -*-
-# Copyright (C) 2015-2016 by Brendt Wohlberg <brendt@ieee.org>
+# Copyright (C) 2015-2017 by Brendt Wohlberg <brendt@ieee.org>
 # All rights reserved. BSD 3-clause License.
 # This file is part of the SPORCO package. Details of the copyright
 # and user license can be found in the 'LICENSE.txt' file distributed
@@ -174,7 +174,7 @@ class ConvRepIndexing(object):
         * K is the number of signals in S
         * M is the number of filters in D
 
-        It should be emphasised that dimC and `dimK` may take on values
+        It should be emphasised that dimC and dimK may take on values
         0 or 1, and represent the number of channel and signal
         dimensions respectively *in input S*. In the internal layout
         of S there is always a dimension allocated for channels and
@@ -355,18 +355,21 @@ class ConvCnstrMOD(admm.ADMMEqual):
         :class:`sporco.admm.admm.ADMMEqual.Options`, together with
         additional options:
 
-        ``AuxVarObj`` : Flag indicating whether the objective function \
-        should be evaluated using variable X  (``False``) or Y (``True``) \
-        as its argument
+          ``AuxVarObj`` : Flag indicating whether the objective
+          function should be evaluated using variable X (``False``) or
+          Y (``True``) as its argument. Setting this flag to ``True``
+          often gives a better estimate of the objective function, but
+          at additional computational cost.
 
-        ``LinSolveCheck`` : If ``True``, compute relative residual of \
-        X step solver
+          ``LinSolveCheck`` : If ``True``, compute relative residual
+          of X step solver.
 
-        ``ZeroMean`` : Flag indicating whether the solution dictionary \
-        :math:`\{\mathbf{d}_m\}` should have zero-mean components
+        ``ZeroMean`` : Flag indicating whether the solution
+          dictionary :math:`\{\mathbf{d}_m\}` should have zero-mean
+          components.
 
-        ``LinSolve`` : Select linear solver for x step. Options are \
-        ``SM`` (Sherman-Morrison) or ``CG`` (Conjugate Gradient)
+        ``LinSolve`` : Select linear solver for x step. Options are
+        ``SM`` (Sherman-Morrison) or ``CG`` (Conjugate Gradient).
 
         ``CG`` : CG solver options
 

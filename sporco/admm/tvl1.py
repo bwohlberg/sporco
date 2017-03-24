@@ -1,5 +1,5 @@
 #-*- coding: utf-8 -*-
-# Copyright (C) 2015-2016 by Brendt Wohlberg <brendt@ieee.org>
+# Copyright (C) 2015-2017 by Brendt Wohlberg <brendt@ieee.org>
 # All rights reserved. BSD 3-clause License.
 # This file is part of the SPORCO package. Details of the copyright
 # and user license can be found in the 'LICENSE.txt' file distributed
@@ -90,17 +90,17 @@ class TVL1Denoise(admm.ADMM):
         :class:`sporco.admm.admm.ADMM.Options`, together with
         additional options:
 
-        ``gEvalY`` : Flag indicating whether the :math:`g` component of the \
-        objective function should be evaluated using variable Y \
-        (``True``) or X (``False``) as its argument
+          ``gEvalY`` : Flag indicating whether the :math:`g` component
+          of the objective function should be evaluated using variable
+          Y (``True``) or X (``False``) as its argument.
 
-        ``MaxGSIter`` : Maximum Gauss-Seidel iterations
+          ``MaxGSIter`` : Maximum Gauss-Seidel iterations.
 
-        ``GSTol`` : Gauss-Seidel stopping tolerance
+          ``GSTol`` : Gauss-Seidel stopping tolerance.
 
-        ``DFidWeight`` : Data fidelity weight matrix
+          ``DFidWeight`` : Data fidelity weight matrix.
 
-        ``TVWeight`` : TV term weight matrix
+          ``TVWeight`` : TV term weight matrix.
         """
 
         defaults = copy.deepcopy(admm.ADMM.Options.defaults)
@@ -428,16 +428,16 @@ class TVL1Deconv(admm.ADMM):
         :class:`sporco.admm.admm.ADMM.Options`, together with
         additional options:
 
-        ``gEvalY`` : Flag indicating whether the :math:`g` component of the \
-        objective function should be evaluated using variable Y \
-        (``True``) or X (``False``) as its argument
+          ``gEvalY`` : Flag indicating whether the :math:`g` component
+          of the objective function should be evaluated using variable
+          Y (``True``) or X (``False``) as its argument.
 
-        ``LinSolveCheck`` : If ``True``, compute relative residual of
-        X step solver
+          ``LinSolveCheck`` : If ``True``, compute relative residual of
+          X step solver.
 
-        ``DFidWeight`` : Data fidelity weight matrix
+          ``DFidWeight`` : Data fidelity weight matrix.
 
-        ``TVWeight`` : TV term weight matrix
+          ``TVWeight`` : TV term weight matrix.
         """
 
         defaults = copy.deepcopy(admm.ADMM.Options.defaults)

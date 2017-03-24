@@ -1,5 +1,5 @@
 #-*- coding: utf-8 -*-
-# Copyright (C) 2015-2016 by Brendt Wohlberg <brendt@ieee.org>
+# Copyright (C) 2015-2017 by Brendt Wohlberg <brendt@ieee.org>
 # All rights reserved. BSD 3-clause License.
 # This file is part of the SPORCO package. Details of the copyright
 # and user license can be found in the 'LICENSE.txt' file distributed
@@ -74,12 +74,13 @@ class CnstrMOD(admm.ADMMEqual):
         :class:`sporco.admm.admm.ADMMEqual.Options`, together with
         additional options:
 
-        ``AuxVarObj`` : Flag indicating whether the objective function \
-        should be evaluated using variable X  (``False``) or Y (``True``) \
-        as its argument
+          ``AuxVarObj`` : Flag indicating whether the objective
+          function should be evaluated using variable X (``False``) or
+          Y (``True``) as its argument. Setting this flag to ``True``
+          often gives a better estimate of the objective function
 
-        ``ZeroMean`` : Flag indicating whether the solution dictionary \
-        :math:`D` should have zero-mean components
+          ``ZeroMean`` : Flag indicating whether the solution
+          dictionary :math:`D` should have zero-mean components.
         """
 
         defaults = copy.deepcopy(admm.ADMMEqual.Options.defaults)

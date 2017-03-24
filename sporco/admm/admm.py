@@ -1,5 +1,5 @@
 #-*- coding: utf-8 -*-
-# Copyright (C) 2015-2016 by Brendt Wohlberg <brendt@ieee.org>
+# Copyright (C) 2015-2017 by Brendt Wohlberg <brendt@ieee.org>
 # All rights reserved. BSD 3-clause License.
 # This file is part of the SPORCO package. Details of the copyright
 # and user license can be found in the 'LICENSE.txt' file distributed
@@ -127,55 +127,57 @@ class ADMM(with_metaclass(_ADMM_Meta, object)):
 
         Options:
 
-          ``Verbose`` : Flag determining whether iteration status is displayed.
+          ``Verbose`` : Flag determining whether iteration status is
+          displayed.
 
-          ``StatusHeader`` : Flag determining whether status header and \
-              separator are dislayed
+          ``StatusHeader`` : Flag determining whether status header and
+          separator are displayed.
 
-          ``DataType`` : Specify data type for solution variables, \
-              e.g. ``np.float32``
+          ``DataType`` : Specify data type for solution variables,
+          e.g. ``np.float32``.
 
-          ``Y0`` : Initial value for Y variable
+          ``Y0`` : Initial value for Y variable.
 
-          ``U0`` : Initial value for U variable
+          ``U0`` : Initial value for U variable.
 
-          ``Callback`` : Callback function to be called at the end of \
-               every iteration
+          ``Callback`` : Callback function to be called at the end of
+          every iteration.
 
-          ``MaxMainIter`` : Maximum main iterations
+          ``MaxMainIter`` : Maximum main iterations.
 
-          ``AbsStopTol`` : Absolute convergence tolerance (see \
-              Sec. 3.3.1 of :cite:`boyd-2010-distributed`)
+          ``AbsStopTol`` : Absolute convergence tolerance (see Sec. 3.3.1
+          of :cite:`boyd-2010-distributed`).
 
-          ``RelStopTol`` : Relative convergence tolerance (see \
-              Sec. 3.3.1 of :cite:`boyd-2010-distributed`)
+          ``RelStopTol`` : Relative convergence tolerance (see Sec. 3.3.1
+          of :cite:`boyd-2010-distributed`).
 
-          ``RelaxParam`` : Relaxation parameter (see \
-              Sec. 3.4.3 of :cite:`boyd-2010-distributed`)
+          ``RelaxParam`` : Relaxation parameter (see Sec. 3.4.3 of
+          :cite:`boyd-2010-distributed`). Note: relaxation is disabled
+          by setting this value to 1.0.
 
-          ``rho`` : ADMM penalty parameter
+          ``rho`` : ADMM penalty parameter.
 
-          ``AutoRho`` : Options for adaptive rho strategy (see \
-              :cite:`wohlberg-2015-adaptive` and Sec. 3.4.3 of \
-              :cite:`boyd-2010-distributed`)
+          ``AutoRho`` : Options for adaptive rho strategy (see
+          :cite:`wohlberg-2015-adaptive` and Sec. 3.4.3 of
+          :cite:`boyd-2010-distributed`).
 
-            ``Enabled`` : Flag determining whether adaptive rho \
-              strategy is enabled
+            ``Enabled`` : Flag determining whether adaptive rho
+            strategy is enabled.
 
-            ``Period`` : Iteration period on which rho is updated
+            ``Period`` : Iteration period on which rho is updated.
 
-            ``Scaling`` : Multiplier applied to rho when updated
+            ``Scaling`` : Multiplier applied to rho when updated.
 
-            ``RsdlRatio`` : Primal/dual residual ratio in rho update test
+            ``RsdlRatio`` : Primal/dual residual ratio in rho update test.
 
-            ``RsdlTarget`` : Residual ratio targeted by auto rho update policy
+            ``RsdlTarget`` : Residual ratio targeted by auto rho update policy.
 
-            ``AutoScaling`` : Flag determining whether RhoScaling value is \
-                adaptively determined. If  enabled, Scaling specifies a \
-                maximum allowed multiplier instead of a fixed multiplier.
+            ``AutoScaling`` : Flag determining whether RhoScaling value is
+            adaptively determined. If  enabled, Scaling specifies a
+            maximum allowed multiplier instead of a fixed multiplier.
 
-            ``StdResiduals`` : Flag determining whether standard residual \
-                definitions are used instead of normalised residuals
+            ``StdResiduals`` : Flag determining whether standard residual
+            definitions are used instead of normalised residuals.
         """
 
         defaults = {'Verbose' : False, 'StatusHeader' : True,
@@ -856,17 +858,17 @@ class ADMMEqual(ADMM):
         Options include all of those defined in :class:`ADMM.Options`,
         together with additional options:
 
-          ``fEvalX`` : Flag indicating whether the :math:`f` component of the \
-              objective function should be evaluated using variable X \
-              (``True``) or Y (``False``) as its argument
+          ``fEvalX`` : Flag indicating whether the :math:`f` component of the
+          objective function should be evaluated using variable X
+          (``True``) or Y (``False``) as its argument.
 
-          ``gEvalY`` : Flag indicating whether the :math:`g` component of the \
-              objective function should be evaluated using variable Y \
-              (``True``) or X (``False``) as its argument
+          ``gEvalY`` : Flag indicating whether the :math:`g` component of the
+          objective function should be evaluated using variable Y
+          (``True``) or X (``False``) as its argument.
 
-          ``ReturnX`` : Flag indicating whether the return value of the \
-              solve method is the X variable (``True``) or the Y variable \
-              (``False``)
+          ``ReturnX`` : Flag indicating whether the return value of the
+          solve method is the X variable (``True``) or the Y variable
+          (``False``).
         """
 
         defaults = copy.deepcopy(ADMM.Options.defaults)
@@ -1065,13 +1067,16 @@ class ADMMTwoBlockCnstrnt(ADMM):
         Options include all of those defined in :class:`ADMM.Options`,
         together with additional options:
 
-        ``AuxVarObj`` : Flag indicating whether the :math:`g(\mathbf{y})`
-        component of the objective function should be evaluated using
-        variable X  (``False``) or Y (``True``) as its argument.
+          ``AuxVarObj`` : Flag indicating whether the
+          :math:`g(\mathbf{y})` component of the objective function
+          should be evaluated using variable X (``False``) or Y
+          (``True``) as its argument. Setting this flag to ``True``
+          often gives a better estimate of the objective function, but
+          at additional computational cost for some problems.
 
-        ``ReturnVar`` : A string (valid values are 'X', 'Y0', or 'Y1')
-        indicating which of the objective function variables should be
-        returned by the solve method.
+          ``ReturnVar`` : A string (valid values are 'X', 'Y0', or 'Y1')
+          indicating which of the objective function variables should be
+          returned by the solve method.
         """
 
         defaults = copy.deepcopy(ADMM.Options.defaults)

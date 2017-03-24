@@ -1,5 +1,5 @@
 #-*- coding: utf-8 -*-
-# Copyright (C) 2015-2016 by Brendt Wohlberg <brendt@ieee.org>
+# Copyright (C) 2015-2017 by Brendt Wohlberg <brendt@ieee.org>
 # All rights reserved. BSD 3-clause License.
 # This file is part of the SPORCO package. Details of the copyright
 # and user license can be found in the 'LICENSE.txt' file distributed
@@ -73,13 +73,13 @@ class RobustPCA(admm.ADMM):
         :class:`sporco.admm.admm.ADMM.Options`, together with
         an additional option:
 
-        ``fEvalX`` : Flag indicating whether the :math:`f` component of the \
-        objective function should be evaluated using variable X \
-        (``True``) or Y (``False``) as its argument
+          ``fEvalX`` : Flag indicating whether the :math:`f` component
+          of the objective function should be evaluated using variable
+          X (``True``) or Y (``False``) as its argument.
 
-        ``gEvalY`` : Flag indicating whether the :math:`g` component of the \
-        objective function should be evaluated using variable Y \
-        (``True``) or X (``False``) as its argument
+          ``gEvalY`` : Flag indicating whether the :math:`g` component
+          of the objective function should be evaluated using variable
+          Y (``True``) or X (``False``) as its argument.
         """
 
         defaults = copy.deepcopy(admm.ADMM.Options.defaults)
