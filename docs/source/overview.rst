@@ -20,16 +20,7 @@ of Multipliers (ADMM) :cite:`boyd-2010-distributed`.
 Usage Examples
 --------------
 
-Usage of the package is illustrated in the following examples:
-
-* :doc:`Standard sparse coding <examples/demo_bpdn>`
-* :doc:`Standard sparse coding with joint sparsity <examples/demo_bpdnjnt>`
-* :doc:`Convolutional sparse coding (greyscale image)
-  <examples/demo_cbpdn_gry>`
-* :doc:`Convolutional sparse coding (colour image, greyscale dictionary)
-  <examples/demo_cbpdn_clr_gd>`
-* :doc:`Convolutional sparse coding (colour image, colour dictionary)
-  <examples/demo_cbpdn_clr_cd>`
+Usage examples are available as Python scripts and Jupyter Notebooks.
 
 
 .. _example-scripts-section:
@@ -67,8 +58,9 @@ Jupyter Notebooks
 
 `Jupyter Notebook <http://jupyter.org/>`_ versions of some of the
 demos in ``examples`` are also available in the same directories as
-the corresponding demo scripts, or can be viewed online via `nbviewer
-<https://nbviewer.jupyter.org/github/bwohlberg/sporco/blob/master/examples/index.ipynb>`_.
+the corresponding demo scripts. The scripts can also be viewed online
+via `nbviewer <https://nbviewer.jupyter.org/github/bwohlberg/sporco/blob/master/index.ipynb>`_,
+or run interactively at `binder <http://mybinder.org/repo/bwohlberg/sporco>`_.
 
 
 
