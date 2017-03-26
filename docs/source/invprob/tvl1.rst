@@ -1,5 +1,5 @@
-tvl1
-====
+Module tvl1
+===========
 
 This module includes the following classes:
 

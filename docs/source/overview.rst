@@ -102,16 +102,3 @@ Acknowledgments
 
 Thanks to Aric Hagberg for valuable advice on python packaging,
 documentation, and related issues.
-
-
-
-
-.. toctree::
-   :hidden:
-
-   install
-   examples/demo_bpdn
-   examples/demo_bpdnjnt
-   examples/demo_cbpdn_gry
-   examples/demo_cbpdn_clr_gd
-   examples/demo_cbpdn_clr_cd

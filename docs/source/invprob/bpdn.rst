@@ -1,5 +1,5 @@
-bpdn
-====
+Module bpdn
+===========
 
 This module includes the following classes:
 

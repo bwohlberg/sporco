@@ -38,9 +38,3 @@ the following modules:
 The usage of many of these utility and support functions/classes is
 demonstrated in the usage examples in the ``examples`` directory of
 the source distribution.
-
-
-.. toctree::
-   :hidden:
-
-   notes

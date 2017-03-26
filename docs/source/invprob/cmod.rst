@@ -1,5 +1,5 @@
-cmod
-====
+Module cmod
+===========
 
 This module includes the :class:`.CnstrMOD` class for solving the
 problem

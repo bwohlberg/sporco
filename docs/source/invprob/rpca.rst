@@ -1,5 +1,5 @@
-rpca
-====
+Module rpca
+===========
 
 This module includes the :class:`.RobustPCA` class for solving the
 problem

@@ -1,5 +1,5 @@
-cbpdndl
-=======
+Module cbpdndl
+==============
 
 This module includes the :class:`.ConvBPDNDictLearn` class for solving the
 problem

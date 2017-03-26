@@ -1,5 +1,5 @@
-ccmod
-=====
+Module ccmod
+============
 
 This module includes the :class:`.ConvCnstrMOD` class for solving the
 problem

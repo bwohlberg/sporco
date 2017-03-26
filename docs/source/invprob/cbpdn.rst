@@ -1,5 +1,5 @@
-cbpdn
-=====
+Module cbpdn
+============
 
 This module includes the following classes:
 

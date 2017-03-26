@@ -1,5 +1,5 @@
-bpdndl
-======
+Module bpdndl
+=============
 
 This module includes the :class:`.BPDNDictLearn` class for solving the
 problem

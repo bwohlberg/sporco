@@ -51,21 +51,3 @@ problems. See :class:`.BPDN` as an example of the methods that need to
 be defined to implement a complete ADMM algorithm, and
 :class:`.BPDNJoint` as an example of the minor additional code
 required to extend an existing problem.
-
-
-
-.. toctree::
-   :hidden:
-
-   admm
-   invprob/bpdn
-   invprob/cmod
-   invprob/bpdndl
-   invprob/cbpdn
-   invprob/ccmod
-   invprob/cbpdndl
-   invprob/dictlrn
-   invprob/tvl1
-   invprob/tvl2
-   invprob/spline
-   invprob/rpca

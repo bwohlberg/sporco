@@ -1,5 +1,5 @@
-spline
-======
+Module spline
+=============
 
 This module includes the :class:`.SplineL1` class for solving the
 problem
