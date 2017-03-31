@@ -33,6 +33,7 @@ respectively. These methods should be overridden if a different
 initialization is desired.
 
 
+.. _sec-admm-update-steps:
 
 Update Steps
 ------------
@@ -53,7 +54,7 @@ The ADMM updates steps are defined by the following methods:
   This method should set ``self.X`` as a function of ``self.Y`` and
   ``self.U``.
 
-     
+
 * :meth:`.ADMM.ystep`
 
   Solve
@@ -71,7 +72,7 @@ The ADMM updates steps are defined by the following methods:
   relaxation (see Sec. 3.4.3 of :cite:`boyd-2010-distributed`), as
   implemented in :meth:`.ADMM.relax_AX`, to occur without need for
   explicit implementation in classes derived from :class:`.ADMM`.
-     
+
 
 * :meth:`.ADMM.ustep`
 
@@ -121,7 +122,7 @@ method that updates these pre-computed values.
 
 
 
-.. _sec-constraint-def:
+.. _sec-admm-constraint-def:
 
 Constraint Definition
 ---------------------
@@ -152,10 +153,10 @@ constant vector :math:`\mathbf{c}`:
 A derived class implementing a fully-specified ADMM problem (as
 opposed to a partial specialisation) will usually define all of these
 methods. If it does not, it is necessary to override all of the
-methods in :ref:`sec-residual-eval`.
+methods in :ref:`sec-admm-residual-eval`.
 
 
-.. _sec-residual-eval:
+.. _sec-admm-residual-eval:
 
 Residual Evaluation
 -------------------
@@ -198,13 +199,14 @@ residuals:
 |
 
 These methods need not be overridden if those in
-:ref:`sec-constraint-def` are defined since :class:`.ADMM` includes
-definitions of :meth:`.ADMM.rsdl_r`, :meth:`.ADMM.rsdl_s`,
+:ref:`sec-admm-constraint-def` are defined since :class:`.ADMM`
+includes definitions of :meth:`.ADMM.rsdl_r`, :meth:`.ADMM.rsdl_s`,
 :meth:`.ADMM.rsdl_rn`, and :meth:`.ADMM.rsdl_sn` in terms of
 :meth:`.ADMM.cnst_A`, :meth:`.ADMM.cnst_AT`, :meth:`.ADMM.cnst_B`, and
 :meth:`.ADMM.cnst_c`.
 
 
+.. _sec-admm-iteration-stats:
 
 Iteration Statistics
 --------------------
@@ -241,10 +243,10 @@ In most cases a derived class will simply override
 :attr:`.ADMM.itstat_fields_extra` to customise the desired iteration
 statistics fields, but if more flexibility is required,
 :meth:`.ADMM.itstat_fields` should be overridden.
-  
 
-.. _sec-itstat-cnstr:
-      
+
+.. _sec-admm-itstat-cnstr:
+
 IterationStats Construction
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -269,7 +271,7 @@ possibly :attr:`.ADMM.itstat_fields_extra` and
 :meth:`.ADMM.itstat_extra` as well).
 
 
-   
+
 Status Display
 ^^^^^^^^^^^^^^
 
@@ -290,4 +292,4 @@ in most cases it is sufficient to override :attr:`.ADMM.hdrtxt_objfn`
 and :attr:`.ADMM.hdrval_objfun`, which respectively define the header
 strings and mappings for the statistics related to the objective
 function (see :attr:`.ADMM.itstat_fields_objfn` and
-:meth:`.ADMM.eval_objfn` in :ref:`sec-itstat-cnstr`).
+:meth:`.ADMM.eval_objfn` in :ref:`sec-admm-itstat-cnstr`).
