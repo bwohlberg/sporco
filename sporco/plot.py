@@ -31,7 +31,7 @@ __author__ = """Brendt Wohlberg <brendt@ieee.org>"""
 
 
 def plot(dat, x=None, title=None, xlbl=None, ylbl=None, lgnd=None, lglc=None,
-         ptyp='plot', lwidth=1.0, lstyle='solid', block=False, fgrf=None,
+         ptyp='plot', lwidth=1.5, lstyle='solid', block=False, fgrf=None,
          fgnm=None, fgsz=None):
     """
     Plot columns of array.
@@ -55,7 +55,7 @@ def plot(dat, x=None, title=None, xlbl=None, ylbl=None, lgnd=None, lglc=None,
     ptyp : string, optional (default 'plot')
         Plot type specification (options are 'plot', 'semilogx', 'semilogy',
         and 'loglog')
-    lwidth : float, optional (default 1.0)
+    lwidth : float, optional (default 1.5)
         Line width
     lstyle : string, optional (default 'solid')
         Line style (see :class:`matplotlib.lines.Line2D`)
@@ -118,7 +118,8 @@ def plot(dat, x=None, title=None, xlbl=None, ylbl=None, lgnd=None, lglc=None,
 
 
 def surf(z, x=None, y=None, title=None, xlbl=None, ylbl=None, zlbl=None,
-         block=False, cmap=None, fgrf=None, axrf=None, fgnm=None, fgsz=None):
+         lblpad=8.0, block=False, cmap=None, fgrf=None, axrf=None,
+         fgnm=None, fgsz=None):
     """
     Plot columns of array.
 
@@ -138,6 +139,8 @@ def surf(z, x=None, y=None, title=None, xlbl=None, ylbl=None, zlbl=None,
         Label for y-axis
     zlbl : string, optional (default None)
         Label for z-axis
+    lblpad : float, optional (default 8.0)
+        Label padding
     block : boolean, optional (default False)
         If True, the function only returns when the figure is closed
     cmap : matplotlib.cm colormap, optional (default None)
@@ -184,11 +187,11 @@ def surf(z, x=None, y=None, title=None, xlbl=None, ylbl=None, zlbl=None,
     if title is not None:
         plt.title(title)
     if xlbl is not None:
-        ax.set_xlabel(xlbl)
+        ax.set_xlabel(xlbl, labelpad=lblpad)
     if ylbl is not None:
-        ax.set_ylabel(ylbl)
+        ax.set_ylabel(ylbl, labelpad=lblpad)
     if zlbl is not None:
-        ax.set_zlabel(zlbl)
+        ax.set_zlabel(zlbl, labelpad=lblpad)
 
     def press(event):
         if event.key == 'q':

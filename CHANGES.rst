@@ -15,6 +15,9 @@ Version 0.1.5   (Not yet released)
 - Fixed bug in multi-channel data handling in cbpdn.AddMaskSim
 - Fixed bug in util.netgetdata
 - New functions linalg.solvedbd_sm, linalg.solvedbd_sm_c
+- Improved documentation of admm.admm module
+- Changed default line width in plot.plot and added parameter for
+  specifying label padding to plot.surf  
 
 
 
