@@ -270,20 +270,20 @@ class BPDN(GenericBPDN):
 
        ``ObjFun`` : Objective function value
 
-       ``DFid`` :  Value of data fidelity term \
-       :math:`(1/2) \| D \mathbf{x} - \mathbf{s} \|_2^2`
+       ``DFid`` : Value of data fidelity term :math:`(1/2) \| D
+       \mathbf{x} - \mathbf{s} \|_2^2`
 
-       ``RegL1`` : Value of regularisation term \
-       :math:`\| \mathbf{x} \|_1`
+       ``RegL1`` : Value of regularisation term :math:`\| \mathbf{x}
+       \|_1`
 
        ``PrimalRsdl`` : Norm of primal residual
 
        ``DualRsdl`` : Norm of dual residual
 
-       ``EpsPrimal`` : Primal residual stopping tolerance \
+       ``EpsPrimal`` : Primal residual stopping tolerance
        :math:`\epsilon_{\mathrm{pri}}`
 
-       ``EpsDual`` : Dual residual stopping tolerance \
+       ``EpsDual`` : Dual residual stopping tolerance
        :math:`\epsilon_{\mathrm{dua}}`
 
        ``Rho`` : Penalty parameter
@@ -441,10 +441,10 @@ class BPDNJoint(BPDN):
 
        ``DualRsdl`` : Norm of dual Residual
 
-       ``EpsPrimal`` : Primal residual stopping tolerance \
+       ``EpsPrimal`` : Primal residual stopping tolerance
        :math:`\epsilon_{\mathrm{pri}}`
 
-       ``EpsDual`` : Dual residual stopping tolerance \
+       ``EpsDual`` : Dual residual stopping tolerance
        :math:`\epsilon_{\mathrm{dua}}`
 
        ``Rho`` : Penalty parameter
@@ -536,23 +536,23 @@ class ElasticNet(BPDN):
 
        ``ObjFun`` : Objective function value
 
-       ``DFid`` :  Value of data fidelity term \
-       :math:`(1/2) \| D \mathbf{x} - \mathbf{s} \|_2^2`
+       ``DFid`` : Value of data fidelity term :math:`(1/2) \| D
+       \mathbf{x} - \mathbf{s} \|_2^2`
 
-       ``RegL1`` : Value of regularisation term \
-       :math:`\| \mathbf{x} \|_1`
+       ``RegL1`` : Value of regularisation term :math:`\| \mathbf{x}
+       \|_1`
 
-       ``RegL2`` : Value of regularisation term \
-       :math:`(1/2) \| \mathbf{x} \|_2^2`
+       ``RegL2`` : Value of regularisation term :math:`(1/2) \|
+       \mathbf{x} \|_2^2`
 
        ``PrimalRsdl`` : Norm of primal residual
 
        ``DualRsdl`` : Norm of dual Residual
 
-       ``EpsPrimal`` : Primal residual stopping tolerance \
+       ``EpsPrimal`` : Primal residual stopping tolerance
        :math:`\epsilon_{\mathrm{pri}}`
 
-       ``EpsDual`` : Dual residual stopping tolerance \
+       ``EpsDual`` : Dual residual stopping tolerance
        :math:`\epsilon_{\mathrm{dua}}`
 
        ``Rho`` : Penalty parameter

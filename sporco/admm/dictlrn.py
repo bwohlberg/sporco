@@ -57,7 +57,7 @@ class IterStatsConfig(object):
           display
         hdrmap : dict
           Dictionary mapping column header titles to IterationStats entries
-            """
+        """
 
         self.IterationStats = collections.namedtuple('IterationStats', isfld)
         self.isxmap = isxmap
@@ -164,7 +164,8 @@ class DictLearn(object):
 
         Options:
 
-          ``Verbose`` : Flag determining whether iteration status is displayed.
+          ``Verbose`` : Flag determining whether iteration status is
+          displayed.
 
           ``StatusHeader`` : Flag determining whether status header and
           separator are displayed.

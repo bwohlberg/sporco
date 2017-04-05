@@ -55,21 +55,21 @@ class TVL1Denoise(admm.ADMM):
 
        ``ObjFun`` : Objective function value
 
-       ``DFid`` :  Value of data fidelity term \
-       :math:`\| W_{\mathrm{df}} (\mathbf{x} - \mathbf{s}) \|_1`
+       ``DFid`` : Value of data fidelity term :math:`\|
+       W_{\mathrm{df}} (\mathbf{x} - \mathbf{s}) \|_1`
 
-       ``RegTV`` : Value of regularisation term \
-       :math:`\| W_{\mathrm{tv}} \sqrt{(G_r \mathbf{x})^2 +
-       (G_c \mathbf{x})^2} \|_1`
+       ``RegTV`` : Value of regularisation term :math:`\|
+       W_{\mathrm{tv}} \sqrt{(G_r \mathbf{x})^2 + (G_c \mathbf{x})^2}
+       \|_1`
 
        ``PrimalRsdl`` : Norm of primal residual
 
        ``DualRsdl`` : Norm of dual residual
 
-       ``EpsPrimal`` : Primal residual stopping tolerance \
+       ``EpsPrimal`` : Primal residual stopping tolerance
        :math:`\epsilon_{\mathrm{pri}}`
 
-       ``EpsDual`` : Dual residual stopping tolerance \
+       ``EpsDual`` : Dual residual stopping tolerance
        :math:`\epsilon_{\mathrm{dua}}`
 
        ``Rho`` : Penalty parameter
@@ -396,21 +396,21 @@ class TVL1Deconv(admm.ADMM):
 
        ``ObjFun`` : Objective function value
 
-       ``DFid`` :  Value of data fidelity term \
-       :math:`\| W_{\mathrm{df}} (H \mathbf{x} - \mathbf{s}) \|_1`
+       ``DFid`` : Value of data fidelity term :math:`\|
+       W_{\mathrm{df}} (H \mathbf{x} - \mathbf{s}) \|_1`
 
-       ``RegTV`` : Value of regularisation term \
-       :math:`\| W_{\mathrm{tv}} \sqrt{(G_r \mathbf{x})^2 +
-       (G_c \mathbf{x})^2} \|_1`
+       ``RegTV`` : Value of regularisation term :math:`\|
+       W_{\mathrm{tv}} \sqrt{(G_r \mathbf{x})^2 + (G_c \mathbf{x})^2}
+       \|_1`
 
        ``PrimalRsdl`` : Norm of primal residual
 
        ``DualRsdl`` : Norm of dual residual
 
-       ``EpsPrimal`` : Primal residual stopping tolerance \
+       ``EpsPrimal`` : Primal residual stopping tolerance
        :math:`\epsilon_{\mathrm{pri}}`
 
-       ``EpsDual`` : Dual residual stopping tolerance \
+       ``EpsDual`` : Dual residual stopping tolerance
        :math:`\epsilon_{\mathrm{dua}}`
 
        ``Rho`` : Penalty parameter

@@ -638,11 +638,11 @@ class ExampleImages(object):
         # This is a temporary measure to catch attempts to use the old
         # interface of this method
         if fname is None:
-            raise RuntimeError('Example images are no longer downloaded as part '
-                'of the build process, and the interface of ExampleImages.image '
-                'has changed. Please see section "Test Images" in the SPORCO '
-                'package README.rst file, and consult the documentation for '
-                'ExampleImages.image.')
+            raise RuntimeError('Example images are no longer downloaded as '
+                'part of the build process, and the interface of '
+                'ExampleImages.image has changed. Please see section "Test '
+                'Images" in the SPORCO package README.rst file, and consult '
+                'the documentation for ExampleImages.image.')
             
         if scaled is None:
             scaled = self.scaled

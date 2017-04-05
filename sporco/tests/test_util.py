@@ -29,7 +29,7 @@ class TestSet01(object):
         t0 = nt(0, 1, 2)
         t0a = util.ntpl2array(t0)
         t1 = util.array2ntpl(t0a)
-        
+
 
     def test_02(self):
         D = np.random.randn(64, 64)
@@ -54,7 +54,7 @@ class TestSet01(object):
     def test_06(self):
         img = np.random.randn(64, 64)
         blk = util.imageblocks(img, (8, 8))
-    
+
 
     def test_07(self):
         rgb = np.random.randn(64, 64, 3)

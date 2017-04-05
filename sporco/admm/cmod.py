@@ -47,7 +47,8 @@ class CnstrMOD(admm.ADMMEqual):
 
        ``Iter`` : Iteration number
 
-       ``DFid`` :  Value of data fidelity term :math:`(1/2) \|  D X - S \|_2^2`
+       ``DFid`` : Value of data fidelity term :math:`(1/2) \| D X - S
+       \|_2^2`
 
        ``Cnstr`` : Constraint violation measure
 
@@ -55,10 +56,10 @@ class CnstrMOD(admm.ADMMEqual):
 
        ``DualRsdl`` : Norm of dual residual
 
-       ``EpsPrimal`` : Primal residual stopping tolerance \
+       ``EpsPrimal`` : Primal residual stopping tolerance
        :math:`\epsilon_{\mathrm{pri}}`
 
-       ``EpsDual`` : Dual residual stopping tolerance \
+       ``EpsDual`` : Dual residual stopping tolerance
        :math:`\epsilon_{\mathrm{dua}}`
 
        ``Rho`` : Penalty parameter

@@ -44,11 +44,10 @@ class BPDNDictLearn(dictlrn.DictLearn):
 
        ``ObjFun`` : Objective function value
 
-       ``DFid`` :  Value of data fidelity term \
-       :math:`(1/2) \| D X - S \|_F^2`
+       ``DFid`` : Value of data fidelity term :math:`(1/2) \| D X - S
+       \|_F^2`
 
-       ``RegL1`` : Value of regularisation term \
-       :math:`\| X \|_1`
+       ``RegL1`` : Value of regularisation term :math:`\| X \|_1`
 
        ``Cnstr`` : Constraint violation measure
 

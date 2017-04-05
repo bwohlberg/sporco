@@ -321,9 +321,8 @@ class ConvCnstrMOD(admm.ADMMEqual):
 
        ``Iter`` : Iteration number
 
-       ``DFid`` :  Value of data fidelity term \
-       :math:`(1/2) \sum_k \|  \sum_m \mathbf{d}_m * \mathbf{x}_{k,m} -
-       \mathbf{s}_k \|_2^2`
+       ``DFid`` : Value of data fidelity term :math:`(1/2) \sum_k \|
+       \sum_m \mathbf{d}_m * \mathbf{x}_{k,m} - \mathbf{s}_k \|_2^2`
 
        ``Cnstr`` : Constraint violation measure
 
@@ -331,10 +330,10 @@ class ConvCnstrMOD(admm.ADMMEqual):
 
        ``DualRsdl`` : Norm of dual residual
 
-       ``EpsPrimal`` : Primal residual stopping tolerance \
+       ``EpsPrimal`` : Primal residual stopping tolerance
        :math:`\epsilon_{\mathrm{pri}}`
 
-       ``EpsDual`` : Dual residual stopping tolerance \
+       ``EpsDual`` : Dual residual stopping tolerance
        :math:`\epsilon_{\mathrm{dua}}`
 
        ``Rho`` : Penalty parameter
@@ -364,7 +363,7 @@ class ConvCnstrMOD(admm.ADMMEqual):
           ``LinSolveCheck`` : If ``True``, compute relative residual
           of X step solver.
 
-        ``ZeroMean`` : Flag indicating whether the solution
+          ``ZeroMean`` : Flag indicating whether the solution
           dictionary :math:`\{\mathbf{d}_m\}` should have zero-mean
           components.
 
@@ -504,7 +503,7 @@ class ConvCnstrMOD(admm.ADMMEqual):
         # channels also appear on the multiple image index.
         if self.cri.Cd == 1 and self.cri.C > 1:
             self.S = S.reshape(self.cri.Nv + (1,) +
-                               (self.cri.C*self.cri.K,) + (1,))
+                        (self.cri.C*self.cri.K,) + (1,))
         else:
             self.S = S.reshape(self.cri.shpS)
         self.S = np.asarray(self.S, dtype=self.dtype)

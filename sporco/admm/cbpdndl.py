@@ -50,12 +50,11 @@ class ConvBPDNDictLearn(dictlrn.DictLearn):
 
        ``ObjFun`` : Objective function value
 
-       ``DFid`` :  Value of data fidelity term \
-       :math:`(1/2) \sum_k \|  \sum_m \mathbf{d}_m * \mathbf{x}_{k,m} -
-       \mathbf{s}_k \|_2^2`
+       ``DFid`` : Value of data fidelity term :math:`(1/2) \sum_k \|
+       \sum_m \mathbf{d}_m * \mathbf{x}_{k,m} - \mathbf{s}_k \|_2^2`
 
-       ``RegL1`` : Value of regularisation term \
-       :math:`\sum_k \sum_m \| \mathbf{x}_{k,m} \|_1`
+       ``RegL1`` : Value of regularisation term :math:`\sum_k \sum_m
+       \| \mathbf{x}_{k,m} \|_1`
 
        ``Cnstr`` : Constraint violation measure
 

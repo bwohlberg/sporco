@@ -43,28 +43,28 @@ class SplineL1(admm.ADMM):
         \| D \mathbf{x} \|_2^2  \;\; \\text{such that} \;\;
         \mathbf{x} - \mathbf{y} = \mathbf{s} \;\;.
 
-    After termination of the :meth:`solve` method, attribute :attr:`itstat` is
-    a list of tuples representing statistics of each iteration. The
-    fields of the named tuple ``IterationStats`` are:
+    After termination of the :meth:`solve` method, attribute
+    :attr:`itstat` is a list of tuples representing statistics of each
+    iteration. The fields of the named tuple ``IterationStats`` are:
 
        ``Iter`` : Iteration number
 
        ``ObjFun`` : Objective function value
 
-       ``DFid`` :  Value of data fidelity term \
-       :math:`\| W (\mathbf{x} - \mathbf{s}) \|_1`
+       ``DFid`` : Value of data fidelity term :math:`\| W (\mathbf{x}
+       - \mathbf{s}) \|_1`
 
-       ``Reg`` : Value of regularisation term \
-       :math:`\\frac{1}{2} \| D \mathbf{x} \|_2^2`
+       ``Reg`` : Value of regularisation term :math:`\\frac{1}{2} \| D
+       \mathbf{x} \|_2^2`
 
        ``PrimalRsdl`` : Norm of primal residual
 
        ``DualRsdl`` : Norm of dual residual
 
-       ``EpsPrimal`` : Primal residual stopping tolerance \
+       ``EpsPrimal`` : Primal residual stopping tolerance
        :math:`\epsilon_{\mathrm{pri}}`
 
-       ``EpsDual`` : Dual residual stopping tolerance \
+       ``EpsDual`` : Dual residual stopping tolerance
        :math:`\epsilon_{\mathrm{dua}}`
 
        ``Rho`` : Penalty parameter
