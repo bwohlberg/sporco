@@ -236,8 +236,8 @@ class GenericConvBPDN(admm.ADMMEqual):
 
        ``ObjFun`` : Objective function value
 
-       ``DFid`` :  Value of data fidelity term \
-       :math:`(1/2) \| \sum_m \mathbf{d}_m * \mathbf{x}_m - \mathbf{s} \|_2^2`
+       ``DFid`` : Value of data fidelity term :math:`(1/2) \| \sum_m
+       \mathbf{d}_m * \mathbf{x}_m - \mathbf{s} \|_2^2`
 
        ``Reg`` : Value of regularisation term
 
@@ -245,10 +245,10 @@ class GenericConvBPDN(admm.ADMMEqual):
 
        ``DualRsdl`` : Norm of dual residual
 
-       ``EpsPrimal`` : Primal residual stopping tolerance \
+       ``EpsPrimal`` : Primal residual stopping tolerance
        :math:`\epsilon_{\mathrm{pri}}`
 
-       ``EpsDual`` : Dual residual stopping tolerance \
+       ``EpsDual`` : Dual residual stopping tolerance
        :math:`\epsilon_{\mathrm{dua}}`
 
        ``Rho`` : Penalty parameter
@@ -612,20 +612,20 @@ class ConvBPDN(GenericConvBPDN):
 
        ``ObjFun`` : Objective function value
 
-       ``DFid`` :  Value of data fidelity term \
-       :math:`(1/2) \| \sum_m \mathbf{d}_m * \mathbf{x}_m - \mathbf{s} \|_2^2`
+       ``DFid`` : Value of data fidelity term :math:`(1/2) \| \sum_m
+       \mathbf{d}_m * \mathbf{x}_m - \mathbf{s} \|_2^2`
 
-       ``RegL1`` : Value of regularisation term \
-       :math:`\sum_m \| \mathbf{x}_m \|_1`
+       ``RegL1`` : Value of regularisation term :math:`\sum_m \|
+       \mathbf{x}_m \|_1`
 
        ``PrimalRsdl`` : Norm of primal residual
 
        ``DualRsdl`` : Norm of dual residual
 
-       ``EpsPrimal`` : Primal residual stopping tolerance \
+       ``EpsPrimal`` : Primal residual stopping tolerance
        :math:`\epsilon_{\mathrm{pri}}`
 
-       ``EpsDual`` : Dual residual stopping tolerance \
+       ``EpsDual`` : Dual residual stopping tolerance
        :math:`\epsilon_{\mathrm{dua}}`
 
        ``Rho`` : Penalty parameter
@@ -822,10 +822,10 @@ class ConvBPDNJoint(ConvBPDN):
 
        ``DualRsdl`` : Norm of dual Residual
 
-       ``EpsPrimal`` : Primal residual stopping tolerance \
+       ``EpsPrimal`` : Primal residual stopping tolerance
        :math:`\epsilon_{\mathrm{pri}}`
 
-       ``EpsDual`` : Dual residual stopping tolerance \
+       ``EpsDual`` : Dual residual stopping tolerance
        :math:`\epsilon_{\mathrm{dua}}`
 
        ``Rho`` : Penalty parameter
@@ -925,23 +925,23 @@ class ConvElasticNet(ConvBPDN):
 
        ``ObjFun`` : Objective function value
 
-       ``DFid`` :  Value of data fidelity term \
-       :math:`(1/2) \|  \sum_m \mathbf{d}_m * \mathbf{x}_m - \mathbf{s} \|_2^2`
+       ``DFid`` : Value of data fidelity term :math:`(1/2) \| \sum_m
+       \mathbf{d}_m * \mathbf{x}_m - \mathbf{s} \|_2^2`
 
-       ``RegL1`` : Value of regularisation term \
-       :math:`\sum_m \| \mathbf{x}_m \|_1`
+       ``RegL1`` : Value of regularisation term :math:`\sum_m \|
+       \mathbf{x}_m \|_1`
 
-       ``RegL2`` : Value of regularisation term \
-       :math:`(1/2) \sum_m \| \mathbf{x}_m \|_2^2`
+       ``RegL2`` : Value of regularisation term :math:`(1/2) \sum_m \|
+       \mathbf{x}_m \|_2^2`
 
        ``PrimalRsdl`` : Norm of primal residual
 
        ``DualRsdl`` : Norm of dual residual
 
-       ``EpsPrimal`` : Primal residual stopping tolerance \
+       ``EpsPrimal`` : Primal residual stopping tolerance
        :math:`\epsilon_{\mathrm{pri}}`
 
-       ``EpsDual`` : Dual residual stopping tolerance \
+       ``EpsDual`` : Dual residual stopping tolerance
        :math:`\epsilon_{\mathrm{dua}}`
 
        ``Rho`` : Penalty parameter
@@ -1088,23 +1088,23 @@ class ConvBPDNGradReg(ConvBPDN):
 
        ``ObjFun`` : Objective function value
 
-       ``DFid`` :  Value of data fidelity term \
-       :math:`(1/2) \|  \sum_m \mathbf{d}_m * \mathbf{x}_m - \mathbf{s} \|_2^2`
+       ``DFid`` : Value of data fidelity term :math:`(1/2) \| \sum_m
+       \mathbf{d}_m * \mathbf{x}_m - \mathbf{s} \|_2^2`
 
-       ``RegL1`` : Value of regularisation term \
-       :math:`\sum_m \| \mathbf{x}_m \|_1`
+       ``RegL1`` : Value of regularisation term :math:`\sum_m \|
+       \mathbf{x}_m \|_1`
 
-       ``RegGrad`` : Value of regularisation term \
-       :math:`(1/2) \sum_i \sum_m \| G_i \mathbf{x}_m \|_2^2`
+       ``RegGrad`` : Value of regularisation term :math:`(1/2) \sum_i
+       \sum_m \| G_i \mathbf{x}_m \|_2^2`
 
        ``PrimalRsdl`` : Norm of primal residual
 
        ``DualRsdl`` : Norm of dual residual
 
-       ``EpsPrimal`` : Primal residual stopping tolerance \
+       ``EpsPrimal`` : Primal residual stopping tolerance
        :math:`\epsilon_{\mathrm{pri}}`
 
-       ``EpsDual`` : Dual residual stopping tolerance \
+       ``EpsDual`` : Dual residual stopping tolerance
        :math:`\epsilon_{\mathrm{dua}}`
 
        ``Rho`` : Penalty parameter
@@ -1647,21 +1647,20 @@ class ConvBPDNMaskDcpl(ConvTwoBlockCnstrnt):
 
        ``ObjFun`` : Objective function value
 
-       ``DFid`` :  Value of data fidelity term \
-       :math:`(1/2) \|  W (\sum_m \mathbf{d}_m * \mathbf{x}_m -
-       \mathbf{s}) \|_2^2`
+       ``DFid`` : Value of data fidelity term :math:`(1/2) \| W
+       (\sum_m \mathbf{d}_m * \mathbf{x}_m - \mathbf{s}) \|_2^2`
 
-       ``RegL1`` : Value of regularisation term \
-       :math:`\sum_m \| \mathbf{x}_m \|_1`
+       ``RegL1`` : Value of regularisation term :math:`\sum_m \|
+       \mathbf{x}_m \|_1`
 
        ``PrimalRsdl`` : Norm of primal residual
 
        ``DualRsdl`` : Norm of dual residual
 
-       ``EpsPrimal`` : Primal residual stopping tolerance \
+       ``EpsPrimal`` : Primal residual stopping tolerance
        :math:`\epsilon_{\mathrm{pri}}`
 
-       ``EpsDual`` : Dual residual stopping tolerance \
+       ``EpsDual`` : Dual residual stopping tolerance
        :math:`\epsilon_{\mathrm{dua}}`
 
        ``Rho`` : Penalty parameter
@@ -1890,7 +1889,7 @@ class AddMaskSim(object):
         self.inner_ystep()
         # Apply mask to AMS component and insert into Y from inner
         # cbpdn object
-        Yi[self.W.astype(np.bool)] = 0.0
+        Yi[np.where(self.W.astype(np.bool))] = 0.0
         self.cbpdn.Y[amidx] = Yi
 
 
