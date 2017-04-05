@@ -4,6 +4,7 @@ include setup.cfg
 include pytest.ini
 include README.rst
 include LICENSE
+include CHANGES.rst
 include requirements.txt
 
 recursive-include examples *.py *.ipynb
