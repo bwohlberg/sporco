@@ -29,9 +29,8 @@ class BPDNDictLearn(dictlrn.DictLearn):
     Solve the optimisation problem
 
     .. math::
-       \mathrm{argmin}_{D, X} \;
-       (1/2) \| D X - S \|_F^2 + \lambda \| X \|_1 \quad \\text{such that}
-       \quad \|\mathbf{d}_m\|_2 = 1
+       \mathrm{argmin}_{D, X} \; (1/2) \| D X - S \|_F^2 + \lambda \|
+       X \|_1 \quad \\text{such that} \quad \|\mathbf{d}_m\|_2 = 1
 
     via interleaved alternation between the ADMM steps of the
     :class:`.BPDN` and :class:`.CnstrMOD` problems.
@@ -79,10 +78,10 @@ class BPDNDictLearn(dictlrn.DictLearn):
           ``CMOD`` : Options :class:`sporco.admm.cmod.CnstrMOD.Options`
         """
 
-        defaults = {'Verbose' : False, 'StatusHeader' : True,
-                    'MaxMainIter' : 1000,
-                    'BPDN' : copy.deepcopy(bpdn.BPDN.Options.defaults),
-                    'CMOD' : copy.deepcopy(cmod.CnstrMOD.Options.defaults)}
+        defaults = copy.deepcopy(dictlrn.DictLearn.Options.defaults)
+        defaults.update({
+            'BPDN' : copy.deepcopy(bpdn.BPDN.Options.defaults),
+            'CMOD' : copy.deepcopy(cmod.CnstrMOD.Options.defaults)})
 
 
         def __init__(self, opt=None):

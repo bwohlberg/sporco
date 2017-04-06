@@ -171,10 +171,13 @@ class DictLearn(object):
           separator are displayed.
 
           ``MaxMainIter`` : Maximum main iterations.
+
+          ``Callback`` : Callback function to be called at the end of
+          every iteration.
         """
 
         defaults = {'Verbose' : False, 'StatusHeader' : True,
-                    'MaxMainIter' : 1000}
+                    'MaxMainIter' : 1000, 'Callback' : None}
 
 
         def __init__(self, opt=None):
@@ -278,6 +281,9 @@ class DictLearn(object):
             if self.opt['Verbose']:
                 self.isc.printiterstats(itst)
 
+            # Call callback function if defined
+            if self.opt['Callback'] is not None:
+                self.opt['Callback'](self, j)
 
         # Record run time
         self.runtime += self.timer.elapsed()

@@ -81,7 +81,6 @@ class ConvBPDNDictLearn(dictlrn.DictLearn):
         :class:`sporco.admm.dictlrn.DictLearn.Options`, together with
         additional options:
 
-
           ``DictSize`` : Dictionary size vector.
 
           ``CBPDN`` : Options :class:`sporco.admm.cbpdn.ConvBPDN.Options`
@@ -89,10 +88,10 @@ class ConvBPDNDictLearn(dictlrn.DictLearn):
           ``CCMOD`` : Options :class:`sporco.admm.ccmod.ConvCnstrMOD.Options`
         """
 
-        defaults = {'Verbose' : False, 'StatusHeader' : True,
-                'MaxMainIter' : 1000, 'DictSize' : None,
+        defaults = copy.deepcopy(dictlrn.DictLearn.Options.defaults)
+        defaults.update({'DictSize' : None,
                 'CBPDN' : copy.deepcopy(cbpdn.ConvBPDN.Options.defaults),
-                'CCMOD' : copy.deepcopy(ccmod.ConvCnstrMOD.Options.defaults)}
+                'CCMOD' : copy.deepcopy(ccmod.ConvCnstrMOD.Options.defaults)})
 
 
         def __init__(self, opt=None):
