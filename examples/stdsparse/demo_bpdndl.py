@@ -50,7 +50,7 @@ opt = bpdndl.BPDNDictLearn.Options({'Verbose' : True, 'MaxMainIter' : 100,
 # Run optimisation
 d = bpdndl.BPDNDictLearn(D0, S, lmbda, opt)
 d.solve()
-print("BPDNDictLearn solve time: %.2fs" % d.runtime)
+print("BPDNDictLearn solve time: %.2fs" % d.timer.elapsed('solve'))
 
 
 # Display dictionaries

@@ -186,12 +186,6 @@ class TVL2Denoise(admm.ADMM):
         # Need to initialise X because of Gauss-Seidel in xstep
         self.X = self.S
 
-        # Increment `runtime` to reflect object initialisation
-        # time. The timer object is reset to avoid double-counting of
-        # elapsed time if a similar increment is applied in a derived
-        # class __init__.
-        self.runtime += self.timer.elapsed(reset=True)
-
 
 
     def uinit(self, ushape):
@@ -506,12 +500,6 @@ class TVL2Deconv(admm.ADMM):
         # Construct gradient operators in frequency domain
         self.Gf, self.GHGf = sl.GradientFilters(S.ndim, axes, self.axshp,
                                                 dtype=self.dtype)
-
-        # Increment `runtime` to reflect object initialisation
-        # time. The timer object is reset to avoid double-counting of
-        # elapsed time if a similar increment is applied in a derived
-        # class __init__.
-        self.runtime += self.timer.elapsed(reset=True)
 
 
 

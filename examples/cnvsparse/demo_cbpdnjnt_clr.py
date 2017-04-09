@@ -46,7 +46,7 @@ opt = cbpdn.ConvBPDN.Options({'Verbose' : True, 'MaxMainIter' : 200,
 # Initialise and run ConvBPDN object
 b = cbpdn.ConvBPDNJoint(D, sh, lmbda, mu, opt, dimK=0)
 X = b.solve()
-print("ConvBPDNJoint solve time: %.2fs" % b.runtime)
+print("ConvBPDNJoint solve time: %.2fs" % b.timer.elapsed('solve'))
 
 
 # Reconstruct representation

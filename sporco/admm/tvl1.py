@@ -185,12 +185,6 @@ class TVL1Denoise(admm.ADMM):
         # Need to initialise X because of Gauss-Seidel in xstep
         self.X = self.S
 
-        # Increment `runtime` to reflect object initialisation
-        # time. The timer object is reset to avoid double-counting of
-        # elapsed time if a similar increment is applied in a derived
-        # class __init__.
-        self.runtime += self.timer.elapsed(reset=True)
-
 
 
     def uinit(self, ushape):
@@ -533,12 +527,6 @@ class TVL1Deconv(admm.ADMM):
                                                 dtype=self.dtype)
         self.GAf = np.concatenate((self.Gf, self.Af[..., np.newaxis]),
                                   axis=self.Gf.ndim-1)
-
-        # Increment `runtime` to reflect object initialisation
-        # time. The timer object is reset to avoid double-counting of
-        # elapsed time if a similar increment is applied in a derived
-        # class __init__.
-        self.runtime += self.timer.elapsed(reset=True)
 
 
 

@@ -49,7 +49,7 @@ opt = bpdn.ElasticNet.Options({'Verbose' : True, 'MaxMainIter' : 500,
 # Initialise and run BPDN object
 b = bpdn.ElasticNet(D, s, lmbda, mu, opt)
 b.solve()
-print("ElasticNet solve time: %.2fs" % b.runtime)
+print("ElasticNet solve time: %.2fs" % b.timer.elapsed('solve'))
 
 
 # Plot results

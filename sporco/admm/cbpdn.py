@@ -287,7 +287,7 @@ class GenericConvBPDN(admm.ADMMEqual):
         """
 
         defaults = copy.deepcopy(admm.ADMMEqual.Options.defaults)
-        defaults.update({'AuxVarObj' : False,  'ReturnX' : False,
+        defaults.update({'AuxVarObj' : False, 'ReturnX' : False,
                          'HighMemSolve' : False, 'LinSolveCheck' : False,
                          'RelaxParam' : 1.8, 'NonNegCoef' : False,
                          'NoBndryCross' : False})
@@ -388,13 +388,6 @@ class GenericConvBPDN(admm.ADMMEqual):
                                           dtype=sl.complex_dtype(self.dtype))
 
         self.setdict()
-
-        # Increment `runtime` to reflect object initialisation
-        # time. The timer object is reset to avoid double-counting of
-        # elapsed time if a similar increment is applied in a derived
-        # class __init__.
-        self.runtime += self.timer.elapsed(reset=True)
-
 
 
 
@@ -1387,12 +1380,6 @@ class ConvTwoBlockCnstrnt(admm.ADMMTwoBlockCnstrnt):
 
         self.setdict()
 
-        # Increment `runtime` to reflect object initialisation
-        # time. The timer object is reset to avoid double-counting of
-        # elapsed time if a similar increment is applied in a derived
-        # class __init__.
-        self.runtime += self.timer.elapsed(reset=True)
-
 
 
     def setdict(self, D=None):
@@ -1934,7 +1921,7 @@ class AddMaskSim(object):
         # Call solve method of inner cbpdn object
         Xi = self.cbpdn.solve()
         # Copy attributes from inner cbpdn object
-        self.runtime = self.cbpdn.runtime
+        self.timer = self.cbpdn.timer
         self.itstat = self.cbpdn.itstat
         # Return result of inner cbpdn object with AMS component removed
         return Xi[self.index_primary()]

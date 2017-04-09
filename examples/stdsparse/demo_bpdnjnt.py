@@ -69,7 +69,7 @@ print('Minimum ℓ1 error: %5.2f at (𝜆,μ) = (%.2e, %.2e)' % (sfvl, lmbda, mu
 opt['Verbose'] = True
 b = bpdn.BPDNJoint(D, s, lmbda, mu, opt)
 b.solve()
-print("BPDNJoint solve time: %.2fs" % b.runtime)
+print("BPDNJoint solve time: %.2fs" % b.timer.elapsed('solve'))
 
 
 # Display recovery results

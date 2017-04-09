@@ -39,7 +39,7 @@ opt = tvl1.TVL1Deconv.Options({'Verbose' : True, 'MaxMainIter' : 200,
 # Initialise and run TVDeconv object
 b = tvl1.TVL1Deconv(np.ones((1,1)), imgn, lmbda, opt)
 imgr = b.solve()
-print("TVL1Deconv solve time: %.2fs" % b.runtime)
+print("TVL1Deconv solve time: %.2fs" % b.timer.elapsed('solve'))
 
 
 # Display test images

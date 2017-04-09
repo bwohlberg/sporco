@@ -37,7 +37,7 @@ opt = spline.SplineL1.Options({'Verbose' : True, 'gEvalY' : False})
 # Initialise and run SplineL1 object
 b = spline.SplineL1(imgn, lmbda, opt)
 imgr = b.solve()
-print("SplineL1 solve time: %.2fs" % b.runtime)
+print("SplineL1 solve time: %.2fs" % b.timer.elapsed('solve'))
 
 
 # Display input and result image

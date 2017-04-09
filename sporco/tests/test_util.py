@@ -114,3 +114,32 @@ class TestSet01(object):
         os.remove(ipth)
         os.rmdir(os.path.join(bpth, 'a'))
         os.rmdir(bpth)
+
+
+    def test_15(self):
+        t = util.Timer()
+        t.start()
+        t0 = t.elapsed()
+        t.stop()
+        t1 = t.elapsed()
+        assert(t0 >= 0.0)
+        assert(t1 >= t0)
+        assert(len(t.__str__()) > 0)
+
+
+    def test_16(self):
+        t = util.Timer()
+        t.start(['a', 'b'])
+        t.stop('a')
+        t.stop('b')
+        t.stop(['a', 'b'])
+        assert(t.elapsed('a') >= 0.0)
+        assert(t.elapsed('b') >= 0.0)
+        assert(t.elapsed('a', total=False) == 0.0)
+
+
+    def test_17(self):
+        t = util.Timer()
+        with util.ContextTimer(t):
+            t0 = t.elapsed()
+        assert(t.elapsed() >= 0.0)

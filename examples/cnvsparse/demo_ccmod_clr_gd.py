@@ -52,7 +52,7 @@ opt = ccmod.ConvCnstrMODOptions({'Verbose' : True, 'MaxMainIter' : 100,
                                   'rho' : 5.0})
 c = ccmod.ConvCnstrMOD(b.Y, sh, D0.shape, opt)
 c.solve()
-print("ConvCnstrMOD solve time: %.2fs" % c.runtime)
+print("ConvCnstrMOD solve time: %.2fs" % c.timer.elapsed('solve'))
 D1 = c.getdict().squeeze()
 
 

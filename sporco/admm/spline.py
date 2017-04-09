@@ -167,12 +167,6 @@ class SplineL1(admm.ADMM):
             self.Alpha += -2.0 + 2.0*np.cos(axn*np.pi/float(ashp[ax]))
         self.Gamma = 1.0 / (1.0 + (self.lmbda/self.rho)*(self.Alpha**2))
 
-        # Increment `runtime` to reflect object initialisation
-        # time. The timer object is reset to avoid double-counting of
-        # elapsed time if a similar increment is applied in a derived
-        # class __init__.
-        self.runtime += self.timer.elapsed(reset=True)
-
 
 
     def uinit(self, ushape):

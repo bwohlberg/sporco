@@ -51,7 +51,7 @@ ams = cbpdn.AddMaskSim(cbpdn.ConvBPDN, D, S, W, lmbda, opt=opt)
 
 # Call solve via wrapper
 X = ams.solve()
-print("AddMaskSim wrapped ConvBPDN solve time: %.2fs" % ams.runtime)
+print("AddMaskSim wrapped ConvBPDN solve time: %.2fs" % ams.timer.elapsed('solve'))
 
 
 # Reconstruct representation

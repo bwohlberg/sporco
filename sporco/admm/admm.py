@@ -64,19 +64,34 @@ def _module_name_nested(cls, nstnm='Options'):
 
 
 class _ADMM_Meta(type):
-    """Metaclass for ADMM class that handles intialisation of IterationStats
-    namedtuple and applies module_name_nested to class definitions to fix
-    problems with lookup of nested class definitions when using pickle.
+    """Metaclass for ADMM class that handles intialisation of
+    IterationStats namedtuple and applies module_name_nested to class
+    definitions to fix problems with lookup of nested class
+    definitions when using pickle. It is also responsible for stopping
+    the object initialisation timer at the end of initialisation.
     """
 
     def __init__(cls, *args):
 
         # Initialise named tuple type for recording ADMM iteration statistics
         cls.IterationStats = collections.namedtuple('IterationStats',
-                                cls.itstat_fields())
+                                                    cls.itstat_fields())
+        # Ensure that timer attribute has been initialised
+        cls.timer = util.Timer(['init', 'solve', 'solve_wo_func',
+                                'solve_wo_rsdl'])
         # Apply _module_name_nested function to class after creation
         _module_name_nested(cls)
 
+
+
+    def __call__(cls, *args, **kwargs):
+
+        # Initialise instance
+        instance = super(_ADMM_Meta, cls).__call__(*args, **kwargs)
+        # Stop initialisation timer
+        instance.timer.stop('init')
+        # Return instance
+        return instance
 
 
 
@@ -127,6 +142,15 @@ class ADMM(with_metaclass(_ADMM_Meta, object)):
         """ADMM algorithm options.
 
         Options:
+
+          ``FastSolve`` : Flag determining whether non-essential
+          computation is skipped. When ``FastSolve`` is ``True`` and
+          ``Verbose`` is ``False``, the functional value and related
+          iteration statistics are not computed. If ``FastSolve`` is
+          ``True`` and the ``AutoRho`` mechanism is disabled,
+          residuals are also not calculated, in which case the
+          residual-based stopping method is also disabled, with the
+          number of iterations determined only by ``MaxMainIter``.
 
           ``Verbose`` : Flag determining whether iteration status is
           displayed.
@@ -181,8 +205,9 @@ class ADMM(with_metaclass(_ADMM_Meta, object)):
             definitions are used instead of normalised residuals.
         """
 
-        defaults = {'Verbose' : False, 'StatusHeader' : True,
-                    'DataType' : None, 'MaxMainIter' : 1000,
+        defaults = {'FastSolve' : False, 'Verbose' : False,
+                    'StatusHeader' : True, 'DataType' : None,
+                    'MaxMainIter' : 1000,
                     'AbsStopTol' : 0.0, 'RelStopTol' : 1e-3,
                     'RelaxParam' : 1.0, 'rho' : None,
                     'AutoRho' :
@@ -224,6 +249,15 @@ class ADMM(with_metaclass(_ADMM_Meta, object)):
 
 
 
+    def __new__(cls, *args, **kwargs):
+        """Create an ADMM object and start its initialisation timer."""
+
+        instance = super(ADMM, cls).__new__(cls)
+        instance.timer.start('init')
+        return instance
+
+
+
     def __init__(self, Nx, yshape, ushape, dtype, opt=None):
         r"""
         Initialise an ADMM object with problem size and options.
@@ -246,12 +280,6 @@ class ADMM(with_metaclass(_ADMM_Meta, object)):
             opt = ADMM.Options()
         if not isinstance(opt, ADMM.Options):
             raise TypeError("Parameter opt must be an instance of ADMM.Options")
-
-        # Management of timing of object initialisation is the
-        # responsibility of derived classes. Timing of :meth:`solve`
-        # is managed by this class.
-        self.runtime = 0.0
-        self.timer = util.Timer()
 
         self.opt = opt
         self.Nx = Nx
@@ -377,14 +405,32 @@ class ADMM(with_metaclass(_ADMM_Meta, object)):
         If option ``Verbose`` is ``True``, the progress of the
         optimisation is displayed at every iteration. At termination
         of this method, attribute :attr:`itstat` is a list of tuples
-        representing statistics of each iteration.
+        representing statistics of each iteration, unless option
+        ``FastSolve`` is ``True`` and option ``Verbose`` is ``False``.
+
+        Attribute :attr:`timer` is an instance of :class:`.util.Timer`
+        that provides the following labelled timers:
+
+          ``init``: Time taken for object initialisation by
+          :meth:`__init__`
+
+          ``solve``: Total time taken by call(s) to :meth:`solve`
+
+          ``solve_wo_func``: Total time taken by call(s) to
+          :meth:`solve`, excluding time taken to compute functional
+          value and related iteration statistics
+
+          ``solve_wo_rsdl`` : Total time taken by call(s) to
+          :meth:`solve`, excluding time taken to compute functional
+          value and related iteration statistics as well as time take
+          to compute residuals and implemented ``AutoRho`` mechanism
         """
 
         # Open status display
         fmtstr, nsep = self.display_start()
 
-        # Reset timer
-        self.timer.start()
+        # Start solve timer
+        self.timer.start(['solve', 'solve_wo_func', 'solve_wo_rsdl'])
 
         # Main optimisation iterations
         for k in range(self.k, self.k + self.opt['MaxMainIter']):
@@ -405,37 +451,59 @@ class ADMM(with_metaclass(_ADMM_Meta, object)):
             self.ustep()
 
             # Compute residuals and stopping thresholds
-            r, s, epri, edua = self.compute_residuals()
+            self.timer.stop('solve_wo_rsdl')
+            if self.opt['AutoRho', 'Enabled'] or not self.opt['FastSolve']:
+                r, s, epri, edua = self.compute_residuals()
+            self.timer.start('solve_wo_rsdl')
 
-            # Compute and record other iteration statistics
-            itst = self.iteration_stats(k, r, s, epri, edua)
-            self.itstat.append(itst)
-
-            # Display iteration stats if Verbose option enabled
-            self.display_status(fmtstr, itst)
+            # Compute and record other iteration statistics and
+            # display iteration stats if Verbose option enabled
+            self.timer.stop(['solve_wo_func', 'solve_wo_rsdl'])
+            if not self.opt['FastSolve']:
+                itst = self.iteration_stats(k, r, s, epri, edua)
+                self.itstat.append(itst)
+                self.display_status(fmtstr, itst)
+            self.timer.start(['solve_wo_func', 'solve_wo_rsdl'])
 
             # Automatic rho adjustment
-            self.update_rho(k, r, s)
+            self.timer.stop('solve_wo_rsdl')
+            if self.opt['AutoRho', 'Enabled'] or not self.opt['FastSolve']:
+                self.update_rho(k, r, s)
+            self.timer.start('solve_wo_rsdl')
 
             # Call callback function if defined
             if self.opt['Callback'] is not None:
                 self.opt['Callback'](self, k)
 
             # Stop if residual-based stopping tolerances reached
-            if r < epri and s < edua:
-                break
+            if self.opt['AutoRho', 'Enabled'] or not self.opt['FastSolve']:
+                if r < epri and s < edua:
+                    break
 
-
-        # Record run time
-        self.runtime += self.timer.elapsed()
 
         # Record iteration count
         self.k = k+1
+
+        # Record solve time
+        self.timer.stop(['solve', 'solve_wo_func', 'solve_wo_rsdl'])
 
         # Print final separator string if Verbose option enabled
         self.display_end(nsep)
 
         return self.getmin()
+
+
+
+    @property
+    def runtime(self):
+        """Transitional property providing access to the new timer
+        mechanism. This will be removed in the future.
+        """
+
+        warnings.warn("admm.ADMM.runtime attribute has been replaced by "\
+            "an upgraded timer class: please see the documentation for "\
+            "admm.ADMM.solve method and util.Timer class")
+        return self.timer.elapsed('init') + self.timer.elapsed('solve')
 
 
 
@@ -558,7 +626,7 @@ class ADMM(with_metaclass(_ADMM_Meta, object)):
     def iteration_stats(self, k, r, s, epri, edua):
         """Construct iteration stats record tuple."""
 
-        tk = self.timer.elapsed()
+        tk = self.timer.elapsed('solve')
         tpl = (k,) + self.eval_objfn() + (r, s, epri, edua, self.rho) +\
               self.itstat_extra() + (tk,)
         return type(self).IterationStats(*tpl)

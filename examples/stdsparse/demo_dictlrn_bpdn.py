@@ -65,7 +65,7 @@ dstep = cmod.CnstrMOD(None, S, (D0.shape[1], S.shape[1]), optd)
 opt = dictlrn.DictLearn.Options({'Verbose' : True, 'MaxMainIter' : 100})
 d = dictlrn.DictLearn(xstep, dstep, opt)
 Dmx = d.solve()
-print("DictLearn solve time: %.2fs" % d.runtime)
+print("DictLearn solve time: %.2fs" % d.timer.elapsed('solve'))
 
 
 # Display dictionaries

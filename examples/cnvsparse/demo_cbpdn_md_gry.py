@@ -48,7 +48,7 @@ opt = cbpdn.ConvBPDNMaskDcpl.Options({'Verbose' : True, 'MaxMainIter' : 500,
 # Initialise and run ConvBPDNMaskDcpl object
 b = cbpdn.ConvBPDNMaskDcpl(D, S, lmbda, W, opt)
 X = b.solve()
-print("ConvBPDNMaskDcpl solve time: %.2fs" % b.runtime)
+print("ConvBPDNMaskDcpl solve time: %.2fs" % b.timer.elapsed('solve'))
 
 # Reconstruct representation
 Sr = b.reconstruct().squeeze()

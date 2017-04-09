@@ -45,7 +45,7 @@ opt = cbpdn.ConvElasticNet.Options({'Verbose' : True, 'MaxMainIter' : 250,
 # Initialise and run ConvBPDN object
 b = cbpdn.ConvElasticNet(D, sh, lmbda, mu, opt)
 X = b.solve()
-print("ConvElasticNet solve time: %.2fs" % b.runtime)
+print("ConvElasticNet solve time: %.2fs" % b.timer.elapsed('solve'))
 
 
 # Reconstruct representation

@@ -38,7 +38,7 @@ opt = tvl2.TVL2Denoise.Options({'Verbose' : True, 'MaxMainIter' : 200,
 # Initialise and run TVL2Denoise object
 b = tvl2.TVL2Denoise(imgn, lmbda, opt)
 imgr = b.solve()
-print("TVL2Denoise solve time: %.2fs" % b.runtime)
+print("TVL2Denoise solve time: %.2fs" % b.timer.elapsed('solve'))
 
 
 # Display test images

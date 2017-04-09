@@ -47,7 +47,7 @@ opt = bpdn.BPDN.Options({'Verbose' : True, 'MaxMainIter' : 200,
                          'RelStopTol' : 1e-3})
 b = bpdn.BPDN(D0, S, lmbda, opt)
 b.solve()
-print("BPDN solve time: %.2fs\n" % b.runtime)
+print("BPDN solve time: %.2fs\n" % b.timer.elapsed('solve'))
 
 
 # Update dictionary for training set S
@@ -55,7 +55,7 @@ opt = cmod.CnstrMOD.Options({'Verbose' : True, 'MaxMainIter' : 100,
                              'RelStopTol' : 1e-3, 'rho' : 4e2})
 c = cmod.CnstrMOD(b.Y, S, None, opt)
 c.solve()
-print("CMOD solve time: %.2fs" % c.runtime)
+print("CMOD solve time: %.2fs" % c.timer.elapsed('solve'))
 
 
 # Display dictionaries

@@ -51,7 +51,7 @@ opt = cbpdn.ConvBPDNGradReg.Options({'Verbose' : True, 'MaxMainIter' : 200,
 # Initialise and run ConvBPDNGradReg object
 b = cbpdn.ConvBPDNGradReg(D, img, lmbda, mu, opt)
 X = b.solve()
-print("ConvBPDNGradReg solve time: %.2fs" % b.runtime)
+print("ConvBPDNGradReg solve time: %.2fs" % b.timer.elapsed('solve'))
 
 # Reconstruct representation
 imgr = b.reconstruct().squeeze()

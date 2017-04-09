@@ -76,7 +76,7 @@ opt = cbpdndl.ConvBPDNDictLearn.Options({'Verbose' : True, 'MaxMainIter' : 200,
 # Run optimisation
 d = cbpdndl.ConvBPDNDictLearn(D0, vh, lmbda, opt, dimK=0, dimN=3)
 D1 = d.solve()
-print("ConvBPDNDictLearn solve time: %.2fs" % d.runtime)
+print("ConvBPDNDictLearn solve time: %.2fs" % d.timer.elapsed('solve'))
 
 
 # Display central temporal slice (index 2) of dictionaries

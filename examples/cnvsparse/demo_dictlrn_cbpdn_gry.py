@@ -81,7 +81,7 @@ dstep = ccmod.ConvCnstrMOD(None, sh, D0.shape, optd)
 opt = dictlrn.DictLearn.Options({'Verbose' : True, 'MaxMainIter' : 100})
 d = dictlrn.DictLearn(xstep, dstep, opt)
 D1 = d.solve()
-print("DictLearn solve time: %.2fs" % d.runtime, "\n")
+print("DictLearn solve time: %.2fs" % d.timer.elapsed('solve'), "\n")
 
 
 # Display dictionaries

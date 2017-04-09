@@ -51,7 +51,7 @@ opt = cbpdndl.ConvBPDNDictLearn.Options({'Verbose' : True, 'MaxMainIter' : 200,
 # Run optimisation
 d = cbpdndl.ConvBPDNDictLearn(D0, sh, lmbda, opt)
 D1 = d.solve()
-print("ConvBPDNDictLearn solve time: %.2fs" % d.runtime, "\n")
+print("ConvBPDNDictLearn solve time: %.2fs" % d.timer.elapsed('solve'), "\n")
 
 
 # Display dictionaries

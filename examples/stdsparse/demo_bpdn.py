@@ -63,7 +63,7 @@ print('Minimum ℓ1 error: %5.2f at 𝜆 = %.2e' % (sfvl, lmbda))
 opt['Verbose'] = True
 b = bpdn.BPDN(D, s, lmbda, opt)
 b.solve()
-print("BPDN solve time: %.2fs" % b.runtime)
+print("BPDN solve time: %.2fs" % b.timer.elapsed('solve'))
 
 
 # Plot results

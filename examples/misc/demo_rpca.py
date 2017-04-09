@@ -34,7 +34,7 @@ opt = rpca.RobustPCA.Options({'Verbose' : True, 'gEvalY' : False,
                               'AutoRho' : {'Enabled' : True}})
 b = rpca.RobustPCA(S1, None, opt)
 X, Y = b.solve()
-print("RobustPCA solve time: %.2fs" % b.runtime)
+print("RobustPCA solve time: %.2fs" % b.timer.elapsed('solve'))
 print(" low rank error (l2): %.2e" % np.linalg.norm(S0 - X))
 
 

@@ -142,12 +142,6 @@ class RobustPCA(admm.ADMM):
 
         self.S = np.asarray(S, dtype=self.dtype)
 
-        # Increment `runtime` to reflect object initialisation
-        # time. The timer object is reset to avoid double-counting of
-        # elapsed time if a similar increment is applied in a derived
-        # class __init__.
-        self.runtime += self.timer.elapsed(reset=True)
-
 
 
     def uinit(self, ushape):
