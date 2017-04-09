@@ -129,11 +129,13 @@ class TestSet01(object):
         s = np.random.randn(N, N)
         lmbda = 1e-1
         try:
-            b = cbpdn.ConvBPDN(D, s, lmbda)
+            opt = cbpdn.ConvBPDN.Options({'LinSolveCheck' : True})
+            b = cbpdn.ConvBPDN(D, s, lmbda, opt=opt)
             b.solve()
         except Exception as e:
             print(e)
             assert(0)
+        assert(np.array(b.getitstat().XSlvRelRes).max() < 1e-5)
 
 
     def test_09(self):
@@ -165,7 +167,6 @@ class TestSet01(object):
         rho = 1e-1
         opt = cbpdn.ConvBPDN.Options({'Verbose' : False, 'MaxMainIter' : 500,
                                       'RelStopTol' : 1e-3, 'rho' : rho,
-                                      'LinSolveCheck' : True,
                                       'AutoRho' : {'Enabled' : False}})
         b = cbpdn.ConvBPDN(D, S, lmbda, opt)
         b.solve()
@@ -208,11 +209,13 @@ class TestSet01(object):
         s = np.random.randn(N, N, Cs)
         lmbda = 1e-1
         try:
-            b = cbpdn.ConvBPDN(D, s, lmbda, dimK=0)
+            opt = cbpdn.ConvBPDN.Options({'LinSolveCheck' : True})
+            b = cbpdn.ConvBPDN(D, s, lmbda, opt=opt, dimK=0)
             b.solve()
         except Exception as e:
             print(e)
             assert(0)
+        assert(np.array(b.getitstat().XSlvRelRes).max() < 1e-5)
 
 
     def test_13(self):

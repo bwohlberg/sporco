@@ -10,9 +10,9 @@
 from __future__ import division
 from __future__ import absolute_import
 
+import copy
 import numpy as np
 from scipy import linalg
-import copy
 
 from sporco.admm import admm
 import sporco.linalg as sl
@@ -21,14 +21,14 @@ __author__ = """Brendt Wohlberg <brendt@ieee.org>"""
 
 
 class CnstrMOD(admm.ADMMEqual):
-    """ADMM algorithm for a constrained variant of the Method of Optimal
+    r"""ADMM algorithm for a constrained variant of the Method of Optimal
     Directions (MOD) :cite:`engan-1999-method` problem, referred to here
     as Constrained MOD (CMOD).
 
     Solve the optimisation problem
 
     .. math::
-       \mathrm{argmin}_D \| D X - S \|_2^2 \quad \\text{such that}
+       \mathrm{argmin}_D \| D X - S \|_2^2 \quad \text{such that}
        \quad \| \mathbf{d}_m \|_2 = 1 \;\;,
 
     where :math:`\mathbf{d}_m` is column :math:`m` of matrix :math:`D`,
@@ -36,7 +36,7 @@ class CnstrMOD(admm.ADMMEqual):
 
     .. math::
        \mathrm{argmin}_D \| D X - S \|_2^2 + \iota_C(G) \quad
-       \\text{such that} \quad D = G \;\;,
+       \text{such that} \quad D = G \;\;,
 
     where :math:`\iota_C(\cdot)` is the indicator function of feasible
     set :math:`C` consisting of matrices with unit-norm columns.
@@ -86,7 +86,7 @@ class CnstrMOD(admm.ADMMEqual):
 
         defaults = copy.deepcopy(admm.ADMMEqual.Options.defaults)
         defaults.update({'AuxVarObj' : True, 'ReturnX' : False,
-                        'RelaxParam' : 1.8, 'ZeroMean' : False})
+                         'RelaxParam' : 1.8, 'ZeroMean' : False})
         defaults['AutoRho'].update({'Enabled' : True})
 
 
@@ -97,8 +97,8 @@ class CnstrMOD(admm.ADMMEqual):
                 opt = {}
             admm.ADMMEqual.Options.__init__(self, opt)
 
-            if self['AutoRho','RsdlTarget'] is None:
-                self['AutoRho','RsdlTarget'] = 1.0
+            if self['AutoRho', 'RsdlTarget'] is None:
+                self['AutoRho', 'RsdlTarget'] = 1.0
 
 
 
@@ -150,7 +150,7 @@ class CnstrMOD(admm.ADMMEqual):
             Nm = dsz[0]
         else:
             Nm = A.shape[0]
-        super(CnstrMOD, self).__init__((Nc,Nm), S.dtype, opt)
+        super(CnstrMOD, self).__init__((Nc, Nm), S.dtype, opt)
 
         # Set penalty parameter
         self.set_attr('rho', opt['rho'], dval=S.shape[1] / 500.0,
@@ -204,7 +204,9 @@ class CnstrMOD(admm.ADMMEqual):
 
 
     def xstep(self):
-        """Minimise Augmented Lagrangian with respect to :math:`\mathbf{x}`."""
+        r"""Minimise Augmented Lagrangian with respect to
+        :math:`\mathbf{x}`.
+        """
 
         self.X = np.asarray(sl.lu_solve_AATI(self.A, self.rho, self.SAT +
                             self.rho*(self.Y - self.U), self.lu, self.piv,),
@@ -213,7 +215,9 @@ class CnstrMOD(admm.ADMMEqual):
 
 
     def ystep(self):
-        """Minimise Augmented Lagrangian with respect to :math:`\mathbf{y}`."""
+        r"""Minimise Augmented Lagrangian with respect to
+        :math:`\mathbf{y}`.
+        """
 
         self.Y = self.Pcn(self.AX + self.U)
 
@@ -231,7 +235,7 @@ class CnstrMOD(admm.ADMMEqual):
 
 
     def obfn_dfd(self):
-        """Compute data fidelity term :math:`(1/2) \| D \mathbf{x} -
+        r"""Compute data fidelity term :math:`(1/2) \| D \mathbf{x} -
         \mathbf{s} \|_2^2`.
         """
 
@@ -240,7 +244,7 @@ class CnstrMOD(admm.ADMMEqual):
 
 
     def obfn_cns(self):
-        """Compute constraint violation measure :math:`\| P(\mathbf{y}) -
+        r"""Compute constraint violation measure :math:`\| P(\mathbf{y}) -
         \mathbf{y}\|_2`.
         """
 

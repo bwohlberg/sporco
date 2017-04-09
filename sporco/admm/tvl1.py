@@ -5,16 +5,16 @@
 # and user license can be found in the 'LICENSE.txt' file distributed
 # with the package.
 
-"""Classes for ADMM algorithms for Total Variation (TV) optimisation with
-an :math:`\ell_1` data fidelity term"""
+r"""Classes for ADMM algorithms for Total Variation (TV) optimisation
+with an :math:`\ell_1` data fidelity term"""
 
 from __future__ import division
 from __future__ import absolute_import
 from builtins import range
 
+import copy
 import numpy as np
 from scipy import linalg
-import copy
 
 from sporco.admm import admm
 import sporco.linalg as sl
@@ -23,7 +23,7 @@ __author__ = """Brendt Wohlberg <brendt@ieee.org>"""
 
 
 class TVL1Denoise(admm.ADMM):
-    """ADMM algorithm for :math:`\ell_1`-TV denoising problem
+    r"""ADMM algorithm for :math:`\ell_1`-TV denoising problem
     :cite:`alliney-1992-digital` :cite:`esser-2010-primal` (Sec. 2.4.4).
 
     Solve the optimisation problem
@@ -31,21 +31,21 @@ class TVL1Denoise(admm.ADMM):
     .. math::
        \mathrm{argmin}_\mathbf{x} \;
         \| W_{\mathrm{df}}  (\mathbf{x} - \mathbf{s}) \|_1 +
-             \lambda \\left\| W_{\mathrm{tv}} \sqrt{(G_r \mathbf{x})^2 +
-             (G_c \mathbf{x})^2} \\right\|_1
+             \lambda \left\| W_{\mathrm{tv}} \sqrt{(G_r \mathbf{x})^2 +
+             (G_c \mathbf{x})^2} \right\|_1
 
     via the ADMM problem
 
     .. math::
        \mathrm{argmin}_{\mathbf{x},\mathbf{y}_d,\mathbf{y}_r,\mathbf{y}_c} \;
        (1/2) \| W_{\mathrm{df}} \mathbf{y}_d \|_1 +
-             \lambda \\left\| W_{\mathrm{tv}} \sqrt{(\mathbf{y}_r)^2 +
-             (\mathbf{y}_c)^2} \\right\|_1 \;\\text{such that}\;
-       \\left( \\begin{array}{c} G_r \\\\ G_c \\\\ I \\end{array} \\right)
-       \mathbf{x}  - \\left( \\begin{array}{c} \mathbf{y}_r \\\\
-       \mathbf{y}_c \\\\ \mathbf{y}_d \\end{array}
-       \\right) = \\left( \\begin{array}{c} \mathbf{0} \\\\ \mathbf{0} \\\\
-       \mathbf{s} \\end{array} \\right) \;\;.
+             \lambda \left\| W_{\mathrm{tv}} \sqrt{(\mathbf{y}_r)^2 +
+             (\mathbf{y}_c)^2} \right\|_1 \;\text{such that}\;
+       \left( \begin{array}{c} G_r \\ G_c \\ I \end{array} \right)
+       \mathbf{x}  - \left( \begin{array}{c} \mathbf{y}_r \\
+       \mathbf{y}_c \\ \mathbf{y}_d \end{array}
+       \right) = \left( \begin{array}{c} \mathbf{0} \\ \mathbf{0} \\
+       \mathbf{s} \end{array} \right) \;\;.
 
     After termination of the :meth:`solve` method, attribute :attr:`itstat` is
     a list of tuples representing statistics of each iteration. The
@@ -120,8 +120,8 @@ class TVL1Denoise(admm.ADMM):
                 opt = {}
             admm.ADMM.Options.__init__(self, opt)
 
-            if self['AutoRho','RsdlTarget'] is None:
-                self['AutoRho','RsdlTarget'] = 1.0
+            if self['AutoRho', 'RsdlTarget'] is None:
+                self['AutoRho', 'RsdlTarget'] = 1.0
 
 
 
@@ -132,7 +132,7 @@ class TVL1Denoise(admm.ADMM):
 
 
 
-    def __init__(self, S, lmbda, opt=None, axes=(0,1), caxis=None):
+    def __init__(self, S, lmbda, opt=None, axes=(0, 1), caxis=None):
         """
         Initialise a TVL1Denoise object with problem parameters.
 
@@ -164,7 +164,7 @@ class TVL1Denoise(admm.ADMM):
         if caxis is None:
             self.saxes = (-1,)
         else:
-            self.saxes = (caxis,-1)
+            self.saxes = (caxis, -1)
         self.lmbda = self.dtype.type(lmbda)
 
         # Set penalty parameter
@@ -178,7 +178,7 @@ class TVL1Denoise(admm.ADMM):
         self.lcw = self.LaplaceCentreWeight()
         self.Wtv = np.asarray(self.opt['TVWeight'], dtype=self.dtype)
         if hasattr(self.Wtv, 'ndim') and self.Wtv.ndim == S.ndim:
-            self.Wtvna = self.Wtv[...,np.newaxis]
+            self.Wtvna = self.Wtv[..., np.newaxis]
         else:
             self.Wtvna = self.Wtv
 
@@ -194,7 +194,7 @@ class TVL1Denoise(admm.ADMM):
 
 
     def uinit(self, ushape):
-        """Return initialiser for working variable U"""
+        """Return initialiser for working variable U."""
 
         if  self.opt['Y0'] is None:
             return np.zeros(ushape, dtype=self.dtype)
@@ -202,22 +202,24 @@ class TVL1Denoise(admm.ADMM):
             # If initial Y is non-zero, initial U is chosen so that
             # the relevant dual optimality criterion (see (3.10) in
             # boyd-2010-distributed) is satisfied.
-            Yss = np.sqrt(np.sum(self.Y[...,0:-1]**2, axis=self.S.ndim,
-                        keepdims=True))
-            U0 = (self.lmbda/self.rho)*sl.zdivide(self.Y[...,0:-1], Yss)
-            U1 = (1.0 / self.rho)*np.sign(self.Y[...,-1:])
+            Yss = np.sqrt(np.sum(self.Y[..., 0:-1]**2, axis=self.S.ndim,
+                                 keepdims=True))
+            U0 = (self.lmbda/self.rho)*sl.zdivide(self.Y[..., 0:-1], Yss)
+            U1 = (1.0 / self.rho)*np.sign(self.Y[..., -1:])
             return np.concatenate((U0, U1), axis=self.S.ndim)
 
 
 
     def xstep(self):
-        """Minimise Augmented Lagrangian with respect to :math:`\mathbf{x}`."""
+        r"""Minimise Augmented Lagrangian with respect to
+        :math:`\mathbf{x}`.
+        """
 
         ngsit = 0
         gsrrs = np.inf
         YU = self.Y - self.U
-        SYU = self.S + YU[...,-1]
-        YU[...,-1] = 0.0
+        SYU = self.S + YU[..., -1]
+        YU[..., -1] = 0.0
         ATYU = self.cnst_AT(YU)
         while gsrrs > self.opt['GSTol'] and ngsit < self.opt['MaxGSIter']:
             self.X = self.GaussSeidelStep(
@@ -233,12 +235,14 @@ class TVL1Denoise(admm.ADMM):
 
 
     def ystep(self):
-        """Minimise Augmented Lagrangian with respect to :math:`\mathbf{y}`."""
+        r"""Minimise Augmented Lagrangian with respect to
+        :math:`\mathbf{y}`.
+        """
 
-        self.Y[...,0:-1] = sl.shrink2(self.AX[...,0:-1] + self.U[...,0:-1],
+        self.Y[..., 0:-1] = sl.shrink2(self.AX[..., 0:-1] + self.U[..., 0:-1],
                         (self.lmbda/self.rho)*self.Wtvna, axis=self.saxes)
-        self.Y[...,-1] = sl.shrink1(self.AX[...,-1] + self.U[...,-1] - self.S,
-                                (1.0/self.rho)*self.Wdf)
+        self.Y[..., -1] = sl.shrink1(self.AX[..., -1] + self.U[..., -1] -
+                                     self.S, (1.0/self.rho)*self.Wdf)
 
 
 
@@ -255,7 +259,7 @@ class TVL1Denoise(admm.ADMM):
 
 
     def eval_objfn(self):
-        """Compute components of objective function as well as total
+        r"""Compute components of objective function as well as total
         contribution to objective function. Data fidelity term is
         :math:`(1/2) \| \mathbf{x} - \mathbf{s} \|_2^2` and
         regularisation term is :math:`\| W_{\mathrm{tv}}
@@ -263,8 +267,8 @@ class TVL1Denoise(admm.ADMM):
         """
 
         gvr = self.obfn_gvar()
-        dfd = np.sum(np.abs(self.Wdf * gvr[...,-1]))
-        reg = np.sum(self.Wtv * np.sqrt(np.sum(gvr[...,0:-1]**2,
+        dfd = np.sum(np.abs(self.Wdf * gvr[..., -1]))
+        reg = np.sum(self.Wtv * np.sqrt(np.sum(gvr[..., 0:-1]**2,
                                                axis=self.saxes)))
         obj = dfd + self.lmbda*reg
         return (obj, dfd, reg)
@@ -279,32 +283,32 @@ class TVL1Denoise(admm.ADMM):
 
 
     def cnst_A(self, X):
-        """Compute :math:`A \mathbf{x}` component of ADMM problem constraint.
-        In this case
-        :math:`A \mathbf{x} = (G_r^T \;\; G_c^T \;\; I)^T \mathbf{x}`.
+        r"""Compute :math:`A \mathbf{x}` component of ADMM problem
+        constraint. In this case :math:`A \mathbf{x} = (G_r^T \;\; G_c^T
+        \;\; I)^T \mathbf{x}`.
         """
 
         return np.concatenate(
-            [sl.Gax(X, ax)[...,np.newaxis] for ax in self.axes] +
-            [X[...,np.newaxis],], axis=X.ndim)
+            [sl.Gax(X, ax)[..., np.newaxis] for ax in self.axes] +
+            [X[..., np.newaxis],], axis=X.ndim)
 
 
 
     def cnst_AT(self, X):
-        """Compute :math:`A^T \mathbf{x}` where :math:`A \mathbf{x}` is
+        r"""Compute :math:`A^T \mathbf{x}` where :math:`A \mathbf{x}` is
         a component of ADMM problem constraint. In this case
         :math:`A^T \mathbf{x} = (G_r^T \;\; G_c^T \;\; I) \mathbf{x}`.
         """
 
         return np.sum(np.concatenate(
-            [sl.GTax(X[...,ax], ax)[...,np.newaxis] for ax in self.axes] +
-            [X[...,-1:],], axis=X.ndim-1), axis=X.ndim-1)
+            [sl.GTax(X[..., ax], ax)[..., np.newaxis] for ax in self.axes] +
+            [X[..., -1:],], axis=X.ndim-1), axis=X.ndim-1)
 
 
 
     def cnst_B(self, Y):
-        """Compute :math:`B \mathbf{y}` component of ADMM problem constraint.
-        In this case :math:`B \mathbf{y} = -\mathbf{y}`.
+        r"""Compute :math:`B \mathbf{y}` component of ADMM problem
+        constraint.  In this case :math:`B \mathbf{y} = -\mathbf{y}`.
         """
 
         return -Y
@@ -312,13 +316,13 @@ class TVL1Denoise(admm.ADMM):
 
 
     def cnst_c(self):
-        """Compute constant component :math:`\mathbf{c}` of ADMM problem
-        constraint. In this case
-        :math:`\mathbf{c} = (\mathbf{0} \;\; \mathbf{0} \;\; \mathbf{s})`.
+        r"""Compute constant component :math:`\mathbf{c}` of ADMM problem
+        constraint. In this case :math:`\mathbf{c} = (\mathbf{0} \;\;
+        \mathbf{0} \;\; \mathbf{s})`.
         """
 
         c = np.zeros(self.S.shape + (len(self.axes)+1,), self.dtype)
-        c[...,-1] = self.S
+        c[..., -1] = self.S
         return c
 
 
@@ -338,25 +342,26 @@ class TVL1Denoise(admm.ADMM):
 
 
     def LaplaceCentreWeight(self):
-        """Centre weighting matrix for TV Laplacian"""
+        """Centre weighting matrix for TV Laplacian."""
 
         sz = [1,] * self.S.ndim
         for ax in self.axes:
             sz[ax] = self.S.shape[ax]
         lcw = 2*len(self.axes)*np.ones(sz, dtype=self.dtype)
         for ax in self.axes:
-            lcw[(slice(None),)*ax + ((0,-1),)] -= 1.0
+            lcw[(slice(None),)*ax + ((0, -1),)] -= 1.0
         return lcw
 
 
 
     def GaussSeidelStep(self, S, X, ATYU, rho, lcw, W2):
-        """Gauss-Seidel step for linear system in TV problem"""
+        """Gauss-Seidel step for linear system in TV problem."""
 
         Xss = np.zeros_like(S, dtype=self.dtype)
         for ax in self.axes:
-            Xss += sl.zpad(X[(slice(None),)*ax + (slice(0,-1),)], (1,0), ax)
-            Xss += sl.zpad(X[(slice(None),)*ax + (slice(1,None),)], (0,1), ax)
+            Xss += sl.zpad(X[(slice(None),)*ax + (slice(0, -1),)], (1, 0), ax)
+            Xss += sl.zpad(X[(slice(None),)*ax + (slice(1, None),)],
+                           (0, 1), ax)
         return (rho*(Xss + ATYU) + W2*S) / (W2 + rho*lcw)
 
 
@@ -364,15 +369,15 @@ class TVL1Denoise(admm.ADMM):
 
 
 class TVL1Deconv(admm.ADMM):
-    """ADMM algorithm for :math:`\ell_1`-TV deconvolution problem.
+    r"""ADMM algorithm for :math:`\ell_1`-TV deconvolution problem.
 
     Solve the optimisation problem
 
     .. math::
        \mathrm{argmin}_\mathbf{x} \;
        \| W_{\mathrm{df}} (H \mathbf{x} - \mathbf{s}) \|_1 +
-       \lambda \\left\| W_{\mathrm{tv}} \sqrt{(G_r \mathbf{x})^2 +
-       (G_c \mathbf{x})^2} \\right\|_1 \;\;,
+       \lambda \left\| W_{\mathrm{tv}} \sqrt{(G_r \mathbf{x})^2 +
+       (G_c \mathbf{x})^2} \right\|_1 \;\;,
 
     where :math:`H` denotes the linear operator corresponding to a
     convolution, via the ADMM problem
@@ -380,13 +385,13 @@ class TVL1Deconv(admm.ADMM):
     .. math::
        \mathrm{argmin}_{\mathbf{x},\mathbf{y}_d,\mathbf{y}_r,\mathbf{y}_c} \;
        (1/2) \| W_{\mathrm{df}} \mathbf{y}_d \|_1 +
-             \lambda \\left\| W_{\mathrm{tv}} \sqrt{(\mathbf{y}_r)^2 +
-             (\mathbf{y}_c)^2} \\right\|_1 \;\\text{such that}\;
-       \\left( \\begin{array}{c} G_r \\\\ G_c \\\\ H \\end{array} \\right)
-       \mathbf{x}  - \\left( \\begin{array}{c} \mathbf{y}_r \\\\
-       \mathbf{y}_c \\\\ \mathbf{y}_d \\end{array}
-       \\right) = \\left( \\begin{array}{c} \mathbf{0} \\\\ \mathbf{0} \\\\
-       \mathbf{s} \\end{array} \\right) \;\;.
+             \lambda \left\| W_{\mathrm{tv}} \sqrt{(\mathbf{y}_r)^2 +
+             (\mathbf{y}_c)^2} \right\|_1 \;\text{such that}\;
+       \left( \begin{array}{c} G_r \\ G_c \\ H \end{array} \right)
+       \mathbf{x}  - \left( \begin{array}{c} \mathbf{y}_r \\
+       \mathbf{y}_c \\ \mathbf{y}_d \end{array}
+       \right) = \left( \begin{array}{c} \mathbf{0} \\ \mathbf{0} \\
+       \mathbf{s} \end{array} \right) \;\;.
 
     After termination of the :meth:`solve` method, attribute :attr:`itstat` is
     a list of tuples representing statistics of each iteration. The
@@ -454,8 +459,8 @@ class TVL1Deconv(admm.ADMM):
                 opt = {}
             admm.ADMM.Options.__init__(self, opt)
 
-            if self['AutoRho','RsdlTarget'] is None:
-                self['AutoRho','RsdlTarget'] = 1.0
+            if self['AutoRho', 'RsdlTarget'] is None:
+                self['AutoRho', 'RsdlTarget'] = 1.0
 
 
 
@@ -466,7 +471,7 @@ class TVL1Deconv(admm.ADMM):
 
 
 
-    def __init__(self, A, S, lmbda, opt=None, axes=(0,1), caxis=None):
+    def __init__(self, A, S, lmbda, opt=None, axes=(0, 1), caxis=None):
         """
         Initialise a TVL1Deconv object with problem parameters.
 
@@ -499,7 +504,7 @@ class TVL1Deconv(admm.ADMM):
         if caxis is None:
             self.saxes = (-1,)
         else:
-            self.saxes = (caxis,-1)
+            self.saxes = (caxis, -1)
         self.lmbda = self.dtype.type(lmbda)
 
         # Set penalty parameter
@@ -520,13 +525,13 @@ class TVL1Deconv(admm.ADMM):
         self.Wdf = np.asarray(self.opt['DFidWeight'], dtype=self.dtype)
         self.Wtv = np.asarray(self.opt['TVWeight'], dtype=self.dtype)
         if hasattr(self.Wtv, 'ndim') and self.Wtv.ndim == S.ndim:
-            self.Wtvna = self.Wtv[...,np.newaxis]
+            self.Wtvna = self.Wtv[..., np.newaxis]
         else:
             self.Wtvna = self.Wtv
 
         self.Gf, self.GHGf = sl.GradientFilters(S.ndim, axes, self.axshp,
                                                 dtype=self.dtype)
-        self.GAf = np.concatenate((self.Gf, self.Af[...,np.newaxis]),
+        self.GAf = np.concatenate((self.Gf, self.Af[..., np.newaxis]),
                                   axis=self.Gf.ndim-1)
 
         # Increment `runtime` to reflect object initialisation
@@ -538,7 +543,7 @@ class TVL1Deconv(admm.ADMM):
 
 
     def uinit(self, ushape):
-        """Return initialiser for working variable U"""
+        """Return initialiser for working variable U."""
 
         if  self.opt['Y0'] is None:
             return np.zeros(ushape, dtype=self.dtype)
@@ -546,16 +551,18 @@ class TVL1Deconv(admm.ADMM):
             # If initial Y is non-zero, initial U is chosen so that
             # the relevant dual optimality criterion (see (3.10) in
             # boyd-2010-distributed) is satisfied.
-            Yss = np.sqrt(np.sum(self.Y[...,0:-1]**2, axis=self.S.ndim,
+            Yss = np.sqrt(np.sum(self.Y[..., 0:-1]**2, axis=self.S.ndim,
                         keepdims=True))
-            U0 = (self.lmbda/self.rho)*sl.zdivide(self.Y[...,0:-1], Yss)
-            U1 = (1.0 / self.rho)*np.sign(self.Y[...,-1:])
+            U0 = (self.lmbda/self.rho)*sl.zdivide(self.Y[..., 0:-1], Yss)
+            U1 = (1.0 / self.rho)*np.sign(self.Y[..., -1:])
             return np.concatenate((U0, U1), axis=self.S.ndim)
 
 
 
     def xstep(self):
-        """Minimise Augmented Lagrangian with respect to :math:`\mathbf{x}`."""
+        r"""Minimise Augmented Lagrangian with respect to
+        :math:`\mathbf{x}`.
+        """
 
         b = self.AHSf + np.sum(np.conj(self.GAf) *
             sl.rfftn(self.Y-self.U, axes=self.axes), axis=self.Y.ndim-1)
@@ -571,12 +578,14 @@ class TVL1Deconv(admm.ADMM):
 
 
     def ystep(self):
-        """Minimise Augmented Lagrangian with respect to :math:`\mathbf{y}`."""
+        r"""Minimise Augmented Lagrangian with respect to
+        :math:`\mathbf{y}`.
+        """
 
-        self.Y[...,0:-1] = sl.shrink2(self.AX[...,0:-1] + self.U[...,0:-1],
+        self.Y[..., 0:-1] = sl.shrink2(self.AX[..., 0:-1] + self.U[..., 0:-1],
                         (self.lmbda/self.rho)*self.Wtvna, axis=self.saxes)
-        self.Y[...,-1] = sl.shrink1(self.AX[...,-1] + self.U[...,-1] - self.S,
-                                (1.0/self.rho)*self.Wdf)
+        self.Y[..., -1] = sl.shrink1(self.AX[..., -1] + self.U[..., -1] -
+                                    self.S, (1.0/self.rho)*self.Wdf)
 
 
 
@@ -593,7 +602,7 @@ class TVL1Deconv(admm.ADMM):
 
 
     def eval_objfn(self):
-        """Compute components of objective function as well as total
+        r"""Compute components of objective function as well as total
         contribution to objective function.  Data fidelity term is
         :math:`\| W_{\mathrm{df}} (H \mathbf{x} - \mathbf{s}) \|_1` and
         regularisation term is :math:`\| W_{\mathrm{tv}}
@@ -601,8 +610,8 @@ class TVL1Deconv(admm.ADMM):
         """
 
         gvr = self.obfn_gvar()
-        dfd = np.sum(self.Wdf * np.abs(gvr[...,-1]))
-        reg = np.sum(self.Wtv * np.sqrt(np.sum(gvr[...,0:-1]**2,
+        dfd = np.sum(self.Wdf * np.abs(gvr[..., -1]))
+        reg = np.sum(self.Wtv * np.sqrt(np.sum(gvr[..., 0:-1]**2,
                                                axis=self.saxes)))
         obj = dfd + self.lmbda*reg
         return (obj, dfd, reg)
@@ -617,19 +626,19 @@ class TVL1Deconv(admm.ADMM):
 
 
     def cnst_A(self, X, Xf=None):
-        """Compute :math:`A \mathbf{x}` component of ADMM problem constraint.
-        In this case :math:`A \mathbf{x} = (G_r^T \;\; G_c^T \;\; H)^T
-        \mathbf{x}`.
+        r"""Compute :math:`A \mathbf{x}` component of ADMM problem
+        constraint.  In this case :math:`A \mathbf{x} = (G_r^T \;\;
+        G_c^T \;\; H)^T \mathbf{x}`.
         """
 
         if Xf is None:
             Xf = sl.rfftn(X, axes=self.axes)
-        return sl.irfftn(self.GAf*Xf[...,np.newaxis], None, axes=self.axes)
+        return sl.irfftn(self.GAf*Xf[..., np.newaxis], None, axes=self.axes)
 
 
 
     def cnst_AT(self, X):
-        """Compute :math:`A^T \mathbf{x}` where :math:`A \mathbf{x}` is
+        r"""Compute :math:`A^T \mathbf{x}` where :math:`A \mathbf{x}` is
         a component of ADMM problem constraint. In this case
         :math:`A^T \mathbf{x} = (G_r^T \;\; G_c^T \;\; H^T) \mathbf{x}`.
         """
@@ -641,8 +650,8 @@ class TVL1Deconv(admm.ADMM):
 
 
     def cnst_B(self, Y):
-        """Compute :math:`B \mathbf{y}` component of ADMM problem constraint.
-        In this case :math:`B \mathbf{y} = -\mathbf{y}`.
+        r"""Compute :math:`B \mathbf{y}` component of ADMM problem
+        constraint.  In this case :math:`B \mathbf{y} = -\mathbf{y}`.
         """
 
         return -Y
@@ -650,12 +659,12 @@ class TVL1Deconv(admm.ADMM):
 
 
     def cnst_c(self):
-        """Compute constant component :math:`\mathbf{c}` of ADMM problem
+        r"""Compute constant component :math:`\mathbf{c}` of ADMM problem
         constraint. In this case :math:`\mathbf{c} = \mathbf{0}`.
         """
 
         c = np.zeros(self.S.shape + (len(self.axes)+1,), self.dtype)
-        c[...,-1] = self.S
+        c[..., -1] = self.S
         return c
 
 

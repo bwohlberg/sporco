@@ -12,11 +12,11 @@ from __future__ import absolute_import
 from __future__ import print_function
 from builtins import range
 
-import numpy as np
-from scipy import linalg
 import copy
 from types import MethodType
 import pprint
+import numpy as np
+from scipy import linalg
 
 from sporco.admm import admm
 import sporco.linalg as sl
@@ -207,15 +207,15 @@ class ConvRepIndexing(object):
 
 
 class GenericConvBPDN(admm.ADMMEqual):
-    """Base class for ADMM algorithm for solving variants of the
+    r"""Base class for ADMM algorithm for solving variants of the
     Convolutional BPDN (CBPDN) :cite:`wohlberg-2016-efficient` problem.
 
     The generic problem form is
 
     .. math::
        \mathrm{argmin}_\mathbf{x} \;
-       (1/2) \\left\| \sum_m \mathbf{d}_m * \mathbf{x}_m -
-       \mathbf{s} \\right\|_2^2 + \lambda f( \{ \mathbf{x}_m \} )
+       (1/2) \left\| \sum_m \mathbf{d}_m * \mathbf{x}_m -
+       \mathbf{s} \right\|_2^2 + \lambda f( \{ \mathbf{x}_m \} )
 
     for input image :math:`\mathbf{s}`, dictionary filters
     :math:`\mathbf{d}_m`, and coefficient maps :math:`\mathbf{x}_m`,
@@ -224,9 +224,9 @@ class GenericConvBPDN(admm.ADMMEqual):
 
     .. math::
        \mathrm{argmin}_{\mathbf{x}, \mathbf{y}} \;
-       (1/2) \\left\| \sum_m \mathbf{d}_m * \mathbf{x}_m -
-       \mathbf{s} \\right\|_2^2 + f ( \{ \mathbf{y}_m \} )
-       \quad \\text{such that} \quad \mathbf{x}_m = \mathbf{y}_m \;\;.
+       (1/2) \left\| \sum_m \mathbf{d}_m * \mathbf{x}_m -
+       \mathbf{s} \right\|_2^2 + f ( \{ \mathbf{y}_m \} )
+       \quad \text{such that} \quad \mathbf{x}_m = \mathbf{y}_m \;\;.
 
     After termination of the :meth:`solve` method, attribute
     :attr:`itstat` is a list of tuples representing statistics of each
@@ -385,7 +385,7 @@ class GenericConvBPDN(admm.ADMMEqual):
         xfshp = list(self.Y.shape)
         xfshp[dimN-1] = xfshp[dimN-1]//2 + 1
         self.Xf = sl.pyfftw_empty_aligned(xfshp,
-                            dtype=sl.complex_dtype(self.dtype))
+                                          dtype=sl.complex_dtype(self.dtype))
 
         self.setdict()
 
@@ -435,7 +435,7 @@ class GenericConvBPDN(admm.ADMMEqual):
 
 
     def xstep(self):
-        """Minimise Augmented Lagrangian with respect to :math:`\mathbf{x}`."""
+        r"""Minimise Augmented Lagrangian with respect to :math:`\mathbf{x}`."""
 
         self.YU[:] = self.Y - self.U
 
@@ -465,7 +465,7 @@ class GenericConvBPDN(admm.ADMMEqual):
 
 
     def ystep(self):
-        """Minimise Augmented Lagrangian with respect to :math:`\mathbf{y}`.
+        r"""Minimise Augmented Lagrangian with respect to :math:`\mathbf{y}`.
         If this method is not overridden, the problem is solved without
         any regularisation other than the option enforcement of
         non-negativity of the solution and filter boundary crossing
@@ -477,7 +477,8 @@ class GenericConvBPDN(admm.ADMMEqual):
             self.Y[self.Y < 0.0] = 0.0
         if self.opt['NoBndryCross']:
             for n in range(0, self.cri.dimN):
-                self.Y[(slice(None),)*n +(slice(1-self.D.shape[n],None),)] = 0.0
+                self.Y[(slice(None),)*n +
+                       (slice(1-self.D.shape[n], None),)] = 0.0
 
 
 
@@ -504,7 +505,7 @@ class GenericConvBPDN(admm.ADMMEqual):
 
 
     def obfn_dfd(self):
-        """Compute data fidelity term :math:`(1/2) \| \sum_m \mathbf{d}_m *
+        r"""Compute data fidelity term :math:`(1/2) \| \sum_m \mathbf{d}_m *
         \mathbf{x}_m - \mathbf{s} \|_2^2`.
         """
 
@@ -553,7 +554,7 @@ class GenericConvBPDN(admm.ADMMEqual):
 
 
 class ConvBPDN(GenericConvBPDN):
-    """ADMM algorithm for the Convolutional BPDN (CBPDN)
+    r"""ADMM algorithm for the Convolutional BPDN (CBPDN)
     :cite:`wohlberg-2014-efficient` :cite:`wohlberg-2016-efficient`
     :cite:`wohlberg-2016-convolutional` problem.
 
@@ -561,8 +562,8 @@ class ConvBPDN(GenericConvBPDN):
 
     .. math::
        \mathrm{argmin}_\mathbf{x} \;
-       (1/2) \\left\| \sum_m \mathbf{d}_m * \mathbf{x}_m -
-       \mathbf{s} \\right\|_2^2 + \lambda \sum_m \| \mathbf{x}_m \|_1
+       (1/2) \left\| \sum_m \mathbf{d}_m * \mathbf{x}_m -
+       \mathbf{s} \right\|_2^2 + \lambda \sum_m \| \mathbf{x}_m \|_1
 
     for input image :math:`\mathbf{s}`, dictionary filters
     :math:`\mathbf{d}_m`, and coefficient maps :math:`\mathbf{x}_m`,
@@ -570,17 +571,17 @@ class ConvBPDN(GenericConvBPDN):
 
     .. math::
        \mathrm{argmin}_{\mathbf{x}, \mathbf{y}} \;
-       (1/2) \\left\| \sum_m \mathbf{d}_m * \mathbf{x}_m -
-       \mathbf{s} \\right\|_2^2 + \lambda \sum_m \| \mathbf{y}_m \|_1
-       \quad \\text{such that} \quad \mathbf{x}_m = \mathbf{y}_m \;\;.
+       (1/2) \left\| \sum_m \mathbf{d}_m * \mathbf{x}_m -
+       \mathbf{s} \right\|_2^2 + \lambda \sum_m \| \mathbf{y}_m \|_1
+       \quad \text{such that} \quad \mathbf{x}_m = \mathbf{y}_m \;\;.
 
     Multi-image and multi-channel problems are also supported. The
     multi-image problem is
 
     .. math::
        \mathrm{argmin}_\mathbf{x} \;
-       (1/2) \sum_k \\left\| \sum_m \mathbf{d}_m * \mathbf{x}_{k,m} -
-       \mathbf{s}_k \\right\|_2^2 + \lambda \sum_k \sum_m
+       (1/2) \sum_k \left\| \sum_m \mathbf{d}_m * \mathbf{x}_{k,m} -
+       \mathbf{s}_k \right\|_2^2 + \lambda \sum_k \sum_m
        \| \mathbf{x}_{k,m} \|_1
 
     with input images :math:`\mathbf{s}_k` and coefficient maps
@@ -589,8 +590,8 @@ class ConvBPDN(GenericConvBPDN):
 
     .. math::
        \mathrm{argmin}_\mathbf{x} \;
-       (1/2) \sum_c \\left\| \sum_m \mathbf{d}_m * \mathbf{x}_{c,m} -
-       \mathbf{s}_c \\right\|_2^2 +
+       (1/2) \sum_c \left\| \sum_m \mathbf{d}_m * \mathbf{x}_{c,m} -
+       \mathbf{s}_c \right\|_2^2 +
        \lambda \sum_c \sum_m \| \mathbf{x}_{c,m} \|_1
 
     with single-channel dictionary filters :math:`\mathbf{d}_m` and
@@ -598,8 +599,8 @@ class ConvBPDN(GenericConvBPDN):
 
     .. math::
        \mathrm{argmin}_\mathbf{x} \;
-       (1/2) \sum_c \\left\| \sum_m \mathbf{d}_{c,m} * \mathbf{x}_m -
-       \mathbf{s}_c \\right\|_2^2 + \lambda \sum_m \| \mathbf{x}_m \|_1
+       (1/2) \sum_c \left\| \sum_m \mathbf{d}_{c,m} * \mathbf{x}_m -
+       \mathbf{s}_c \right\|_2^2 + \lambda \sum_m \| \mathbf{x}_m \|_1
 
     with multi-channel dictionary filters :math:`\mathbf{d}_{c,m}` and
     single-channel coefficient maps :math:`\mathbf{x}_m`.
@@ -637,7 +638,7 @@ class ConvBPDN(GenericConvBPDN):
 
 
     class Options(GenericConvBPDN.Options):
-        """ConvBPDN algorithm options
+        r"""ConvBPDN algorithm options
 
         Options include all of those defined in
         :class:`sporco.admm.admm.ADMMEqual.Options`, together with
@@ -734,7 +735,7 @@ class ConvBPDN(GenericConvBPDN):
             rho_xi = (1.0 + (18.3)**(np.log10(self.lmbda)+1.0))
         else:
             rho_xi = 1.0
-        self.set_attr('rho_xi', opt['AutoRho','RsdlTarget'], dval=rho_xi,
+        self.set_attr('rho_xi', opt['AutoRho', 'RsdlTarget'], dval=rho_xi,
                       dtype=self.dtype)
 
         # Call parent class __init__
@@ -756,7 +757,7 @@ class ConvBPDN(GenericConvBPDN):
 
 
     def ystep(self):
-        """Minimise Augmented Lagrangian with respect to :math:`\mathbf{y}`."""
+        r"""Minimise Augmented Lagrangian with respect to :math:`\mathbf{y}`."""
 
         self.Y = sl.shrink1(self.AX + self.U, (self.lmbda/self.rho) * self.wl1)
         super(ConvBPDN, self).ystep()
@@ -776,7 +777,7 @@ class ConvBPDN(GenericConvBPDN):
 
 
 class ConvBPDNJoint(ConvBPDN):
-    """
+    r"""
     ADMM algorithm for Convolutional BPDN with joint sparsity via an
     :math:`\ell_{2,1}` norm term :cite:`wohlberg-2016-convolutional`
     (the :math:`\ell_2` norms are computed over the channel index).
@@ -785,8 +786,8 @@ class ConvBPDNJoint(ConvBPDN):
 
     .. math::
        \mathrm{argmin}_\mathbf{x} \;
-       (1/2) \sum_c \\left\| \sum_m \mathbf{d}_m * \mathbf{x}_{c,m} -
-       \mathbf{s}_c \\right\|_2^2 + \lambda \sum_c \sum_m
+       (1/2) \sum_c \left\| \sum_m \mathbf{d}_m * \mathbf{x}_{c,m} -
+       \mathbf{s}_c \right\|_2^2 + \lambda \sum_c \sum_m
        \| \mathbf{x}_{c,m} \|_1 + \mu \| \{ \mathbf{x}_{c,m} \} \|_{2,1}
 
     with input images :math:`\mathbf{s}_c`, dictionary filters
@@ -795,10 +796,10 @@ class ConvBPDNJoint(ConvBPDN):
 
     .. math::
        \mathrm{argmin}_{\mathbf{x}, \mathbf{y}} \;
-       (1/2) \sum_c \\left\| \sum_m \mathbf{d}_m * \mathbf{x}_{c,m} -
-       \mathbf{s}_c \\right\|_2^2 + \lambda \sum_c \sum_m
+       (1/2) \sum_c \left\| \sum_m \mathbf{d}_m * \mathbf{x}_{c,m} -
+       \mathbf{s}_c \right\|_2^2 + \lambda \sum_c \sum_m
        \| \mathbf{y}_{c,m} \|_1 + \mu \| \{ \mathbf{y}_{c,m} \} \|_{2,1}
-       \quad \\text{such that} \quad \mathbf{x}_{c,m} = \mathbf{y}_{c,m} \;\;.
+       \quad \text{such that} \quad \mathbf{x}_{c,m} = \mathbf{y}_{c,m} \;\;.
 
     After termination of the :meth:`solve` method, attribute :attr:`itstat` is
     a list of tuples representing statistics of each iteration. The
@@ -809,8 +810,8 @@ class ConvBPDNJoint(ConvBPDN):
        ``ObjFun`` : Objective function value
 
        ``DFid`` :  Value of data fidelity term :math:`(1/2) \sum_c
-       \\left\| \sum_m \mathbf{d}_m * \mathbf{x}_{k,m} - \mathbf{s}_c
-       \\right\|_2^2`
+       \left\| \sum_m \mathbf{d}_m * \mathbf{x}_{k,m} - \mathbf{s}_c
+       \right\|_2^2`
 
        ``RegL1`` : Value of regularisation term :math:`\sum_c \sum_m
        \| \mathbf{x}_{c,m} \|_1`
@@ -874,7 +875,9 @@ class ConvBPDNJoint(ConvBPDN):
 
 
     def ystep(self):
-        """Minimise Augmented Lagrangian with respect to :math:`\mathbf{y}`."""
+        r"""Minimise Augmented Lagrangian with respect to
+        :math:`\mathbf{y}`.
+        """
 
         self.Y = sl.shrink12(self.AX + self.U, (self.lmbda/self.rho)*self.wl1,
                              self.mu/self.rho, axis=self.cri.axisC)
@@ -883,7 +886,7 @@ class ConvBPDNJoint(ConvBPDN):
 
 
     def obfn_reg(self):
-        """Compute regularisation terms and contribution to objective
+        r"""Compute regularisation terms and contribution to objective
         function. Regularisation terms are :math:`\| Y \|_1` and
         :math:`\| Y \|_{2,1}`.
         """
@@ -897,25 +900,25 @@ class ConvBPDNJoint(ConvBPDN):
 
 
 class ConvElasticNet(ConvBPDN):
-    """ADMM algorithm for a convolutional form of the elastic net problem
+    r"""ADMM algorithm for a convolutional form of the elastic net problem
     :cite:`zou-2005-regularization`.
 
     Solve the optimisation problem
 
     .. math::
        \mathrm{argmin}_\mathbf{x} \;
-       (1/2) \\left\| \sum_m \mathbf{d}_m * \mathbf{x}_m - \mathbf{s}
-       \\right\|_2^2 + \lambda \sum_m \| \mathbf{x}_m \|_1 +
+       (1/2) \left\| \sum_m \mathbf{d}_m * \mathbf{x}_m - \mathbf{s}
+       \right\|_2^2 + \lambda \sum_m \| \mathbf{x}_m \|_1 +
        (\mu/2) \sum_m \| \mathbf{x}_m \|_2^2
 
     via the ADMM problem
 
     .. math::
        \mathrm{argmin}_{\mathbf{x}, \mathbf{y}} \;
-       (1/2) \\left\| \sum_m \mathbf{d}_m * \mathbf{x}_m -
-       \mathbf{s} \\right\|_2^2 + \lambda \sum_m \| \mathbf{y}_m \|_1
+       (1/2) \left\| \sum_m \mathbf{d}_m * \mathbf{x}_m -
+       \mathbf{s} \right\|_2^2 + \lambda \sum_m \| \mathbf{y}_m \|_1
        + (\mu/2) \sum_m \| \mathbf{x}_m \|_2^2
-       \quad \\text{such that} \quad \mathbf{x}_m = \mathbf{y}_m \;\;.
+       \quad \text{such that} \quad \mathbf{x}_m = \mathbf{y}_m \;\;.
 
     After termination of the :meth:`solve` method, attribute :attr:`itstat` is
     a list of tuples representing statistics of each iteration. The
@@ -1015,7 +1018,9 @@ class ConvElasticNet(ConvBPDN):
 
 
     def xstep(self):
-        """Minimise Augmented Lagrangian with respect to :math:`\mathbf{x}`."""
+        r"""Minimise Augmented Lagrangian with respect to
+        :math:`\mathbf{x}`.
+        """
 
         self.YU[:] = self.Y - self.U
 
@@ -1058,7 +1063,7 @@ class ConvElasticNet(ConvBPDN):
 
 
 class ConvBPDNGradReg(ConvBPDN):
-    """ADMM algorithm for an extension of Convolutional BPDN including a
+    r"""ADMM algorithm for an extension of Convolutional BPDN including a
     term penalising the gradient of the coefficient maps
     :cite:`wohlberg-2016-convolutional2`.
 
@@ -1066,8 +1071,8 @@ class ConvBPDNGradReg(ConvBPDN):
 
     .. math::
        \mathrm{argmin}_\mathbf{x} \;
-       (1/2) \\left\| \sum_m \mathbf{d}_m * \mathbf{x}_m - \mathbf{s}
-       \\right\|_2^2 + \lambda \sum_m \| \mathbf{x}_m \|_1 +
+       (1/2) \left\| \sum_m \mathbf{d}_m * \mathbf{x}_m - \mathbf{s}
+       \right\|_2^2 + \lambda \sum_m \| \mathbf{x}_m \|_1 +
        (\mu/2) \sum_i \sum_m \| G_i \mathbf{x}_m \|_2^2 \;\;,
 
     where :math:`G_i` is an operator computing the derivative along index
@@ -1075,10 +1080,10 @@ class ConvBPDNGradReg(ConvBPDN):
 
     .. math::
        \mathrm{argmin}_\mathbf{x} \;
-       (1/2) \\left\| \sum_m \mathbf{d}_m * \mathbf{x}_m - \mathbf{s}
-       \\right\|_2^2 + \lambda \sum_m \| \mathbf{y}_m \|_1 +
+       (1/2) \left\| \sum_m \mathbf{d}_m * \mathbf{x}_m - \mathbf{s}
+       \right\|_2^2 + \lambda \sum_m \| \mathbf{y}_m \|_1 +
        (\mu/2) \sum_i \sum_m \| G_i \mathbf{x}_m \|_2^2
-       \quad \\text{such that} \quad \mathbf{x}_m = \mathbf{y}_m \;\;.
+       \quad \text{such that} \quad \mathbf{x}_m = \mathbf{y}_m \;\;.
 
     After termination of the :meth:`solve` method, attribute :attr:`itstat` is
     a list of tuples representing statistics of each iteration. The
@@ -1116,7 +1121,7 @@ class ConvBPDNGradReg(ConvBPDN):
 
 
     class Options(ConvBPDN.Options):
-        """ConvBPDNGradReg algorithm options
+        r"""ConvBPDNGradReg algorithm options
 
         Options include all of those defined in
         :class:`sporco.admm.cbpdn.ConvBPDN.Options`, together with
@@ -1217,7 +1222,9 @@ class ConvBPDNGradReg(ConvBPDN):
 
 
     def xstep(self):
-        """Minimise Augmented Lagrangian with respect to :math:`\mathbf{x}`."""
+        r"""Minimise Augmented Lagrangian with respect to
+        :math:`\mathbf{x}`.
+        """
 
         self.YU[:] = self.Y - self.U
 
@@ -1238,7 +1245,7 @@ class ConvBPDNGradReg(ConvBPDN):
                 DHop = lambda x: np.conj(self.Df) * x
             else:
                 DHop = lambda x: np.sum(np.conj(self.Df) * x,
-                                        axis=self.cri.axisC,  keepdims=True)
+                                        axis=self.cri.axisC, keepdims=True)
             ax = DHop(Dop(self.Xf)) + (self.mu*self.GHGf + self.rho)*self.Xf
             self.xrrs = sl.rrs(ax, b)
         else:
@@ -1262,7 +1269,7 @@ class ConvBPDNGradReg(ConvBPDN):
 
 
 class ConvTwoBlockCnstrnt(admm.ADMMTwoBlockCnstrnt):
-    """Base class for ADMM algorithms for problems of the form
+    r"""Base class for ADMM algorithms for problems of the form
 
     .. math::
        \mathrm{argmin}_\mathbf{x} \;
@@ -1273,25 +1280,25 @@ class ConvTwoBlockCnstrnt(admm.ADMMTwoBlockCnstrnt):
 
     .. math::
        \mathrm{argmin}_{\mathbf{x},\mathbf{y}_0,\mathbf{y}_1} \;
-       g_0(\mathbf{y}_0) + g_1(\mathbf{y}_1) \;\\text{such that}\;
-       \\left( \\begin{array}{c} D \\\\ I \\end{array} \\right) \mathbf{x}
-       - \\left( \\begin{array}{c} \mathbf{y}_0 \\\\ \mathbf{y}_1 \\end{array}
-       \\right) = \\left( \\begin{array}{c} \mathbf{s} \\\\
-       \mathbf{0} \\end{array} \\right) \;\;.
+       g_0(\mathbf{y}_0) + g_1(\mathbf{y}_1) \;\text{such that}\;
+       \left( \begin{array}{c} D \\ I \end{array} \right) \mathbf{x}
+       - \left( \begin{array}{c} \mathbf{y}_0 \\ \mathbf{y}_1 \end{array}
+       \right) = \left( \begin{array}{c} \mathbf{s} \\
+       \mathbf{0} \end{array} \right) \;\;.
 
     In this case the ADMM constraint is :math:`A\mathbf{x} + B\mathbf{y} =
     \mathbf{c}` where
 
     .. math::
-       A = \\left( \\begin{array}{c} D \\\\ I \\end{array} \\right)
-       \\qquad B = -I \\qquad \mathbf{y} = \\left( \\begin{array}{c}
-       \mathbf{y}_0 \\\\ \mathbf{y}_1 \\end{array} \\right) \\qquad
-       \mathbf{c} = \\left( \\begin{array}{c} \mathbf{s} \\\\
-       \mathbf{0} \\end{array} \\right) \;\;.
+       A = \left( \begin{array}{c} D \\ I \end{array} \right)
+       \qquad B = -I \qquad \mathbf{y} = \left( \begin{array}{c}
+       \mathbf{y}_0 \\ \mathbf{y}_1 \end{array} \right) \qquad
+       \mathbf{c} = \left( \begin{array}{c} \mathbf{s} \\
+       \mathbf{0} \end{array} \right) \;\;.
 
-    This class specialises class :class:`.ADMMTwoBlockCnstrnt`, but remains a
-    base class for other classes that specialise to specific
-    optimisation problems.
+    This class specialises class :class:`.ADMMTwoBlockCnstrnt`, but remains
+    a base class for other classes that specialise to specific optimisation
+    problems.
     """
 
     class Options(admm.ADMMTwoBlockCnstrnt.Options):
@@ -1316,7 +1323,7 @@ class ConvTwoBlockCnstrnt(admm.ADMMTwoBlockCnstrnt):
         """
 
         defaults = copy.deepcopy(admm.ADMMEqual.Options.defaults)
-        defaults.update({'AuxVarObj' : False,  'HighMemSolve' : False,
+        defaults.update({'AuxVarObj' : False, 'HighMemSolve' : False,
                          'LinSolveCheck' : False, 'NonNegCoef' : False,
                          'NoBndryCross' : False, 'RelaxParam' : 1.8,
                          'rho' : 1.0, 'ReturnVar' : 'Y1'})
@@ -1376,7 +1383,7 @@ class ConvTwoBlockCnstrnt(admm.ADMMTwoBlockCnstrnt):
         xfshp = list(self.cri.shpX)
         xfshp[dimN-1] = xfshp[dimN-1]//2 + 1
         self.Xf = sl.pyfftw_empty_aligned(xfshp,
-                            dtype=sl.complex_dtype(self.dtype))
+                                          dtype=sl.complex_dtype(self.dtype))
 
         self.setdict()
 
@@ -1410,7 +1417,9 @@ class ConvTwoBlockCnstrnt(admm.ADMMTwoBlockCnstrnt):
 
 
     def xstep(self):
-        """Minimise Augmented Lagrangian with respect to :math:`\mathbf{x}`."""
+        r"""Minimise Augmented Lagrangian with respect to
+        :math:`\mathbf{x}`.
+        """
 
         self.YU[:] = self.Y - self.U
         self.block_sep0(self.YU)[:] += self.S
@@ -1445,7 +1454,9 @@ class ConvTwoBlockCnstrnt(admm.ADMMTwoBlockCnstrnt):
 
 
     def ystep(self):
-        """Minimise Augmented Lagrangian with respect to :math:`\mathbf{y}`."""
+        r"""Minimise Augmented Lagrangian with respect to
+        :math:`\mathbf{y}`.
+        """
 
         if self.opt['NonNegCoef'] or self.opt['NoBndryCross']:
             Y1 = self.block_sep1(self.Y)
@@ -1453,7 +1464,8 @@ class ConvTwoBlockCnstrnt(admm.ADMMTwoBlockCnstrnt):
                 Y1[Y1 < 0.0] = 0.0
             if self.opt['NoBndryCross']:
                 for n in range(0, self.cri.dimN):
-                    Y1[(slice(None),)*n +(slice(1-self.D.shape[n],None),)] = 0.0
+                    Y1[(slice(None),)*n +
+                       (slice(1-self.D.shape[n], None),)] = 0.0
             self.block_sep1(self.Y)[:] = Y1
 
 
@@ -1477,7 +1489,7 @@ class ConvTwoBlockCnstrnt(admm.ADMMTwoBlockCnstrnt):
 
 
     def block_sep0(self, Y):
-        """Separate variable into component corresponding to
+        r"""Separate variable into component corresponding to
         :math:`\mathbf{y}_0` in :math:`\mathbf{y}\;\;`. The method
         from parent class :class:`.ADMMTwoBlockCnstrnt` is overridden
         here to allow swapping of C (channel) and M (filter) axes in
@@ -1488,12 +1500,12 @@ class ConvTwoBlockCnstrnt(admm.ADMMTwoBlockCnstrnt):
         """
 
         return np.swapaxes(Y[(slice(None),)*self.blkaxis +
-                    (slice(0,self.blkidx),)], self.cri.axisC, self.cri.axisM)
+                    (slice(0, self.blkidx),)], self.cri.axisC, self.cri.axisM)
 
 
 
     def block_cat(self, Y0, Y1):
-        """Concatenate components corresponding to :math:`\mathbf{y}_0` and
+        r"""Concatenate components corresponding to :math:`\mathbf{y}_0` and
         :math:`\mathbf{y}_1` to form :math:`\mathbf{y}\;\;`.
         The method from parent class :class:`.ADMMTwoBlockCnstrnt` is
         overridden here to allow swapping of C (channel) and M
@@ -1509,7 +1521,7 @@ class ConvTwoBlockCnstrnt(admm.ADMMTwoBlockCnstrnt):
 
 
     def cnst_A(self, X, Xf=None):
-        """Compute :math:`A \mathbf{x}` component of ADMM problem
+        r"""Compute :math:`A \mathbf{x}` component of ADMM problem
         constraint.
         """
 
@@ -1529,7 +1541,7 @@ class ConvTwoBlockCnstrnt(admm.ADMMTwoBlockCnstrnt):
 
 
     def cnst_A0(self, X, Xf=None):
-        """Compute :math:`A_0 \mathbf{x}` component of ADMM problem
+        r"""Compute :math:`A_0 \mathbf{x}` component of ADMM problem
         constraint.
         """
 
@@ -1544,7 +1556,7 @@ class ConvTwoBlockCnstrnt(admm.ADMMTwoBlockCnstrnt):
 
 
     def cnst_A0T(self, Y0):
-        """Compute :math:`A_0^T \mathbf{y}_0` component of
+        r"""Compute :math:`A_0^T \mathbf{y}_0` component of
         :math:`A^T \mathbf{y}` (see :meth:`.ADMMTwoBlockCnstrnt.cnst_AT`).
         """
 
@@ -1558,7 +1570,7 @@ class ConvTwoBlockCnstrnt(admm.ADMMTwoBlockCnstrnt):
 
 
     def cnst_c0(self):
-        """Compute constant component :math:`\mathbf{c}_0` of
+        r"""Compute constant component :math:`\mathbf{c}_0` of
         :math:`\mathbf{c}` in the ADMM problem constraint.
         """
 
@@ -1615,15 +1627,15 @@ class ConvTwoBlockCnstrnt(admm.ADMMTwoBlockCnstrnt):
 
 
 class ConvBPDNMaskDcpl(ConvTwoBlockCnstrnt):
-    """ADMM algorithm for Convolutional BPDN with Mask Decoupling
+    r"""ADMM algorithm for Convolutional BPDN with Mask Decoupling
     :cite:`heide-2015-fast` :cite:`wohlberg-2016-boundary`.
 
     Solve the optimisation problem
 
     .. math::
        \mathrm{argmin}_\mathbf{x} \;
-       (1/2) \\left\|  W \\left(\sum_m \mathbf{d}_m * \mathbf{x}_m -
-       \mathbf{s}\\right) \\right\|_2^2 + \lambda \sum_m
+       (1/2) \left\|  W \left(\sum_m \mathbf{d}_m * \mathbf{x}_m -
+       \mathbf{s}\right) \right\|_2^2 + \lambda \sum_m
        \| \mathbf{x}_m \|_1 \;\;,
 
     where :math:`W` is a mask array, via the ADMM problem
@@ -1631,11 +1643,11 @@ class ConvBPDNMaskDcpl(ConvTwoBlockCnstrnt):
     .. math::
        \mathrm{argmin}_{\mathbf{x},\mathbf{y}_0,\mathbf{y}_1} \;
        (1/2) \| W \mathbf{y}_0 \|_2^2 + \lambda \| \mathbf{y}_1 \|_1
-       \;\\text{such that}\;
-       \\left( \\begin{array}{c} D \\\\ I \\end{array} \\right) \mathbf{x}
-       - \\left( \\begin{array}{c} \mathbf{y}_0 \\\\ \mathbf{y}_1 \\end{array}
-       \\right) = \\left( \\begin{array}{c} \mathbf{s} \\\\
-       \mathbf{0} \\end{array} \\right) \;\;,
+       \;\text{such that}\;
+       \left( \begin{array}{c} D \\ I \end{array} \right) \mathbf{x}
+       - \left( \begin{array}{c} \mathbf{y}_0 \\ \mathbf{y}_1 \end{array}
+       \right) = \left( \begin{array}{c} \mathbf{s} \\
+       \mathbf{0} \end{array} \right) \;\;,
 
     where :math:`D \mathbf{x} = \sum_m \mathbf{d}_m * \mathbf{x}_m`.
 
@@ -1671,7 +1683,7 @@ class ConvBPDNMaskDcpl(ConvTwoBlockCnstrnt):
     """
 
     class Options(ConvTwoBlockCnstrnt.Options):
-        """ConvBPDNMaskDcpl algorithm options
+        r"""ConvBPDNMaskDcpl algorithm options
 
         Options include all of those defined in
         :class:`sporco.admm.cbpdn.ConvTwoBlockCnstrnt.Options`, together with
@@ -1760,7 +1772,9 @@ class ConvBPDNMaskDcpl(ConvTwoBlockCnstrnt):
 
 
     def ystep(self):
-        """Minimise Augmented Lagrangian with respect to :math:`\mathbf{y}`."""
+        r"""Minimise Augmented Lagrangian with respect to
+        :math:`\mathbf{y}`.
+        """
 
         AXU = self.AX + self.U
         Y0 = (self.rho*(self.block_sep0(AXU) - self.S)) / (self.W**2 + self.rho)
@@ -1772,7 +1786,7 @@ class ConvBPDNMaskDcpl(ConvTwoBlockCnstrnt):
 
 
     def obfn_g0(self, Y0):
-        """Compute :math:`g_0(\mathbf{y}_0)` component of ADMM objective
+        r"""Compute :math:`g_0(\mathbf{y}_0)` component of ADMM objective
         function.
         """
 
@@ -1781,7 +1795,7 @@ class ConvBPDNMaskDcpl(ConvTwoBlockCnstrnt):
 
 
     def obfn_g1(self, Y1):
-        """Compute :math:`g_1(\mathbf{y_1})` component of ADMM objective
+        r"""Compute :math:`g_1(\mathbf{y_1})` component of ADMM objective
         function.
         """
 
@@ -1847,7 +1861,7 @@ class AddMaskSim(object):
         else:
             self.imp = np.zeros(D.shape[0:dimN] + (self.cri.Cd,)*2)
             for c in range(0, self.cri.Cd):
-                self.imp[(0,)*dimN+(c,c,)] = 1.0
+                self.imp[(0,)*dimN+(c, c,)] = 1.0
         Di = np.concatenate((D, self.imp), axis=D.ndim-1)
 
         # Construct inner cbpdn object
@@ -1876,9 +1890,9 @@ class AddMaskSim(object):
 
 
     def ystep(self):
-        """This method is inserted into the inner cbpdn object, replacing its
-        own ystep method, thereby providing a hook for applying the additional
-        steps necessary for the AMS method.
+        """This method is inserted into the inner cbpdn object,
+        replacing its own ystep method, thereby providing a hook for
+        applying the additional steps necessary for the AMS method.
         """
 
         # Extract AMS part of ystep argument so that it is not
@@ -1895,9 +1909,9 @@ class AddMaskSim(object):
 
 
     def obfn_gvar(self):
-        """This method is inserted into the inner cbpdn object, replacing its
-        own obfn_gvar method, thereby providing a hook for applying the
-        additional steps necessary for the AMS method.
+        """This method is inserted into the inner cbpdn object,
+        replacing its own obfn_gvar method, thereby providing a hook for
+        applying the additional steps necessary for the AMS method.
         """
 
         # Get inner cbpdn object gvar
@@ -1906,7 +1920,7 @@ class AddMaskSim(object):
         # filter (the impulse inserted for the AMS method) to zero so
         # that it does not affect the results (e.g. l1 norm) computed
         # from this variable by the inner cbpdn object
-        gv[...,-1] = 0
+        gv[..., -1] = 0
 
         return gv
 
@@ -1948,7 +1962,7 @@ class AddMaskSim(object):
         (inner) component of the main variables X, Y, etc.
         """
 
-        return np.s_[...,0:-self.cri.Cd]
+        return np.s_[..., 0:-self.cri.Cd]
 
 
 
@@ -1956,7 +1970,7 @@ class AddMaskSim(object):
         """Return an index expression appropriate for extracting the
         additive mask (outer) component of the main variables X, Y, etc."""
 
-        return np.s_[...,-self.cri.Cd:]
+        return np.s_[..., -self.cri.Cd:]
 
 
 
@@ -1971,7 +1985,8 @@ class AddMaskSim(object):
         Xf = sl.rfftn(X, None, self.cri.axisN)
         # Multiply in frequency domain with non-impulse component of
         # dictionary
-        Sf = np.sum(self.cbpdn.Df[...,0:-self.cri.Cd] * Xf, axis=self.cri.axisM)
+        Sf = np.sum(self.cbpdn.Df[..., 0:-self.cri.Cd] * Xf,
+                    axis=self.cri.axisM)
         # Transform to spatial domain and return result
         return sl.irfftn(Sf, self.cri.Nv, self.cri.axisN)
 

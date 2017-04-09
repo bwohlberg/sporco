@@ -5,14 +5,14 @@
 # and user license can be found in the 'LICENSE.txt' file distributed
 # with the package.
 
-"""Classes for ADMM algorithms for :math:`\ell_1` spline optimisation"""
+r"""Classes for ADMM algorithms for :math:`\ell_1` spline optimisation"""
 
 from __future__ import division
 from __future__ import absolute_import
 
+import copy
 import numpy as np
 from scipy import linalg
-import copy
 
 from sporco.admm import admm
 import sporco.linalg as sl
@@ -21,7 +21,7 @@ __author__ = """Brendt Wohlberg <brendt@ieee.org>"""
 
 
 class SplineL1(admm.ADMM):
-    """ADMM algorithm for the :math:`\ell_1`-spline problem
+    r"""ADMM algorithm for the :math:`\ell_1`-spline problem
     for equi-spaced samples :cite:`garcia-2010-robust`,
     :cite:`tepper-2013-fast`.
 
@@ -29,18 +29,18 @@ class SplineL1(admm.ADMM):
 
     .. math::
        \mathrm{argmin}_\mathbf{x} \;
-        \| W(\mathbf{x} - \mathbf{s}) \|_1 + \\frac{\lambda}{2} \;
+        \| W(\mathbf{x} - \mathbf{s}) \|_1 + \frac{\lambda}{2} \;
         \| D \mathbf{x} \|_2^2 \;\;,
 
-    where :math:`D = \\left( \\begin{array}{ccc} -1 & 1 & & & \\\\
-    1 & -2 & 1 & & \\\\ & \\ddots & \\ddots & \ddots &  \\\\
-    & & 1 & -2 & 1 \\\\ & & & 1 & -1 \\end{array} \\right)\;`,
+    where :math:`D = \left( \begin{array}{ccc} -1 & 1 & & & \\
+    1 & -2 & 1 & & \\ & \ddots & \ddots & \ddots &  \\
+    & & 1 & -2 & 1 \\ & & & 1 & -1 \end{array} \right)\;`,
     via the ADMM problem
 
     .. math::
        \mathrm{argmin}_{\mathbf{x}, \mathbf{y}} \;
-        \| W \mathbf{y} \|_1 + \\frac{\lambda}{2} \;
-        \| D \mathbf{x} \|_2^2  \;\; \\text{such that} \;\;
+        \| W \mathbf{y} \|_1 + \frac{\lambda}{2} \;
+        \| D \mathbf{x} \|_2^2  \;\; \text{such that} \;\;
         \mathbf{x} - \mathbf{y} = \mathbf{s} \;\;.
 
     After termination of the :meth:`solve` method, attribute
@@ -54,7 +54,7 @@ class SplineL1(admm.ADMM):
        ``DFid`` : Value of data fidelity term :math:`\| W (\mathbf{x}
        - \mathbf{s}) \|_1`
 
-       ``Reg`` : Value of regularisation term :math:`\\frac{1}{2} \| D
+       ``Reg`` : Value of regularisation term :math:`\frac{1}{2} \| D
        \mathbf{x} \|_2^2`
 
        ``PrimalRsdl`` : Norm of primal residual
@@ -109,8 +109,8 @@ class SplineL1(admm.ADMM):
                 opt = {}
             admm.ADMM.Options.__init__(self, opt)
 
-            if self['AutoRho','RsdlTarget'] is None:
-                self['AutoRho','RsdlTarget'] = 1.0
+            if self['AutoRho', 'RsdlTarget'] is None:
+                self['AutoRho', 'RsdlTarget'] = 1.0
 
 
 
@@ -121,7 +121,7 @@ class SplineL1(admm.ADMM):
 
 
 
-    def __init__(self, S, lmbda, opt=None, axes=(0,1)):
+    def __init__(self, S, lmbda, opt=None, axes=(0, 1)):
         """
         Initialise a SplineL1 object with problem parameters.
 
@@ -163,7 +163,7 @@ class SplineL1(admm.ADMM):
         for ax in axes:
             ashp = [1,] * S.ndim
             ashp[ax] = S.shape[ax]
-            axn = np.arange(0,ashp[ax]).reshape(ashp)
+            axn = np.arange(0, ashp[ax]).reshape(ashp)
             self.Alpha += -2.0 + 2.0*np.cos(axn*np.pi/float(ashp[ax]))
         self.Gamma = 1.0 / (1.0 + (self.lmbda/self.rho)*(self.Alpha**2))
 
@@ -176,7 +176,7 @@ class SplineL1(admm.ADMM):
 
 
     def uinit(self, ushape):
-        """Return initialiser for working variable U"""
+        """Return initialiser for working variable U."""
 
         if  self.opt['Y0'] is None:
             return np.zeros(ushape, dtype=self.dtype)
@@ -189,7 +189,8 @@ class SplineL1(admm.ADMM):
 
 
     def xstep(self):
-        """Minimise Augmented Lagrangian with respect to :math:`\mathbf{x}`."""
+        r"""Minimise Augmented Lagrangian with respect to
+        :math:`\mathbf{x}`."""
 
         self.X = sl.idctii(self.Gamma*sl.dctii(self.Y + self.S - self.U,
                                          axes=self.axes), axes=self.axes)
@@ -203,7 +204,9 @@ class SplineL1(admm.ADMM):
 
 
     def ystep(self):
-        """Minimise Augmented Lagrangian with respect to :math:`\mathbf{y}`."""
+        r"""Minimise Augmented Lagrangian with respect to
+        :math:`\mathbf{y}`.
+        """
 
         self.Y = sl.shrink1(self.AX - self.S + self.U, self.Wdf / self.rho)
 
@@ -229,7 +232,7 @@ class SplineL1(admm.ADMM):
 
 
     def eval_objfn(self):
-        """Compute components of objective function as well as total
+        r"""Compute components of objective function as well as total
         contribution to objective function. Data fidelity term is
         :math:`(1/2) \| \mathbf{x} - \mathbf{s} \|_2^2` and
         regularisation term is :math:`\| D \mathbf{x} \|_2^2`.
@@ -252,8 +255,8 @@ class SplineL1(admm.ADMM):
 
 
     def cnst_A(self, X):
-        """Compute :math:`A \mathbf{x}` component of ADMM problem constraint.
-        In this case :math:`A \mathbf{x} = \mathbf{x}`.
+        r"""Compute :math:`A \mathbf{x}` component of ADMM problem
+        constraint.  In this case :math:`A \mathbf{x} = \mathbf{x}`.
         """
 
         return X
@@ -261,8 +264,8 @@ class SplineL1(admm.ADMM):
 
 
     def cnst_AT(self, X):
-        """Compute :math:`A^T \mathbf{x}` where :math:`A \mathbf{x}` is
-        a component of ADMM problem constraint. In this case
+        r"""Compute :math:`A^T \mathbf{x}` where :math:`A \mathbf{x}`
+        is a component of ADMM problem constraint. In this case
         :math:`A^T \mathbf{x} = \mathbf{x}`.
         """
 
@@ -271,8 +274,8 @@ class SplineL1(admm.ADMM):
 
 
     def cnst_B(self, Y):
-        """Compute :math:`B \mathbf{y}` component of ADMM problem constraint.
-        In this case :math:`B \mathbf{y} = -\mathbf{y}`.
+        r"""Compute :math:`B \mathbf{y}` component of ADMM problem
+        constraint.  In this case :math:`B \mathbf{y} = -\mathbf{y}`.
         """
 
         return -Y
@@ -280,7 +283,7 @@ class SplineL1(admm.ADMM):
 
 
     def cnst_c(self):
-        """Compute constant component :math:`\mathbf{c}` of ADMM problem
+        r"""Compute constant component :math:`\mathbf{c}` of ADMM problem
         constraint. In this case :math:`\mathbf{c} = \mathbf{s}`.
         """
 

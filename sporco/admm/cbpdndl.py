@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2015-2016 by Brendt Wohlberg <brendt@ieee.org>
+# Copyright (C) 2015-2017 by Brendt Wohlberg <brendt@ieee.org>
 # All rights reserved. BSD 3-clause License.
 # This file is part of the SPORCO package. Details of the copyright
 # and user license can be found in the 'LICENSE.txt' file distributed
@@ -12,8 +12,8 @@ from __future__ import absolute_import
 from builtins import range
 from builtins import object
 
-import numpy as np
 import copy
+import numpy as np
 
 from sporco.util import u
 from sporco.admm import cbpdn
@@ -24,16 +24,16 @@ __author__ = """Brendt Wohlberg <brendt@ieee.org>"""
 
 
 class ConvBPDNDictLearn(dictlrn.DictLearn):
-    """Dictionary learning based on ConvBPDN and ConvCnstrMOD
+    r"""Dictionary learning based on ConvBPDN and ConvCnstrMOD
     :cite:`wohlberg-2016-efficient`.
 
     Solve the optimisation problem
 
     .. math::
        \mathrm{argmin}_{\mathbf{d}, \mathbf{x}} \;
-       (1/2) \sum_k \\left \|  \sum_m \mathbf{d}_m * \mathbf{x}_{k,m} -
-       \mathbf{s}_k \\right \|_2^2 + \lambda \sum_k \sum_m
-       \| \mathbf{x}_{k,m} \|_1 \quad \\text{such that}
+       (1/2) \sum_k \left \|  \sum_m \mathbf{d}_m * \mathbf{x}_{k,m} -
+       \mathbf{s}_k \right \|_2^2 + \lambda \sum_k \sum_m
+       \| \mathbf{x}_{k,m} \|_1 \quad \text{such that}
        \quad \mathbf{d}_m \in C \;\;,
 
     where :math:`C` is the feasible set consisting of filters with

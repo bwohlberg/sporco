@@ -13,12 +13,13 @@ from future.utils import with_metaclass
 from builtins import range
 from builtins import object
 
-import numpy as np
-from scipy import linalg
-import scipy
 import copy
 import collections
 import sys
+import warnings
+import numpy as np
+import scipy
+from scipy import linalg
 
 from sporco import cdict
 from sporco import util
@@ -68,20 +69,20 @@ class _ADMM_Meta(type):
     problems with lookup of nested class definitions when using pickle.
     """
 
-    def __init__(self, *args):
+    def __init__(cls, *args):
 
         # Initialise named tuple type for recording ADMM iteration statistics
-        self.IterationStats = collections.namedtuple('IterationStats',
-                                self.itstat_fields())
+        cls.IterationStats = collections.namedtuple('IterationStats',
+                                cls.itstat_fields())
         # Apply _module_name_nested function to class after creation
-        _module_name_nested(self)
+        _module_name_nested(cls)
 
 
 
 
 
 class ADMM(with_metaclass(_ADMM_Meta, object)):
-    """Base class for Alternating Direction Method of Multipliers (ADMM)
+    r"""Base class for Alternating Direction Method of Multipliers (ADMM)
     algorithms :cite:`boyd-2010-distributed`.
 
     Solve an optimisation problems of the form
@@ -192,7 +193,7 @@ class ADMM(with_metaclass(_ADMM_Meta, object)):
                         'StdResiduals' : False
                     },
                     'Y0' : None, 'U0' : None, 'Callback' : None
-                }
+                   }
 
         def __init__(self, opt=None):
             """Initialise ADMM algorithm options object."""
@@ -224,7 +225,7 @@ class ADMM(with_metaclass(_ADMM_Meta, object)):
 
 
     def __init__(self, Nx, yshape, ushape, dtype, opt=None):
-        """
+        r"""
         Initialise an ADMM object with problem size and options.
 
         Parameters
@@ -446,7 +447,7 @@ class ADMM(with_metaclass(_ADMM_Meta, object)):
 
 
     def xstep(self):
-        """Minimise Augmented Lagrangian with respect to :math:`\mathbf{x}`.
+        r"""Minimise Augmented Lagrangian with respect to :math:`\mathbf{x}`.
 
         Overriding this method is required.
         """
@@ -456,7 +457,7 @@ class ADMM(with_metaclass(_ADMM_Meta, object)):
 
 
     def ystep(self):
-        """Minimise Augmented Lagrangian with respect to :math:`\mathbf{y}`.
+        r"""Minimise Augmented Lagrangian with respect to :math:`\mathbf{y}`.
 
         Overriding this method is required.
         """
@@ -489,7 +490,7 @@ class ADMM(with_metaclass(_ADMM_Meta, object)):
             # Compute relaxed version of AX
             alpha = self.rlx
             self.AX = alpha*self.AXnr - (1-alpha)*(self.cnst_B(self.Y) -
-                                self._cnst_c)
+                                                   self._cnst_c)
 
 
 
@@ -527,8 +528,9 @@ class ADMM(with_metaclass(_ADMM_Meta, object)):
         named tuple.
         """
 
-        return ('Iter',) + cls.itstat_fields_objfn + ('PrimalRsdl', 'DualRsdl',
-        'EpsPrimal', 'EpsDual', 'Rho') +  cls.itstat_fields_extra + ('Time',)
+        return ('Iter',) + cls.itstat_fields_objfn + \
+          ('PrimalRsdl', 'DualRsdl', 'EpsPrimal', 'EpsDual', 'Rho') + \
+          cls.itstat_fields_extra + ('Time',)
 
 
 
@@ -638,8 +640,8 @@ class ADMM(with_metaclass(_ADMM_Meta, object)):
             else:
                 hdrtxt = type(self).hdrtxt()[0:-1]
             # Call utility function to construct status display formatting
-            hdrstr, fmtstr, nsep = util.solve_status_str(hdrtxt,
-                                type(self).fwiter, type(self).fpothr)
+            hdrstr, fmtstr, nsep = util.solve_status_str(
+                hdrtxt, type(self).fwiter, type(self).fpothr)
             # Print header and separator strings
             if self.opt['StatusHeader']:
                 print(hdrstr)
@@ -660,7 +662,7 @@ class ADMM(with_metaclass(_ADMM_Meta, object)):
             hdrtxt = type(self).hdrtxt()
             hdrval = type(self).hdrval()
             itdsp = tuple([getattr(itst, hdrval[col]) for col in hdrtxt])
-            if not self.opt['AutoRho','Enabled']:
+            if not self.opt['AutoRho', 'Enabled']:
                 itdsp = itdsp[0:-1]
 
             print(fmtstr % itdsp)
@@ -676,28 +678,28 @@ class ADMM(with_metaclass(_ADMM_Meta, object)):
 
 
     def var_x(self):
-        """Get :math:`\mathbf{x}` variable."""
+        r"""Get :math:`\mathbf{x}` variable."""
 
         return self.X
 
 
 
     def var_y(self):
-        """Get :math:`\mathbf{y}` variable."""
+        r"""Get :math:`\mathbf{y}` variable."""
 
         return self.Y
 
 
 
     def var_u(self):
-        """Get :math:`\mathbf{u}` variable."""
+        r"""Get :math:`\mathbf{u}` variable."""
 
         return self.U
 
 
 
     def obfn_f(self, X):
-        """Compute :math:`f(\mathbf{x})` component of ADMM objective function.
+        r"""Compute :math:`f(\mathbf{x})` component of ADMM objective function.
 
         Overriding this method is required if :meth:`eval_objfun`
         is not overridden.
@@ -708,7 +710,7 @@ class ADMM(with_metaclass(_ADMM_Meta, object)):
 
 
     def obfn_g(self, Y):
-        """Compute :math:`g(\mathbf{y})` component of ADMM objective function.
+        r"""Compute :math:`g(\mathbf{y})` component of ADMM objective function.
 
         Overriding this method is required if :meth:`eval_objfun`
         is not overridden.
@@ -719,7 +721,7 @@ class ADMM(with_metaclass(_ADMM_Meta, object)):
 
 
     def cnst_A(self, X):
-        """Compute :math:`A \mathbf{x}` component of ADMM problem constraint.
+        r"""Compute :math:`A \mathbf{x}` component of ADMM problem constraint.
 
         Overriding this method is required if methods :meth:`rsdl_r`,
         :meth:`rsdl_s`, :meth:`rsdl_rn`, and :meth:`rsdl_sn` are not
@@ -731,7 +733,7 @@ class ADMM(with_metaclass(_ADMM_Meta, object)):
 
 
     def cnst_AT(self, X):
-        """Compute :math:`A^T \mathbf{x}` where :math:`A \mathbf{x}` is
+        r"""Compute :math:`A^T \mathbf{x}` where :math:`A \mathbf{x}` is
         a component of ADMM problem constraint.
 
         Overriding this method is required if methods :meth:`rsdl_r`,
@@ -744,7 +746,7 @@ class ADMM(with_metaclass(_ADMM_Meta, object)):
 
 
     def cnst_B(self, Y):
-        """Compute :math:`B \mathbf{y}` component of ADMM problem constraint.
+        r"""Compute :math:`B \mathbf{y}` component of ADMM problem constraint.
 
         Overriding this method is required if methods :meth:`rsdl_r`,
         :meth:`rsdl_s`, :meth:`rsdl_rn`, and :meth:`rsdl_sn` are not
@@ -756,7 +758,7 @@ class ADMM(with_metaclass(_ADMM_Meta, object)):
 
 
     def cnst_c(self):
-        """Compute constant component :math:`\mathbf{c}` of ADMM problem
+        r"""Compute constant component :math:`\mathbf{c}` of ADMM problem
         constraint.
 
         Overriding this method is required if methods :meth:`rsdl_r`,
@@ -838,7 +840,7 @@ class ADMM(with_metaclass(_ADMM_Meta, object)):
 
 
 class ADMMEqual(ADMM):
-    """Base class for ADMM algorithms with a simple equality constraint.
+    r"""Base class for ADMM algorithms with a simple equality constraint.
 
     Solve optimisation problems of the form
 
@@ -955,7 +957,7 @@ class ADMMEqual(ADMM):
 
 
     def cnst_A(self, X):
-        """Compute :math:`A \mathbf{x}` component of ADMM problem constraint.
+        r"""Compute :math:`A \mathbf{x}` component of ADMM problem constraint.
         In this case :math:`A \mathbf{x} = \mathbf{x}` since the constraint
         is :math:`\mathbf{x} = \mathbf{y}`.
         """
@@ -964,7 +966,7 @@ class ADMMEqual(ADMM):
 
 
     def cnst_AT(self, X):
-        """Compute :math:`A^T \mathbf{x}` where :math:`A \mathbf{x}` is
+        r"""Compute :math:`A^T \mathbf{x}` where :math:`A \mathbf{x}` is
         a component of ADMM problem constraint. In this case
         :math:`A^T \mathbf{x} = \mathbf{x}` since the constraint
         is :math:`\mathbf{x} = \mathbf{y}`.
@@ -975,7 +977,7 @@ class ADMMEqual(ADMM):
 
 
     def cnst_B(self, Y):
-        """Compute :math:`B \mathbf{y}` component of ADMM problem constraint.
+        r"""Compute :math:`B \mathbf{y}` component of ADMM problem constraint.
         In this case :math:`B \mathbf{y} = -\mathbf{y}` since the constraint
         is :math:`\mathbf{x} = \mathbf{y}`.
         """
@@ -985,7 +987,7 @@ class ADMMEqual(ADMM):
 
 
     def cnst_c(self):
-        """Compute constant component :math:`\mathbf{c}` of ADMM problem
+        r"""Compute constant component :math:`\mathbf{c}` of ADMM problem
         constraint. In this case :math:`\mathbf{c} = \mathbf{0}` since
         the constraint is :math:`\mathbf{x} = \mathbf{y}`.
         """
@@ -1025,7 +1027,7 @@ class ADMMEqual(ADMM):
 
 
 class ADMMTwoBlockCnstrnt(ADMM):
-    """Base class for ADMM algorithms for problems for which
+    r"""Base class for ADMM algorithms for problems for which
     :math:`g(\mathbf{y}) = g_0(\mathbf{y}_0) + g_1(\mathbf{y}_1)` with
     :math:`\mathbf{y}^T = (\mathbf{y}_0^T \; \mathbf{y}_1^T)`.
 
@@ -1040,21 +1042,21 @@ class ADMMTwoBlockCnstrnt(ADMM):
     .. math::
        \mathrm{argmin}_{\mathbf{x},\mathbf{y}_0,\mathbf{y}_1} \;
        f(\mathbf{x}) + g_0(\mathbf{y}_0) + g_0(\mathbf{y}_1)
-       \;\\text{such that}\;
-       \\left( \\begin{array}{c} A_0 \\\\ A_1 \\end{array} \\right) \mathbf{x}
-       - \\left( \\begin{array}{c} \mathbf{y}_0 \\\\ \mathbf{y}_1 \\end{array}
-       \\right) = \\left( \\begin{array}{c} \mathbf{c}_0 \\\\
-       \mathbf{c}_1 \\end{array} \\right) \;\;.
+       \;\text{such that}\;
+       \left( \begin{array}{c} A_0 \\ A_1 \end{array} \right) \mathbf{x}
+       - \left( \begin{array}{c} \mathbf{y}_0 \\ \mathbf{y}_1 \end{array}
+       \right) = \left( \begin{array}{c} \mathbf{c}_0 \\
+       \mathbf{c}_1 \end{array} \right) \;\;.
 
     In this case the ADMM constraint is :math:`A\mathbf{x} + B\mathbf{y} =
     \mathbf{c}` where
 
     .. math::
-       A = \\left( \\begin{array}{c} A_0 \\\\ A_1 \\end{array} \\right)
-       \\qquad B = -I \\qquad \mathbf{y} = \\left( \\begin{array}{c}
-       \mathbf{y}_0 \\\\ \mathbf{y}_1 \\end{array} \\right) \\qquad
-       \mathbf{c} = \\left( \\begin{array}{c} \mathbf{c}_0 \\\\
-       \mathbf{c}_1 \\end{array} \\right) \;\;.
+       A = \left( \begin{array}{c} A_0 \\ A_1 \end{array} \right)
+       \qquad B = -I \qquad \mathbf{y} = \left( \begin{array}{c}
+       \mathbf{y}_0 \\ \mathbf{y}_1 \end{array} \right) \qquad
+       \mathbf{c} = \left( \begin{array}{c} \mathbf{c}_0 \\
+       \mathbf{c}_1 \end{array} \right) \;\;.
 
     This class specialises class :class:`.ADMM`, but remains a base class for
     other classes that specialise to specific optimisation problems.
@@ -1062,7 +1064,7 @@ class ADMMTwoBlockCnstrnt(ADMM):
 
 
     class Options(ADMM.Options):
-        """ADMMTwoBlockCnstrnt algorithm options.
+        r"""ADMMTwoBlockCnstrnt algorithm options.
 
         Options include all of those defined in :class:`ADMM.Options`,
         together with additional options:
@@ -1106,7 +1108,7 @@ class ADMMTwoBlockCnstrnt(ADMM):
 
 
     def __init__(self, Nx, yshape, blkaxis, blkidx, dtype, opt=None):
-        """
+        r"""
         Initialise an ADMMTwoBlockCnstrnt object with problem size and options.
 
         Parameters
@@ -1153,25 +1155,25 @@ class ADMMTwoBlockCnstrnt(ADMM):
 
 
     def block_sep0(self, Y):
-        """Separate variable into component corresponding to
+        r"""Separate variable into component corresponding to
         :math:`\mathbf{y}_0` in :math:`\mathbf{y}\;\;`.
         """
 
-        return Y[(slice(None),)*self.blkaxis + (slice(0,self.blkidx),)]
+        return Y[(slice(None),)*self.blkaxis + (slice(0, self.blkidx),)]
 
 
 
     def block_sep1(self, Y):
-        """Separate variable into component corresponding to
+        r"""Separate variable into component corresponding to
         :math:`\mathbf{y}_1` in :math:`\mathbf{y}\;\;`.
         """
 
-        return Y[(slice(None),)*self.blkaxis + (slice(self.blkidx,None),)]
+        return Y[(slice(None),)*self.blkaxis + (slice(self.blkidx, None),)]
 
 
 
     def block_sep(self, Y):
-        """Separate variable into components corresponding to blocks
+        r"""Separate variable into components corresponding to blocks
         :math:`\mathbf{y}_0` and :math:`\mathbf{y}_1` in
         :math:`\mathbf{y}\;\;`.
         """
@@ -1181,7 +1183,7 @@ class ADMMTwoBlockCnstrnt(ADMM):
 
 
     def block_cat(self, Y0, Y1):
-        """Concatenate components corresponding to :math:`\mathbf{y}_0` and
+        r"""Concatenate components corresponding to :math:`\mathbf{y}_0` and
         :math:`\mathbf{y}_1` to form :math:`\mathbf{y}\;\;`.
         """
 
@@ -1208,14 +1210,14 @@ class ADMMTwoBlockCnstrnt(ADMM):
 
 
     def var_y0(self):
-        """Get :math:`\mathbf{y}_0` variable."""
+        r"""Get :math:`\mathbf{y}_0` variable."""
 
         return self.block_sep0(self.Y)
 
 
 
     def var_y1(self):
-        """Get :math:`\mathbf{y}_1` variable."""
+        r"""Get :math:`\mathbf{y}_1` variable."""
 
         return self.block_sep1(self.Y)
 
@@ -1251,7 +1253,7 @@ class ADMMTwoBlockCnstrnt(ADMM):
 
 
     def obfn_f(self, X):
-        """Compute :math:`f(\mathbf{x})` component of ADMM objective
+        r"""Compute :math:`f(\mathbf{x})` component of ADMM objective
         function. Unless overridden, :math:`f(\mathbf{x}) = 0`.
         """
 
@@ -1260,7 +1262,7 @@ class ADMMTwoBlockCnstrnt(ADMM):
 
 
     def obfn_g(self, Y):
-        """Compute :math:`g(\mathbf{y}) = g_0(\mathbf{y}_0) +
+        r"""Compute :math:`g(\mathbf{y}) = g_0(\mathbf{y}_0) +
         g_1(\mathbf{y}_1)` component of ADMM objective function.
         """
 
@@ -1269,7 +1271,7 @@ class ADMMTwoBlockCnstrnt(ADMM):
 
 
     def obfn_g0(self, Y0):
-        """Compute :math:`g_0(\mathbf{y}_0)` component of ADMM objective
+        r"""Compute :math:`g_0(\mathbf{y}_0)` component of ADMM objective
         function.
 
         Overriding this method is required.
@@ -1280,7 +1282,7 @@ class ADMMTwoBlockCnstrnt(ADMM):
 
 
     def obfn_g1(self, Y1):
-        """Compute :math:`g_1(\mathbf{y_1})` component of ADMM objective
+        r"""Compute :math:`g_1(\mathbf{y_1})` component of ADMM objective
         function.
 
         Overriding this method is required.
@@ -1304,7 +1306,7 @@ class ADMMTwoBlockCnstrnt(ADMM):
 
 
     def cnst_A(self, X):
-        """Compute :math:`A \mathbf{x}` component of ADMM problem
+        r"""Compute :math:`A \mathbf{x}` component of ADMM problem
         constraint.
         """
 
@@ -1313,12 +1315,12 @@ class ADMMTwoBlockCnstrnt(ADMM):
 
 
     def cnst_AT(self, Y):
-        """Compute :math:`A^T \mathbf{y}` where
+        r"""Compute :math:`A^T \mathbf{y}` where
 
         .. math::
-           A^T \mathbf{y} = \\left( \\begin{array}{cc} A_0^T & A_1^T
-           \\end{array} \\right) \\left( \\begin{array}{c} \mathbf{y}_0
-           \\\\ \mathbf{y}_1 \\end{array} \\right) = A_0^T \mathbf{y}_0 +
+           A^T \mathbf{y} = \left( \begin{array}{cc} A_0^T & A_1^T
+           \end{array} \right) \left( \begin{array}{c} \mathbf{y}_0
+           \\ \mathbf{y}_1 \end{array} \right) = A_0^T \mathbf{y}_0 +
            A_1^T \mathbf{y}_1 \;\;.
         """
 
@@ -1328,7 +1330,7 @@ class ADMMTwoBlockCnstrnt(ADMM):
 
 
     def cnst_B(self, Y):
-        """Compute :math:`B \mathbf{y}` component of ADMM problem constraint.
+        r"""Compute :math:`B \mathbf{y}` component of ADMM problem constraint.
         In this case :math:`B \mathbf{y} = -\mathbf{y}` since the constraint
         is :math:`A \mathbf{x} - \mathbf{y} = \mathbf{c}`.
         """
@@ -1338,7 +1340,7 @@ class ADMMTwoBlockCnstrnt(ADMM):
 
 
     def cnst_c(self):
-        """Compute constant component :math:`\mathbf{c}` of ADMM problem
+        r"""Compute constant component :math:`\mathbf{c}` of ADMM problem
         constraint. This method should not be used or overridden: all
         calculations should make use of components :meth:`cnst_c0` and
         :meth:`cnst_c1` so that these methods can return scalar zeros
@@ -1350,7 +1352,7 @@ class ADMMTwoBlockCnstrnt(ADMM):
 
 
     def cnst_c0(self):
-        """Compute constant component :math:`\mathbf{c}_0` of
+        r"""Compute constant component :math:`\mathbf{c}_0` of
         :math:`\mathbf{c}` in the ADMM problem constraint. Unless overridden,
         :math:`\mathbf{c}_0 = 0`.
         """
@@ -1360,7 +1362,7 @@ class ADMMTwoBlockCnstrnt(ADMM):
 
 
     def cnst_c1(self):
-        """Compute constant component :math:`\mathbf{c}_1` of
+        r"""Compute constant component :math:`\mathbf{c}_1` of
         :math:`\mathbf{c}` in the ADMM problem constraint. Unless overridden,
         :math:`\mathbf{c}_1 = 0`.
         """
@@ -1370,7 +1372,7 @@ class ADMMTwoBlockCnstrnt(ADMM):
 
 
     def cnst_A0(self, X):
-        """Compute :math:`A_0 \mathbf{x}` component of :math:`A \mathbf{x}` in
+        r"""Compute :math:`A_0 \mathbf{x}` component of :math:`A \mathbf{x}` in
         ADMM problem constraint (see :meth:`cnst_A`). Unless overridden,
         :math:`A_0 \mathbf{x} = \mathbf{x}`, i.e. :math:`A_0 = I`.
         """
@@ -1380,7 +1382,7 @@ class ADMMTwoBlockCnstrnt(ADMM):
 
 
     def cnst_A0T(self, Y0):
-        """Compute :math:`A_0^T \mathbf{y}_0` component of
+        r"""Compute :math:`A_0^T \mathbf{y}_0` component of
         :math:`A^T \mathbf{y}` (see :meth:`cnst_AT`). Unless overridden,
         :math:`A_0^T \mathbf{y}_0 = \mathbf{y}_0`, i.e. :math:`A_0 = I`.
         """
@@ -1390,7 +1392,7 @@ class ADMMTwoBlockCnstrnt(ADMM):
 
 
     def cnst_A1(self, X):
-        """Compute :math:`A_1 \mathbf{x}` component of :math:`A \mathbf{x}`
+        r"""Compute :math:`A_1 \mathbf{x}` component of :math:`A \mathbf{x}`
         in ADMM problem constraint (see :meth:`cnst_A`). Unless overridden,
         :math:`A_1 \mathbf{x} = \mathbf{x}`, i.e. :math:`A_1 = I`.
         """
@@ -1400,7 +1402,7 @@ class ADMMTwoBlockCnstrnt(ADMM):
 
 
     def cnst_A1T(self, Y1):
-        """Compute :math:`A_1^T \mathbf{y}_1` component of
+        r"""Compute :math:`A_1^T \mathbf{y}_1` component of
         :math:`A^T \mathbf{y}` (see :meth:`cnst_AT`). Unless overridden,
         :math:`A_1^T \mathbf{y}_1 = \mathbf{y}_1`, i.e. :math:`A_1 = I`.
         """
@@ -1448,7 +1450,7 @@ class ADMMTwoBlockCnstrnt(ADMM):
 
         if not hasattr(self, '_cnst_nrm_c'):
             self._cnst_nrm_c = np.sqrt(linalg.norm(self.cnst_c0())**2 +
-                              linalg.norm(self.cnst_c1())**2)
+                                       linalg.norm(self.cnst_c1())**2)
         return max((linalg.norm(AX), linalg.norm(Y), self._cnst_nrm_c))
 
 

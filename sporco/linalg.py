@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2015-2016 by Brendt Wohlberg <brendt@ieee.org>
+# Copyright (C) 2015-2017 by Brendt Wohlberg <brendt@ieee.org>
 # All rights reserved. BSD 3-clause License.
 # This file is part of the SPORCO package. Details of the copyright
 # and user license can be found in the 'LICENSE.txt' file distributed
@@ -10,12 +10,12 @@
 from __future__ import division
 from builtins import range
 
+import multiprocessing
 import numpy as np
 from scipy import linalg
 from scipy import fftpack
 from scipy.sparse.linalg import LinearOperator
 from scipy.sparse.linalg import cg
-import multiprocessing
 import pyfftw
 try:
     import numexpr as ne
@@ -249,7 +249,7 @@ def idctii(x, axes=None):
 
 
 def solvedbi_sm(ah, rho, b, c=None, axis=4):
-    """
+    r"""
     Solve a diagonal block linear system with a scaled identity term
     using the Sherman-Morrison equation.
 
@@ -257,7 +257,7 @@ def solvedbi_sm(ah, rho, b, c=None, axis=4):
     systems of the form (see :cite:`wohlberg-2016-efficient`)
 
     .. math::
-      (\\rho I + \mathbf{a} \mathbf{a}^H ) \; \mathbf{x} = \mathbf{b} \;\;.
+      (\rho I + \mathbf{a} \mathbf{a}^H ) \; \mathbf{x} = \mathbf{b} \;\;.
 
     In this equation inner products and matrix products are taken along
     the specified axis of the corresponding multi-dimensional arrays; the
@@ -268,7 +268,7 @@ def solvedbi_sm(ah, rho, b, c=None, axis=4):
     ah : array_like
       Linear system component :math:`\mathbf{a}^H`
     rho : float
-      Linear system parameter :math:`\\rho`
+      Linear system parameter :math:`\rho`
     b : array_like
       Linear system component :math:`\mathbf{b}`
     c : array_like, optional (default None)
@@ -295,7 +295,7 @@ def solvedbi_sm(ah, rho, b, c=None, axis=4):
 
 
 def solvedbi_sm_c(ah, a, rho, axis=4):
-    """
+    r"""
     Compute cached component used by :func:`solvedbi_sm`.
 
     Parameters
@@ -305,7 +305,7 @@ def solvedbi_sm_c(ah, a, rho, axis=4):
     a : array_like
       Linear system component :math:`\mathbf{a}`
     rho : float
-      Linear system parameter :math:`\\rho`
+      Linear system parameter :math:`\rho`
     axis : int, optional (default 4)
       Axis along which to solve the linear system
 
@@ -320,7 +320,7 @@ def solvedbi_sm_c(ah, a, rho, axis=4):
 
 
 def solvedbd_sm(ah, d, b, c=None, axis=4):
-    """
+    r"""
     Solve a diagonal block linear system with a diagonal term
     using the Sherman-Morrison equation.
 
@@ -366,7 +366,7 @@ def solvedbd_sm(ah, d, b, c=None, axis=4):
 
 
 def solvedbd_sm_c(ah, a, d, axis=4):
-    """
+    r"""
     Compute cached component used by :func:`solvedbd_sm`.
 
     Parameters
@@ -391,7 +391,7 @@ def solvedbd_sm_c(ah, a, d, axis=4):
 
 
 def solvemdbi_ism(ah, rho, b, axisM, axisK):
-    """
+    r"""
     Solve a multiple diagonal block linear system with a scaled
     identity term by iterated application of the Sherman-Morrison
     equation. The computation is performed in a way that avoids
@@ -402,7 +402,7 @@ def solvemdbi_ism(ah, rho, b, axisM, axisK):
     systems of the form (see :cite:`wohlberg-2016-efficient`)
 
     .. math::
-      (\\rho I + \mathbf{a}_0 \mathbf{a}_0^H + \mathbf{a}_1 \mathbf{a}_1^H +
+      (\rho I + \mathbf{a}_0 \mathbf{a}_0^H + \mathbf{a}_1 \mathbf{a}_1^H +
        \; \ldots \; + \mathbf{a}_{K-1} \mathbf{a}_{K-1}^H) \; \mathbf{x} =
        \mathbf{b}
 
@@ -416,7 +416,7 @@ def solvemdbi_ism(ah, rho, b, axisM, axisK):
     ah : array_like
       Linear system component :math:`\mathbf{a}^H`
     rho : float
-      Linear system parameter :math:`\\rho`
+      Linear system parameter :math:`\rho`
     b : array_like
       Linear system component :math:`\mathbf{b}`
     axisM : int
@@ -462,7 +462,7 @@ def solvemdbi_ism(ah, rho, b, axisM, axisK):
 
 
 def solvemdbi_rsm(ah, rho, b, axisK, dimN=2):
-    """
+    r"""
     Solve a multiple diagonal block linear system with a scaled
     identity term by repeated application of the Sherman-Morrison
     equation. The computation is performed by explictly constructing
@@ -474,7 +474,7 @@ def solvemdbi_rsm(ah, rho, b, axisK, dimN=2):
     systems of the form (see :cite:`wohlberg-2016-efficient`)
 
     .. math::
-      (\\rho I + \mathbf{a}_0 \mathbf{a}_0^H + \mathbf{a}_1 \mathbf{a}_1^H +
+      (\rho I + \mathbf{a}_0 \mathbf{a}_0^H + \mathbf{a}_1 \mathbf{a}_1^H +
        \; \ldots \; + \mathbf{a}_{K-1} \mathbf{a}_{K-1}^H) \; \mathbf{x} =
        \mathbf{b}
 
@@ -488,7 +488,7 @@ def solvemdbi_rsm(ah, rho, b, axisK, dimN=2):
     ah : array_like
       Linear system component :math:`\mathbf{a}^H`
     rho : float
-      Linear system parameter :math:`\\rho`
+      Linear system parameter :math:`\rho`
     b : array_like
       Linear system component :math:`\mathbf{b}`
     axisK : int
@@ -509,7 +509,7 @@ def solvemdbi_rsm(ah, rho, b, axisK, dimN=2):
     K = ah.shape[axisK]
     a = np.conj(ah)
     Ainv = np.ones(ah.shape[0:dimN] + (1,)*4) * \
-        np.reshape(np.eye(M,M) / rho, (1,)*(dimN+2) + (M, M))
+        np.reshape(np.eye(M, M) / rho, (1,)*(dimN+2) + (M, M))
 
     for k in range(0, K):
         slck = slcnc + (slice(k, k+1),) + (slice(None), np.newaxis,)
@@ -521,12 +521,12 @@ def solvemdbi_rsm(ah, rho, b, axisK, dimN=2):
         Ainv = Ainv - AiaahAi / ahAia
 
     return np.sum(Ainv * np.swapaxes(b[(slice(None),)*b.ndim + (np.newaxis,)],
-                                        dimN+2, dimN+3), dimN+3)
+                                     dimN+2, dimN+3), dimN+3)
 
 
 
 def solvemdbi_cg(ah, rho, b, axisM, axisK, tol=1e-5, mit=1000, isn=None):
-    """
+    r"""
     Solve a multiple diagonal block linear system with a scaled
     identity term using Conjugate Gradient (CG) via
     :func:`scipy.sparse.linalg.cg`.
@@ -535,7 +535,7 @@ def solvemdbi_cg(ah, rho, b, axisM, axisK, tol=1e-5, mit=1000, isn=None):
     systems of the form (see :cite:`wohlberg-2016-efficient`)
 
      .. math::
-      (\\rho I + \mathbf{a}_0 \mathbf{a}_0^H + \mathbf{a}_1 \mathbf{a}_1^H +
+      (\rho I + \mathbf{a}_0 \mathbf{a}_0^H + \mathbf{a}_1 \mathbf{a}_1^H +
        \; \ldots \; + \mathbf{a}_{K-1} \mathbf{a}_{K-1}^H) \; \mathbf{x} =
        \mathbf{b}
 
@@ -585,16 +585,16 @@ def solvemdbi_cg(ah, rho, b, axisM, axisK, tol=1e-5, mit=1000, isn=None):
 
 
 def lu_factor(A, rho):
-    """
-    Compute LU factorisation of either :math:`A^T A + \\rho I` or
-    :math:`A A^T + \\rho I`, depending on which matrix is smaller.
+    r"""
+    Compute LU factorisation of either :math:`A^T A + \rho I` or
+    :math:`A A^T + \rho I`, depending on which matrix is smaller.
 
     Parameters
     ----------
     A : array_like
       Array :math:`A`
     rho : float
-      Scalar :math:`\\rho`
+      Scalar :math:`\rho`
 
     Returns
     -------
@@ -620,18 +620,18 @@ def lu_factor(A, rho):
 
 
 def lu_solve_ATAI(A, rho, b, lu, piv):
-    """
-    Solve the linear system :math:`(A^T A + \\rho I)\\mathbf{x} = \\mathbf{b}`
-    or :math:`(A^T A + \\rho I)X = B` using :func:`scipy.linalg.lu_solve`.
+    r"""
+    Solve the linear system :math:`(A^T A + \rho I)\mathbf{x} = \mathbf{b}`
+    or :math:`(A^T A + \rho I)X = B` using :func:`scipy.linalg.lu_solve`.
 
     Parameters
     ----------
     A : array_like
       Matrix :math:`A`
     rho : float
-      Scalar :math:`\\rho`
+      Scalar :math:`\rho`
     b : array_like
-      Vector :math:`\\mathbf{b}` or matrix :math:`B`
+      Vector :math:`\mathbf{b}` or matrix :math:`B`
     lu : array_like
       Matrix containing U in its upper triangle, and L in its lower triangle,
       as returned by :func:`scipy.linalg.lu_factor`
@@ -655,18 +655,18 @@ def lu_solve_ATAI(A, rho, b, lu, piv):
 
 
 def lu_solve_AATI(A, rho, b, lu, piv):
-    """
-    Solve the linear system :math:`(A A^T + \\rho I)\\mathbf{x} = \\mathbf{b}`
-    or :math:`(A A^T + \\rho I)X = B` using :func:`scipy.linalg.lu_solve`.
+    r"""
+    Solve the linear system :math:`(A A^T + \rho I)\mathbf{x} = \mathbf{b}`
+    or :math:`(A A^T + \rho I)X = B` using :func:`scipy.linalg.lu_solve`.
 
     Parameters
     ----------
     A : array_like
       Matrix :math:`A`
     rho : float
-      Scalar :math:`\\rho`
+      Scalar :math:`\rho`
     b : array_like
-      Vector :math:`\\mathbf{b}` or matrix :math:`B`
+      Vector :math:`\mathbf{b}` or matrix :math:`B`
     lu : array_like
       Matrix containing U in its upper triangle, and L in its lower triangle,
       as returned by :func:`scipy.linalg.lu_factor`
@@ -709,7 +709,7 @@ def zpad(x, pd, ax):
       Padded array
     """
 
-    xpd = ((0,0),)*ax + (pd,) + ((0,0),)*(x.ndim-ax-1)
+    xpd = ((0, 0),)*ax + (pd,) + ((0, 0),)*(x.ndim-ax-1)
     return np.pad(x, xpd, 'constant')
 
 
@@ -732,7 +732,8 @@ def Gax(x, ax):
     """
 
     slc0 = (slice(None),)*ax
-    return zpad(x[slc0 + (slice(1,None),)] - x[slc0 + (slice(-1),)], (0,1), ax)
+    return zpad(x[slc0 + (slice(1, None),)] - x[slc0 + (slice(-1),)],
+                (0, 1), ax)
 
 
 
@@ -754,13 +755,13 @@ def GTax(x, ax):
     """
 
     slc0 = (slice(None),)*ax
-    return zpad(x[slc0 + (slice(-1),)], (1,0), ax) - \
-      zpad(x[slc0 + (slice(-1),)], (0,1), ax)
+    return zpad(x[slc0 + (slice(-1),)], (1, 0), ax) - \
+      zpad(x[slc0 + (slice(-1),)], (0, 1), ax)
 
 
 
 def GradientFilters(ndim, axes, axshp, dtype=None):
-    """
+    r"""
     Construct a set of filters for computing gradients in the frequency
     domain.
 
@@ -789,7 +790,7 @@ def GradientFilters(ndim, axes, axshp, dtype=None):
     g = np.zeros([2 if k in axes else 1 for k in range(ndim)] +
                  [len(axes),], dtype)
     for k in axes:
-        g[(0,)*k +(slice(None),)+(0,)*(g.ndim-2-k)+(k,)] = [1,-1]
+        g[(0,)*k +(slice(None),)+(0,)*(g.ndim-2-k)+(k,)] = [1, -1]
     Gf = rfftn(g, axshp, axes=axes)
     GHGf = np.sum(np.conj(Gf)*Gf, axis=-1)
     return Gf, GHGf
@@ -797,20 +798,20 @@ def GradientFilters(ndim, axes, axshp, dtype=None):
 
 
 def shrink1(x, alpha):
-    """
+    r"""
     Scalar shrinkage/soft thresholding function
 
      .. math::
-      \mathcal{S}_{1,\\alpha}(\mathbf{x}) = \mathrm{sign}(\mathbf{x}) \odot
-      \max(0, |\mathbf{x}| - \\alpha) = \mathrm{prox}_f(\mathbf{x}) \;\;
-      \\text{where} \;\; f(\mathbf{u}) = \\alpha \|\mathbf{u}\|_1 \;\;.
+      \mathcal{S}_{1,\alpha}(\mathbf{x}) = \mathrm{sign}(\mathbf{x}) \odot
+      \max(0, |\mathbf{x}| - \alpha) = \mathrm{prox}_f(\mathbf{x}) \;\;
+      \text{where} \;\; f(\mathbf{u}) = \alpha \|\mathbf{u}\|_1 \;\;.
 
     Parameters
     ----------
     x : array_like
       Input array :math:`\mathbf{x}`
     alpha : float or array_like
-      Shrinkage parameter :math:`\\alpha`
+      Shrinkage parameter :math:`\alpha`
 
     Returns
     -------
@@ -852,14 +853,14 @@ def zdivide(x, y):
 
 
 def shrink2(x, alpha, axis=-1):
-    """
+    r"""
     Vector shrinkage/soft thresholding function
 
      .. math::
-      \mathcal{S}_{2,\\alpha}(\mathbf{x}) =
-      \\frac{\mathbf{x}}{\|\mathbf{x}\|_2} \max(0, \|\mathbf{x}\|_2 - \\alpha)
+      \mathcal{S}_{2,\alpha}(\mathbf{x}) =
+      \frac{\mathbf{x}}{\|\mathbf{x}\|_2} \max(0, \|\mathbf{x}\|_2 - \alpha)
       = \mathrm{prox}_f(\mathbf{x}) \;\;
-      \\text{where} \;\; f(\mathbf{u}) = \\alpha \|\mathbf{u}\|_2 \;\;.
+      \text{where} \;\; f(\mathbf{u}) = \alpha \|\mathbf{u}\|_2 \;\;.
 
     The :math:`\ell_2` norm is applied over the specified axis of a
     multi-dimensional input (the last axis by default).
@@ -869,7 +870,7 @@ def shrink2(x, alpha, axis=-1):
     x : array_like
       Input array :math:`\mathbf{x}`
     alpha : float or array_like
-      Shrinkage parameter :math:`\\alpha`
+      Shrinkage parameter :math:`\alpha`
     axis : int, optional (default -1)
       Axis of x over which the :math:`\ell_2` norm
 
@@ -887,16 +888,16 @@ def shrink2(x, alpha, axis=-1):
 
 
 def shrink12(x, alpha, beta, axis=-1):
-    """
+    r"""
     Compound shrinkage/soft thresholding function
     :cite:`wohlberg-2012-local` :cite:`chartrand-2013-nonconvex`
 
      .. math::
-      \mathcal{S}_{1,2,\\alpha,\\beta}(\mathbf{x}) =
-      \mathcal{S}_{2,\\beta}(\mathcal{S}_{1,\\alpha}(\mathbf{x}))
+      \mathcal{S}_{1,2,\alpha,\beta}(\mathbf{x}) =
+      \mathcal{S}_{2,\beta}(\mathcal{S}_{1,\alpha}(\mathbf{x}))
       = \mathrm{prox}_f(\mathbf{x}) \;\;
-      \\text{where} \;\; f(\mathbf{u}) = \\alpha \|\mathbf{u}\|_1 +
-      \\beta \|\mathbf{u}\|_2 \;\;.
+      \text{where} \;\; f(\mathbf{u}) = \alpha \|\mathbf{u}\|_1 +
+      \beta \|\mathbf{u}\|_2 \;\;.
 
     The :math:`\ell_2` norm is applied over the specified axis of a
     multi-dimensional input (the last axis by default).
@@ -906,9 +907,9 @@ def shrink12(x, alpha, beta, axis=-1):
     x : array_like
       Input array :math:`\mathbf{x}`
     alpha : float or array_like
-      Shrinkage parameter :math:`\\alpha`
+      Shrinkage parameter :math:`\alpha`
     beta : float or array_like
-      Shrinkage parameter :math:`\\beta`
+      Shrinkage parameter :math:`\beta`
     axis : int, optional (default -1)
       Axis of x over which the :math:`\ell_2` norm
 
@@ -923,7 +924,7 @@ def shrink12(x, alpha, beta, axis=-1):
 
 
 def proj_l2ball(b, s, r, axes=None):
-    """
+    r"""
     Project :math:`\mathbf{b}` into the :math:`\ell_2` ball of radius
     :math:`r` about :math:`\mathbf{s}`, i.e.
     :math:`\{ \mathbf{x} : \|\mathbf{x} - \mathbf{s} \|_2 \leq r \}`.
@@ -952,7 +953,7 @@ def proj_l2ball(b, s, r, axes=None):
 
 
 def promote16(u, fn=None, *args, **kwargs):
-    """
+    r"""
     Utility function for use with functions that do not support arrays
     of dtype np.float16. This function has two distinct modes of
     operation. If called with only the `u` parameter specified, the
@@ -1064,7 +1065,7 @@ def blockcirculant(A):
       Output array
     """
 
-    r,c = A[0].shape
+    r, c = A[0].shape
     B = np.zeros((len(A)*r, len(A)*c), dtype=A[0].dtype)
     for k in range(len(A)):
         for l in range(len(A)):
@@ -1074,8 +1075,8 @@ def blockcirculant(A):
 
 
 
-def fl2norm2(xf, axis=(0,1)):
-    """
+def fl2norm2(xf, axis=(0, 1)):
+    r"""
     Compute the squared :math:`\ell_2` norm in the DFT domain, taking
     into account the unnormalised DFT scaling, i.e. given the DFT of a
     multi-dimensional array computed via :func:`fftn`, return the
@@ -1101,8 +1102,8 @@ def fl2norm2(xf, axis=(0,1)):
 
 
 
-def rfl2norm2(xf, xs, axis=(0,1)):
-    """
+def rfl2norm2(xf, xs, axis=(0, 1)):
+    r"""
     Compute the squared :math:`\ell_2` norm in the DFT domain, taking
     into account the unnormalised DFT scaling, i.e. given the DFT of a
     multi-dimensional array computed via :func:`rfftn`, return the
@@ -1130,9 +1131,9 @@ def rfl2norm2(xf, xs, axis=(0,1)):
     slc0 = (slice(None),)*axis[-1]
     nrm0 = linalg.norm(xf[slc0 + (0,)])
     idx1 = (xs[axis[-1]]+1)//2
-    nrm1 = linalg.norm(xf[slc0 + (slice(1,idx1),)])
+    nrm1 = linalg.norm(xf[slc0 + (slice(1, idx1),)])
     if xs[axis[-1]]%2 == 0:
-        nrm2 = linalg.norm(xf[slc0 + (slice(-1,None),)])
+        nrm2 = linalg.norm(xf[slc0 + (slice(-1, None),)])
     else:
         nrm2 = 0.0
     return scl*(nrm0**2 + 2.0*nrm1**2 + nrm2**2)
@@ -1140,7 +1141,7 @@ def rfl2norm2(xf, xs, axis=(0,1)):
 
 
 def rrs(ax, b):
-    """
+    r"""
     Compute relative residual :math:`\|\mathbf{b} - A \mathbf{x}\|_2 /
     \|\mathbf{b}\|_2` of the solution to a linear equation :math:`A \mathbf{x}
     = \mathbf{b}`. Returns 1.0 if :math:`\mathbf{b} = 0`.

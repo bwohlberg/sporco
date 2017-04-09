@@ -10,9 +10,9 @@
 from __future__ import division
 from __future__ import absolute_import
 
+import copy
 import numpy as np
 from scipy import linalg
-import copy
 
 from sporco.admm import admm
 import sporco.linalg as sl
@@ -23,7 +23,7 @@ __author__ = """Brendt Wohlberg <brendt@ieee.org>"""
 
 
 class GenericBPDN(admm.ADMMEqual):
-    """Base class for ADMM algorithm for solving variants of the
+    r"""Base class for ADMM algorithm for solving variants of the
     Basis Pursuit DeNoising (BPDN) :cite:`chen-1998-atomic` problem.
 
     The generic problem form is
@@ -38,7 +38,7 @@ class GenericBPDN(admm.ADMMEqual):
     .. math::
        \mathrm{argmin}_\mathbf{x} \;
        (1/2) \| D \mathbf{x} - \mathbf{s} \|_2^2 + f(\mathbf{y})
-       \quad \\text{such that} \quad \mathbf{x} = \mathbf{y} \;\;.
+       \quad \text{such that} \quad \mathbf{x} = \mathbf{y} \;\;.
 
     After termination of the :meth:`solve` method, attribute
     :attr:`itstat` is a list of tuples representing statistics of each
@@ -173,7 +173,7 @@ class GenericBPDN(admm.ADMMEqual):
 
 
     def xstep(self):
-        """Minimise Augmented Lagrangian with respect to :math:`\mathbf{x}`."""
+        r"""Minimise Augmented Lagrangian with respect to :math:`\mathbf{x}`."""
 
         self.X = np.asarray(sl.lu_solve_ATAI(self.D, self.rho, self.DTS +
                         self.rho*(self.Y - self.U), self.lu, self.piv),
@@ -182,7 +182,7 @@ class GenericBPDN(admm.ADMMEqual):
 
 
     def ystep(self):
-        """Minimise Augmented Lagrangian with respect to :math:`\mathbf{y}`.
+        r"""Minimise Augmented Lagrangian with respect to :math:`\mathbf{y}`.
         If this method is not overridden, the problem is solved without
         any regularisation other than the option enforcement of
         non-negativity of the solution. When it is overridden, it
@@ -208,7 +208,7 @@ class GenericBPDN(admm.ADMMEqual):
 
 
     def obfn_dfd(self):
-        """Compute data fidelity term :math:`(1/2) \| D \mathbf{x} -
+        r"""Compute data fidelity term :math:`(1/2) \| D \mathbf{x} -
         \mathbf{s} \|_2^2`.
         """
 
@@ -236,7 +236,7 @@ class GenericBPDN(admm.ADMMEqual):
 
 
 class BPDN(GenericBPDN):
-    """ADMM algorithm for the Basis Pursuit DeNoising (BPDN)
+    r"""ADMM algorithm for the Basis Pursuit DeNoising (BPDN)
     :cite:`chen-1998-atomic` problem.
 
     Solve the Single Measurement Vector (SMV) BPDN problem
@@ -250,7 +250,7 @@ class BPDN(GenericBPDN):
     .. math::
        \mathrm{argmin}_\mathbf{x} \;
        (1/2) \| D \mathbf{x} - \mathbf{s} \|_2^2 + \lambda \| \mathbf{y} \|_1
-       \quad \\text{such that} \quad \mathbf{x} = \mathbf{y} \;\;.
+       \quad \text{such that} \quad \mathbf{x} = \mathbf{y} \;\;.
 
 
     The Multiple Measurement Vector (MMV) BPDN problem
@@ -293,7 +293,7 @@ class BPDN(GenericBPDN):
 
 
     class Options(GenericBPDN.Options):
-        """BPDN algorithm options
+        r"""BPDN algorithm options
 
         Options include all of those defined in
         :class:`.GenericBPDN.Options`, together with additional
@@ -363,7 +363,7 @@ class BPDN(GenericBPDN):
                       dtype=self.dtype)
 
         # Set rho_xi attribute
-        self.set_attr('rho_xi', opt['AutoRho','RsdlTarget'],
+        self.set_attr('rho_xi', opt['AutoRho', 'RsdlTarget'],
                       dval=(1.0 + (18.3)**(np.log10(self.lmbda)+1.0)),
                       dtype=self.dtype)
 
@@ -385,7 +385,7 @@ class BPDN(GenericBPDN):
 
 
     def ystep(self):
-        """Minimise Augmented Lagrangian with respect to :math:`\mathbf{y}`."""
+        r"""Minimise Augmented Lagrangian with respect to :math:`\mathbf{y}`."""
 
         self.Y = np.asarray(sl.shrink1(self.AX + self.U,
                             (self.lmbda/self.rho)*self.wl1),
@@ -407,7 +407,7 @@ class BPDN(GenericBPDN):
 
 
 class BPDNJoint(BPDN):
-    """ADMM algorithm for BPDN with joint sparsity via an :math:`\ell_{2,1}`
+    r"""ADMM algorithm for BPDN with joint sparsity via an :math:`\ell_{2,1}`
     norm term.
 
     Solve the optimisation problem
@@ -420,7 +420,7 @@ class BPDNJoint(BPDN):
 
     .. math::
        \mathrm{argmin}_X \; (1/2) \| D X - S \|_2^2 +
-       \lambda \| Y \|_1 + \mu \| Y \|_{2,1} \quad \\text{such that} \quad
+       \lambda \| Y \|_1 + \mu \| Y \|_{2,1} \quad \text{such that} \quad
        X = Y \;\;.
 
     After termination of the :meth:`solve` method, attribute :attr:`itstat` is
@@ -486,7 +486,7 @@ class BPDNJoint(BPDN):
 
 
     def ystep(self):
-        """Minimise Augmented Lagrangian with respect to :math:`\mathbf{y}`."""
+        r"""Minimise Augmented Lagrangian with respect to :math:`\mathbf{y}`."""
 
         self.Y = np.asarray(sl.shrink12(self.AX + self.U,
                             (self.lmbda/self.rho)*self.wl1, self.mu/self.rho),
@@ -496,7 +496,7 @@ class BPDNJoint(BPDN):
 
 
     def obfn_reg(self):
-        """Compute regularisation terms and contribution to objective
+        r"""Compute regularisation terms and contribution to objective
         function. Regularisation terms are :math:`\| Y \|_1` and
         :math:`\| Y \|_{2,1}`.
         """
@@ -510,7 +510,7 @@ class BPDNJoint(BPDN):
 
 
 class ElasticNet(BPDN):
-    """ADMM algorithm for the elastic net :cite:`zou-2005-regularization`
+    r"""ADMM algorithm for the elastic net :cite:`zou-2005-regularization`
     problem.
 
     Solve the optimisation problem
@@ -525,7 +525,7 @@ class ElasticNet(BPDN):
     .. math::
        \mathrm{argmin}_\mathbf{x} \;
        (1/2) \| D \mathbf{x} - \mathbf{s} \|_2^2 + \lambda \| \mathbf{y} \|_1
-       + (\mu/2) \| \mathbf{x} \|_2^2 \quad \\text{such that} \quad
+       + (\mu/2) \| \mathbf{x} \|_2^2 \quad \text{such that} \quad
        \mathbf{x} = \mathbf{y} \;\;.
 
     After termination of the :meth:`solve` method, attribute :attr:`itstat` is
@@ -611,7 +611,9 @@ class ElasticNet(BPDN):
 
 
     def xstep(self):
-        """Minimise Augmented Lagrangian with respect to :math:`\mathbf{x}`."""
+        r"""Minimise Augmented Lagrangian with respect to
+        :math:`\mathbf{x}`.
+        """
 
         self.X = np.asarray(sl.lu_solve_ATAI(self.D, self.mu + self.rho,
                     self.DTS + self.rho*(self.Y - self.U), self.lu, self.piv),

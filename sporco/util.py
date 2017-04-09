@@ -14,9 +14,6 @@ from future.utils import PY2
 from builtins import range
 from builtins import object
 
-import numpy as np
-from scipy import misc
-import scipy.ndimage.interpolation as sni
 from timeit import default_timer as timer
 import os
 import imghdr
@@ -31,6 +28,9 @@ if PY2:
 else:
     import urllib.request as urlrequest
     import urllib.error as urlerror
+import numpy as np
+from scipy import misc
+import scipy.ndimage.interpolation as sni
 
 import sporco.linalg as sla
 import sporco.plot as spl
@@ -342,8 +342,8 @@ def tikhonov_filter(s, lmbda, npd=16):
     A = 1.0 + lmbda*np.conj(Gr)*Gr + lmbda*np.conj(Gc)*Gc
     if s.ndim > 2:
         A = A[(slice(None),)*2 + (np.newaxis,)*(s.ndim-2)]
-    sp = np.pad(s, ((npd, npd),)*2 + ((0,0),)*(s.ndim-2), 'symmetric')
-    slp = np.real(sla.ifftn(sla.fftn(sp, axes=(0,1)) / A, axes=(0,1)))
+    sp = np.pad(s, ((npd, npd),)*2 + ((0, 0),)*(s.ndim-2), 'symmetric')
+    slp = np.real(sla.ifftn(sla.fftn(sp, axes=(0, 1)) / A, axes=(0, 1)))
     sl = slp[npd:(slp.shape[0]-npd), npd:(slp.shape[1]-npd)]
     sh = s - sl
     return sl.astype(s.dtype), sh.astype(s.dtype)
@@ -412,7 +412,7 @@ def grid_search(fn, grd, fmin=True, nproc=None):
     if isinstance(fval[0], (tuple, list, np.ndarray)):
         nfnv = len(fval[0])
         fvmx = np.reshape(fval, [a.size for a in grd] + [nfnv,])
-        sidx = np.unravel_index(slct(fvmx.reshape((-1,nfnv)), axis=0),
+        sidx = np.unravel_index(slct(fvmx.reshape((-1, nfnv)), axis=0),
                         fvmx.shape[0:-1]) + (np.array((range(nfnv))),)
         sprm = np.array([grd[k][sidx[k]] for k in range(len(grd))])
         sfvl = tuple(fvmx[sidx])
@@ -643,7 +643,7 @@ class ExampleImages(object):
                 'ExampleImages.image has changed. Please see section "Test '
                 'Images" in the SPORCO package README.rst file, and consult '
                 'the documentation for ExampleImages.image.')
-            
+
         if scaled is None:
             scaled = self.scaled
         if dtype is None:

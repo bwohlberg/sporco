@@ -11,10 +11,10 @@ from __future__ import division
 from __future__ import absolute_import
 from builtins import range
 
-import numpy as np
-from scipy import linalg
 import copy
 import pprint
+import numpy as np
+from scipy import linalg
 
 from sporco.admm import admm
 import sporco.linalg as sl
@@ -271,24 +271,24 @@ class ConvRepIndexing(object):
 
 
 class ConvCnstrMOD(admm.ADMMEqual):
-    """ADMM algorithm for Convolutional Constrained MOD problem
+    r"""ADMM algorithm for Convolutional Constrained MOD problem
     :cite:`wohlberg-2016-efficient` :cite:`wohlberg-2016-convolutional`.
 
     Solve the optimisation problem
 
     .. math::
        \mathrm{argmin}_\mathbf{d} \;
-       (1/2) \sum_k \\left\| \sum_m \mathbf{d}_m * \mathbf{x}_{k,m} -
-       \mathbf{s}_k \\right\|_2^2 \quad \\text{such that} \quad
+       (1/2) \sum_k \left\| \sum_m \mathbf{d}_m * \mathbf{x}_{k,m} -
+       \mathbf{s}_k \right\|_2^2 \quad \text{such that} \quad
        \mathbf{d}_m \in C
 
     via the ADMM problem
 
     .. math::
        \mathrm{argmin}_\mathbf{d} \;
-       (1/2) \sum_k \\left\| \sum_m \mathbf{d}_m * \mathbf{x}_{k,m} -
-       \mathbf{s}_k \\right\|_2^2 + \sum_m \iota_C(\mathbf{g}_m) \quad
-       \\text{such that} \quad \mathbf{d}_m = \mathbf{g}_m \;\;,
+       (1/2) \sum_k \left\| \sum_m \mathbf{d}_m * \mathbf{x}_{k,m} -
+       \mathbf{s}_k \right\|_2^2 + \sum_m \iota_C(\mathbf{g}_m) \quad
+       \text{such that} \quad \mathbf{d}_m = \mathbf{g}_m \;\;,
 
     where :math:`\iota_C(\cdot)` is the indicator function of feasible
     set :math:`C` consisting of filters with unit norm and constrained
@@ -297,8 +297,8 @@ class ConvCnstrMOD(admm.ADMMEqual):
 
     .. math::
        \mathrm{argmin}_\mathbf{d} \;
-       (1/2) \sum_c \sum_k \\left\| \sum_m \mathbf{d}_m * \mathbf{x}_{c,k,m} -
-       \mathbf{s}_{c,k} \\right\|_2^2 \quad \\text{such that} \quad
+       (1/2) \sum_c \sum_k \left\| \sum_m \mathbf{d}_m * \mathbf{x}_{c,k,m} -
+       \mathbf{s}_{c,k} \right\|_2^2 \quad \text{such that} \quad
        \mathbf{d}_m \in C
 
     with single-channel dictionary filters :math:`\mathbf{d}_m` and
@@ -306,8 +306,8 @@ class ConvCnstrMOD(admm.ADMMEqual):
 
     .. math::
        \mathrm{argmin}_\mathbf{d} \;
-       (1/2) \sum_c \sum_k \\left\| \sum_m \mathbf{d}_{c,m} * \mathbf{x}_{k,m} -
-       \mathbf{s}_{c,k} \\right\|_2^2 \quad \\text{such that} \quad
+       (1/2) \sum_c \sum_k \left\| \sum_m \mathbf{d}_{c,m} * \mathbf{x}_{k,m} -
+       \mathbf{s}_{c,k} \right\|_2^2 \quad \text{such that} \quad
        \mathbf{d}_{c,m} \in C
 
     with multi-channel dictionary filters :math:`\mathbf{d}_{c,m}` and
@@ -348,7 +348,7 @@ class ConvCnstrMOD(admm.ADMMEqual):
 
 
     class Options(admm.ADMMEqual.Options):
-        """ConvCnstrMOD algorithm options
+        r"""ConvCnstrMOD algorithm options
 
         Options include all of those defined in
         :class:`sporco.admm.admm.ADMMEqual.Options`, together with
@@ -394,8 +394,8 @@ class ConvCnstrMOD(admm.ADMMEqual):
                 opt = {}
             admm.ADMMEqual.Options.__init__(self, opt)
 
-            if self['AutoRho','RsdlTarget'] is None:
-                self['AutoRho','RsdlTarget'] = 1.0
+            if self['AutoRho', 'RsdlTarget'] is None:
+                self['AutoRho', 'RsdlTarget'] = 1.0
 
 
 
@@ -574,7 +574,7 @@ class ConvCnstrMOD(admm.ADMMEqual):
 
 
     def xstep(self):
-        """Minimise Augmented Lagrangian with respect to :math:`\mathbf{x}`."""
+        r"""Minimise Augmented Lagrangian with respect to :math:`\mathbf{x}`."""
 
         self.cgit = None
 
@@ -606,7 +606,8 @@ class ConvCnstrMOD(admm.ADMMEqual):
 
 
     def ystep(self):
-        """Minimise Augmented Lagrangian with respect to :math:`\mathbf{y}`.
+        r"""Minimise Augmented Lagrangian with respect to
+        :math:`\mathbf{y}`.
         """
 
         self.Y = self.Pcn(self.AX + self.U)
@@ -635,7 +636,7 @@ class ConvCnstrMOD(admm.ADMMEqual):
 
 
     def obfn_dfd(self):
-        """Compute data fidelity term :math:`(1/2) \| \sum_m \mathbf{d}_m *
+        r"""Compute data fidelity term :math:`(1/2) \| \sum_m \mathbf{d}_m *
         \mathbf{x}_m - \mathbf{s} \|_2^2`.
         """
 
@@ -646,7 +647,7 @@ class ConvCnstrMOD(admm.ADMMEqual):
 
 
     def obfn_cns(self):
-        """Compute constraint violation measure :math:`\| P(\mathbf{y}) -
+        r"""Compute constraint violation measure :math:`\| P(\mathbf{y}) -
         \mathbf{y}\|_2`.
         """
 
@@ -815,7 +816,7 @@ def zeromean(v, dsz, dimN=2):
 
 
 def normalise(v, dimN=2):
-    """Normalise vectors, corresponding to slices along specified number
+    r"""Normalise vectors, corresponding to slices along specified number
     of initial spatial dimensions of an array, to have unit
     :math:`\ell_2` norm. The remaining axes enumerate the distinct
     vectors to be normalised.
@@ -833,7 +834,7 @@ def normalise(v, dimN=2):
       Normalised array
     """
 
-    axisN = tuple(range(0,dimN))
+    axisN = tuple(range(0, dimN))
     vn = np.sqrt(np.sum(v**2, axisN, keepdims=True))
     vn[vn == 0] = 1.0
     return np.asarray(v / vn, dtype=v.dtype)

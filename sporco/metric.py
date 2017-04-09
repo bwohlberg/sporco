@@ -267,10 +267,10 @@ def gmsd(vref, vcmp, rescale=True, returnMap=False):
 
     T = 170.0
     dwn = 2
-    dx = np.array([[1,0,-1],[1,0,-1],[1,0,-1]])/3.0
+    dx = np.array([[1, 0, -1], [1, 0, -1], [1, 0, -1]])/3.0
     dy = dx.T
 
-    ukrn = np.ones((2,2))/4.0
+    ukrn = np.ones((2, 2))/4.0
     aveY1 = signal.convolve2d(scl*vref, ukrn, mode='same', boundary='symm')
     aveY2 = signal.convolve2d(scl*vcmp, ukrn, mode='same', boundary='symm')
     Y1 = aveY1[0::dwn, 0::dwn]

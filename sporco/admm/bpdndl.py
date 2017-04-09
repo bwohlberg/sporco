@@ -12,8 +12,8 @@ from __future__ import absolute_import
 from builtins import range
 from builtins import object
 
-import numpy as np
 import copy
+import numpy as np
 
 from sporco.util import u
 from sporco.admm import bpdn
@@ -24,7 +24,7 @@ __author__ = """Brendt Wohlberg <brendt@ieee.org>"""
 
 
 class BPDNDictLearn(dictlrn.DictLearn):
-    """Dictionary learning based on BPDN and CnstrMOD
+    r"""Dictionary learning based on BPDN and CnstrMOD
 
     Solve the optimisation problem
 

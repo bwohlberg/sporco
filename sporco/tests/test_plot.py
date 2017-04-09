@@ -70,4 +70,3 @@ class TestSet01(object):
         fig = plot.figure()
         plot.imview(z3, title='Imview Test', fgrf=fig)
         plot.close()
-

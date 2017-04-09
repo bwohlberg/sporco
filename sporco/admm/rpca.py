@@ -10,8 +10,8 @@
 from __future__ import division
 from __future__ import absolute_import
 
-import numpy as np
 import copy
+import numpy as np
 
 from sporco.admm import admm
 import sporco.linalg as sl
@@ -22,14 +22,14 @@ __author__ = """Brendt Wohlberg <brendt@ieee.org>"""
 
 
 class RobustPCA(admm.ADMM):
-    """ADMM algorithm for Robust PCA problem :cite:`candes-2011-robust`
+    r"""ADMM algorithm for Robust PCA problem :cite:`candes-2011-robust`
     :cite:`cai-2010-singular`.
 
     Solve the optimisation problem
 
     .. math::
        \mathrm{argmin}_{X, Y} \;
-        \| X \|_* + \lambda \| Y \|_1 \quad \\text{such that}
+        \| X \|_* + \lambda \| Y \|_1 \quad \text{such that}
         \quad X + Y = S \;\;.
 
     This problem is unusual in that it is already in ADMM form without
@@ -96,8 +96,8 @@ class RobustPCA(admm.ADMM):
                 opt = {}
             admm.ADMM.Options.__init__(self, opt)
 
-            if self['AutoRho','RsdlTarget'] is None:
-                self['AutoRho','RsdlTarget'] = 1.0
+            if self['AutoRho', 'RsdlTarget'] is None:
+                self['AutoRho', 'RsdlTarget'] = 1.0
 
 
 
@@ -172,17 +172,21 @@ class RobustPCA(admm.ADMM):
 
 
     def xstep(self):
-        """Minimise Augmented Lagrangian with respect to :math:`\mathbf{x}`."""
+        r"""Minimise Augmented Lagrangian with respect to
+        :math:`\mathbf{x}`.
+        """
 
         self.X, self.ss = shrinksv(self.S - self.Y - self.U, 1 / self.rho)
 
 
 
     def ystep(self):
-        """Minimise Augmented Lagrangian with respect to :math:`\mathbf{y}`."""
+        r"""Minimise Augmented Lagrangian with respect to
+        :math:`\mathbf{y}`.
+        """
 
         self.Y = np.asarray(sl.shrink1(self.S - self.AX - self.U,
-                            self.lmbda/self.rho), dtype=self.dtype)
+                                       self.lmbda/self.rho), dtype=self.dtype)
 
 
 
@@ -228,8 +232,8 @@ class RobustPCA(admm.ADMM):
 
 
     def cnst_A(self, X):
-        """Compute :math:`A \mathbf{x}` component of ADMM problem constraint.
-        In this case :math:`A \mathbf{x} = \mathbf{x}`.
+        r"""Compute :math:`A \mathbf{x}` component of ADMM problem
+        constraint.  In this case :math:`A \mathbf{x} = \mathbf{x}`.
         """
 
         return X
@@ -237,7 +241,7 @@ class RobustPCA(admm.ADMM):
 
 
     def cnst_AT(self, X):
-        """Compute :math:`A^T \mathbf{x}` where :math:`A \mathbf{x}` is
+        r"""Compute :math:`A^T \mathbf{x}` where :math:`A \mathbf{x}` is
         a component of ADMM problem constraint. In this case
         :math:`A^T \mathbf{x} = \mathbf{x}`.
         """
@@ -247,15 +251,15 @@ class RobustPCA(admm.ADMM):
 
 
     def cnst_B(self, Y):
-        """Compute :math:`B \mathbf{y}` component of ADMM problem constraint.
-        In this case :math:`B \mathbf{y} = -\mathbf{y}`.
+        r"""Compute :math:`B \mathbf{y}` component of ADMM problem
+        constraint.  In this case :math:`B \mathbf{y} = -\mathbf{y}`.
         """
 
         return Y
 
 
     def cnst_c(self):
-        """Compute constant component :math:`\mathbf{c}` of ADMM problem
+        r"""Compute constant component :math:`\mathbf{c}` of ADMM problem
         constraint. In this case :math:`\mathbf{c} = \mathbf{s}`.
         """
 
