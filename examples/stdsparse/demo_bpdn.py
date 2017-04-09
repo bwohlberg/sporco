@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 # Copyright (C) 2015-2017 by Brendt Wohlberg <brendt@ieee.org>
 # All rights reserved. BSD 3-clause License.
 # This file is part of the SPORCO package. Details of the copyright
@@ -82,7 +82,7 @@ plot.plot(its.ObjFun, fgrf=fig2, xlbl='Iterations', ylbl='Functional')
 plot.subplot(2,2,3)
 plot.plot(np.vstack((its.PrimalRsdl, its.DualRsdl)).T, fgrf=fig2,
           ptyp='semilogy', xlbl='Iterations', ylbl='Residual',
-          lgnd=['Primal', 'Dual']);
+          lgnd=['Primal', 'Dual'])
 plot.subplot(2,2,4)
 plot.plot(its.Rho, fgrf=fig2, xlbl='Iterations', ylbl='Penalty Parameter')
 fig2.show()
