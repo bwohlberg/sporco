@@ -73,13 +73,18 @@ class BPDNDictLearn(dictlrn.DictLearn):
         :class:`sporco.admm.dictlrn.DictLearn.Options`, together with
         additional options:
 
+          ``AccurateDFid`` : Flag determining whether data fidelity term is
+          estimated from the value computed in the X update (``False``) or is
+          computed after every outer iteration over an X update and a D
+          update (``True``), which is slower but more accurate.
+
           ``BPDN`` : Options :class:`sporco.admm.bpdn.BPDN.Options`
 
           ``CMOD`` : Options :class:`sporco.admm.cmod.CnstrMOD.Options`
         """
 
         defaults = copy.deepcopy(dictlrn.DictLearn.Options.defaults)
-        defaults.update({
+        defaults.update({'AccurateDFid' : False,
             'BPDN' : copy.deepcopy(bpdn.BPDN.Options.defaults),
             'CMOD' : copy.deepcopy(cmod.CnstrMOD.Options.defaults)})
 
@@ -136,22 +141,44 @@ class BPDNDictLearn(dictlrn.DictLearn):
         dstep = cmod.CnstrMOD(xstep.Y, S, (Nc, Nm), opt['CMOD'])
 
         # Configure iteration statistics reporting
-        isc = dictlrn.IterStatsConfig(
-            isfld = ['Iter', 'ObjFun', 'DFid', 'RegL1', 'Cnstr', 'XPrRsdl',
-                     'XDlRsdl', 'XRho', 'DPrRsdl', 'DDlRsdl', 'DRho', 'Time'],
+        if self.opt['AccurateDFid']:
+            isxmap = {'XPrRsdl' : 'PrimalRsdl', 'XDlRsdl' : 'DualRsdl',
+                      'XRho' : 'Rho'}
+            evlmap = {'ObjFun' : 'ObjFun', 'DFid' : 'DFid', 'RegL1' : 'RegL1'}
+        else:
             isxmap = {'ObjFun' : 'ObjFun', 'DFid' : 'DFid', 'RegL1' : 'RegL1',
                       'XPrRsdl' : 'PrimalRsdl', 'XDlRsdl' : 'DualRsdl',
-                      'XRho' : 'Rho'},
-            isdmap = {'Cnstr' :  'Cnstr', 'DPrRsdl' : 'PrimalRsdl',
-                      'DDlRsdl' : 'DualRsdl', 'DRho' : 'Rho'},
-            evlmap = {},
-            hdrtxt = ['Itn', 'Fnc', 'DFid', u('ℓ1'), 'Cnstr', 'r_X', 's_X',
-                      u('ρ_X'), 'r_D', 's_D', u('ρ_D')],
-            hdrmap = {'Itn' : 'Iter', 'Fnc' : 'ObjFun', 'DFid' : 'DFid',
-                      u('ℓ1') : 'RegL1', 'Cnstr' : 'Cnstr', 'r_X' : 'XPrRsdl',
-                      's_X' : 'XDlRsdl', u('ρ_X') : 'XRho', 'r_D' : 'DPrRsdl',
-                      's_D' : 'DDlRsdl', u('ρ_D') : 'DRho'}
+                      'XRho' : 'Rho'}
+            evlmap = {}
+        isc = dictlrn.IterStatsConfig(
+            isfld=['Iter', 'ObjFun', 'DFid', 'RegL1', 'Cnstr', 'XPrRsdl',
+                   'XDlRsdl', 'XRho', 'DPrRsdl', 'DDlRsdl', 'DRho', 'Time'],
+            isxmap=isxmap,
+            isdmap={'Cnstr' :  'Cnstr', 'DPrRsdl' : 'PrimalRsdl',
+                    'DDlRsdl' : 'DualRsdl', 'DRho' : 'Rho'},
+            evlmap=evlmap,
+            hdrtxt=['Itn', 'Fnc', 'DFid', u('ℓ1'), 'Cnstr', 'r_X', 's_X',
+                    u('ρ_X'), 'r_D', 's_D', u('ρ_D')],
+            hdrmap={'Itn' : 'Iter', 'Fnc' : 'ObjFun', 'DFid' : 'DFid',
+                    u('ℓ1') : 'RegL1', 'Cnstr' : 'Cnstr', 'r_X' : 'XPrRsdl',
+                    's_X' : 'XDlRsdl', u('ρ_X') : 'XRho', 'r_D' : 'DPrRsdl',
+                    's_D' : 'DDlRsdl', u('ρ_D') : 'DRho'}
             )
 
         # Call parent constructor
         super(BPDNDictLearn, self).__init__(xstep, dstep, opt, isc)
+
+
+
+    def evaluate(self):
+        """Evaluate functional value of previous iteration"""
+
+        if self.opt['AccurateDFid']:
+            D = self.dstep.var_y()
+            X = self.xstep.var_y()
+            S = self.xstep.S
+            dfd = 0.5*np.linalg.norm((D.dot(X) - S))**2
+            rl1 = np.sum(np.abs(X))
+            return dict(DFid=dfd, RegL1=rl1, ObjFun=dfd+self.xstep.lmbda*rl1)
+        else:
+            return None
