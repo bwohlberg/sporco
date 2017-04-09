@@ -58,11 +58,20 @@ class TestSet01(object):
         y = np.linspace(-1,1,20)[:,np.newaxis]
         z = np.sqrt(x**2 + y**2)
         fig = plot.figure()
-        plot.imview(z, title='Imview Test', fgrf=fig)
+        plot.imview(z, title='Imview Test', fltscl=True, fgrf=fig)
         plot.close()
 
 
     def test_07(self):
+        x = np.linspace(-1,1,20)[np.newaxis,:]
+        y = np.linspace(-1,1,20)[:,np.newaxis]
+        z = (100.0*np.sqrt(x**2 + y**2)).astype(np.uint16)
+        fig = plot.figure()
+        plot.imview(z, title='Imview Test', fltscl=True, fgrf=fig)
+        plot.close()
+
+
+    def test_08(self):
         x = np.linspace(-1,1,20)[np.newaxis,:]
         y = np.linspace(-1,1,20)[:,np.newaxis]
         z = np.sqrt(x**2 + y**2)

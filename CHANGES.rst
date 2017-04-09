@@ -17,7 +17,13 @@ Version 0.1.5   (Not yet released)
 - New functions linalg.solvedbd_sm, linalg.solvedbd_sm_c
 - Improved documentation of admm.admm module
 - Changed default line width in plot.plot and added parameter for
-  specifying label padding to plot.surf  
+  specifying label padding to plot.surf
+- Improved capabilities of util.Timer class and modified admm.ADMM
+  class to use it
+- New FastSolve option instructs admm.ADMM class to skip
+  non-essential calculations
+- New AccurateDFid option for more accurate functional evaluation in
+  admm.BPDNDictLearn and admm.ConvBPDNDictLearn
 
 
 

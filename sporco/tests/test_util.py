@@ -125,11 +125,13 @@ class TestSet01(object):
         assert(t0 >= 0.0)
         assert(t1 >= t0)
         assert(len(t.__str__()) > 0)
+        assert(len(t.labels()) > 0)
 
 
     def test_16(self):
-        t = util.Timer()
+        t = util.Timer('a')
         t.start(['a', 'b'])
+        t0 = t.elapsed('a')
         t.stop('a')
         t.stop('b')
         t.stop(['a', 'b'])
@@ -143,3 +145,22 @@ class TestSet01(object):
         with util.ContextTimer(t):
             t0 = t.elapsed()
         assert(t.elapsed() >= 0.0)
+
+
+    def test_18(self):
+        t = util.Timer()
+        t.start()
+        with util.ContextTimer(t, action='StopStart'):
+            t0 = t.elapsed()
+        t.stop()
+        assert(t.elapsed() >= 0.0)
+
+
+    def test_19(self):
+        with pytest.raises(ValueError):
+            dat = util.netgetdata('http://devnull', maxtry=0)
+
+
+    def test_20(self):
+        with pytest.raises(util.urlerror.URLError):
+            dat = util.netgetdata('http://devnull')

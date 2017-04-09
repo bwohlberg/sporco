@@ -48,3 +48,15 @@ class TestSet01(object):
         except Exception as e:
             print(e)
             assert(0)
+
+
+    def test_04(self):
+        lmbda = 1e-1
+        opt = cbpdndl.ConvBPDNDictLearn.Options({'AccurateDFid' : True,
+                                                 'MaxMainIter' : 10})
+        try:
+            b = cbpdndl.ConvBPDNDictLearn(self.D0, self.S, lmbda, opt=opt)
+            b.solve()
+        except Exception as e:
+            print(e)
+            assert(0)
