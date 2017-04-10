@@ -53,7 +53,7 @@ def _module_name_nested(cls, nstnm='Options'):
             # Get the module in which the outer class is defined
             mdl = sys.modules[cls.__module__]
             # Construct an extended name by concatenating inner and outer names
-            extnm = cls.__name__  + nst.__name__
+            extnm = cls.__name__ + nst.__name__
             # Allow lookup of the nested class within the module via
             # its extended name
             setattr(mdl, extnm, nst)
@@ -304,14 +304,14 @@ class ADMM(with_metaclass(_ADMM_Meta, object)):
 
 
         # Initialise working variable Y
-        if  self.opt['Y0'] is None:
+        if self.opt['Y0'] is None:
             self.Y = self.yinit(yshape)
         else:
             self.Y = self.opt['Y0'].astype(self.dtype, copy=True)
         self.Yprev = self.Y.copy()
 
         # Initialise working variable U
-        if  self.opt['U0'] is None:
+        if self.opt['U0'] is None:
             self.U = self.uinit(ushape)
         else:
             self.U = self.opt['U0'].astype(self.dtype, copy=True)

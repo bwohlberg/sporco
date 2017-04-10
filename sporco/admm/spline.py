@@ -172,7 +172,7 @@ class SplineL1(admm.ADMM):
     def uinit(self, ushape):
         """Return initialiser for working variable U."""
 
-        if  self.opt['Y0'] is None:
+        if self.opt['Y0'] is None:
             return np.zeros(ushape, dtype=self.dtype)
         else:
             # If initial Y is non-zero, initial U is chosen so that
@@ -189,7 +189,7 @@ class SplineL1(admm.ADMM):
         self.X = sl.idctii(self.Gamma*sl.dctii(self.Y + self.S - self.U,
                                          axes=self.axes), axes=self.axes)
         if self.opt['LinSolveCheck']:
-            self.xrrs = sl.rrs(self.X + (self.lmbda/self.rho)*
+            self.xrrs = sl.rrs(self.X + (self.lmbda/self.rho) *
                     sl.idctii((self.Alpha**2)*sl.dctii(self.X, axes=self.axes),
                     axes=self.axes), self.Y + self.S - self.U)
         else:
