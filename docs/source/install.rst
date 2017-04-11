@@ -40,6 +40,11 @@ The procedure for installing from a source package downloaded from `PyPI
 <https://pypi.python.org/pypi/sporco/>`_ is similar.
 
 
+A summary of the most significant changes between SPORCO releases can
+be found in the ``CHANGES.rst`` file. It is strongly recommended to
+consult this summary when updating from a previous version.
+
+
 
 Test Images
 -----------

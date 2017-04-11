@@ -69,4 +69,3 @@ fig2.show()
 
 # Wait for enter on keyboard
 input()
-

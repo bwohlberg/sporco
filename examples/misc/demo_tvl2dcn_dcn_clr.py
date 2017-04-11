@@ -23,9 +23,9 @@ from sporco.admm import tvl2
 # Utility functions
 n = 13
 n2 = n // 2
-spad = lambda x : np.pad(x, ((n,n),(n,n),(0,0)), mode='symmetric')
-crop = lambda x : x[n+n2:-n+n2,n+n2:-n+n2,:]
-conv = lambda h, x : np.fft.ifft2(np.fft.fft2(h, s=x.shape[0:2], axes=(0,1))
+spad = lambda x: np.pad(x, ((n,n),(n,n),(0,0)), mode='symmetric')
+crop = lambda x: x[n+n2:-n+n2,n+n2:-n+n2,:]
+conv = lambda h, x: np.fft.ifft2(np.fft.fft2(h, s=x.shape[0:2], axes=(0,1))
                 [...,np.newaxis]*np.fft.fft2(x, axes=(0,1)), axes=(0,1)).real
 
 
@@ -85,4 +85,3 @@ fig2.show()
 
 # Wait for enter on keyboard
 input()
-

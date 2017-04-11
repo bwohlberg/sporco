@@ -122,6 +122,11 @@ followed by
 The install commands will usually have to be performed with root privileges.
 
 
+A summary of the most significant changes between SPORCO releases can
+be found in the ``CHANGES.rst`` file. It is strongly recommended to
+consult this summary when updating from a previous version.
+
+
 
 Test Images
 -----------
