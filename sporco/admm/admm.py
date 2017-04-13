@@ -1033,14 +1033,14 @@ class ADMMEqual(ADMM):
         return X
 
 
-    def cnst_AT(self, X):
-        r"""Compute :math:`A^T \mathbf{x}` where :math:`A \mathbf{x}` is
+    def cnst_AT(self, Y):
+        r"""Compute :math:`A^T \mathbf{y}` where :math:`A \mathbf{x}` is
         a component of ADMM problem constraint. In this case
-        :math:`A^T \mathbf{x} = \mathbf{x}` since the constraint
+        :math:`A^T \mathbf{y} = \mathbf{y}` since the constraint
         is :math:`\mathbf{x} = \mathbf{y}`.
         """
 
-        return X
+        return Y
 
 
 
