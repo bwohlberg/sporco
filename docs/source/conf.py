@@ -43,7 +43,8 @@ extensions = [
     'sphinx.ext.viewcode',
     'sphinx.ext.autosummary',
     'sphinx.ext.intersphinx',
-    'sphinxcontrib.bibtex'
+    'sphinxcontrib.bibtex',
+    'sphinx.ext.inheritance_diagram'
 ]
 
 # generate autosummary pages
@@ -271,6 +272,13 @@ intersphinx_mapping = {'http://docs.python.org/': None,
 
 numpydoc_show_class_members = False
 
+graphviz_output_format = 'svg'
+inheritance_graph_attrs = dict(rankdir="LR", fontsize=9, ratio='compress',
+                               bgcolor='transparent')
+inheritance_node_attrs = dict(shape='box', fontsize=9, height=0.4,
+                              margin='"0.08, 0.03"', style='"rounded,filled"',
+                              fillcolor='"#f4f4ffff"')
+
 
 # -- Options for manual page output ---------------------------------------
 
@@ -345,6 +353,8 @@ def skip_member(app, what, name, obj, skip, options):
     if name == "__init__":
         return False
     if name == "IterationStats":
+        return True
+    if name == "timer":
         return True
     return skip
 

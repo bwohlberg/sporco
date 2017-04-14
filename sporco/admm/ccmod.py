@@ -271,7 +271,14 @@ class ConvRepIndexing(object):
 
 
 class ConvCnstrMOD(admm.ADMMEqual):
-    r"""ADMM algorithm for Convolutional Constrained MOD problem
+    r"""**Class inheritance structure**
+
+    .. inheritance-diagram:: ConvCnstrMOD
+       :parts: 2
+
+    |
+
+    ADMM algorithm for Convolutional Constrained MOD problem
     :cite:`wohlberg-2016-efficient` :cite:`wohlberg-2016-convolutional`.
 
     Solve the optimisation problem

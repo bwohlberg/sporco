@@ -21,7 +21,14 @@ __author__ = """Brendt Wohlberg <brendt@ieee.org>"""
 
 
 class CnstrMOD(admm.ADMMEqual):
-    r"""ADMM algorithm for a constrained variant of the Method of Optimal
+    r"""**Class inheritance structure**
+
+    .. inheritance-diagram:: CnstrMOD
+       :parts: 2
+
+    |
+
+    ADMM algorithm for a constrained variant of the Method of Optimal
     Directions (MOD) :cite:`engan-1999-method` problem, referred to here
     as Constrained MOD (CMOD).
 

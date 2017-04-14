@@ -24,7 +24,14 @@ __author__ = """Brendt Wohlberg <brendt@ieee.org>"""
 
 
 class BPDNDictLearn(dictlrn.DictLearn):
-    r"""Dictionary learning based on BPDN and CnstrMOD
+    r"""**Class inheritance structure**
+
+    .. inheritance-diagram:: BPDNDictLearn
+       :parts: 2
+
+    |
+
+    Dictionary learning based on BPDN and CnstrMOD
 
     Solve the optimisation problem
 

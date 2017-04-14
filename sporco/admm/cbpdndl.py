@@ -25,7 +25,14 @@ __author__ = """Brendt Wohlberg <brendt@ieee.org>"""
 
 
 class ConvBPDNDictLearn(dictlrn.DictLearn):
-    r"""Dictionary learning based on ConvBPDN and ConvCnstrMOD
+    r"""**Class inheritance structure**
+
+    .. inheritance-diagram:: ConvBPDNDictLearn
+       :parts: 2
+
+    |
+
+    Dictionary learning based on ConvBPDN and ConvCnstrMOD
     :cite:`wohlberg-2016-efficient`.
 
     Solve the optimisation problem

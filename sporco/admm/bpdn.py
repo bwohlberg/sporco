@@ -23,7 +23,16 @@ __author__ = """Brendt Wohlberg <brendt@ieee.org>"""
 
 
 class GenericBPDN(admm.ADMMEqual):
-    r"""Base class for ADMM algorithm for solving variants of the
+    r"""
+    **Class inheritance structure**
+
+    .. inheritance-diagram:: GenericBPDN
+       :parts: 2
+
+    |
+
+
+    Base class for ADMM algorithm for solving variants of the
     Basis Pursuit DeNoising (BPDN) :cite:`chen-1998-atomic` problem.
 
     The generic problem form is
@@ -230,7 +239,14 @@ class GenericBPDN(admm.ADMMEqual):
 
 
 class BPDN(GenericBPDN):
-    r"""ADMM algorithm for the Basis Pursuit DeNoising (BPDN)
+    r"""**Class inheritance structure**
+
+    .. inheritance-diagram:: BPDN
+       :parts: 2
+
+    |
+
+    ADMM algorithm for the Basis Pursuit DeNoising (BPDN)
     :cite:`chen-1998-atomic` problem.
 
     Solve the Single Measurement Vector (SMV) BPDN problem
@@ -399,9 +415,17 @@ class BPDN(GenericBPDN):
 
 
 
-
 class BPDNJoint(BPDN):
-    r"""ADMM algorithm for BPDN with joint sparsity via an :math:`\ell_{2,1}`
+    r"""
+    **Class inheritance structure**
+
+    .. inheritance-diagram:: BPDNJoint
+       :parts: 2
+
+    |
+
+
+    ADMM algorithm for BPDN with joint sparsity via an :math:`\ell_{2,1}`
     norm term.
 
     Solve the optimisation problem
@@ -504,7 +528,14 @@ class BPDNJoint(BPDN):
 
 
 class ElasticNet(BPDN):
-    r"""ADMM algorithm for the elastic net :cite:`zou-2005-regularization`
+    r"""**Class inheritance structure**
+
+    .. inheritance-diagram:: ElasticNet
+       :parts: 2
+
+    |
+
+    ADMM algorithm for the elastic net :cite:`zou-2005-regularization`
     problem.
 
     Solve the optimisation problem

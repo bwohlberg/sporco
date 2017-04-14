@@ -908,7 +908,14 @@ class ADMM(with_metaclass(_ADMM_Meta, object)):
 
 
 class ADMMEqual(ADMM):
-    r"""Base class for ADMM algorithms with a simple equality constraint.
+    r"""**Class inheritance structure**
+
+    .. inheritance-diagram:: ADMMEqual
+       :parts: 2
+
+    |
+
+    Base class for ADMM algorithms with a simple equality constraint.
 
     Solve optimisation problems of the form
 
@@ -1095,7 +1102,14 @@ class ADMMEqual(ADMM):
 
 
 class ADMMTwoBlockCnstrnt(ADMM):
-    r"""Base class for ADMM algorithms for problems for which
+    r"""**Class inheritance structure**
+
+    .. inheritance-diagram:: ADMMTwoBlockCnstrnt
+       :parts: 2
+
+    |
+
+    Base class for ADMM algorithms for problems for which
     :math:`g(\mathbf{y}) = g_0(\mathbf{y}_0) + g_1(\mathbf{y}_1)` with
     :math:`\mathbf{y}^T = (\mathbf{y}_0^T \; \mathbf{y}_1^T)`.
 

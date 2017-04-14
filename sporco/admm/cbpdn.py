@@ -207,7 +207,14 @@ class ConvRepIndexing(object):
 
 
 class GenericConvBPDN(admm.ADMMEqual):
-    r"""Base class for ADMM algorithm for solving variants of the
+    r"""**Class inheritance structure**
+
+    .. inheritance-diagram:: GenericConvBPDN
+       :parts: 2
+
+    |
+
+    Base class for ADMM algorithm for solving variants of the
     Convolutional BPDN (CBPDN) :cite:`wohlberg-2016-efficient` problem.
 
     The generic problem form is
@@ -547,7 +554,14 @@ class GenericConvBPDN(admm.ADMMEqual):
 
 
 class ConvBPDN(GenericConvBPDN):
-    r"""ADMM algorithm for the Convolutional BPDN (CBPDN)
+    r"""**Class inheritance structure**
+
+    .. inheritance-diagram:: ConvBPDN
+       :parts: 2
+
+    |
+
+    ADMM algorithm for the Convolutional BPDN (CBPDN)
     :cite:`wohlberg-2014-efficient` :cite:`wohlberg-2016-efficient`
     :cite:`wohlberg-2016-convolutional` problem.
 
@@ -770,7 +784,13 @@ class ConvBPDN(GenericConvBPDN):
 
 
 class ConvBPDNJoint(ConvBPDN):
-    r"""
+    r"""**Class inheritance structure**
+
+    .. inheritance-diagram:: ConvBPDNJoint
+       :parts: 2
+
+    |
+
     ADMM algorithm for Convolutional BPDN with joint sparsity via an
     :math:`\ell_{2,1}` norm term :cite:`wohlberg-2016-convolutional`
     (the :math:`\ell_2` norms are computed over the channel index).
@@ -893,7 +913,14 @@ class ConvBPDNJoint(ConvBPDN):
 
 
 class ConvElasticNet(ConvBPDN):
-    r"""ADMM algorithm for a convolutional form of the elastic net problem
+    r"""**Class inheritance structure**
+
+    .. inheritance-diagram:: ConvElasticNet
+       :parts: 2
+
+    |
+
+    ADMM algorithm for a convolutional form of the elastic net problem
     :cite:`zou-2005-regularization`.
 
     Solve the optimisation problem
@@ -1056,7 +1083,14 @@ class ConvElasticNet(ConvBPDN):
 
 
 class ConvBPDNGradReg(ConvBPDN):
-    r"""ADMM algorithm for an extension of Convolutional BPDN including a
+    r"""**Class inheritance structure**
+
+    .. inheritance-diagram:: ConvBPDNGradReg
+       :parts: 2
+
+    |
+
+    ADMM algorithm for an extension of Convolutional BPDN including a
     term penalising the gradient of the coefficient maps
     :cite:`wohlberg-2016-convolutional2`.
 
@@ -1262,7 +1296,14 @@ class ConvBPDNGradReg(ConvBPDN):
 
 
 class ConvTwoBlockCnstrnt(admm.ADMMTwoBlockCnstrnt):
-    r"""Base class for ADMM algorithms for problems of the form
+    r"""**Class inheritance structure**
+
+    .. inheritance-diagram:: ConvTwoBlockCnstrnt
+       :parts: 2
+
+    |
+
+    Base class for ADMM algorithms for problems of the form
 
     .. math::
        \mathrm{argmin}_\mathbf{x} \;
@@ -1614,7 +1655,14 @@ class ConvTwoBlockCnstrnt(admm.ADMMTwoBlockCnstrnt):
 
 
 class ConvBPDNMaskDcpl(ConvTwoBlockCnstrnt):
-    r"""ADMM algorithm for Convolutional BPDN with Mask Decoupling
+    r"""**Class inheritance structure**
+
+    .. inheritance-diagram:: ConvBPDNMaskDcpl
+       :parts: 2
+
+    |
+
+    ADMM algorithm for Convolutional BPDN with Mask Decoupling
     :cite:`heide-2015-fast` :cite:`wohlberg-2016-boundary`.
 
     Solve the optimisation problem
