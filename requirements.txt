@@ -8,4 +8,3 @@ pytest
 sphinx>=1.2.2
 sphinxcontrib-bibtex
 numpydoc
-
