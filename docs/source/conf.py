@@ -340,7 +340,6 @@ if on_rtd:
     MOCK_MODULES = ['pyfftw']
     sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
 
-
 # See https://developer.ridgerun.com/wiki/index.php/How_to_generate_sphinx_documentation_for_python_code_running_in_an_embedded_system
 
 # Sort members by type
