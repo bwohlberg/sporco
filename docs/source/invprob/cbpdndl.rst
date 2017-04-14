@@ -37,6 +37,7 @@ Usage Examples
        :language: python
        :lines: 9-
 
+
 .. container:: toggle
 
     .. container:: header
@@ -48,6 +49,7 @@ Usage Examples
     .. literalinclude:: ../../../examples/cnvsparse/demo_cbpdndl_clr_ssd.py
        :language: python
        :lines: 9-
+
 
 .. container:: toggle
 

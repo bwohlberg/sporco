@@ -6,7 +6,7 @@
 # and user license can be found in the 'LICENSE.txt' file distributed
 # with the package.
 
-"""Usage example: cbpdn.ConvBPDNJoint (colour images)"""
+"""Usage example: cbpdn.ConvBPDNJoint (colour images, greyscale dictionary)"""
 
 from __future__ import print_function
 from builtins import input
@@ -35,10 +35,10 @@ sl, sh = util.tikhonov_filter(img, fltlmbd, npd)
 D = util.convdicts()['G:8x8x64']
 
 
-# Set up ConvBPDN options
+# Set up ConvBPDNJoint options
 lmbda = 1e-2
 mu = 1e-2
-opt = cbpdn.ConvBPDN.Options({'Verbose' : True, 'MaxMainIter' : 200,
+opt = cbpdn.ConvBPDNJoint.Options({'Verbose' : True, 'MaxMainIter' : 200,
                     'LinSolveCheck' : True, 'RelStopTol' : 5e-3,
                     'AuxVarObj' : False})
 
@@ -65,7 +65,7 @@ plot.imview(np.sum(abs(X), axis=b.cri.axisM).squeeze(), fgrf=fig1,
 plot.subplot(2,2,3)
 plot.imview(imgr, fgrf=fig1, title='Reconstructed image')
 plot.subplot(2,2,4)
-plot.imview(imgr - img, fgrf=fig1, fltscl=True, 
+plot.imview(imgr - img, fgrf=fig1, fltscl=True,
             title='Reconstruction difference')
 fig1.show()
 
