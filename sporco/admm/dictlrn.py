@@ -194,6 +194,8 @@ class DictLearn(with_metaclass(_DictLearn_Meta, object)):
           ``StatusHeader`` : Flag determining whether status header and
           separator are displayed.
 
+          ``IterTimer`` : Label of the timer to use for iteration times.
+
           ``MaxMainIter`` : Maximum main iterations.
 
           ``Callback`` : Callback function to be called at the end of
@@ -201,7 +203,8 @@ class DictLearn(with_metaclass(_DictLearn_Meta, object)):
         """
 
         defaults = {'Verbose' : False, 'StatusHeader' : True,
-                    'MaxMainIter' : 1000, 'Callback' : None}
+                    'IterTimer' : 'solve', 'MaxMainIter' : 1000,
+                    'Callback' : None}
 
 
         def __init__(self, opt=None):
@@ -323,7 +326,7 @@ class DictLearn(with_metaclass(_DictLearn_Meta, object)):
             self.timer.start('solve_wo_eval')
 
             # Record elapsed time
-            t = self.timer.elapsed('solve')
+            t = self.timer.elapsed(self.opt['IterTimer'])
 
             # Extract and record iteration stats
             xitstat = self.xstep.itstat[-1] if len(self.xstep.itstat) > 0 else\

@@ -128,10 +128,12 @@ class ADMM(with_metaclass(_ADMM_Meta, object)):
        ``DualRsdl`` : Norm of dual Residual
 
        ``EpsPrimal`` : Primal residual stopping tolerance
-       :math:`\epsilon_{\mathrm{pri}}`
+       :math:`\epsilon_{\mathrm{pri}}` (see Sec. 3.3.1 of
+       :cite:`boyd-2010-distributed`)
 
        ``EpsDual`` : Dual residual stopping tolerance
-       :math:`\epsilon_{\mathrm{dua}}`
+       :math:`\epsilon_{\mathrm{dua}}` (see Sec. 3.3.1 of
+       :cite:`boyd-2010-distributed`)
 
        ``Rho`` : Penalty parameter
 
@@ -139,7 +141,7 @@ class ADMM(with_metaclass(_ADMM_Meta, object)):
     """
 
     class Options(cdict.ConstrainedDict):
-        """ADMM algorithm options.
+        r"""ADMM algorithm options.
 
         Options:
 
@@ -168,6 +170,8 @@ class ADMM(with_metaclass(_ADMM_Meta, object)):
           ``Callback`` : Callback function to be called at the end of
           every iteration.
 
+          ``IterTimer`` : Label of the timer to use for iteration times.
+
           ``MaxMainIter`` : Maximum main iterations.
 
           ``AbsStopTol`` : Absolute convergence tolerance (see Sec. 3.3.1
@@ -180,34 +184,41 @@ class ADMM(with_metaclass(_ADMM_Meta, object)):
           :cite:`boyd-2010-distributed`). Note: relaxation is disabled
           by setting this value to 1.0.
 
-          ``rho`` : ADMM penalty parameter.
+          ``rho`` : ADMM penalty parameter :math:`\rho`.
 
           ``AutoRho`` : Options for adaptive rho strategy (see
           :cite:`wohlberg-2015-adaptive` and Sec. 3.4.3 of
           :cite:`boyd-2010-distributed`).
 
-            ``Enabled`` : Flag determining whether adaptive rho
+            ``Enabled`` : Flag determining whether adaptive penalty parameter
             strategy is enabled.
 
-            ``Period`` : Iteration period on which rho is updated.
+            ``Period`` : Iteration period on which rho is updated. If set to
+            1, the rho update test is applied at every iteration.
 
-            ``Scaling`` : Multiplier applied to rho when updated.
+            ``Scaling`` : Multiplier applied to rho when updated
+            (:math:`\tau` in :cite:`wohlberg-2015-adaptive`).
 
-            ``RsdlRatio`` : Primal/dual residual ratio in rho update test.
+            ``RsdlRatio`` : Primal/dual residual ratio in rho update test
+            (:math:`\mu` in :cite:`wohlberg-2015-adaptive`).
 
-            ``RsdlTarget`` : Residual ratio targeted by auto rho update policy.
+            ``RsdlTarget`` : Residual ratio targeted by auto rho update
+            policy (:math:`\xi` in :cite:`wohlberg-2015-adaptive`).
 
             ``AutoScaling`` : Flag determining whether RhoScaling value is
-            adaptively determined. If  enabled, Scaling specifies a
-            maximum allowed multiplier instead of a fixed multiplier.
+            adaptively determined (see Sec. IV.C in
+            :cite:`wohlberg-2015-adaptive`). If enabled, ``Scaling``
+            specifies a maximum allowed multiplier instead of a fixed
+            multiplier.
 
             ``StdResiduals`` : Flag determining whether standard residual
-            definitions are used instead of normalised residuals.
+            definitions are used instead of normalised residuals (see
+            Sec. IV.B in :cite:`wohlberg-2015-adaptive`).
         """
 
         defaults = {'FastSolve' : False, 'Verbose' : False,
                     'StatusHeader' : True, 'DataType' : None,
-                    'MaxMainIter' : 1000,
+                    'MaxMainIter' : 1000, 'IterTimer' : 'solve',
                     'AbsStopTol' : 0.0, 'RelStopTol' : 1e-3,
                     'RelaxParam' : 1.0, 'rho' : None,
                     'AutoRho' :
@@ -626,8 +637,8 @@ class ADMM(with_metaclass(_ADMM_Meta, object)):
     def iteration_stats(self, k, r, s, epri, edua):
         """Construct iteration stats record tuple."""
 
-        tk = self.timer.elapsed('solve')
-        tpl = (k,) + self.eval_objfn() + (r, s, epri, edua, self.rho) +\
+        tk = self.timer.elapsed(self.opt['IterTimer'])
+        tpl = (k,) + self.eval_objfn() + (r, s, epri, edua, self.rho) + \
               self.itstat_extra() + (tk,)
         return type(self).IterationStats(*tpl)
 
