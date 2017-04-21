@@ -66,10 +66,10 @@ class GenericBPDN(admm.ADMMEqual):
 
        ``DualRsdl`` : Norm of dual residual
 
-       ``EpsPrimal`` : Primal residual stopping tolerance \
+       ``EpsPrimal`` : Primal residual stopping tolerance
        :math:`\epsilon_{\mathrm{pri}}`
 
-       ``EpsDual`` : Dual residual stopping tolerance \
+       ``EpsDual`` : Dual residual stopping tolerance
        :math:`\epsilon_{\mathrm{dua}}`
 
        ``Rho`` : Penalty parameter
@@ -372,9 +372,12 @@ class BPDN(GenericBPDN):
         self.set_attr('rho', opt['rho'], dval=(50.0*self.lmbda + 1.0),
                       dtype=self.dtype)
 
-        # Set rho_xi attribute
-        self.set_attr('rho_xi', opt['AutoRho', 'RsdlTarget'],
-                      dval=(1.0 + (18.3)**(np.log10(self.lmbda)+1.0)),
+        # Set rho_xi attribute (see Sec. VI.C of wohlberg-2015-adaptive)
+        if self.lmbda != 0.0:
+            rho_xi = (1.0 + (18.3)**(np.log10(self.lmbda) + 1.0))
+        else:
+            rho_xi = 1.0
+        self.set_attr('rho_xi', opt['AutoRho', 'RsdlTarget'], dval=rho_xi,
                       dtype=self.dtype)
 
         super(BPDN, self).__init__(D, S, opt)

@@ -737,9 +737,9 @@ class ConvBPDN(GenericConvBPDN):
         self.set_attr('rho', opt['rho'], dval=(50.0*self.lmbda + 1.0),
                       dtype=self.dtype)
 
-        # Set rho_xi attribute
+        # Set rho_xi attribute (see Sec. VI.C of wohlberg-2015-adaptive)
         if self.lmbda != 0.0:
-            rho_xi = (1.0 + (18.3)**(np.log10(self.lmbda)+1.0))
+            rho_xi = (1.0 + (18.3)**(np.log10(self.lmbda) + 1.0))
         else:
             rho_xi = 1.0
         self.set_attr('rho_xi', opt['AutoRho', 'RsdlTarget'], dval=rho_xi,
