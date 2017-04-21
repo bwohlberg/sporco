@@ -3,4 +3,3 @@ sphinx
 sphinxcontrib-bibtex
 numpydoc
 scipy
-
