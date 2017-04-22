@@ -61,7 +61,7 @@ Version 0.1.2   (2017-02-19)
 - In module linalg, moved functions mae, mse, snr, and psnr to new
   module metric, and added new functions isnr, bsnr, pamse, and gmsd
   in this module
-- New method admm.ADMM.getmin, cbpdn.AddMaskSim.setdict,
+- New methods admm.ADMM.getmin, cbpdn.AddMaskSim.setdict,
   cbpdn.AddMaskSim.getcoef
 - Modified classes in modules tvl1 and tvl2 to support Vector TV for
   multi-channel images
