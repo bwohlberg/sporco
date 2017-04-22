@@ -57,7 +57,7 @@ class GenericBPDN(admm.ADMMEqual):
 
        ``ObjFun`` : Objective function value
 
-       ``DFid`` :  Value of data fidelity term \
+       ``DFid`` :  Value of data fidelity term
        :math:`(1/2) \| D \mathbf{x} - \mathbf{s} \|_2^2`
 
        ``Reg`` : Value of regularisation term
