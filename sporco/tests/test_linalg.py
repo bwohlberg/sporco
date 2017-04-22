@@ -279,3 +279,19 @@ class TestSet01(object):
         n1 = np.linalg.norm(x)**2
         n2 = linalg.rfl2norm2(xf, xs=x.shape, axis=(0,))
         assert(np.abs(n1-n2) < 1e-12)
+
+
+    def test_18(self):
+        x = np.random.randn(16,8)
+        y = np.random.randn(16,8)
+        ip1 = np.sum(x * y, axis=0, keepdims=True)
+        ip2 = linalg.inner(x, y, axis=0)
+        assert(np.linalg.norm(ip1 - ip2) < 1e-13)
+
+
+    def test_19(self):
+        x = np.random.randn(8,8,3,12)
+        y = np.random.randn(8,1,1,12)
+        ip1 = np.sum(x * y, axis=-1, keepdims=True)
+        ip2 = linalg.inner(x, y, axis=-1)
+        assert(np.linalg.norm(ip1 - ip2) < 1e-13)
