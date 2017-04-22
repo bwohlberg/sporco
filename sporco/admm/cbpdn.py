@@ -1061,7 +1061,7 @@ class ConvElasticNet(ConvBPDN):
             if self.cri.Cd == 1:
                 DHop = lambda x: np.conj(self.Df) * x
             else:
-                DHop = lambda x: sl.inner(np.conj(self.Df) * x,
+                DHop = lambda x: sl.inner(np.conj(self.Df), x,
                                           axis=self.cri.axisC)
             ax = DHop(Dop(self.Xf)) + (self.mu + self.rho)*self.Xf
             self.xrrs = sl.rrs(ax, b)
@@ -1456,7 +1456,7 @@ class ConvTwoBlockCnstrnt(admm.ADMMTwoBlockCnstrnt):
         if self.cri.Cd == 1:
             b = np.conj(self.Df) * self.block_sep0(YUf) + self.block_sep1(YUf)
         else:
-            b = sl.inner(np.conj(self.Df) * self.block_sep0(YUf),
+            b = sl.inner(np.conj(self.Df), self.block_sep0(YUf),
                          axis=self.cri.axisC) + self.block_sep1(YUf)
 
         if self.cri.Cd == 1:
