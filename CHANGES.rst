@@ -3,8 +3,8 @@ SPORCO Release Notes
 ====================
 
 
-Version 0.1.5   (Not yet released)
-----------------------------------
+Version 0.1.5   (2017-04-22)
+----------------------------
 
 - Fixed serious bug in cbpdn.ConvBPDNGradReg.setdict and
   cbpdn.ConvBPDNGradReg.xstep resulting in incorrect solution of
