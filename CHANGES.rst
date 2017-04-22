@@ -154,8 +154,8 @@ Version 0.0.2   (2016-05-27)
 
 - Package modified for compatibility with Python 2 and 3
 - New functions: util.complex_dtype, util.pyfftw_empty_aligned
-- In admm.bpdn.BPDN and admm.cbpdn.ConvBPDN, introduced new option
-  'NonNegCoef'
+- In admm.bpdn.BPDN and admm.cbpdn.ConvBPDN, introduced new
+  NonNegCoef option
 - New class admm.cbpdn.ConvRepIndexing
 - Improvements to documentation
 - Improvements to package configuration and metadata.
