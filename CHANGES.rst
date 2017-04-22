@@ -24,6 +24,11 @@ Version 0.1.5   (Not yet released)
   non-essential calculations
 - New AccurateDFid option for more accurate functional evaluation in
   admm.BPDNDictLearn and admm.ConvBPDNDictLearn
+- New IterTimer option to select timer used for admm.ADMM iteration
+  timing
+- Introduced new inner product function linalg.inner and improved
+  speed of linalg.solvedbi_sm by using it instead of np.sum and
+  broadcast multiplication
 
 
 
