@@ -562,8 +562,7 @@ class ConvCnstrMOD(admm.ADMMEqual):
 
         self.Af = sl.rfftn(self.A, self.cri.Nv, self.cri.axisN)
         # Compute X^H S
-        self.ASf = np.sum(np.conj(self.Af) * self.Sf, self.cri.axisK,
-                          keepdims=True)
+        self.ASf = sl.inner(np.conj(self.Af), self.Sf, self.cri.axisK)
 
 
 
@@ -641,8 +640,7 @@ class ConvCnstrMOD(admm.ADMMEqual):
         \mathbf{x}_m - \mathbf{s} \|_2^2`.
         """
 
-        Ef = np.sum(self.Af * self.obfn_fvarf(), axis=self.cri.axisM,
-                    keepdims=True) - self.Sf
+        Ef = sl.inner(self.Af, self.obfn_fvarf(), axis=self.cri.axisM) - self.Sf
         return sl.rfl2norm2(Ef, self.S.shape, axis=self.cri.axisN) / 2.0
 
 

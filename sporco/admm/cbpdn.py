@@ -435,7 +435,8 @@ class GenericConvBPDN(admm.ADMMEqual):
 
 
     def xstep(self):
-        r"""Minimise Augmented Lagrangian with respect to :math:`\mathbf{x}`."""
+        r"""Minimise Augmented Lagrangian with respect to
+        :math:`\mathbf{x}`."""
 
         self.YU[:] = self.Y - self.U
 
@@ -450,13 +451,12 @@ class GenericConvBPDN(admm.ADMMEqual):
         self.X = sl.irfftn(self.Xf, self.cri.Nv, self.cri.axisN)
 
         if self.opt['LinSolveCheck']:
-            Dop = lambda x: np.sum(self.Df * x, axis=self.cri.axisM,
-                                   keepdims=True)
+            Dop = lambda x: sl.inner(self.Df, x, axis=self.cri.axisM)
             if self.cri.Cd == 1:
                 DHop = lambda x: np.conj(self.Df) * x
             else:
-                DHop = lambda x: np.sum(np.conj(self.Df) * x,
-                                        axis=self.cri.axisC, keepdims=True)
+                DHop = lambda x: sl.inner(np.conj(self.Df), x,
+                                          axis=self.cri.axisC)
             ax = DHop(Dop(self.Xf)) + self.rho*self.Xf
             self.xrrs = sl.rrs(ax, b)
         else:
@@ -509,8 +509,8 @@ class GenericConvBPDN(admm.ADMMEqual):
         \mathbf{x}_m - \mathbf{s} \|_2^2`.
         """
 
-        Ef = np.sum(self.Df * self.obfn_fvarf(), axis=self.cri.axisM,
-                    keepdims=True) - self.Sf
+        Ef = sl.inner(self.Df, self.obfn_fvarf(), axis=self.cri.axisM) - \
+          self.Sf
         return sl.rfl2norm2(Ef, self.S.shape, axis=self.cri.axisN)/2.0
 
 
@@ -764,9 +764,11 @@ class ConvBPDN(GenericConvBPDN):
 
 
     def ystep(self):
-        r"""Minimise Augmented Lagrangian with respect to :math:`\mathbf{y}`."""
+        r"""Minimise Augmented Lagrangian with respect to
+        :math:`\mathbf{y}`."""
 
-        self.Y = sl.shrink1(self.AX + self.U, (self.lmbda/self.rho) * self.wl1)
+        self.Y = sl.shrink1(self.AX + self.U,
+                            (self.lmbda/self.rho) * self.wl1)
         super(ConvBPDN, self).ystep()
 
 
@@ -1055,13 +1057,12 @@ class ConvElasticNet(ConvBPDN):
         self.X = sl.irfftn(self.Xf, None, self.cri.axisN)
 
         if self.opt['LinSolveCheck']:
-            Dop = lambda x: np.sum(self.Df * x, axis=self.cri.axisM,
-                                   keepdims=True)
+            Dop = lambda x: sl.inner(self.Df, x, axis=self.cri.axisM)
             if self.cri.Cd == 1:
                 DHop = lambda x: np.conj(self.Df) * x
             else:
-                DHop = lambda x: np.sum(np.conj(self.Df) * x,
-                                        axis=self.cri.axisC, keepdims=True)
+                DHop = lambda x: sl.inner(np.conj(self.Df) * x,
+                                          axis=self.cri.axisC)
             ax = DHop(Dop(self.Xf)) + (self.mu + self.rho)*self.Xf
             self.xrrs = sl.rrs(ax, b)
         else:
@@ -1260,19 +1261,19 @@ class ConvBPDNGradReg(ConvBPDN):
             self.Xf[:] = sl.solvedbd_sm(self.Df, self.mu*self.GHGf + self.rho,
                                         b, self.c, self.cri.axisM)
         else:
-            self.Xf[:] = sl.solvemdbi_ism(self.Df, self.mu*self.GHGf + self.rho,
-                                          b, self.cri.axisM, self.cri.axisC)
+            self.Xf[:] = sl.solvemdbi_ism(self.Df, self.mu*self.GHGf +
+                                          self.rho, b, self.cri.axisM,
+                                          self.cri.axisC)
 
         self.X = sl.irfftn(self.Xf, None, self.cri.axisN)
 
         if self.opt['LinSolveCheck']:
-            Dop = lambda x: np.sum(self.Df * x, axis=self.cri.axisM,
-                                   keepdims=True)
+            Dop = lambda x: sl.inner(self.Df, x, axis=self.cri.axisM)
             if self.cri.Cd == 1:
                 DHop = lambda x: np.conj(self.Df) * x
             else:
-                DHop = lambda x: np.sum(np.conj(self.Df) * x,
-                                        axis=self.cri.axisC, keepdims=True)
+                DHop = lambda x: sl.inner(np.conj(self.Df), x,
+                                       axis=self.cri.axisC)
             ax = DHop(Dop(self.Xf)) + (self.mu*self.GHGf + self.rho)*self.Xf
             self.xrrs = sl.rrs(ax, b)
         else:
@@ -1455,11 +1456,12 @@ class ConvTwoBlockCnstrnt(admm.ADMMTwoBlockCnstrnt):
         if self.cri.Cd == 1:
             b = np.conj(self.Df) * self.block_sep0(YUf) + self.block_sep1(YUf)
         else:
-            b = np.sum(np.conj(self.Df) * self.block_sep0(YUf),
-                    axis=self.cri.axisC, keepdims=True) + self.block_sep1(YUf)
+            b = sl.inner(np.conj(self.Df) * self.block_sep0(YUf),
+                         axis=self.cri.axisC) + self.block_sep1(YUf)
 
         if self.cri.Cd == 1:
-            self.Xf[:] = sl.solvedbi_sm(self.Df, 1.0, b, self.c, self.cri.axisM)
+            self.Xf[:] = sl.solvedbi_sm(self.Df, 1.0, b, self.c,
+                                        self.cri.axisM)
         else:
             self.Xf[:] = sl.solvemdbi_ism(self.Df, 1.0, b, self.cri.axisM,
                                           self.cri.axisC)
@@ -1467,13 +1469,12 @@ class ConvTwoBlockCnstrnt(admm.ADMMTwoBlockCnstrnt):
         self.X = sl.irfftn(self.Xf, self.cri.Nv, self.cri.axisN)
 
         if self.opt['LinSolveCheck']:
-            Dop = lambda x: np.sum(self.Df * x, axis=self.cri.axisM,
-                                   keepdims=True)
+            Dop = lambda x: sl.inner(self.Df, x, axis=self.cri.axisM)
             if self.cri.Cd == 1:
                 DHop = lambda x: np.conj(self.Df) * x
             else:
-                DHop = lambda x: np.sum(np.conj(self.Df) * x,
-                                        axis=self.cri.axisC, keepdims=True)
+                DHop = lambda x: sl.inner(np.conj(self.Df), x,
+                                          axis=self.cri.axisC)
             ax = DHop(Dop(self.Xf)) + self.Xf
             self.xrrs = sl.rrs(ax, b)
         else:
@@ -1544,7 +1545,7 @@ class ConvTwoBlockCnstrnt(admm.ADMMTwoBlockCnstrnt):
         """
 
         return np.concatenate((np.swapaxes(Y0, self.cri.axisC,
-                                self.cri.axisM), Y1), axis=self.blkaxis)
+                              self.cri.axisM), Y1), axis=self.blkaxis)
 
 
 
@@ -1578,8 +1579,8 @@ class ConvTwoBlockCnstrnt(admm.ADMMTwoBlockCnstrnt):
         # self.X).
         if Xf is None:
             Xf = sl.rfftn(X, None, self.cri.axisN)
-        return sl.irfftn(np.sum(self.Df * Xf, axis=self.cri.axisM,
-                                keepdims=True), self.cri.Nv, self.cri.axisN)
+        return sl.irfftn(sl.inner(self.Df, Xf, axis=self.cri.axisM),
+                                  self.cri.Nv, self.cri.axisN)
 
 
 
@@ -1592,8 +1593,8 @@ class ConvTwoBlockCnstrnt(admm.ADMMTwoBlockCnstrnt):
         # should be possible to disable relevant diagnostic information
         # (dual residual) to avoid this cost.
         Y0f = sl.rfftn(Y0, None, self.cri.axisN)
-        return sl.irfftn(np.sum(np.conj(self.Df) * Y0f, axis=self.cri.axisC,
-                                keepdims=True), self.cri.Nv, self.cri.axisN)
+        return sl.irfftn(sl.inner(np.conj(self.Df), Y0f, axis=self.cri.axisC),
+                                  self.cri.Nv, self.cri.axisN)
 
 
 

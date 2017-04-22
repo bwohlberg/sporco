@@ -248,6 +248,50 @@ def idctii(x, axes=None):
 
 
 
+def inner(x, y, axis=-1):
+    """
+    Compute inner product of x and y on specified axis, equivalent to
+    np.sum(x * y, axis=axis, keepdims=True).
+
+    Parameters
+    ----------
+    x : array_like
+      Input array x
+    y : array_like
+      Input array y
+    axes : int, optional (default -1)
+      Axis over which to compute the sum
+
+    Returns
+    -------
+    y : ndarray
+      Inner product array equivalent to summing x*y over the specified
+      axis
+    """
+
+    # Convert negative axis to positive
+    if axis < 0:
+        axis = x.ndim + axis
+
+    # If sum not on axis 0, roll specified axis to 0 position
+    if axis == 0:
+        xr = x
+        yr = y
+    else:
+        xr = np.rollaxis(x, axis, 0)
+        yr = np.rollaxis(y, axis, 0)
+
+    # Efficient inner product on axis 0
+    ip = np.einsum(xr, [0, Ellipsis], yr, [0, Ellipsis])[np.newaxis,...]
+
+    # Roll axis back to original position if necessary
+    if axis != 0:
+        ip = np.rollaxis(ip, 0, axis+1)
+
+    return ip
+
+
+
 def solvedbi_sm(ah, rho, b, c=None, axis=4):
     r"""
     Solve a diagonal block linear system with a scaled identity term
@@ -287,10 +331,10 @@ def solvedbi_sm(ah, rho, b, c=None, axis=4):
     if c is None:
         c = solvedbi_sm_c(ah, a, rho, axis)
     if have_numexpr:
-        cb = np.sum(c * b, axis=axis, keepdims=True)
+        cb = inner(c, b, axis=axis)
         return ne.evaluate('(b - (a * cb)) / rho')
     else:
-        return (b - (a * np.sum(c * b, axis=axis, keepdims=True))) / rho
+        return (b - (a * inner(c, b, axis=axis))) / rho
 
 
 
@@ -315,7 +359,7 @@ def solvedbi_sm_c(ah, a, rho, axis=4):
       Argument :math:`\mathbf{c}` used by :func:`solvedbi_sm`
     """
 
-    return ah / (np.sum(ah * a, axis=axis, keepdims=True) + rho)
+    return ah / (inner(ah, a, axis=axis) + rho)
 
 
 
@@ -358,10 +402,10 @@ def solvedbd_sm(ah, d, b, c=None, axis=4):
     if c is None:
         c = solvedbd_sm_c(ah, a, d, axis)
     if have_numexpr:
-        cb = np.sum(c * b, axis=axis, keepdims=True)
+        cb = inner(c, b, axis=axis)
         return ne.evaluate('(b - (a * cb)) / d')
     else:
-        return (b - (a * np.sum(c * b, axis=axis, keepdims=True))) / d
+        return (b - (a * inner(c, b, axis=axis))) / d
 
 
 
@@ -386,7 +430,7 @@ def solvedbd_sm_c(ah, a, d, axis=4):
       Argument :math:`\mathbf{c}` used by :func:`solvedbd_sm`
     """
 
-    return (ah / d) / (np.sum(ah * (a / d), axis=axis, keepdims=True) + 1.0)
+    return (ah / d) / (inner(ah, (a / d), axis=axis) + 1.0)
 
 
 
@@ -434,7 +478,7 @@ def solvemdbi_ism(ah, rho, b, axisM, axisK):
     a = np.conj(ah)
     gamma = np.zeros(a.shape, a.dtype)
     delta = np.zeros(a.shape[0:axisM] + (1,), a.dtype)
-    slcnc = (slice(None),)*axisK
+    slcnc = (slice(None),) * axisK
     alpha = a[slcnc + (slice(0, 1),)] / rho
     beta = b / rho
 
@@ -443,19 +487,17 @@ def solvemdbi_ism(ah, rho, b, axisM, axisK):
 
         slck = slcnc + (slice(k, k+1),)
         gamma[slck] = alpha
-        delta[slck] = 1.0 + np.sum(ah[slck] * gamma[slck], axisM, keepdims=True)
+        delta[slck] = 1.0 + inner(ah[slck], gamma[slck], axis=axisM)
 
-        c = np.sum(ah[slck] * beta, axisM, keepdims=True)
-        d = c * gamma[slck]
-        beta = beta - (d / delta[slck])
+        d = gamma[slck] * inner(ah[slck], beta, axis=axisM)
+        beta[:] -= d / delta[slck]
 
         if k < K-1:
-            alpha = a[slcnc + (slice(k+1, k+2),)] / rho
+            alpha[:] = a[slcnc + (slice(k+1, k+2),)] / rho
             for l in range(0, k+1):
                 slcl = slcnc + (slice(l, l+1),)
-                c = np.sum(ah[slcl] * alpha, axisM, keepdims=True)
-                d = c * gamma[slcl]
-                alpha = alpha - (d / delta[slcl])
+                d = gamma[slcl] * inner(ah[slcl], alpha, axis=axisM)
+                alpha[:] -= d / delta[slcl]
 
     return beta
 
@@ -513,10 +555,10 @@ def solvemdbi_rsm(ah, rho, b, axisK, dimN=2):
 
     for k in range(0, K):
         slck = slcnc + (slice(k, k+1),) + (slice(None), np.newaxis,)
-        Aia = np.sum(Ainv * np.swapaxes(a[slck], dimN+2, dimN+3),
-                     dimN+3, keepdims=True)
-        ahAia = 1.0 + np.sum(ah[slck] * Aia, dimN+2, keepdims=True)
-        ahAi = np.sum(ah[slck] * Ainv, dimN+2, keepdims=True)
+        Aia = inner(Ainv, np.swapaxes(a[slck], dimN+2, dimN+3),
+                     axis=dimN+3)
+        ahAia = 1.0 + inner(ah[slck], Aia, axis=dimN+2)
+        ahAi = inner(ah[slck], Ainv, axis=dimN+2)
         AiaahAi = Aia * ahAi
         Ainv = Ainv - AiaahAi / ahAia
 
@@ -574,8 +616,8 @@ def solvemdbi_cg(ah, rho, b, axisM, axisK, tol=1e-5, mit=1000, isn=None):
     a = np.conj(ah)
     if isn is not None:
         isn = isn.ravel()
-    Aop = lambda x: np.sum(ah * x, axis=axisM, keepdims=True)
-    AHop = lambda x: np.sum(a * x, axis=axisK, keepdims=True)
+    Aop = lambda x: inner(ah, x, axis=axisM)
+    AHop = lambda x: inner(a, x, axis=axisK)
     AHAop = lambda x: AHop(Aop(x))
     vAHAoprI = lambda x: AHAop(x.reshape(b.shape)).ravel() + rho*x.ravel()
     lop = LinearOperator((b.size, b.size), matvec=vAHAoprI, dtype=b.dtype)
@@ -611,10 +653,10 @@ def lu_factor(A, rho):
     # matrix inversion lemma to compute the inverse of A^T*A + rho*I
     if N >= M:
         lu, piv = linalg.lu_factor(A.T.dot(A) + rho*np.identity(M,
-                        dtype=A.dtype))
+                                   dtype=A.dtype))
     else:
         lu, piv = linalg.lu_factor(A.dot(A.T) + rho*np.identity(N,
-                        dtype=A.dtype))
+                                   dtype=A.dtype))
     return lu, piv
 
 
@@ -790,9 +832,9 @@ def GradientFilters(ndim, axes, axshp, dtype=None):
     g = np.zeros([2 if k in axes else 1 for k in range(ndim)] +
                  [len(axes),], dtype)
     for k in axes:
-        g[(0,)*k +(slice(None),)+(0,)*(g.ndim-2-k)+(k,)] = [1, -1]
+        g[(0,) * k + (slice(None),) + (0,) * (g.ndim-2-k) + (k,)] = [1, -1]
     Gf = rfftn(g, axshp, axes=axes)
-    GHGf = np.sum(np.conj(Gf)*Gf, axis=-1)
+    GHGf = np.sum(np.conj(Gf) * Gf, axis=-1)
     return Gf, GHGf
 
 
@@ -1132,7 +1174,7 @@ def rfl2norm2(xf, xs, axis=(0, 1)):
     nrm0 = linalg.norm(xf[slc0 + (0,)])
     idx1 = (xs[axis[-1]]+1)//2
     nrm1 = linalg.norm(xf[slc0 + (slice(1, idx1),)])
-    if xs[axis[-1]]%2 == 0:
+    if xs[axis[-1]] % 2 == 0:
         nrm2 = linalg.norm(xf[slc0 + (slice(-1, None),)])
     else:
         nrm2 = 0.0
@@ -1171,21 +1213,21 @@ import warnings
 import sporco.metric as sm
 
 def mae(*args, **kwargs):
-    warnings.warn("sporco.linalg.mae is deprecated: please use"\
+    warnings.warn("sporco.linalg.mae is deprecated: please use"
                   " sporco.metric.mae")
     return sm.mae(*args, **kwargs)
 
 def mse(*args, **kwargs):
-    warnings.warn("sporco.linalg.mse is deprecated: please use"\
+    warnings.warn("sporco.linalg.mse is deprecated: please use"
                   " sporco.metric.mse")
     return sm.mse(*args, **kwargs)
 
 def snr(*args, **kwargs):
-    warnings.warn("sporco.linalg.snr is deprecated: please use"\
+    warnings.warn("sporco.linalg.snr is deprecated: please use"
                   " sporco.metric.snr")
     return sm.snr(*args, **kwargs)
 
 def psnr(*args, **kwargs):
-    warnings.warn("sporco.linalg.psnr is deprecated: please use"\
+    warnings.warn("sporco.linalg.psnr is deprecated: please use"
                   " sporco.metric.psnr")
     return sm.psnr(*args, **kwargs)
