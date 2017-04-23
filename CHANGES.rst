@@ -6,6 +6,8 @@ SPORCO Release Notes
 Version 0.1.6   (Not yet released)
 ----------------------------------
 
+- Fixed functional evaluation error in cbpdn.ConvBPDNMaskDcpl
+
 
 
 Version 0.1.5   (2017-04-22)
