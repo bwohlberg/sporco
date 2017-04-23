@@ -1821,6 +1821,18 @@ class ConvBPDNMaskDcpl(ConvTwoBlockCnstrnt):
 
 
 
+    def eval_objfn(self):
+        """Compute components of regularisation function as well as total
+        contribution to objective function.
+        """
+
+        g0v = self.obfn_g0(self.obfn_g0var())
+        g1v = self.obfn_g1(self.obfn_g1var())
+        obj = g0v + self.lmbda*g1v
+        return (obj, g0v, g1v)
+
+
+
     def obfn_g0(self, Y0):
         r"""Compute :math:`g_0(\mathbf{y}_0)` component of ADMM objective
         function.
@@ -1835,7 +1847,7 @@ class ConvBPDNMaskDcpl(ConvTwoBlockCnstrnt):
         function.
         """
 
-        return linalg.norm((self.wl1*self.obfn_g1var()).ravel(), 1)
+        return linalg.norm((self.wl1 * self.obfn_g1var()).ravel(), 1)
 
 
 
