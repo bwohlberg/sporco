@@ -1331,6 +1331,47 @@ class ConvTwoBlockCnstrnt(admm.ADMMTwoBlockCnstrnt):
        \mathbf{c} = \left( \begin{array}{c} \mathbf{s} \\
        \mathbf{0} \end{array} \right) \;\;.
 
+    |
+
+    The implementation of this class is substantially complicated by the
+    support of multi-channel signals. In the following, the number of
+    channels in the signal and dictionary are denoted by ``C`` and ``Cd``
+    respectively, the number of signals and the number of filters are
+    denoted by ``K`` and ``M`` respectively, ``D``, ``X``, and ``S`` denote
+    the dictionary, coefficient map, and signal arrays respectively, and
+    ``Y0`` and ``Y1`` denote blocks 0 and 1 of the auxiliary (split)
+    variable of the ADMM problem. We need to consider three different cases:
+
+      1. Single channel signal and dictionary (``C`` = ``Cd`` = 1)
+      2. Multi-channel signal, single channel dictionary (``C`` > 1, ``Cd`` = 1)
+      3. Multi-channel signal and dictionary (``C`` = ``Cd`` > 1)
+
+
+    The final three (non-spatial) dimensions of the main variables in each
+    of these cases are as in the following table:
+
+      ======   ==================   =====================   ==================
+      Var.     ``C`` = ``Cd`` = 1   ``C`` > 1, ``Cd`` = 1   ``C`` = ``Cd`` > 1
+      ======   ==================   =====================   ==================
+      ``D``    1 x 1 x ``M``        1 x 1 x ``M``           ``Cd`` x 1 x ``M``
+      ``X``    1 x ``K`` x ``M``    ``C`` x ``K`` x ``M``   1 x ``K`` x ``M``
+      ``S``    1 x ``K`` x 1        ``C`` x ``K`` x 1       ``C`` x ``K`` x 1
+      ``Y0``   1 x ``K`` x 1        ``C`` x ``K`` x 1       ``C`` x ``K`` x 1
+      ``Y1``   1 x ``K`` x ``M``    ``C`` x ``K`` x ``M``   1 x ``K`` x ``M``
+      ======   ==================   =====================   ==================
+
+    In order to combine the block components ``Y0`` and ``Y1`` of
+    variable ``Y`` into a single array, we need to be able to
+    concatenate the two component arrays on one of the axes. The final
+    ``M`` axis is suitable in the first two cases, but it is not
+    possible to concatenate ``Y0`` and ``Y1`` on the final axis in
+    case 3. The solution is that, in case 3., the the ``C`` and ``M``
+    axes of ``Y0`` are swapped before concatenating, as well as after
+    extracting the ``Y0`` component from the concatenated ``Y``
+    variable (see :meth:`.block_sep0` and :meth:`block_cat`).
+
+    |
+
     This class specialises class :class:`.ADMMTwoBlockCnstrnt`, but remains
     a base class for other classes that specialise to specific optimisation
     problems.
@@ -1402,12 +1443,20 @@ class ConvTwoBlockCnstrnt(admm.ADMMTwoBlockCnstrnt):
         # Infer problem dimensions and set relevant attributes of self
         self.cri = ConvRepIndexing(D, S, dimK=dimK, dimN=dimN)
 
+        # Determine whether axis swapping on Y block 0 is necessary
+        if self.cri.C > 1 and self.cri.Cd > 1:
+            self.y0swapaxes = True
+        else:
+            self.y0swapaxes = False
+
         # Call parent class __init__
         Nx = self.cri.M * self.cri.N * self.cri.K
         shpY = list(self.cri.shpX)
-        shpY[self.cri.axisM] += self.cri.C
+        if self.y0swapaxes:
+            shpY[self.cri.axisC] = 1
+        shpY[self.cri.axisM] += self.cri.Cd
         super(ConvTwoBlockCnstrnt, self).__init__(Nx, shpY, self.cri.axisM,
-                                                  self.cri.C, S.dtype, opt)
+                                                  self.cri.Cd, S.dtype, opt)
 
         # Reshape D and S to standard layout
         self.D = np.asarray(D.reshape(self.cri.shpD), dtype=self.dtype)
@@ -1511,9 +1560,8 @@ class ConvTwoBlockCnstrnt(admm.ADMMTwoBlockCnstrnt):
             if not hasattr(self, 'c1'):
                 self.c1 = self.cnst_c1()
             alpha = self.rlx
-            self.AX = alpha*self.AXnr + \
-                      (1-alpha)*self.block_cat(self.var_y0() + self.c0,
-                                               self.var_y1() + self.c1)
+            self.AX = alpha*self.AXnr + (1-alpha)*self.block_cat(
+                self.var_y0() + self.c0, self.var_y1() + self.c1)
 
 
 
@@ -1527,9 +1575,12 @@ class ConvTwoBlockCnstrnt(admm.ADMMTwoBlockCnstrnt):
         (N x C x K x 1) while block 1 has the dimensions of X (N x 1 x
         K x M).
         """
-
-        return np.swapaxes(Y[(slice(None),)*self.blkaxis +
-                    (slice(0, self.blkidx),)], self.cri.axisC, self.cri.axisM)
+        if self.y0swapaxes:
+            return np.swapaxes(Y[(slice(None),)*self.blkaxis +
+                                 (slice(0, self.blkidx),)],
+                               self.cri.axisC, self.cri.axisM)
+        else:
+            return super(ConvTwoBlockCnstrnt, self).block_sep0(Y)
 
 
 
@@ -1544,8 +1595,11 @@ class ConvTwoBlockCnstrnt(admm.ADMMTwoBlockCnstrnt):
         dimensions of X (N x 1 x K x M).
         """
 
-        return np.concatenate((np.swapaxes(Y0, self.cri.axisC,
-                              self.cri.axisM), Y1), axis=self.blkaxis)
+        if self.y0swapaxes:
+            return np.concatenate((np.swapaxes(Y0, self.cri.axisC,
+                                  self.cri.axisM), Y1), axis=self.blkaxis)
+        else:
+            return super(ConvTwoBlockCnstrnt, self).block_cat(Y0, Y1)
 
 
 
@@ -1793,7 +1847,7 @@ class ConvBPDNMaskDcpl(ConvTwoBlockCnstrnt):
 
 
     def uinit(self, ushape):
-        """Return initialiser for working variable U"""
+        """Return initialiser for working variable U."""
 
         if  self.opt['Y0'] is None:
             return np.zeros(ushape, dtype=self.dtype)

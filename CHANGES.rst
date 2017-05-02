@@ -7,6 +7,7 @@ Version 0.1.6   (Not yet released)
 ----------------------------------
 
 - Fixed functional evaluation error in cbpdn.ConvBPDNMaskDcpl
+- Fixed bug in cbpdn.ConvTwoBlockCnstrnt with multi-channel dictionary
 
 
 
