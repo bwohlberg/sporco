@@ -221,20 +221,40 @@ class TestSet01(object):
     def test_13(self):
         N = 16
         Nd = 5
+        Cd = 3
+        M = 4
+        D = np.random.randn(Nd, Nd, Cd, M)
+        s = np.random.randn(N, N, Cd)
+        lmbda = 1e-1
+        try:
+            opt = cbpdn.ConvBPDN.Options({'LinSolveCheck' : True})
+            b = cbpdn.ConvBPDN(D, s, lmbda, opt=opt, dimK=0)
+            b.solve()
+        except Exception as e:
+            print(e)
+            assert(0)
+        assert(np.array(b.getitstat().XSlvRelRes).max() < 1e-5)
+
+
+    def test_14(self):
+        N = 16
+        Nd = 5
         Cs = 3
         M = 4
         D = np.random.randn(Nd, Nd, M)
         s = np.random.randn(N, N, Cs)
         lmbda = 1e-1
         try:
-            b = cbpdn.ConvBPDNJoint(D, s, lmbda, dimK=0)
+            opt = cbpdn.ConvBPDNJoint.Options({'LinSolveCheck' : True})
+            b = cbpdn.ConvBPDNJoint(D, s, lmbda, opt=opt, dimK=0)
             b.solve()
         except Exception as e:
             print(e)
             assert(0)
+        assert(np.array(b.getitstat().XSlvRelRes).max() < 1e-5)
 
 
-    def test_14(self):
+    def test_15(self):
         N = 16
         Nd = 5
         K = 2
@@ -254,7 +274,7 @@ class TestSet01(object):
         assert(b.U.dtype == dt)
 
 
-    def test_15(self):
+    def test_16(self):
         N = 16
         Nd = 5
         M = 4
@@ -270,7 +290,7 @@ class TestSet01(object):
             assert(0)
 
 
-    def test_16(self):
+    def test_17(self):
         N = 16
         Nd = 5
         K = 2
@@ -290,7 +310,7 @@ class TestSet01(object):
         assert(b.U.dtype == dt)
 
 
-    def test_17(self):
+    def test_18(self):
         N = 16
         Nd = 5
         M = 4
@@ -306,7 +326,7 @@ class TestSet01(object):
             assert(0)
 
 
-    def test_18(self):
+    def test_19(self):
         N = 16
         Nd = 5
         K = 2
@@ -326,7 +346,7 @@ class TestSet01(object):
         assert(b.U.dtype == dt)
 
 
-    def test_21(self):
+    def test_22(self):
         N = 16
         Nd = 5
         M = 4
@@ -341,7 +361,73 @@ class TestSet01(object):
             assert(0)
 
 
-    def test_22(self):
+    def test_23(self):
+        N = 16
+        Nd = 5
+        Cs = 3
+        M = 4
+        D = np.random.randn(Nd, Nd, M)
+        s = np.random.randn(N, N, Cs)
+        lmbda = 1e-1
+        try:
+            b = cbpdn.ConvBPDNMaskDcpl(D, s, lmbda, dimK=0)
+            b.solve()
+        except Exception as e:
+            print(e)
+            assert(0)
+
+
+    def test_24(self):
+        N = 16
+        Nd = 5
+        Cs = 3
+        K = 2
+        M = 4
+        D = np.random.randn(Nd, Nd, M)
+        s = np.random.randn(N, N, Cs, K)
+        lmbda = 1e-1
+        try:
+            b = cbpdn.ConvBPDNMaskDcpl(D, s, lmbda)
+            b.solve()
+        except Exception as e:
+            print(e)
+            assert(0)
+
+
+    def test_25(self):
+        N = 16
+        Nd = 5
+        Cd = 3
+        M = 4
+        D = np.random.randn(Nd, Nd, Cd, M)
+        s = np.random.randn(N, N, Cd)
+        lmbda = 1e-1
+        try:
+            b = cbpdn.ConvBPDNMaskDcpl(D, s, lmbda)
+            b.solve()
+        except Exception as e:
+            print(e)
+            assert(0)
+
+
+    def test_26(self):
+        N = 16
+        Nd = 5
+        Cd = 3
+        K = 2
+        M = 4
+        D = np.random.randn(Nd, Nd, Cd, M)
+        s = np.random.randn(N, N, Cd, K)
+        lmbda = 1e-1
+        try:
+            b = cbpdn.ConvBPDNMaskDcpl(D, s, lmbda)
+            b.solve()
+        except Exception as e:
+            print(e)
+            assert(0)
+
+
+    def test_27(self):
         N = 16
         Nd = 5
         K = 2
@@ -360,7 +446,7 @@ class TestSet01(object):
         assert(b.U.dtype == dt)
 
 
-    def test_23(self):
+    def test_28(self):
         N = 16
         Nd = 5
         M = 4
@@ -376,7 +462,7 @@ class TestSet01(object):
             assert(0)
 
 
-    def test_24(self):
+    def test_29(self):
         N = 16
         Nd = 5
         M = 4
@@ -395,7 +481,7 @@ class TestSet01(object):
         assert(b.cbpdn.U.dtype == dt)
 
 
-    def test_26(self):
+    def test_31(self):
         N = 16
         Nd = 5
         M = 4
@@ -411,14 +497,14 @@ class TestSet01(object):
         assert(np.linalg.norm(Xb-Xc)==0.0)
 
 
-    def test_27(self):
+    def test_32(self):
         opt = cbpdn.GenericConvBPDN.Options({'AuxVarObj' : False})
         assert(opt['fEvalX'] is True and opt['gEvalY'] is False)
         opt['AuxVarObj'] = True
         assert(opt['fEvalX'] is False and opt['gEvalY'] is True)
 
 
-    def test_28(self):
+    def test_33(self):
         opt = cbpdn.GenericConvBPDN.Options({'AuxVarObj' : True})
         assert(opt['fEvalX'] is False and opt['gEvalY'] is True)
         opt['AuxVarObj'] = False
