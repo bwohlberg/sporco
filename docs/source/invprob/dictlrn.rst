@@ -7,7 +7,7 @@ sparse coding and dictionary update steps, each of which is based on
 an ADMM algorithm. This is a very flexible framework that supports
 constucting a wide variety of dictionary learning algorithms based on
 the different sparse coding and dictionary update methods provided in
-SPORCO; some examples are provided below. 
+SPORCO; some examples are provided below.
 
 The standard dictionary learning classes in :mod:`.admm.bpdndl`
 and the convolutional dictionary learning classes in :mod:`.admm.cbpdndl`
@@ -28,7 +28,7 @@ Usage Examples
 
     .. literalinclude:: ../../../examples/stdsparse/demo_dictlrn_bpdn.py
        :language: python
-       :lines: 14-
+       :lines: 11-
 
 
 .. container:: toggle
@@ -40,7 +40,7 @@ Usage Examples
 
     .. literalinclude:: ../../../examples/cnvsparse/demo_dictlrn_cbpdn_gry.py
        :language: python
-       :lines: 14-
+       :lines: 18-
 
 
 .. container:: toggle
@@ -53,7 +53,7 @@ Usage Examples
 
     .. literalinclude:: ../../../examples/cnvsparse/demo_dictlrn_cbpdn_clr.py
        :language: python
-       :lines: 14-
+       :lines: 18-
 
 
 .. container:: toggle
@@ -66,7 +66,7 @@ Usage Examples
 
     .. literalinclude:: ../../../examples/cnvsparse/demo_dictlrn_cbpdnjnt_clr.py
        :language: python
-       :lines: 14-
+       :lines: 18-
 
 
 .. container:: toggle
@@ -78,7 +78,7 @@ Usage Examples
 
     .. literalinclude:: ../../../examples/cnvsparse/demo_dictlrn_cbpdn_md.py
        :language: python
-       :lines: 14-
+       :lines: 17-
 
 
 .. container:: toggle
@@ -90,4 +90,4 @@ Usage Examples
 
     .. literalinclude:: ../../../examples/cnvsparse/demo_dictlrn_cbpdn_ams.py
        :language: python
-       :lines: 14-
+       :lines: 17-
