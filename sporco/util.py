@@ -112,6 +112,30 @@ def array2ntpl(arr):
 
 
 
+def transpose_ntpl_list(lst):
+    """Transpose a list of named tuple objects (of the same type) into a
+    named tuple of lists.
+
+    Parameters
+    ----------
+    lst : list of collections.namedtuple object
+      List of named tuple objects of the same type
+
+    Returns
+    -------
+    ntpl : collections.namedtuple object
+      Named tuple object with each entry consisting of a list of the
+      corresponding fields of the named tuple objects in list ``lst``
+    """
+
+    cls = collections.namedtuple(lst[0].__class__.__name__, lst[0]._fields)
+    if len(lst) == 0:
+        return None
+    else:
+        return cls(*[[lst[k][l] for k in range(len(lst))]
+                   for l in range(len(lst[0]))])
+
+
 
 def solve_status_str(hdrtxt, fwiter=4, fpothr=2):
     """Construct header and format details for status display of an
@@ -281,6 +305,25 @@ def rgb2gray(rgb):
 
 
 
+def complex_randn(*args):
+    """Return a complex array of samples drawn from a standard normal
+    distribution.
+
+    Parameters
+    ----------
+    d0, d1, ..., dn: int
+      Dimensions of the random array
+
+    Returns
+    -------
+    a : ndarray
+      Random array of shape (d0, d1, ..., dn)
+    """
+
+    return np.random.randn(*args) + 1j*np.random.randn(*args)
+
+
+
 def spnoise(s, frc, smn=0.0, smx=1.0):
     """Return image with salt & pepper noise imposed on it.
 
@@ -347,6 +390,27 @@ def tikhonov_filter(s, lmbda, npd=16):
     sl = slp[npd:(slp.shape[0]-npd), npd:(slp.shape[1]-npd)]
     sh = s - sl
     return sl.astype(s.dtype), sh.astype(s.dtype)
+
+
+
+def idle_cpu_count(mincpu=1):
+    """Estimate number of idle CPUs, for use by multiprocessing code
+    needing to determine how many processes can be run without excessive
+    load.
+
+    Parameters
+    ----------
+    mincpu : int
+      Minimum number of CPUs to report, independent of actual estimate
+
+    Returns
+    -------
+    idle : int
+      Estimate of number of idle CPUs
+    """
+
+    idle = int(os.cpu_count() - np.floor(os.getloadavg()[0]))
+    return max(mincpu, idle)
 
 
 
