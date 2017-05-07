@@ -253,7 +253,7 @@ class ConvBPDNMaskDcplDictLearn(dictlrn.DictLearn):
 
     Dictionary learning based on :class:`.ConvBPDNMaskDcpl` and
     :class:`.ConvCnstrMODMaskDcpl` :cite:`heide-2015-fast`
-    :cite:`wohlberg-2016-boundary` :cite:`garcia-2017-convolutional`
+    :cite:`wohlberg-2016-boundary`
 
     Solve the optimisation problem
 
