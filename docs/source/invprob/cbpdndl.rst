@@ -62,3 +62,28 @@ Usage Examples
     .. literalinclude:: ../../../examples/cnvsparse/demo_cbpdndl_clr_msd.py
        :language: python
        :lines: 9-
+
+.. container:: toggle
+
+    .. container:: header
+
+	:class:`.cbpdndl.ConvBPDNMaskDcplDictLearn` usage (greyscale images,
+	single-scale dictionary, as in :cite:`wohlberg-2016-boundary`)
+
+    .. literalinclude:: ../../../examples/cnvsparse/demo_cbpdndl_md_gry.py
+       :language: python
+       :lines: 11-
+
+
+
+.. container:: toggle
+
+    .. container:: header
+
+	:class:`.cbpdndl.ConvBPDNMaskDcplDictLearn` usage (colour images,
+	single-scale colour dictionary, see :cite:`wohlberg-2016-boundary`
+	:cite:`wohlberg-2016-convolutional`)
+
+    .. literalinclude:: ../../../examples/cnvsparse/demo_cbpdndl_md_clr.py
+       :language: python
+       :lines: 11-
