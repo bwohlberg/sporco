@@ -52,30 +52,40 @@ D0 = np.random.randn(8, 8, 64)
 # Pad input array and create mask array
 shp = np.pad(sh, ((0,7),(0,7),(0,0)), 'constant')
 W = np.pad(np.ones(sh.shape[0:2]), ((0,7),(0,7)), 'constant')
+W = np.reshape(W, W.shape + (1,1,1))
 
 
 # Construct object representing problem dimensions
 cri = ccmod.ConvRepIndexing(D0.shape, shp)
 
+
 # X and D update options
 lmbda = 0.2
 optx = cbpdn.ConvBPDNMaskDcpl.Options({'Verbose' : False, 'MaxMainIter' : 1,
                     'rho' : 20.0*lmbda, 'AutoRho' : {'Enabled' : False}})
-optd = ccmod.ConvCnstrMOD.Options({'Verbose' : False, 'MaxMainIter' : 1,
-                    'rho' : 2*cri.K, 'AutoRho' : {'Enabled' : False,}})
+optd = ccmod.ConvCnstrMODMaskDcpl.Options({'Verbose' : False,
+                    'MaxMainIter' : 1, 'rho' : 2*cri.K,
+                    'AutoRho' : {'Enabled' : False}})
+
 
 # Normalise dictionary according to Y update options
 D0n = ccmod.getPcn0(optd['ZeroMean'], D0.shape, dimN=2, dimC=0)(D0)
 
-# Update D update options to include initial values for Y and U
-optd.update({'Y0' : ccmod.zpad(ccmod.stdformD(D0n, cri.C, cri.M), cri.Nv),
-             'U0' : np.zeros(cri.shpD)})
+
+# Modify D update options to include initial value for Y (this procedure
+# is essential to correct algorithm performance)
+Y0b0 = np.zeros(cri.Nv + (cri.C, 1, cri.K))
+Y0b1 = ccmod.zpad(ccmod.stdformD(D0n, cri.C, cri.M), cri.Nv)
+optd.update({'Y0' : np.concatenate((Y0b0, Y0b1), axis=cri.axisM)})
+
 
 # Create X update object
 xstep = cbpdn.ConvBPDNMaskDcpl(D0n, shp, lmbda, W, optx)
 
+
 # Create D update object
-dstep = ccmod.ConvCnstrMOD(None, shp, D0.shape, optd)
+dstep = ccmod.ConvCnstrMODMaskDcpl(None, shp, W, D0.shape, optd)
+
 
 # Create DictLearn object
 opt = dictlrn.DictLearn.Options({'Verbose' : True, 'MaxMainIter' : 100})
@@ -107,7 +117,7 @@ plot.plot(np.vstack((itsx.PrimalRsdl, itsx.DualRsdl, itsd.PrimalRsdl,
           lgnd=['X Primal', 'X Dual', 'D Primal', 'D Dual'])
 plot.subplot(1,3,3)
 plot.plot(np.vstack((itsx.Rho, itsd.Rho)).T, fgrf=fig2, xlbl='Iterations',
-          ylbl='Penalty Parameter', ptyp='semilogy', lgnd=['Rho', 'Sigma'])
+          ylbl='Penalty Parameter', lgnd=['Rho', 'Sigma'])
 fig2.show()
 
 
