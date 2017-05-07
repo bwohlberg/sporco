@@ -444,7 +444,7 @@ class ADMM(with_metaclass(_ADMM_Meta, object)):
         self.timer.start(['solve', 'solve_wo_func', 'solve_wo_rsdl'])
 
         # Main optimisation iterations
-        for k in range(self.k, self.k + self.opt['MaxMainIter']):
+        for self.k in range(self.k, self.k + self.opt['MaxMainIter']):
 
             # Update record of Y from previous iteration
             self.Yprev = self.Y.copy()
@@ -471,7 +471,7 @@ class ADMM(with_metaclass(_ADMM_Meta, object)):
             # display iteration stats if Verbose option enabled
             self.timer.stop(['solve_wo_func', 'solve_wo_rsdl'])
             if not self.opt['FastSolve']:
-                itst = self.iteration_stats(k, r, s, epri, edua)
+                itst = self.iteration_stats(self.k, r, s, epri, edua)
                 self.itstat.append(itst)
                 self.display_status(fmtstr, itst)
             self.timer.start(['solve_wo_func', 'solve_wo_rsdl'])
@@ -479,12 +479,13 @@ class ADMM(with_metaclass(_ADMM_Meta, object)):
             # Automatic rho adjustment
             self.timer.stop('solve_wo_rsdl')
             if self.opt['AutoRho', 'Enabled'] or not self.opt['FastSolve']:
-                self.update_rho(k, r, s)
+                self.update_rho(self.k, r, s)
             self.timer.start('solve_wo_rsdl')
 
             # Call callback function if defined
             if self.opt['Callback'] is not None:
-                self.opt['Callback'](self, k)
+                if self.opt['Callback'](self):
+                    break
 
             # Stop if residual-based stopping tolerances reached
             if self.opt['AutoRho', 'Enabled'] or not self.opt['FastSolve']:
@@ -492,8 +493,8 @@ class ADMM(with_metaclass(_ADMM_Meta, object)):
                     break
 
 
-        # Record iteration count
-        self.k = k+1
+        # Increment iteration count
+        self.k += 1
 
         # Record solve time
         self.timer.stop(['solve', 'solve_wo_func', 'solve_wo_rsdl'])
@@ -615,7 +616,7 @@ class ADMM(with_metaclass(_ADMM_Meta, object)):
 
     @classmethod
     def hdrtxt(cls):
-        """Construct tuple of status display column title"""
+        """Construct tuple of status display column titles."""
 
         return ('Itn',) + cls.hdrtxt_objfn + ('r', 's', u('ρ'))
 
@@ -700,7 +701,7 @@ class ADMM(with_metaclass(_ADMM_Meta, object)):
                 elif s > (mu/xi)*r:
                     rsf = 1.0/rhomlt
                 self.rho = self.dtype.type(rsf*self.rho)
-                self.U = self.U/rsf
+                self.U /= rsf
                 if rsf != 1.0:
                     self.rhochange()
 
@@ -1225,10 +1226,10 @@ class ADMMTwoBlockCnstrnt(ADMM):
 
         if opt is None:
             opt = ADMM.Options()
-        super(ADMMTwoBlockCnstrnt, self).__init__(Nx, yshape, yshape,
-                                                  dtype, opt)
         self.blkaxis = blkaxis
         self.blkidx = blkidx
+        super(ADMMTwoBlockCnstrnt, self).__init__(Nx, yshape, yshape,
+                                                  dtype, opt)
 
 
 

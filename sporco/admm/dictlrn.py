@@ -310,7 +310,8 @@ class DictLearn(with_metaclass(_DictLearn_Meta, object)):
         # Reset timer
         self.timer.start(['solve', 'solve_wo_eval'])
 
-        for j in range(self.j, self.j + self.opt['MaxMainIter']):
+        # Main optimisation iterations
+        for self.j in range(self.j, self.j + self.opt['MaxMainIter']):
 
             # X update
             self.xstep.solve()
@@ -320,7 +321,7 @@ class DictLearn(with_metaclass(_DictLearn_Meta, object)):
             self.dstep.solve()
             self.xstep.setdict(self.dstep.getdict())
 
-            # Evaluate progress
+            # Evaluate functional
             self.timer.stop('solve_wo_eval')
             evl = self.evaluate()
             self.timer.start('solve_wo_eval')
@@ -335,7 +336,7 @@ class DictLearn(with_metaclass(_DictLearn_Meta, object)):
             ditstat = self.dstep.itstat[-1] if len(self.dstep.itstat) > 0 else\
                       self.dstep.IterationStats(*([0.0,] *
                             len(self.dstep.IterationStats._fields)))
-            itst = self.isc.iterstats(j, t, xitstat, ditstat, evl)
+            itst = self.isc.iterstats(self.j, t, xitstat, ditstat, evl)
             self.itstat.append(itst)
 
             # Display iteration stats if Verbose option enabled
@@ -344,11 +345,11 @@ class DictLearn(with_metaclass(_DictLearn_Meta, object)):
 
             # Call callback function if defined
             if self.opt['Callback'] is not None:
-                self.opt['Callback'](self, j)
+                self.opt['Callback'](self)
 
 
-        # Record iteration count
-        self.j = j+1
+        # Increment iteration count
+        self.j += 1
 
         # Record solve time
         self.timer.stop(['solve', 'solve_wo_eval'])
@@ -388,10 +389,4 @@ class DictLearn(with_metaclass(_DictLearn_Meta, object)):
         named tuples.
         """
 
-        if len(self.itstat) == 0:
-            return None
-        else:
-            return self.isc.IterationStats(
-                *[[self.itstat[k][l] for k in range(len(self.itstat))]
-                  for l in range(len(self.itstat[0]))]
-            )
+        return util.transpose_ntpl_list(self.itstat)
