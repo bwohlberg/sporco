@@ -32,8 +32,8 @@ class ConvBPDNDictLearn(dictlrn.DictLearn):
 
     |
 
-    Dictionary learning based on ConvBPDN and ConvCnstrMOD
-    :cite:`wohlberg-2016-efficient`.
+    Dictionary learning based on :class:`.ConvBPDN` and
+    :class:`.ConvCnstrMOD` :cite:`wohlberg-2016-efficient`.
 
     Solve the optimisation problem
 
@@ -47,11 +47,11 @@ class ConvBPDNDictLearn(dictlrn.DictLearn):
     where :math:`C` is the feasible set consisting of filters with
     unit norm and constrained support, via interleaved alternation
     between the ADMM steps of the :class:`.ConvBPDN` and
-    :class:`.ConvCnstrMOD` problems. The multi-channel variants
-    supported by :class:`.ConvCnstrMOD` are also supported.
+    :func:`.ConvCnstrMOD` problems. The multi-channel variants
+    supported by :func:`.ConvCnstrMOD` classes are also supported.
 
-    After termination of the :meth:`solve` method, attribute :attr:`itstat` is
-    a list of tuples representing statistics of each iteration. The
+    After termination of the :meth:`solve` method, attribute :attr:`itstat`
+    is a list of tuples representing statistics of each iteration. The
     fields of the named tuple ``IterationStats`` are:
 
        ``Iter`` : Iteration number
@@ -86,19 +86,19 @@ class ConvBPDNDictLearn(dictlrn.DictLearn):
         """CBPDN dictionary learning algorithm options.
 
         Options include all of those defined in
-        :class:`sporco.admm.dictlrn.DictLearn.Options`, together with
-        additional options:
+        :class:`.dictlrn.DictLearn.Options`, together with additional
+        options:
 
           ``AccurateDFid`` : Flag determining whether data fidelity term is
-          estimated from the value computed in the X update (``False``) or is
-          computed after every outer iteration over an X update and a D
+          estimated from the value computed in the X update (``False``) or
+          is computed after every outer iteration over an X update and a D
           update (``True``), which is slower but more accurate.
 
           ``DictSize`` : Dictionary size vector.
 
-          ``CBPDN`` : Options :class:`sporco.admm.cbpdn.ConvBPDN.Options`
+          ``CBPDN`` : Options :class:`.cbpdn.ConvBPDN.Options`
 
-          ``CCMOD`` : Options :class:`sporco.admm.ccmod.ConvCnstrMOD.Options`
+          ``CCMOD`` : Options :func:`.ccmod.ConvCnstrMODOptions`
         """
 
         defaults = copy.deepcopy(dictlrn.DictLearn.Options.defaults)
@@ -207,8 +207,22 @@ class ConvBPDNDictLearn(dictlrn.DictLearn):
 
 
 
+    def reconstruct(self, D=None, X=None):
+        """Reconstruct representation."""
+
+        if D is None:
+            D = self.dstep.var_y()
+        if X is None:
+            X = self.xstep.var_y()
+        Df = sl.rfftn(D, self.xstep.cri.Nv, self.xstep.cri.axisN)
+        Xf = sl.rfftn(X, self.xstep.cri.Nv, self.xstep.cri.axisN)
+        DXf = sl.inner(Df, Xf, axis=self.xstep.cri.axisM)
+        return sl.irfftn(DXf, self.xstep.cri.Nv, self.xstep.cri.axisN)
+
+
+
     def evaluate(self):
-        """Evaluate functional value of previous iteration"""
+        """Evaluate functional value of previous iteration."""
 
         if self.opt['AccurateDFid']:
             D = self.dstep.var_y()
@@ -216,7 +230,7 @@ class ConvBPDNDictLearn(dictlrn.DictLearn):
             Df = sl.rfftn(D, self.xstep.cri.Nv, self.xstep.cri.axisN)
             Xf = sl.rfftn(X, self.xstep.cri.Nv, self.xstep.cri.axisN)
             Sf = self.xstep.Sf
-            Ef = np.sum(Df * Xf, axis=self.xstep.cri.axisM, keepdims=True) - Sf
+            Ef = sl.inner(Df, Xf, axis=self.xstep.cri.axisM) - Sf
             dfd = sl.rfl2norm2(Ef, self.xstep.S.shape,
                                axis=self.xstep.cri.axisN)/2.0
             rl1 = np.sum(np.abs(X))
