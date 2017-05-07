@@ -81,3 +81,68 @@ class TestSet01(object):
         except Exception as e:
             print(e)
             assert(0)
+
+
+    def test_06(self):
+        lmbda = 1e-1
+        W = np.ones(self.S.shape[0:2] + (1, self.S.shape[2], 1))
+        opt = cbpdndl.ConvBPDNMaskDcplDictLearn.Options({'MaxMainIter' : 10})
+        try:
+            b = cbpdndl.ConvBPDNMaskDcplDictLearn(self.D0, self.S, lmbda, W,
+                                                  opt=opt)
+            b.solve()
+        except Exception as e:
+            print(e)
+            assert(0)
+
+
+    def test_07(self):
+        lmbda = 1e-1
+        W = np.ones(self.S.shape[0:2] + (1, self.S.shape[2], 1))
+        opt = cbpdndl.ConvBPDNMaskDcplDictLearn.Options(
+            {'AccurateDFid' : True,'MaxMainIter' : 10})
+        try:
+            b = cbpdndl.ConvBPDNMaskDcplDictLearn(self.D0, self.S, lmbda, W,
+                                                  opt=opt)
+            b.solve()
+        except Exception as e:
+            print(e)
+            assert(0)
+
+
+    def test_08(self):
+        N = 16
+        Nc = 3
+        Nd = 5
+        M = 4
+        K = 3
+        D0 = np.random.randn(Nd, Nd, Nc, M)
+        S = np.random.randn(N, N, Nc, K)
+        lmbda = 1e-1
+        W = np.ones((N, N, 1, K, 1))
+        opt = cbpdndl.ConvBPDNMaskDcplDictLearn.Options({'MaxMainIter': 10})
+        try:
+            b = cbpdndl.ConvBPDNMaskDcplDictLearn(D0, S, lmbda, W, opt=opt)
+            b.solve()
+        except Exception as e:
+            print(e)
+            assert(0)
+
+
+    def test_09(self):
+        N = 16
+        Nc = 3
+        Nd = 5
+        M = 4
+        K = 3
+        D0 = np.random.randn(Nd, Nd, 1, M)
+        S = np.random.randn(N, N, Nc, K)
+        lmbda = 1e-1
+        W = np.ones((N, N, Nc, K, 1))
+        opt = cbpdndl.ConvBPDNMaskDcplDictLearn.Options({'MaxMainIter': 10})
+        try:
+            b = cbpdndl.ConvBPDNMaskDcplDictLearn(D0, S, lmbda, W, opt=opt)
+            b.solve()
+        except Exception as e:
+            print(e)
+            assert(0)

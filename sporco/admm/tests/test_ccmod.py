@@ -144,14 +144,102 @@ class TestSet01(object):
 
 
     def test_09(self):
+        N = 16
+        M = 4
+        Nd = 8
+        X = np.random.randn(N, N, 1, 1, M)
+        S = np.random.randn(N, N)
+        W = 1.0
+        try:
+            opt = ccmod.ConvCnstrMODMaskDcpl.Options({'Verbose' : False,
+                            'MaxMainIter' : 20, 'LinSolveCheck' : True})
+            c = ccmod.ConvCnstrMODMaskDcpl(X, S, W, (Nd, Nd, 1, M),
+                                           opt=opt, dimK=0)
+            c.solve()
+        except Exception as e:
+            print(e)
+            assert(0)
+
+
+    def test_10(self):
+        N = 16
+        K = 3
+        M = 4
+        Nd = 8
+        X = np.random.randn(N, N, 1, K, M)
+        S = np.random.randn(N, N, K)
+        W = 1.0
+        try:
+            opt = ccmod.ConvCnstrMODMaskDcpl.Options({'Verbose' : False,
+                            'MaxMainIter' : 20, 'LinSolveCheck' : True})
+            c = ccmod.ConvCnstrMODMaskDcpl(X, S, W, (Nd, Nd, 1, M), opt=opt)
+            c.solve()
+        except Exception as e:
+            print(e)
+            assert(0)
+
+
+    def test_11(self):
+        N = 16
+        M = 4
+        Nc = 3
+        Nd = 8
+        X = np.random.randn(N, N, Nc, 1, M)
+        S = np.random.randn(N, N, Nc)
+        W = 1.0
+        try:
+            opt = ccmod.ConvCnstrMODMaskDcpl.Options({'Verbose' : False,
+                            'MaxMainIter' : 20, 'LinSolveCheck' : True})
+            c = ccmod.ConvCnstrMODMaskDcpl(X, S, W, (Nd, Nd, 1, M),
+                                           opt=opt, dimK=0)
+            c.solve()
+        except Exception as e:
+            print(e)
+            assert(0)
+
+
+    def test_12(self):
+        N = 16
+        M = 4
+        K = 2
+        Nc = 3
+        Nd = 8
+        X = np.random.randn(N, N, Nc, K, M)
+        S = np.random.randn(N, N, Nc, K)
+        W = 1.0
+        try:
+            opt = ccmod.ConvCnstrMODMaskDcpl.Options({'Verbose' : False,
+                            'MaxMainIter' : 20, 'LinSolveCheck' : True})
+            c = ccmod.ConvCnstrMODMaskDcpl(X, S, W, (Nd, Nd, 1, M),
+                                           opt=opt)
+            c.solve()
+        except Exception as e:
+            print(e)
+            assert(0)
+
+
+    def test_13(self):
+        N = 16
+        M = 4
+        K = 2
+        Nc = 3
+        Nd = 8
+        X = np.random.randn(N, N, Nc, K, M)
+        S = np.random.randn(N, N, Nc, K)
+        W = 1.0
+        try:
+            opt = ccmod.ConvCnstrMODMaskDcpl.Options({'Verbose' : False,
+                            'MaxMainIter' : 20, 'LinSolveCheck' : True})
+            c = ccmod.ConvCnstrMODMaskDcpl(X, S, W, (Nd, Nd, Nc, M),
+                                           opt=opt)
+            c.solve()
+        except Exception as e:
+            print(e)
+            assert(0)
+
+
+    def test_14(self):
         opt = ccmod.ConvCnstrMOD.Options({'AuxVarObj' : False})
         assert(opt['fEvalX'] is True and opt['gEvalY'] is False)
         opt['AuxVarObj'] = True
         assert(opt['fEvalX'] is False and opt['gEvalY'] is True)
-
-
-    def test_10(self):
-        opt = ccmod.ConvCnstrMOD.Options({'AuxVarObj' : True})
-        assert(opt['fEvalX'] is False and opt['gEvalY'] is True)
-        opt['AuxVarObj'] = False
-        assert(opt['fEvalX'] is True and opt['gEvalY'] is False)

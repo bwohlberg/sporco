@@ -662,6 +662,505 @@ class ConvCnstrMOD(admm.ADMMEqual):
 
 
 
+class ConvCnstrMODMaskDcpl(admm.ADMMTwoBlockCnstrnt):
+    r"""
+    **Class inheritance structure**
+
+    .. inheritance-diagram:: ConvCnstrMODMaskDcpl
+       :parts: 2
+
+    |
+
+    ADMM algorithm for Convolutional Constrained MOD with Mask Decoupling
+    :cite:`heide-2015-fast`.
+
+    Solve the optimisation problem
+
+    .. math::
+       \mathrm{argmin}_\mathbf{d} \;
+       (1/2) \left\|  W \left(\sum_m \mathbf{d}_m * \mathbf{x}_m -
+       \mathbf{s}\right) \right\|_2^2 \quad \text{such that} \quad
+       \mathbf{d}_m \in C
+
+    where :math:`W` is a mask array, via the ADMM problem
+
+    .. math::
+       \mathrm{argmin}_{\mathbf{d},\mathbf{g}_0,\mathbf{g}_1} \;
+       (1/2) \| W \mathbf{g}_0 \|_2^2 + \iota_C(\mathbf{g}_1)
+       \;\text{such that}\;
+       \left( \begin{array}{c} X \\ I \end{array} \right) \mathbf{d}
+       - \left( \begin{array}{c} \mathbf{g}_0 \\ \mathbf{g}_1 \end{array}
+       \right) = \left( \begin{array}{c} \mathbf{s} \\
+       \mathbf{0} \end{array} \right) \;\;,
+
+    where  :math:`\iota_C(\cdot)` is the indicator function of feasible
+    set :math:`C` consisting of filters with unit norm and constrained
+    support, and :math:`X \mathbf{d} = \sum_m \mathbf{x}_m * \mathbf{d}_m`.
+
+   |
+
+    The implementation of this class is substantially complicated by the
+    support of multi-channel signals. In the following, the number of
+    channels in the signal and dictionary are denoted by ``C`` and ``Cd``
+    respectively, the number of signals and the number of filters are
+    denoted by ``K`` and ``M`` respectively, ``X``, ``Z``, and ``S`` denote
+    the dictionary, coefficient map, and signal arrays respectively, and
+    ``Y0`` and ``Y1`` denote blocks 0 and 1 of the auxiliary (split)
+    variable of the ADMM problem. We need to consider three different cases:
+
+      1. Single channel signal and dictionary (``C`` = ``Cd`` = 1)
+      2. Multi-channel signal, single channel dictionary (``C`` > 1, ``Cd`` = 1)
+      3. Multi-channel signal and dictionary (``C`` = ``Cd`` > 1)
+
+
+    The final three (non-spatial) dimensions of the main variables in each
+    of these cases are as in the following table:
+
+      ======   ==================   =====================   ==================
+      Var.     ``C`` = ``Cd`` = 1   ``C`` > 1, ``Cd`` = 1   ``C`` = ``Cd`` > 1
+      ======   ==================   =====================   ==================
+      ``X``    1 x 1 x ``M``        1 x 1 x ``M``           ``Cd`` x 1 x ``M``
+      ``Z``    1 x ``K`` x ``M``    ``C`` x ``K`` x ``M``   1 x ``K`` x ``M``
+      ``S``    1 x ``K`` x 1        ``C`` x ``K`` x 1       ``C`` x ``K`` x 1
+      ``Y0``   1 x ``K`` x 1        ``C`` x ``K`` x 1       ``C`` x ``K`` x 1
+      ``Y1``   1 x 1 x ``M``        1 x 1 x ``M``           ``C`` x 1 x ``M``
+      ======   ==================   =====================   ==================
+
+    In order to combine the block components ``Y0`` and ``Y1`` of
+    variable ``Y`` into a single array, we need to be able to
+    concatenate the two component arrays on one of the axes, but the shapes
+    ``Y0`` and ``Y1`` are not compatible for concatenation. The solution for
+    cases 1. and 3. is to swap the ``K`` and ``M`` axes of `Y0`` before
+    concatenating, as well as after extracting the ``Y0`` component from the
+    concatenated ``Y`` variable. In case 2., since the ``C`` and ``K``
+    indices have the same behaviour in the dictionary update equation, we
+    combine these axes in :meth:`.__init__`, so that the case 2. array shapes
+    become
+
+      ======      =====================
+      Var.        ``C`` > 1, ``Cd`` = 1
+      ======      =====================
+      ``X``       1 x 1 x ``M``
+      ``Z``       1 x ``C`` ``K`` x ``M``
+      ``S``       1 x ``C`` ``K`` x 1
+      ``Y0``      1 x ``C`` ``K`` x 1
+      ``Y1``      1 x 1 x ``M``
+      ======      =====================
+
+    making it possible to concatenate ``Y0`` and ``Y1`` using the same
+    axis swapping strategy as in the other cases. See :meth:`.block_sep0`
+    and :meth:`block_cat` for additional details.
+
+    |
+
+    After termination of the :meth:`solve` method, attribute :attr:`itstat` is
+    a list of tuples representing statistics of each iteration. The
+    fields of the named tuple ``IterationStats`` are:
+
+       ``Iter`` : Iteration number
+
+       ``DFid`` : Value of data fidelity term :math:`(1/2) \sum_k \|
+       W (\sum_m \mathbf{d}_m * \mathbf{x}_{k,m} - \mathbf{s}_k) \|_2^2`
+
+       ``Cnstr`` : Constraint violation measure
+
+       ``PrimalRsdl`` : Norm of primal residual
+
+       ``DualRsdl`` : Norm of dual residual
+
+       ``EpsPrimal`` : Primal residual stopping tolerance
+       :math:`\epsilon_{\mathrm{pri}}`
+
+       ``EpsDual`` : Dual residual stopping tolerance
+       :math:`\epsilon_{\mathrm{dua}}`
+
+       ``Rho`` : Penalty parameter
+
+       ``XSlvRelRes`` : Relative residual of X step solver
+
+       ``Time`` : Cumulative run time
+    """
+
+
+    class Options(admm.ADMMTwoBlockCnstrnt.Options):
+        """ConvTwoBlockCnstrnt algorithm options
+
+        Options include all of those defined in
+        :class:`.ADMMTwoBlockCnstrnt.Options`, together with
+        additional options:
+
+          ``LinSolveCheck`` : Flag indicating whether to compute
+          relative residual of X step solver.
+
+          ``ZeroMean`` : Flag indicating whether the solution
+          dictionary :math:`\{\mathbf{d}_m\}` should have zero-mean
+          components.
+        """
+
+        defaults = copy.deepcopy(admm.ADMMEqual.Options.defaults)
+        defaults.update({'AuxVarObj' : False, 'LinSolveCheck' : False,
+                         'ZeroMean' : False,
+                         'RelaxParam' : 1.8, 'rho' : 1.0, 'ReturnVar' : 'Y1'})
+
+
+        def __init__(self, opt=None):
+            """Initialise ConvCnstrMODMaskDcpl algorithm options object."""
+
+            if opt is None:
+                opt = {}
+            admm.ADMMTwoBlockCnstrnt.Options.__init__(self, opt)
+
+
+
+    itstat_fields_objfn = ('DFid', 'Cnstr')
+    itstat_fields_extra = ('XSlvRelRes',)
+    hdrtxt_objfn = ('DFid', 'Cnstr')
+    hdrval_objfun = {'DFid' : 'DFid', 'Cnstr' : 'Cnstr'}
+
+
+
+    def __init__(self, Z, S, W, dsz, opt=None, dimK=None, dimN=2):
+        """
+        Initialise a ConvCnstrMODMaskDcpl object with problem size and
+        options.
+
+        Parameters
+        ----------
+        Z : array_like
+          Coefficient map array
+        S : array_like
+          Signal array
+        W : array_like
+          Mask array. The array shape must be such that the array is
+          compatible for multiplication with the *internal* shape of
+          input array S (see :class:`.ConvRepIndexing` for a discussion
+          of the distinction between *external* and *internal* data
+          layouts).
+        dsz : tuple
+          Filter support size(s)
+        opt : :class:`ConvCnstrMODMaskDcpl.Options` object
+          Algorithm options
+        dimK : 0, 1, or None, optional (default None)
+          Number of dimensions in input signal corresponding to multiple
+          independent signals
+        dimN : int, optional (default 2)
+          Number of spatial dimensions
+        """
+
+        # Set default options if none specified
+        if opt is None:
+            opt = ConvCnstrMODMaskDcpl.Options()
+
+        # Infer problem dimensions and set relevant attributes of self
+        self.cri = ConvRepIndexing(dsz, S, dimK=dimK, dimN=dimN)
+
+        # Reshape W if necessary (see discussion of reshape of S below)
+        if self.cri.Cd == 1 and self.cri.C > 1 and hasattr(W, 'ndim'):
+            self.W = W.reshape(W.shape[0:self.cri.dimN] +
+                    (1, W.shape[self.cri.axisC] * W.shape[self.cri.axisK], 1))
+        else:
+            self.W = W
+
+        # Call parent class __init__
+        Nx = self.cri.N * self.cri.Cd * self.cri.M
+        CK = (self.cri.C if self.cri.Cd == 1 else 1) * self.cri.K
+        shpY = list(self.cri.shpX)
+        shpY[self.cri.axisC] = self.cri.Cd
+        shpY[self.cri.axisK] = 1
+        shpY[self.cri.axisM] += CK
+        super(ConvCnstrMODMaskDcpl, self).__init__(Nx, shpY, self.cri.axisM,
+                                                   CK, S.dtype, opt)
+
+        # Reshape S to standard layout (Z, i.e. X in cbpdn, is assumed
+        # to be taken from cbpdn, and therefore already in standard
+        # form). If the dictionary has a single channel but the input
+        # (and therefore also the coefficient map array) has multiple
+        # channels, the channel index and multiple image index have
+        # the same behaviour in the dictionary update equation: the
+        # simplest way to handle this is to just reshape so that the
+        # channels also appear on the multiple image index.
+        if self.cri.Cd == 1 and self.cri.C > 1:
+            self.S = S.reshape(self.cri.Nv + (1, self.cri.C*self.cri.K, 1))
+        else:
+            self.S = S.reshape(self.cri.shpS)
+        self.S = np.asarray(self.S, dtype=self.dtype)
+
+        # Create constraint set projection function
+        self.Pcn = getPcn(opt['ZeroMean'], dsz, self.cri.Nv, self.cri.dimN)
+
+        # Initialise byte-aligned arrays for pyfftw
+        self.YU = sl.pyfftw_empty_aligned(self.Y.shape, dtype=self.dtype)
+        xfshp = list(self.cri.Nv + (self.cri.Cd, 1, self.cri.M))
+        xfshp[dimN-1] = xfshp[dimN-1]//2 + 1
+        self.Xf = sl.pyfftw_empty_aligned(xfshp,
+                                          dtype=sl.complex_dtype(self.dtype))
+
+        if Z is not None:
+            self.setcoef(Z)
+
+
+
+    def uinit(self, ushape):
+        """Return initialiser for working variable U"""
+
+        if self.opt['Y0'] is None:
+            return np.zeros(ushape, dtype=self.dtype)
+        else:
+            # If initial Y is non-zero, initial U is chosen so that
+            # the relevant dual optimality criterion (see (3.10) in
+            # boyd-2010-distributed) is satisfied.
+            Ub0 = (self.W**2) * self.block_sep0(self.Y) / self.rho
+            Ub1 = self.block_sep1(self.Y)
+            return self.block_cat(Ub0, Ub1)
+
+
+
+    def setcoef(self, Z):
+        """Set coefficient array."""
+
+        # If the dictionary has a single channel but the input (and
+        # therefore also the coefficient map array) has multiple
+        # channels, the channel index and multiple image index have
+        # the same behaviour in the dictionary update equation: the
+        # simplest way to handle this is to just reshape so that the
+        # channels also appear on the multiple image index.
+        if self.cri.Cd == 1 and self.cri.C > 1:
+            Z = Z.reshape(self.cri.Nv + (1, self.cri.Cx*self.cri.K,
+                                         self.cri.M,))
+        self.Z = np.asarray(Z, dtype=self.dtype)
+
+        self.Zf = sl.rfftn(self.Z, self.cri.Nv, self.cri.axisN)
+
+
+
+    def getdict(self):
+        """Get final dictionary."""
+
+        return bcrop(self.block_sep1(self.Y), self.cri.dsz)
+
+
+
+    def xstep(self):
+        r"""Minimise Augmented Lagrangian with respect to
+        :math:`\mathbf{x}`.
+        """
+
+        self.YU[:] = self.Y - self.U
+        self.block_sep0(self.YU)[:] += self.S
+        YUf = sl.rfftn(self.YU, None, self.cri.axisN)
+        b = sl.inner(np.conj(self.Zf), self.block_sep0(YUf),
+                     axis=self.cri.axisK) + self.block_sep1(YUf)
+
+        self.Xf[:] = sl.solvemdbi_ism(self.Zf, 1.0, b, self.cri.axisM,
+                                      self.cri.axisK)
+        self.X = sl.irfftn(self.Xf, self.cri.Nv, self.cri.axisN)
+
+        if self.opt['LinSolveCheck']:
+            Zop = lambda x: sl.inner(self.Zf, x, axis=self.cri.axisM)
+            ZHop = lambda x: sl.inner(np.conj(self.Zf), x,
+                                      axis=self.cri.axisK)
+            ax = ZHop(Zop(self.Xf)) + self.Xf
+            self.xrrs = sl.rrs(ax, b)
+        else:
+            self.xrrs = None
+
+
+
+    def ystep(self):
+        r"""Minimise Augmented Lagrangian with respect to
+        :math:`\mathbf{y}`.
+        """
+
+        AXU = self.AX + self.U
+        Y0 = (self.rho*(self.block_sep0(AXU) - self.S)) / (self.W**2 +
+                                                           self.rho)
+        Y1 = self.Pcn(self.block_sep1(AXU))
+        self.Y = self.block_cat(Y0, Y1)
+
+
+
+    def relax_AX(self):
+        """Implement relaxation if option ``RelaxParam`` != 1.0."""
+
+        self.AXnr = self.cnst_A(self.X, self.Xf)
+        if self.rlx == 1.0:
+            self.AX = self.AXnr
+        else:
+            alpha = self.rlx
+            self.AX = alpha*self.AXnr + (1-alpha)*self.block_cat(
+                self.var_y0() + self.S, self.var_y1())
+
+
+
+    def block_sep0(self, Y):
+        r"""Separate variable into component corresponding to
+        :math:`\mathbf{y}_0` in :math:`\mathbf{y}\;\;`. The method from
+        parent class :class:`.ADMMTwoBlockCnstrnt` is overridden here to
+        allow swapping of K (multi-image) and M (filter) axes in block 0
+        so that it can be concatenated on axis M with block 1. This is
+        necessary because block 0 has the dimensions of S while block 1
+        has the dimensions of D. Handling of multi-channel signals
+        substantially complicate this issue. There are two multi-channel
+        cases: multi-channel dictionary and signal (Cd = C > 1), and
+        single-channel dictionary with multi-channel signal (Cd = 1, C >
+        1). In the former case, S and D shapes are (N x C x K x 1) and
+        (N x C x 1 x M) respectively. In the latter case,
+        :meth:`.__init__` has already taken care of combining C
+        (multi-channel) and K (multi-image) axes in S, so the S and D
+        shapes are (N x 1 x C K x 1) and (N x 1 x 1 x M) respectively.
+        """
+
+        return np.swapaxes(Y[(slice(None),)*self.blkaxis +
+            (slice(0, self.blkidx),)], self.cri.axisK, self.cri.axisM)
+
+
+
+    def block_cat(self, Y0, Y1):
+        r"""Concatenate components corresponding to :math:`\mathbf{y}_0` and
+        :math:`\mathbf{y}_1` to form :math:`\mathbf{y}\;\;`.
+        The method from parent class :class:`.ADMMTwoBlockCnstrnt` is
+        overridden here to allow swapping of K (multi-image) and M
+        (filter) axes in block 0 so that it can be concatenated on axis
+        M with block 1. This is necessary because block 0 has the
+        dimensions of S while block 1 has the dimensions of D. Handling
+        of multi-channel signals substantially complicate this
+        issue. There are two multi-channel cases: multi-channel dictionary
+        and signal (Cd = C > 1), and single-channel dictionary with
+        multi-channel signal (Cd = 1, C > 1). In the former case, S and D
+        shapes are (N x C x K x 1) and (N x C x 1 x M) respectively. In the
+        latter case, :meth:`.__init__` has already taken care of combining C
+        (multi-channel) and K (multi-image) axes in S, so the S and D
+        shapes are (N x 1 x C K x 1) and (N x 1 x 1 x M) respectively.
+        """
+
+        return np.concatenate((np.swapaxes(Y0, self.cri.axisK,
+                              self.cri.axisM), Y1), axis=self.blkaxis)
+
+
+
+    def cnst_A(self, X, Xf=None):
+        r"""Compute :math:`A \mathbf{x}` component of ADMM problem
+        constraint.
+        """
+
+        return self.block_cat(self.cnst_A0(X, Xf), self.cnst_A1(X))
+
+
+
+    def obfn_g0var(self):
+        """Variable to be evaluated in computing
+        :meth:`.ADMMTwoBlockCnstrnt.obfn_g0`, depending on the ``AuxVarObj``
+        option value.
+        """
+
+        return self.var_y0() if self.opt['AuxVarObj'] else \
+            self.cnst_A0(None, self.Xf) - self.cnst_c0()
+
+
+
+    def cnst_A0(self, X, Xf=None):
+        r"""Compute :math:`A_0 \mathbf{x}` component of ADMM problem
+        constraint.
+        """
+
+        # This calculation involves non-negligible computational cost
+        # when Xf is None (i.e. the function is not being applied to
+        # self.X).
+        if Xf is None:
+            Xf = sl.rfftn(X, None, self.cri.axisN)
+        return sl.irfftn(sl.inner(self.Zf, Xf, axis=self.cri.axisM),
+                                  self.cri.Nv, self.cri.axisN)
+
+
+
+    def cnst_A0T(self, Y0):
+        r"""Compute :math:`A_0^T \mathbf{y}_0` component of
+        :math:`A^T \mathbf{y}` (see :meth:`.ADMMTwoBlockCnstrnt.cnst_AT`).
+        """
+
+        # This calculation involves non-negligible computational cost. It
+        # should be possible to disable relevant diagnostic information
+        # (dual residual) to avoid this cost.
+        Y0f = sl.rfftn(Y0, None, self.cri.axisN)
+        return sl.irfftn(sl.inner(np.conj(self.Zf), Y0f,
+                    axis=self.cri.axisK), self.cri.Nv, self.cri.axisN)
+
+
+
+    def cnst_c0(self):
+        r"""Compute constant component :math:`\mathbf{c}_0` of
+        :math:`\mathbf{c}` in the ADMM problem constraint.
+        """
+
+        return self.S
+
+
+
+    def eval_objfn(self):
+        """Compute components of regularisation function as well as total
+        contribution to objective function.
+        """
+
+        dfd = self.obfn_g0(self.obfn_g0var())
+        cns = self.obfn_g1(self.obfn_g1var())
+        return (dfd, cns)
+
+
+
+    def obfn_g0(self, Y0):
+        r"""Compute :math:`g_0(\mathbf{y}_0)` component of ADMM objective
+        function.
+        """
+
+        return (linalg.norm(self.W * self.obfn_g0var())**2) / 2.0
+
+
+
+    def obfn_g1(self, Y1):
+        r"""Compute :math:`g_1(\mathbf{y_1})` component of ADMM objective
+        function.
+        """
+
+        return linalg.norm((self.Pcn(self.obfn_g1var()) - self.obfn_g1var()))
+
+
+
+    def itstat_extra(self):
+        """Non-standard entries for the iteration stats record tuple."""
+
+        return (self.xrrs,)
+
+
+
+    def reconstruct(self, D=None):
+        """Reconstruct representation."""
+
+        if D is None:
+            Df = self.Xf
+        else:
+            Df = sl.rfftn(D, None, self.cri.axisN)
+
+        Sf = np.sum(self.Zf * Xf, axis=self.cri.axisM)
+        return sl.irfftn(Sf, self.cri.Nv, self.cri.axisN)
+
+
+
+    def rsdl_s(self, Yprev, Y):
+        """Compute dual residual vector."""
+
+        return self.rho*linalg.norm(self.cnst_AT(self.U))
+
+
+
+    def rsdl_sn(self, U):
+        """Compute dual residual normalisation term."""
+
+        return self.rho*linalg.norm(U)
+
+
+
+
+
 def stdformD(D, Cd, M, dimN=2):
     """Reshape dictionary array (X here, D in cbpdn module) to internal
     standard form.
