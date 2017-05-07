@@ -5,7 +5,7 @@ import pytest
 
 import numpy as np
 from sporco import linalg
-
+from sporco import util
 
 
 class TestSet01(object):
@@ -84,10 +84,8 @@ class TestSet01(object):
         N = 32
         M = 16
         K = 8
-        D = np.random.randn(N, N, 1, 1, M).astype('complex') + \
-            np.random.randn(N, N, 1, 1, M).astype('complex') * 1.0j
-        X = np.random.randn(N, N, 1, K, M).astype('complex') + \
-            np.random.randn(N, N, 1, K, M).astype('complex') * 1.0j
+        D = util.complex_randn(N, N, 1, 1, M)
+        X = util.complex_randn(N, N, 1, K, M)
         S = np.sum(D*X, axis=4, keepdims=True)
         Z = (D.conj()*np.sum(D*X, axis=4, keepdims=True) + \
              rho*X - D.conj()*S) / rho
@@ -101,10 +99,8 @@ class TestSet01(object):
         N = 32
         M = 16
         K = 8
-        D = np.random.randn(N, N, 1, 1, M).astype('complex') + \
-            np.random.randn(N, N, 1, 1, M).astype('complex') * 1.0j
-        X = np.random.randn(N, N, 1, K, M).astype('complex') + \
-            np.random.randn(N, N, 1, K, M).astype('complex') * 1.0j
+        D = util.complex_randn(N, N, 1, 1, M)
+        X = util.complex_randn(N, N, 1, K, M)
         S = np.sum(D*X, axis=4, keepdims=True)
         d = 1e-1 * (np.random.randn(N, N, 1, 1, M).astype('complex') + \
             np.random.randn(N, N, 1, 1, M).astype('complex') * 1.0j)
@@ -121,10 +117,8 @@ class TestSet01(object):
         N = 32
         M = 16
         K = 8
-        D = np.random.randn(N, N, 1, 1, M).astype('complex') + \
-            np.random.randn(N, N, 1, 1, M).astype('complex') * 1.0j
-        X = np.random.randn(N, N, 1, K, M).astype('complex') + \
-            np.random.randn(N, N, 1, K, M).astype('complex') * 1.0j
+        D = util.complex_randn(N, N, 1, 1, M)
+        X = util.complex_randn(N, N, 1, K, M)
         S = np.sum(D*X, axis=4, keepdims=True)
 
         Xop = lambda x: np.sum(X * x, axis=4, keepdims=True)
@@ -142,10 +136,8 @@ class TestSet01(object):
         M = 16
         C = 3
         K = 8
-        D = np.random.randn(N, N, C, 1, M).astype('complex') + \
-            np.random.randn(N, N, C, 1, M).astype('complex') * 1.0j
-        X = np.random.randn(N, N, 1, K, M).astype('complex') + \
-            np.random.randn(N, N, 1, K, M).astype('complex') * 1.0j
+        D = util.complex_randn(N, N, C, 1, M)
+        X = util.complex_randn(N, N, 1, K, M)
         S = np.sum(D*X, axis=4, keepdims=True)
 
         Xop = lambda x: np.sum(X * x, axis=4, keepdims=True)
@@ -162,10 +154,8 @@ class TestSet01(object):
         N = 32
         M = 16
         K = 8
-        D = np.random.randn(N, N, 1, 1, M).astype('complex') + \
-            np.random.randn(N, N, 1, 1, M).astype('complex') * 1.0j
-        X = np.random.randn(N, N, 1, K, M).astype('complex') + \
-            np.random.randn(N, N, 1, K, M).astype('complex') * 1.0j
+        D = util.complex_randn(N, N, 1, 1, M)
+        X = util.complex_randn(N, N, 1, K, M)
         S = np.sum(D*X, axis=4, keepdims=True)
 
         Xop = lambda x: np.sum(X * x, axis=4, keepdims=True)
@@ -183,10 +173,8 @@ class TestSet01(object):
         M = 32
         C = 3
         K = 8
-        D = np.random.randn(N, N, C, 1, M).astype('complex') + \
-            np.random.randn(N, N, C, 1, M).astype('complex') * 1.0j
-        X = np.random.randn(N, N, 1, K, M).astype('complex') + \
-            np.random.randn(N, N, 1, K, M).astype('complex') * 1.0j
+        D = util.complex_randn(N, N, C, 1, M)
+        X = util.complex_randn(N, N, 1, K, M)
         S = np.sum(D*X, axis=4, keepdims=True)
 
         Xop = lambda x: np.sum(X * x, axis=4, keepdims=True)
@@ -203,10 +191,8 @@ class TestSet01(object):
         N = 32
         M = 16
         K = 8
-        D = np.random.randn(N, N, 1, 1, M).astype('complex') + \
-            np.random.randn(N, N, 1, 1, M).astype('complex') * 1.0j
-        X = np.random.randn(N, N, 1, K, M).astype('complex') + \
-            np.random.randn(N, N, 1, K, M).astype('complex') * 1.0j
+        D = util.complex_randn(N, N, 1, 1, M)
+        X = util.complex_randn(N, N, 1, K, M)
         S = np.sum(D*X, axis=4, keepdims=True)
 
         Xop = lambda x: np.sum(X * x, axis=4, keepdims=True)
@@ -224,10 +210,8 @@ class TestSet01(object):
         M = 32
         C = 3
         K = 8
-        D = np.random.randn(N, N, C, 1, M).astype('complex') + \
-            np.random.randn(N, N, C, 1, M).astype('complex') * 1.0j
-        X = np.random.randn(N, N, 1, K, M).astype('complex') + \
-            np.random.randn(N, N, 1, K, M).astype('complex') * 1.0j
+        D = util.complex_randn(N, N, C, 1, M)
+        X = util.complex_randn(N, N, 1, K, M)
         S = np.sum(D*X, axis=4, keepdims=True)
 
         Xop = lambda x: np.sum(X * x, axis=4, keepdims=True)
@@ -281,12 +265,14 @@ class TestSet01(object):
         assert(np.abs(n1-n2) < 1e-12)
 
 
+
     def test_18(self):
         x = np.random.randn(16,8)
         y = np.random.randn(16,8)
         ip1 = np.sum(x * y, axis=0, keepdims=True)
         ip2 = linalg.inner(x, y, axis=0)
         assert(np.linalg.norm(ip1 - ip2) < 1e-13)
+
 
 
     def test_19(self):
