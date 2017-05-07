@@ -282,7 +282,7 @@ def inner(x, y, axis=-1):
         yr = np.rollaxis(y, axis, 0)
 
     # Efficient inner product on axis 0
-    ip = np.einsum(xr, [0, Ellipsis], yr, [0, Ellipsis])[np.newaxis,...]
+    ip = np.einsum(xr, [0, Ellipsis], yr, [0, Ellipsis])[np.newaxis, ...]
 
     # Roll axis back to original position if necessary
     if axis != 0:
@@ -839,6 +839,30 @@ def GradientFilters(ndim, axes, axshp, dtype=None):
 
 
 
+def zdivide(x, y):
+    """
+    Return x/y, with 0 instead of NaN where y is 0.
+
+    Parameters
+    ----------
+    x : array_like
+      Numerator
+    y : array_like
+      Denominator
+
+    Returns
+    -------
+    z : ndarray
+      Quotient `x`/`y`
+    """
+
+    with np.errstate(divide='ignore', invalid='ignore'):
+        div = x / y
+    div[np.logical_or(np.isnan(div), np.isinf(div))] = 0
+    return div
+
+
+
 def shrink1(x, alpha):
     r"""
     Scalar shrinkage/soft thresholding function
@@ -867,30 +891,6 @@ def shrink1(x, alpha):
         )
     else:
         return np.sign(x) * (np.clip(np.abs(x) - alpha, 0, float('Inf')))
-
-
-
-def zdivide(x, y):
-    """
-    Return x/y, with 0 instead of NaN where y is 0.
-
-    Parameters
-    ----------
-    x : array_like
-      Numerator
-    y : array_like
-      Denominator
-
-    Returns
-    -------
-    z : ndarray
-      Quotient `x`/`y`
-    """
-
-    with np.errstate(divide='ignore', invalid='ignore'):
-        div = x / y
-    div[np.logical_or(np.isnan(div), np.isinf(div))] = 0
-    return div
 
 
 
