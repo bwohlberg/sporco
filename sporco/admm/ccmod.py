@@ -374,14 +374,14 @@ class ConvCnstrMOD(admm.ADMMEqual):
           dictionary :math:`\{\mathbf{d}_m\}` should have zero-mean
           components.
 
-        ``LinSolve`` : Select linear solver for x step. Options are
-        ``SM`` (Sherman-Morrison) or ``CG`` (Conjugate Gradient).
+          ``LinSolve`` : Select linear solver for x step. Options are
+          ``SM`` (Sherman-Morrison) or ``CG`` (Conjugate Gradient).
 
-        ``CG`` : CG solver options
+          ``CG`` : CG solver options
 
-          ``MaxIter`` : Maximum iterations
+            ``MaxIter`` : Maximum iterations
 
-          ``StopTol`` : Stopping tolerance
+            ``StopTol`` : Stopping tolerance
         """
 
         defaults = copy.deepcopy(admm.ADMMEqual.Options.defaults)
@@ -574,7 +574,8 @@ class ConvCnstrMOD(admm.ADMMEqual):
 
 
     def xstep(self):
-        r"""Minimise Augmented Lagrangian with respect to :math:`\mathbf{x}`."""
+        r"""Minimise Augmented Lagrangian with respect to
+        :math:`\mathbf{x}`."""
 
         self.cgit = None
 
@@ -582,8 +583,8 @@ class ConvCnstrMOD(admm.ADMMEqual):
 
         b = self.ZSf + self.rho*sl.rfftn(self.YU, None, self.cri.axisN)
         if self.opt['LinSolve'] == 'SM':
-            self.Xf[:] = sl.solvemdbi_ism(self.Zf, self.rho, b, self.cri.axisM,
-                                self.cri.axisK)
+            self.Xf[:] = sl.solvemdbi_ism(self.Zf, self.rho, b,
+                                self.cri.axisM, self.cri.axisK)
         else:
             self.Xf[:], cgit = sl.solvemdbi_cg(self.Zf, self.rho, b,
                                 self.cri.axisM, self.cri.axisK,
@@ -795,11 +796,21 @@ class ConvCnstrMODMaskDcpl(admm.ADMMTwoBlockCnstrnt):
           ``ZeroMean`` : Flag indicating whether the solution
           dictionary :math:`\{\mathbf{d}_m\}` should have zero-mean
           components.
+
+          ``LinSolve`` : Select linear solver for x step. Options are
+          ``SM`` (Sherman-Morrison) or ``CG`` (Conjugate Gradient).
+
+          ``CG`` : CG solver options
+
+            ``MaxIter`` : Maximum iterations
+
+            ``StopTol`` : Stopping tolerance
         """
 
         defaults = copy.deepcopy(admm.ADMMEqual.Options.defaults)
         defaults.update({'AuxVarObj' : False, 'LinSolveCheck' : False,
-                         'ZeroMean' : False,
+                         'ZeroMean' : False, 'LinSolve' : 'SM',
+                         'CG' : {'MaxIter' : 1000, 'StopTol' : 1e-3},
                          'RelaxParam' : 1.8, 'rho' : 1.0, 'ReturnVar' : 'Y1'})
 
 
@@ -813,7 +824,7 @@ class ConvCnstrMODMaskDcpl(admm.ADMMTwoBlockCnstrnt):
 
 
     itstat_fields_objfn = ('DFid', 'Cnstr')
-    itstat_fields_extra = ('XSlvRelRes',)
+    itstat_fields_extra = ('XSlvRelRes', 'CGIt')
     hdrtxt_objfn = ('DFid', 'Cnstr')
     hdrval_objfun = {'DFid' : 'DFid', 'Cnstr' : 'Cnstr'}
 
@@ -944,6 +955,7 @@ class ConvCnstrMODMaskDcpl(admm.ADMMTwoBlockCnstrnt):
         r"""Minimise Augmented Lagrangian with respect to
         :math:`\mathbf{x}`.
         """
+        self.cgit = None
 
         self.YU[:] = self.Y - self.U
         self.block_sep0(self.YU)[:] += self.S
@@ -951,8 +963,17 @@ class ConvCnstrMODMaskDcpl(admm.ADMMTwoBlockCnstrnt):
         b = sl.inner(np.conj(self.Zf), self.block_sep0(YUf),
                      axis=self.cri.axisK) + self.block_sep1(YUf)
 
-        self.Xf[:] = sl.solvemdbi_ism(self.Zf, 1.0, b, self.cri.axisM,
-                                      self.cri.axisK)
+        if self.opt['LinSolve'] == 'SM':
+            self.Xf[:] = sl.solvemdbi_ism(self.Zf, 1.0, b, self.cri.axisM,
+                                          self.cri.axisK)
+        else:
+            self.Xf[:], cgit = sl.solvemdbi_cg(self.Zf, 1.0, b,
+                                    self.cri.axisM, self.cri.axisK,
+                                    self.opt['CG', 'StopTol'],
+                                    self.opt['CG', 'MaxIter'], self.Xf)
+            self.cgit = cgit
+
+
         self.X = sl.irfftn(self.Xf, self.cri.Nv, self.cri.axisN)
 
         if self.opt['LinSolveCheck']:
@@ -1128,7 +1149,7 @@ class ConvCnstrMODMaskDcpl(admm.ADMMTwoBlockCnstrnt):
     def itstat_extra(self):
         """Non-standard entries for the iteration stats record tuple."""
 
-        return (self.xrrs,)
+        return (self.xrrs, self.cgit)
 
 
 
