@@ -106,7 +106,7 @@ class ConvRepIndexing(object):
         that S, D, and X refers to the names of signal, dictionary,
         and coefficient map arrays in :class:`.ConvBPDN`; the
         corresponding variable names in :class:`.ConvCnstrMOD` are S,
-        X, and A.
+        X, and Z.
 
         The most fundamental parameter is `dimN`, which specifies the
         dimensionality of the spatial/temporal samples being
@@ -430,7 +430,7 @@ class ConvCnstrMOD(admm.ADMMEqual):
 
 
 
-    def __init__(self, A, S, dsz, opt=None, dimK=1, dimN=2):
+    def __init__(self, Z, S, dsz, opt=None, dimK=1, dimN=2):
         """Initialise a ConvCnstrMOD object with problem parameters.
 
         This class supports an arbitrary number of spatial dimensions,
@@ -453,7 +453,7 @@ class ConvCnstrMOD(admm.ADMMEqual):
           If dimK = 0 then input S is of form
             S(N0,  N1,   C,   K)  or  S(N0,  N1,   C)
 
-        The internal data layout for S, D (X here), and X (A here) is:
+        The internal data layout for S, D (X here), and X (Z here) is:
         ::
 
           dim<0> - dim<Nds-1> : Spatial dimensions, product of N0,N1,... is N
@@ -464,7 +464,7 @@ class ConvCnstrMOD(admm.ADMMEqual):
             sptl.      chn  sig  flt
           S(N0,  N1,   C,   K,   1)
           D(N0,  N1,   C,   1,   M)   (X here)
-          X(N0,  N1,   1,   K,   M)   (A here)
+          X(N0,  N1,   1,   K,   M)   (Z here)
 
         The `dsz` parameter indicates the desired filter supports in the
         output dictionary, since this cannot be inferred from the
@@ -473,7 +473,7 @@ class ConvCnstrMOD(admm.ADMMEqual):
 
         Parameters
         ----------
-        A : array_like
+        Z : array_like
           Coefficient map array
         S : array_like
           Signal array
@@ -500,7 +500,7 @@ class ConvCnstrMOD(admm.ADMMEqual):
         # Set penalty parameter
         self.set_attr('rho', opt['rho'], dval=self.cri.K, dtype=self.dtype)
 
-        # Reshape S to standard layout (A, i.e. X in cbpdn, is assumed
+        # Reshape S to standard layout (Z, i.e. X in cbpdn, is assumed
         # to be taken from cbpdn, and therefore already in standard
         # form). If the dictionary has a single channel but the input
         # (and therefore also the coefficient map array) has multiple
@@ -510,7 +510,7 @@ class ConvCnstrMOD(admm.ADMMEqual):
         # channels also appear on the multiple image index.
         if self.cri.Cd == 1 and self.cri.C > 1:
             self.S = S.reshape(self.cri.Nv + (1,) +
-                        (self.cri.C*self.cri.K,) + (1,))
+                               (self.cri.C*self.cri.K,) + (1,))
         else:
             self.S = S.reshape(self.cri.shpS)
         self.S = np.asarray(self.S, dtype=self.dtype)
@@ -528,8 +528,8 @@ class ConvCnstrMOD(admm.ADMMEqual):
         self.Xf = sl.pyfftw_empty_aligned(xfshp,
                             dtype=sl.complex_dtype(self.dtype))
 
-        if A is not None:
-            self.setcoef(A)
+        if Z is not None:
+            self.setcoef(Z)
 
 
 
@@ -546,7 +546,7 @@ class ConvCnstrMOD(admm.ADMMEqual):
 
 
 
-    def setcoef(self, A):
+    def setcoef(self, Z):
         """Set coefficient array."""
 
         # If the dictionary has a single channel but the input (and
@@ -556,13 +556,13 @@ class ConvCnstrMOD(admm.ADMMEqual):
         # simplest way to handle this is to just reshape so that the
         # channels also appear on the multiple image index.
         if self.cri.Cd == 1 and self.cri.C > 1:
-            A = A.reshape(self.cri.Nv + (1,) + (self.cri.Cx*self.cri.K,) +
+            Z = Z.reshape(self.cri.Nv + (1,) + (self.cri.Cx*self.cri.K,) +
                           (self.cri.M,))
-        self.A = np.asarray(A, dtype=self.dtype)
+        self.Z = np.asarray(Z, dtype=self.dtype)
 
-        self.Af = sl.rfftn(self.A, self.cri.Nv, self.cri.axisN)
+        self.Zf = sl.rfftn(self.Z, self.cri.Nv, self.cri.axisN)
         # Compute X^H S
-        self.ASf = sl.inner(np.conj(self.Af), self.Sf, self.cri.axisK)
+        self.ZSf = sl.inner(np.conj(self.Zf), self.Sf, self.cri.axisK)
 
 
 
@@ -580,12 +580,12 @@ class ConvCnstrMOD(admm.ADMMEqual):
 
         self.YU[:] = self.Y - self.U
 
-        b = self.ASf + self.rho*sl.rfftn(self.YU, None, self.cri.axisN)
+        b = self.ZSf + self.rho*sl.rfftn(self.YU, None, self.cri.axisN)
         if self.opt['LinSolve'] == 'SM':
-            self.Xf[:] = sl.solvemdbi_ism(self.Af, self.rho, b, self.cri.axisM,
+            self.Xf[:] = sl.solvemdbi_ism(self.Zf, self.rho, b, self.cri.axisM,
                                 self.cri.axisK)
         else:
-            self.Xf[:], cgit = sl.solvemdbi_cg(self.Af, self.rho, b,
+            self.Xf[:], cgit = sl.solvemdbi_cg(self.Zf, self.rho, b,
                                 self.cri.axisM, self.cri.axisK,
                                 self.opt['CG', 'StopTol'],
                                 self.opt['CG', 'MaxIter'], self.Xf)
@@ -594,11 +594,10 @@ class ConvCnstrMOD(admm.ADMMEqual):
         self.X = sl.irfftn(self.Xf, self.cri.Nv, self.cri.axisN)
 
         if self.opt['LinSolveCheck']:
-            Aop = lambda x: np.sum(self.Af * x, axis=self.cri.axisM,
-                                   keepdims=True)
-            AHop = lambda x: np.sum(np.conj(self.Af) * x, axis=self.cri.axisK,
-                                    keepdims=True)
-            ax = AHop(Aop(self.Xf)) + self.rho*self.Xf
+            Zop = lambda x: sl.inner(self.Zf, x, axis=self.cri.axisM)
+            ZHop = lambda x: sl.inner(np.conj(self.Zf), x,
+                                      axis=self.cri.axisK)
+            ax = ZHop(Zop(self.Xf)) + self.rho*self.Xf
             self.xrrs = sl.rrs(ax, b)
         else:
             self.xrrs = None
@@ -640,7 +639,7 @@ class ConvCnstrMOD(admm.ADMMEqual):
         \mathbf{x}_m - \mathbf{s} \|_2^2`.
         """
 
-        Ef = sl.inner(self.Af, self.obfn_fvarf(), axis=self.cri.axisM) - self.Sf
+        Ef = sl.inner(self.Zf, self.obfn_fvarf(), axis=self.cri.axisM) - self.Sf
         return sl.rfl2norm2(Ef, self.S.shape, axis=self.cri.axisN) / 2.0
 
 

@@ -132,13 +132,13 @@ class CnstrMOD(admm.ADMMEqual):
 
 
 
-    def __init__(self, A, S, dsz=None, opt=None):
+    def __init__(self, Z, S, dsz=None, opt=None):
         """
         Initialise a CnstrMOD object with problem parameters.
 
         Parameters
         ----------
-        A : array_like, shape (M, K)
+        Z : array_like, shape (M, K)
           Sparse representation coefficient matrix
         S : array_like, shape (N, K)
           Signal vector or matrix
@@ -152,11 +152,11 @@ class CnstrMOD(admm.ADMMEqual):
             opt = CnstrMOD.Options()
 
         Nc = S.shape[0]
-        # If A not specified, get dictionary size from dsz
-        if A is None:
+        # If Z not specified, get dictionary size from dsz
+        if Z is None:
             Nm = dsz[0]
         else:
-            Nm = A.shape[0]
+            Nm = Z.shape[0]
         super(CnstrMOD, self).__init__((Nc, Nm), S.dtype, opt)
 
         # Set penalty parameter
@@ -168,8 +168,8 @@ class CnstrMOD(admm.ADMMEqual):
         # Create constraint set projection function
         self.Pcn = getPcn(opt['ZeroMean'])
 
-        if A is not None:
-            self.setcoef(A)
+        if Z is not None:
+            self.setcoef(Z)
 
 
 
@@ -186,13 +186,13 @@ class CnstrMOD(admm.ADMMEqual):
 
 
 
-    def setcoef(self, A):
+    def setcoef(self, Z):
         """Set coefficient array."""
 
-        self.A = np.asarray(A, dtype=self.dtype)
-        self.SAT = self.S.dot(A.T)
+        self.Z = np.asarray(Z, dtype=self.dtype)
+        self.SZT = self.S.dot(Z.T)
         # Factorise dictionary for efficient solves
-        self.lu, self.piv = sl.lu_factor(A, self.rho)
+        self.lu, self.piv = sl.lu_factor(Z, self.rho)
         self.lu = np.asarray(self.lu, dtype=self.dtype)
 
 
@@ -209,7 +209,7 @@ class CnstrMOD(admm.ADMMEqual):
         :math:`\mathbf{x}`.
         """
 
-        self.X = np.asarray(sl.lu_solve_AATI(self.A, self.rho, self.SAT +
+        self.X = np.asarray(sl.lu_solve_AATI(self.Z, self.rho, self.SZT +
                             self.rho*(self.Y - self.U), self.lu, self.piv,),
                             dtype=self.dtype)
 
@@ -240,7 +240,7 @@ class CnstrMOD(admm.ADMMEqual):
         \mathbf{s} \|_2^2`.
         """
 
-        return 0.5*linalg.norm((self.obfn_fvar().dot(self.A) - self.S))**2
+        return 0.5*linalg.norm((self.obfn_fvar().dot(self.Z) - self.S))**2
 
 
 
@@ -256,7 +256,7 @@ class CnstrMOD(admm.ADMMEqual):
     def rhochange(self):
         """Re-factorise matrix when rho changes"""
 
-        self.lu, self.piv = sl.lu_factor(self.A, self.rho)
+        self.lu, self.piv = sl.lu_factor(self.Z, self.rho)
         self.lu = np.asarray(self.lu, dtype=self.dtype)
 
 
