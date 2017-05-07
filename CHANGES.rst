@@ -8,6 +8,11 @@ Version 0.1.6   (Not yet released)
 
 - Fixed functional evaluation error in cbpdn.ConvBPDNMaskDcpl
 - Fixed bug in cbpdn.ConvTwoBlockCnstrnt with multi-channel dictionary
+- New class ccmod.ConvCnstrMODMaskDcpl for dictionary update with mask
+  decoupling
+- New class cbpdndl.ConvBPDNMaskDcplDictLearn for dictionary learning
+  with mask decoupling
+- Corrected serious error in demo_dictlrn_cbpdn_md.py
 
 
 
