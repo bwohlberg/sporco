@@ -252,8 +252,8 @@ def imview(img, title=None, block=False, copy=True, fltscl=False, cmap=None,
     fig : matplotlib.figure.Figure
       Figure object for this figure.
     ax : matplotlib.axes.Axes
-      Axes for this figure suitable for passing as share parameter of another
-      imview call.
+      Axes for this figure suitable for passing as ``axes`` parameter of
+      another imview call.
     """
 
     if img.ndim > 2 and img.shape[2] != 3:
