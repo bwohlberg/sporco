@@ -31,8 +31,8 @@ __author__ = """Brendt Wohlberg <brendt@ieee.org>"""
 
 
 def plot(dat, x=None, title=None, xlbl=None, ylbl=None, lgnd=None, lglc=None,
-         ptyp='plot', lwidth=1.5, lstyle='solid', block=False, fgrf=None,
-         fgnm=None, fgsz=None):
+         ptyp='plot', lwidth=1.5, lstyle='solid', msize=6.0, mstyle='None',
+         block=False, fgrf=None, fgnm=None, fgsz=None):
     """
     Plot columns of array.
 
@@ -53,12 +53,16 @@ def plot(dat, x=None, title=None, xlbl=None, ylbl=None, lgnd=None, lglc=None,
     lglc : string, optional (default None)
         Legend location string
     ptyp : string, optional (default 'plot')
-        Plot type specification (options are 'plot', 'semilogx', 'semilogy',
-        and 'loglog')
+        Plot type specification (options are 'plot', 'semilogx',
+        'semilogy', and 'loglog')
     lwidth : float, optional (default 1.5)
         Line width
     lstyle : string, optional (default 'solid')
         Line style (see :class:`matplotlib.lines.Line2D`)
+    msize : float, optional (default 6.0)
+        Marker size
+    mstyle : string, optional (default 'None')
+        Marker style (see :mod:`matplotlib.markers`)
     block : boolean, optional (default False)
         If True, the function only returns when the figure is closed
     fgrf : figure object reference, optional (default None)
@@ -86,9 +90,11 @@ def plot(dat, x=None, title=None, xlbl=None, ylbl=None, lgnd=None, lglc=None,
               'semilogy' : plt.semilogy, 'loglog' : plt.loglog}
     if ptyp in plttyp:
         if x is None:
-            pltln = plttyp[ptyp](dat, linewidth=lwidth, linestyle=lstyle)
+            pltln = plttyp[ptyp](dat, linewidth=lwidth, linestyle=lstyle,
+                                 marker=mstyle, markersize=msize)
         else:
-            pltln = plttyp[ptyp](x, dat, linewidth=lwidth, linestyle=lstyle)
+            pltln = plttyp[ptyp](x, dat, linewidth=lwidth, linestyle=lstyle,
+                                 marker=mstyle, markersize=msize)
     else:
         raise ValueError("Invalid plot type '%s'" % ptyp)
 
