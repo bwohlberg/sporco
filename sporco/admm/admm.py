@@ -247,13 +247,13 @@ class ADMM(with_metaclass(_ADMM_Meta, object)):
 
     itstat_fields_objfn = ('ObjFun', 'FVal', 'GVal')
     """Fields in IterationStats associated with the objective function;
-    see :meth:`eval_objfun`"""
+    see :meth:`eval_objfn`"""
     itstat_fields_extra = ()
     """Non-standard fields in IterationStats; see :meth:`itstat_extra`"""
 
     hdrtxt_objfn = ('Fnc', 'f', 'g')
     """Display column headers associated with the objective function;
-    see :meth:`eval_objfun`"""
+    see :meth:`eval_objfn`"""
     hdrval_objfun = {'Fnc' : 'ObjFun', 'f' : 'FVal', 'g' : 'GVal'}
     """Dictionary mapping display column headers in :attr:`hdrtxt_objfn`
     to IterationStats entries"""
@@ -781,7 +781,7 @@ class ADMM(with_metaclass(_ADMM_Meta, object)):
     def obfn_f(self, X):
         r"""Compute :math:`f(\mathbf{x})` component of ADMM objective function.
 
-        Overriding this method is required if :meth:`eval_objfun`
+        Overriding this method is required if :meth:`eval_objfn`
         is not overridden.
         """
 
@@ -792,7 +792,7 @@ class ADMM(with_metaclass(_ADMM_Meta, object)):
     def obfn_g(self, Y):
         r"""Compute :math:`g(\mathbf{y})` component of ADMM objective function.
 
-        Overriding this method is required if :meth:`eval_objfun`
+        Overriding this method is required if :meth:`eval_objfn`
         is not overridden.
         """
 
@@ -947,12 +947,12 @@ class ADMMEqual(ADMM):
         Options include all of those defined in :class:`ADMM.Options`,
         together with additional options:
 
-          ``fEvalX`` : Flag indicating whether the :math:`f` component of the
-          objective function should be evaluated using variable X
+          ``fEvalX`` : Flag indicating whether the :math:`f` component of
+          the objective function should be evaluated using variable X
           (``True``) or Y (``False``) as its argument.
 
-          ``gEvalY`` : Flag indicating whether the :math:`g` component of the
-          objective function should be evaluated using variable Y
+          ``gEvalY`` : Flag indicating whether the :math:`g` component of
+          the objective function should be evaluated using variable Y
           (``True``) or X (``False``) as its argument.
 
           ``ReturnX`` : Flag indicating whether the return value of the
@@ -1014,8 +1014,8 @@ class ADMMEqual(ADMM):
 
 
     def obfn_fvar(self):
-        """Variable to be evaluated in computing :meth:`ADMM.obfn_f`, depending
-        on the ``fEvalX`` option value.
+        """Variable to be evaluated in computing :meth:`ADMM.obfn_f`,
+        depending on the ``fEvalX`` option value.
         """
 
         return self.X if self.opt['fEvalX'] else self.Y
@@ -1023,8 +1023,8 @@ class ADMMEqual(ADMM):
 
 
     def obfn_gvar(self):
-        """Variable to be evaluated in computing :meth:`ADMM.obfn_g`, depending
-        on the ``gEvalY`` option value.
+        """Variable to be evaluated in computing :meth:`ADMM.obfn_g`,
+        depending on the ``gEvalY`` option value.
         """
 
         return self.Y if self.opt['gEvalY'] else self.X
@@ -1044,9 +1044,9 @@ class ADMMEqual(ADMM):
 
 
     def cnst_A(self, X):
-        r"""Compute :math:`A \mathbf{x}` component of ADMM problem constraint.
-        In this case :math:`A \mathbf{x} = \mathbf{x}` since the constraint
-        is :math:`\mathbf{x} = \mathbf{y}`.
+        r"""Compute :math:`A \mathbf{x}` component of ADMM problem
+        constraint. In this case :math:`A \mathbf{x} = \mathbf{x}` since
+        the constraint is :math:`\mathbf{x} = \mathbf{y}`.
         """
 
         return X
@@ -1064,9 +1064,9 @@ class ADMMEqual(ADMM):
 
 
     def cnst_B(self, Y):
-        r"""Compute :math:`B \mathbf{y}` component of ADMM problem constraint.
-        In this case :math:`B \mathbf{y} = -\mathbf{y}` since the constraint
-        is :math:`\mathbf{x} = \mathbf{y}`.
+        r"""Compute :math:`B \mathbf{y}` component of ADMM problem
+        constraint. In this case :math:`B \mathbf{y} = -\mathbf{y}` since
+        the constraint is :math:`\mathbf{x} = \mathbf{y}`.
         """
 
         return -Y
@@ -1128,8 +1128,8 @@ class ADMMTwoBlockCnstrnt(ADMM):
     Solve optimisation problems of the form
 
     .. math::
-       \mathrm{argmin}_{\mathbf{x}} \; f(\mathbf{x}) + g_0(A_0 \mathbf{x}) +
-       g_1(A_1 \mathbf{x})
+       \mathrm{argmin}_{\mathbf{x}} \; f(\mathbf{x}) + g_0(A_0 \mathbf{x})
+       + g_1(A_1 \mathbf{x})
 
     via an ADMM problem of the form
 
@@ -1142,8 +1142,8 @@ class ADMMTwoBlockCnstrnt(ADMM):
        \right) = \left( \begin{array}{c} \mathbf{c}_0 \\
        \mathbf{c}_1 \end{array} \right) \;\;.
 
-    In this case the ADMM constraint is :math:`A\mathbf{x} + B\mathbf{y} =
-    \mathbf{c}` where
+    In this case the ADMM constraint is :math:`A\mathbf{x} + B\mathbf{y}
+    = \mathbf{c}` where
 
     .. math::
        A = \left( \begin{array}{c} A_0 \\ A_1 \end{array} \right)
@@ -1152,8 +1152,8 @@ class ADMMTwoBlockCnstrnt(ADMM):
        \mathbf{c} = \left( \begin{array}{c} \mathbf{c}_0 \\
        \mathbf{c}_1 \end{array} \right) \;\;.
 
-    This class specialises class :class:`.ADMM`, but remains a base class for
-    other classes that specialise to specific optimisation problems.
+    This class specialises class :class:`.ADMM`, but remains a base class
+    for other classes that specialise to specific optimisation problems.
     """
 
 
@@ -1189,11 +1189,11 @@ class ADMMTwoBlockCnstrnt(ADMM):
 
     itstat_fields_objfn = ('ObjFun', 'FVal', 'G0Val', 'G1Val')
     """Fields in IterationStats associated with the objective function;
-    see :meth:`eval_objfun`"""
+    see :meth:`eval_objfn`"""
 
     hdrtxt_objfn = ('Fnc', 'f', 'g0', 'g1')
     """Display column headers associated with the objective function;
-    see :meth:`eval_objfun`"""
+    see :meth:`eval_objfn`"""
     hdrval_objfun = {'Fnc' : 'ObjFun', 'f' : 'FVal',
                      'g0' : 'G0Val', 'g1' : 'G1Val'}
     """Dictionary mapping display column headers in :attr:`hdrtxt_objfn`
@@ -1203,7 +1203,8 @@ class ADMMTwoBlockCnstrnt(ADMM):
 
     def __init__(self, Nx, yshape, blkaxis, blkidx, dtype, opt=None):
         r"""
-        Initialise an ADMMTwoBlockCnstrnt object with problem size and options.
+        Initialise an ADMMTwoBlockCnstrnt object with problem size and
+        options.
 
         Parameters
         ----------
@@ -1277,8 +1278,8 @@ class ADMMTwoBlockCnstrnt(ADMM):
 
 
     def block_cat(self, Y0, Y1):
-        r"""Concatenate components corresponding to :math:`\mathbf{y}_0` and
-        :math:`\mathbf{y}_1` to form :math:`\mathbf{y}\;\;`.
+        r"""Concatenate components corresponding to :math:`\mathbf{y}_0`
+        and :math:`\mathbf{y}_1` to form :math:`\mathbf{y}\;\;`.
         """
 
         return np.concatenate((Y0, Y1), axis=self.blkaxis)
@@ -1360,7 +1361,8 @@ class ADMMTwoBlockCnstrnt(ADMM):
         g_1(\mathbf{y}_1)` component of ADMM objective function.
         """
 
-        return self.obfn_g0(self.obfn_g0var()) + self.obfn_g1(self.obfn_g1var())
+        return self.obfn_g0(self.obfn_g0var()) \
+          + self.obfn_g1(self.obfn_g1var())
 
 
 
@@ -1424,9 +1426,9 @@ class ADMMTwoBlockCnstrnt(ADMM):
 
 
     def cnst_B(self, Y):
-        r"""Compute :math:`B \mathbf{y}` component of ADMM problem constraint.
-        In this case :math:`B \mathbf{y} = -\mathbf{y}` since the constraint
-        is :math:`A \mathbf{x} - \mathbf{y} = \mathbf{c}`.
+        r"""Compute :math:`B \mathbf{y}` component of ADMM problem
+        constraint. In this case :math:`B \mathbf{y} = -\mathbf{y}` since
+        the constraint is :math:`A \mathbf{x} - \mathbf{y} = \mathbf{c}`.
         """
 
         return -Y
@@ -1447,8 +1449,8 @@ class ADMMTwoBlockCnstrnt(ADMM):
 
     def cnst_c0(self):
         r"""Compute constant component :math:`\mathbf{c}_0` of
-        :math:`\mathbf{c}` in the ADMM problem constraint. Unless overridden,
-        :math:`\mathbf{c}_0 = 0`.
+        :math:`\mathbf{c}` in the ADMM problem constraint. Unless
+        overridden, :math:`\mathbf{c}_0 = 0`.
         """
 
         return 0.0
@@ -1457,8 +1459,8 @@ class ADMMTwoBlockCnstrnt(ADMM):
 
     def cnst_c1(self):
         r"""Compute constant component :math:`\mathbf{c}_1` of
-        :math:`\mathbf{c}` in the ADMM problem constraint. Unless overridden,
-        :math:`\mathbf{c}_1 = 0`.
+        :math:`\mathbf{c}` in the ADMM problem constraint. Unless
+        overridden, :math:`\mathbf{c}_1 = 0`.
         """
 
         return 0.0
@@ -1466,8 +1468,8 @@ class ADMMTwoBlockCnstrnt(ADMM):
 
 
     def cnst_A0(self, X):
-        r"""Compute :math:`A_0 \mathbf{x}` component of :math:`A \mathbf{x}` in
-        ADMM problem constraint (see :meth:`cnst_A`). Unless overridden,
+        r"""Compute :math:`A_0 \mathbf{x}` component of :math:`A \mathbf{x}`
+        in ADMM problem constraint (see :meth:`cnst_A`). Unless overridden,
         :math:`A_0 \mathbf{x} = \mathbf{x}`, i.e. :math:`A_0 = I`.
         """
 
