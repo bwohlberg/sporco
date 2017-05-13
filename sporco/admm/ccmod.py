@@ -385,7 +385,15 @@ class ConvCnstrMOD(admm.ADMMEqual):
         """
 
         defaults = copy.deepcopy(admm.ADMMEqual.Options.defaults)
-        defaults.update({'AuxVarObj' : False, 'ReturnX' : False,
+        # Warning: although __setitem__ below takes care of setting
+        # 'fEvalX' and 'gEvalY' from the value of 'AuxVarObj', this
+        # cannot be relied upon for initialisation since the order of
+        # initialisation of the dictionary keys is not deterministic;
+        # if 'AuxVarObj' is initialised first, the other two keys are
+        # correctly set, but this setting is overwritten when 'fEvalX'
+        # and 'gEvalY' are themselves initialised
+        defaults.update({'AuxVarObj' : False, 'fEvalX' : True,
+                         'gEvalY' : False, 'ReturnX' : False,
                         'RelaxParam' : 1.8, 'ZeroMean' : False,
                         'LinSolve' : 'SM', 'LinSolveCheck' : False,
                         'CG' : {'MaxIter' : 1000, 'StopTol' : 1e-3}})
@@ -434,7 +442,7 @@ class ConvCnstrMOD(admm.ADMMEqual):
         """Initialise a ConvCnstrMOD object with problem parameters.
 
         This class supports an arbitrary number of spatial dimensions,
-        `dimN`, with a default of 2. The input coefficient map array `A`
+        `dimN`, with a default of 2. The input coefficient map array `Z`
         (usually labelled X, but renamed here to avoid confusion with
         the X and Y variables in the ADMM base class) is expected to
         be in standard form as computed by the ConvBPDN class.
@@ -710,7 +718,8 @@ class ConvCnstrMODMaskDcpl(admm.ADMMTwoBlockCnstrnt):
     variable of the ADMM problem. We need to consider three different cases:
 
       1. Single channel signal and dictionary (``C`` = ``Cd`` = 1)
-      2. Multi-channel signal, single channel dictionary (``C`` > 1, ``Cd`` = 1)
+      2. Multi-channel signal, single channel dictionary (``C`` > 1,
+         ``Cd`` = 1)
       3. Multi-channel signal and dictionary (``C`` = ``Cd`` > 1)
 
 
@@ -735,8 +744,8 @@ class ConvCnstrMODMaskDcpl(admm.ADMMTwoBlockCnstrnt):
     concatenating, as well as after extracting the ``Y0`` component from the
     concatenated ``Y`` variable. In case 2., since the ``C`` and ``K``
     indices have the same behaviour in the dictionary update equation, we
-    combine these axes in :meth:`.__init__`, so that the case 2. array shapes
-    become
+    combine these axes in :meth:`.__init__`, so that the case 2. array
+    shapes become
 
       ======      =====================
       Var.        ``C`` > 1, ``Cd`` = 1
@@ -754,8 +763,8 @@ class ConvCnstrMODMaskDcpl(admm.ADMMTwoBlockCnstrnt):
 
     |
 
-    After termination of the :meth:`solve` method, attribute :attr:`itstat` is
-    a list of tuples representing statistics of each iteration. The
+    After termination of the :meth:`solve` method, attribute :attr:`itstat`
+    is a list of tuples representing statistics of each iteration. The
     fields of the named tuple ``IterationStats`` are:
 
        ``Iter`` : Iteration number
@@ -808,7 +817,8 @@ class ConvCnstrMODMaskDcpl(admm.ADMMTwoBlockCnstrnt):
         """
 
         defaults = copy.deepcopy(admm.ADMMEqual.Options.defaults)
-        defaults.update({'AuxVarObj' : False, 'LinSolveCheck' : False,
+        defaults.update({'AuxVarObj' : False, 'fEvalX' : True,
+                         'gEvalY' : False, 'LinSolveCheck' : False,
                          'ZeroMean' : False, 'LinSolve' : 'SM',
                          'CG' : {'MaxIter' : 1000, 'StopTol' : 1e-3},
                          'RelaxParam' : 1.8, 'rho' : 1.0, 'ReturnVar' : 'Y1'})
@@ -868,7 +878,7 @@ class ConvCnstrMODMaskDcpl(admm.ADMMTwoBlockCnstrnt):
         # Reshape W if necessary (see discussion of reshape of S below)
         if self.cri.Cd == 1 and self.cri.C > 1 and hasattr(W, 'ndim'):
             self.W = W.reshape(W.shape[0:self.cri.dimN] +
-                    (1, W.shape[self.cri.axisC] * W.shape[self.cri.axisK], 1))
+                (1, W.shape[self.cri.axisC] * W.shape[self.cri.axisK], 1))
         else:
             self.W = W
 
@@ -1037,21 +1047,22 @@ class ConvCnstrMODMaskDcpl(admm.ADMMTwoBlockCnstrnt):
 
 
     def block_cat(self, Y0, Y1):
-        r"""Concatenate components corresponding to :math:`\mathbf{y}_0` and
-        :math:`\mathbf{y}_1` to form :math:`\mathbf{y}\;\;`.
-        The method from parent class :class:`.ADMMTwoBlockCnstrnt` is
+        r"""Concatenate components corresponding to :math:`\mathbf{y}_0`
+        and :math:`\mathbf{y}_1` to form :math:`\mathbf{y}\;\;`. The
+        method from parent class :class:`.ADMMTwoBlockCnstrnt` is
         overridden here to allow swapping of K (multi-image) and M
         (filter) axes in block 0 so that it can be concatenated on axis
         M with block 1. This is necessary because block 0 has the
         dimensions of S while block 1 has the dimensions of D. Handling
         of multi-channel signals substantially complicate this
-        issue. There are two multi-channel cases: multi-channel dictionary
-        and signal (Cd = C > 1), and single-channel dictionary with
-        multi-channel signal (Cd = 1, C > 1). In the former case, S and D
-        shapes are (N x C x K x 1) and (N x C x 1 x M) respectively. In the
-        latter case, :meth:`.__init__` has already taken care of combining C
-        (multi-channel) and K (multi-image) axes in S, so the S and D
-        shapes are (N x 1 x C K x 1) and (N x 1 x 1 x M) respectively.
+        issue. There are two multi-channel cases: multi-channel
+        dictionary and signal (Cd = C > 1), and single-channel
+        dictionary with multi-channel signal (Cd = 1, C > 1). In the
+        former case, S and D shapes are (N x C x K x 1) and (N x C x 1 x
+        M) respectively. In the latter case, :meth:`.__init__` has
+        already taken care of combining C (multi-channel) and K
+        (multi-image) axes in S, so the S and D shapes are (N x 1 x C K
+        x 1) and (N x 1 x 1 x M) respectively.
         """
 
         return np.concatenate((np.swapaxes(Y0, self.cri.axisK,
@@ -1272,8 +1283,8 @@ def getPcn(zm, dsz, Nv, dimN=2, dimC=1):
 
 
 def zeromean(v, dsz, dimN=2):
-    """Subtract mean value from each filter in the input array v. The `dsz`
-    parameter specifies the support sizes of each filter using the
+    """Subtract mean value from each filter in the input array v. The
+    `dsz` parameter specifies the support sizes of each filter using the
     same format as the `dsz` parameter of :func:`bcrop`. Support sizes
     must be taken into account to ensure that the mean values are
     computed over the correct number of samples, ignoring the

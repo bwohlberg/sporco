@@ -294,7 +294,15 @@ class GenericConvBPDN(admm.ADMMEqual):
         """
 
         defaults = copy.deepcopy(admm.ADMMEqual.Options.defaults)
-        defaults.update({'AuxVarObj' : False, 'ReturnX' : False,
+        # Warning: although __setitem__ below takes care of setting
+        # 'fEvalX' and 'gEvalY' from the value of 'AuxVarObj', this
+        # cannot be relied upon for initialisation since the order of
+        # initialisation of the dictionary keys is not deterministic;
+        # if 'AuxVarObj' is initialised first, the other two keys are
+        # correctly set, but this setting is overwritten when 'fEvalX'
+        # and 'gEvalY' are themselves initialised
+        defaults.update({'AuxVarObj' : False, 'fEvalX' : True,
+                         'gEvalY' : False, 'ReturnX' : False,
                          'HighMemSolve' : False, 'LinSolveCheck' : False,
                          'RelaxParam' : 1.8, 'NonNegCoef' : False,
                          'NoBndryCross' : False})
@@ -1399,7 +1407,8 @@ class ConvTwoBlockCnstrnt(admm.ADMMTwoBlockCnstrnt):
         """
 
         defaults = copy.deepcopy(admm.ADMMEqual.Options.defaults)
-        defaults.update({'AuxVarObj' : False, 'HighMemSolve' : False,
+        defaults.update({'AuxVarObj' : False, 'fEvalX' : True,
+                         'gEvalY' : False, 'HighMemSolve' : False,
                          'LinSolveCheck' : False, 'NonNegCoef' : False,
                          'NoBndryCross' : False, 'RelaxParam' : 1.8,
                          'rho' : 1.0, 'ReturnVar' : 'Y1'})

@@ -13,6 +13,7 @@ Version 0.1.6   (Not yet released)
 - New class cbpdndl.ConvBPDNMaskDcplDictLearn for dictionary learning
   with mask decoupling
 - Corrected serious error in demo_dictlrn_cbpdn_md.py
+- Fixed bug causing non-deterministic 'AuxVarObj' option behaviour
 
 
 

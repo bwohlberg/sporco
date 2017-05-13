@@ -94,7 +94,15 @@ class GenericBPDN(admm.ADMMEqual):
         """
 
         defaults = copy.deepcopy(admm.ADMMEqual.Options.defaults)
-        defaults.update({'AuxVarObj' : True, 'ReturnX' : False,
+        # Warning: although __setitem__ below takes care of setting
+        # 'fEvalX' and 'gEvalY' from the value of 'AuxVarObj', this
+        # cannot be relied upon for initialisation since the order of
+        # initialisation of the dictionary keys is not deterministic;
+        # if 'AuxVarObj' is initialised first, the other two keys are
+        # correctly set, but this setting is overwritten when 'fEvalX'
+        # and 'gEvalY' are themselves initialised
+        defaults.update({'AuxVarObj' : True, 'fEvalX' : False,
+                         'gEvalY' : True, 'ReturnX' : False,
                         'RelaxParam' : 1.8, 'NonNegCoef' : False})
         defaults['AutoRho'].update({'Enabled' : True, 'Period' : 10,
                                     'AutoScaling' : True, 'Scaling' : 1000.0,
@@ -398,7 +406,8 @@ class BPDN(GenericBPDN):
 
 
     def ystep(self):
-        r"""Minimise Augmented Lagrangian with respect to :math:`\mathbf{y}`."""
+        r"""Minimise Augmented Lagrangian with respect to
+        :math:`\mathbf{y}`."""
 
         self.Y = np.asarray(sl.shrink1(self.AX + self.U,
                             (self.lmbda/self.rho)*self.wl1),
@@ -444,8 +453,8 @@ class BPDNJoint(BPDN):
        \lambda \| Y \|_1 + \mu \| Y \|_{2,1} \quad \text{such that} \quad
        X = Y \;\;.
 
-    After termination of the :meth:`solve` method, attribute :attr:`itstat` is
-    a list of tuples representing statistics of each iteration. The
+    After termination of the :meth:`solve` method, attribute :attr:`itstat`
+    is a list of tuples representing statistics of each iteration. The
     fields of the named tuple ``IterationStats`` are:
 
        ``Iter`` : Iteration number
@@ -507,7 +516,8 @@ class BPDNJoint(BPDN):
 
 
     def ystep(self):
-        r"""Minimise Augmented Lagrangian with respect to :math:`\mathbf{y}`."""
+        r"""Minimise Augmented Lagrangian with respect to
+        :math:`\mathbf{y}`."""
 
         self.Y = np.asarray(sl.shrink12(self.AX + self.U,
                             (self.lmbda/self.rho)*self.wl1, self.mu/self.rho),
@@ -556,8 +566,8 @@ class ElasticNet(BPDN):
        + (\mu/2) \| \mathbf{x} \|_2^2 \quad \text{such that} \quad
        \mathbf{x} = \mathbf{y} \;\;.
 
-    After termination of the :meth:`solve` method, attribute :attr:`itstat` is
-    a list of tuples representing statistics of each iteration. The
+    After termination of the :meth:`solve` method, attribute :attr:`itstat`
+    is a list of tuples representing statistics of each iteration. The
     fields of the named tuple ``IterationStats`` are:
 
        ``Iter`` : Iteration number
@@ -644,8 +654,8 @@ class ElasticNet(BPDN):
         """
 
         self.X = np.asarray(sl.lu_solve_ATAI(self.D, self.mu + self.rho,
-                    self.DTS + self.rho*(self.Y - self.U), self.lu, self.piv),
-                    dtype=self.dtype)
+                    self.DTS + self.rho*(self.Y - self.U), self.lu,
+                    self.piv), dtype=self.dtype)
 
 
 

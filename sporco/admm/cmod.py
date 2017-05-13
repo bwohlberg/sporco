@@ -92,7 +92,15 @@ class CnstrMOD(admm.ADMMEqual):
         """
 
         defaults = copy.deepcopy(admm.ADMMEqual.Options.defaults)
-        defaults.update({'AuxVarObj' : True, 'ReturnX' : False,
+        # Warning: although __setitem__ below takes care of setting
+        # 'fEvalX' and 'gEvalY' from the value of 'AuxVarObj', this
+        # cannot be relied upon for initialisation since the order of
+        # initialisation of the dictionary keys is not deterministic;
+        # if 'AuxVarObj' is initialised first, the other two keys are
+        # correctly set, but this setting is overwritten when 'fEvalX'
+        # and 'gEvalY' are themselves initialised
+        defaults.update({'AuxVarObj' : True, 'fEvalX' : False,
+                         'gEvalY' : True, 'ReturnX' : False,
                          'RelaxParam' : 1.8, 'ZeroMean' : False})
         defaults['AutoRho'].update({'Enabled' : True})
 
