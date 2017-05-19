@@ -67,7 +67,7 @@ Usage Examples
 
     .. container:: header
 
-	:class:`.cbpdndl.ConvBPDNMaskDcplDictLearn` usage (greyscale images,
+	:class:`.ConvBPDNMaskDcplDictLearn` usage (greyscale images,
 	single-scale dictionary, as in :cite:`wohlberg-2016-boundary`)
 
     .. literalinclude:: ../../../examples/cnvsparse/demo_cbpdndl_md_gry.py
@@ -80,7 +80,7 @@ Usage Examples
 
     .. container:: header
 
-	:class:`.cbpdndl.ConvBPDNMaskDcplDictLearn` usage (colour images,
+	:class:`.ConvBPDNMaskDcplDictLearn` usage (colour images,
 	single-scale colour dictionary, see :cite:`wohlberg-2016-boundary`
 	:cite:`wohlberg-2016-convolutional`)
 
