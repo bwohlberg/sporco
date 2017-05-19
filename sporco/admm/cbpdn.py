@@ -64,8 +64,8 @@ class ConvRepIndexing(object):
           and any remaining indices are taken as channel indices (i.e. if
           `dimK` = 0 then dimC = 1 and if `dimK` = 1 then dimC = 0).
         * if `dimK` is ``None`` then the number of channel dimensions is
-          determined from the number of dimensions in the input dictionary `D`.
-          Input `D` should have at least `dimN` + 1 dimensions, with the
+          determined from the number of dimensions in the input dictionary
+          `D`. Input `D` should have at least `dimN` + 1 dimensions, with the
           final dimension indexing dictionary filters. If it has exactly
           `dimN` + 1 dimensions then it is a single-channel dictionary,
           and input `S` is also assumed to be single-channel, with the
@@ -620,8 +620,8 @@ class ConvBPDN(GenericConvBPDN):
     with multi-channel dictionary filters :math:`\mathbf{d}_{c,m}` and
     single-channel coefficient maps :math:`\mathbf{x}_m`.
 
-    After termination of the :meth:`solve` method, attribute :attr:`itstat` is
-    a list of tuples representing statistics of each iteration. The
+    After termination of the :meth:`solve` method, attribute :attr:`itstat`
+    is a list of tuples representing statistics of each iteration. The
     fields of the named tuple ``IterationStats`` are:
 
        ``Iter`` : Iteration number
@@ -824,8 +824,8 @@ class ConvBPDNJoint(ConvBPDN):
        \| \mathbf{y}_{c,m} \|_1 + \mu \| \{ \mathbf{y}_{c,m} \} \|_{2,1}
        \quad \text{such that} \quad \mathbf{x}_{c,m} = \mathbf{y}_{c,m} \;\;.
 
-    After termination of the :meth:`solve` method, attribute :attr:`itstat` is
-    a list of tuples representing statistics of each iteration. The
+    After termination of the :meth:`solve` method, attribute :attr:`itstat`
+    is a list of tuples representing statistics of each iteration. The
     fields of the named tuple ``IterationStats`` are:
 
        ``Iter`` : Iteration number
@@ -950,8 +950,8 @@ class ConvElasticNet(ConvBPDN):
        + (\mu/2) \sum_m \| \mathbf{x}_m \|_2^2
        \quad \text{such that} \quad \mathbf{x}_m = \mathbf{y}_m \;\;.
 
-    After termination of the :meth:`solve` method, attribute :attr:`itstat` is
-    a list of tuples representing statistics of each iteration. The
+    After termination of the :meth:`solve` method, attribute :attr:`itstat`
+    is a list of tuples representing statistics of each iteration. The
     fields of the named tuple ``IterationStats`` are:
 
        ``Iter`` : Iteration number
@@ -1121,8 +1121,8 @@ class ConvBPDNGradReg(ConvBPDN):
        (\mu/2) \sum_i \sum_m \| G_i \mathbf{x}_m \|_2^2
        \quad \text{such that} \quad \mathbf{x}_m = \mathbf{y}_m \;\;.
 
-    After termination of the :meth:`solve` method, attribute :attr:`itstat` is
-    a list of tuples representing statistics of each iteration. The
+    After termination of the :meth:`solve` method, attribute :attr:`itstat`
+    is a list of tuples representing statistics of each iteration. The
     fields of the named tuple ``IterationStats`` are:
 
        ``Iter`` : Iteration number
@@ -1351,7 +1351,8 @@ class ConvTwoBlockCnstrnt(admm.ADMMTwoBlockCnstrnt):
     variable of the ADMM problem. We need to consider three different cases:
 
       1. Single channel signal and dictionary (``C`` = ``Cd`` = 1)
-      2. Multi-channel signal, single channel dictionary (``C`` > 1, ``Cd`` = 1)
+      2. Multi-channel signal, single channel dictionary (``C`` > 1,
+         ``Cd`` = 1)
       3. Multi-channel signal and dictionary (``C`` = ``Cd`` > 1)
 
 
@@ -1594,8 +1595,8 @@ class ConvTwoBlockCnstrnt(admm.ADMMTwoBlockCnstrnt):
 
 
     def block_cat(self, Y0, Y1):
-        r"""Concatenate components corresponding to :math:`\mathbf{y}_0` and
-        :math:`\mathbf{y}_1` to form :math:`\mathbf{y}\;\;`.
+        r"""Concatenate components corresponding to :math:`\mathbf{y}_0`
+        and :math:`\mathbf{y}_1` to form :math:`\mathbf{y}\;\;`.
         The method from parent class :class:`.ADMMTwoBlockCnstrnt` is
         overridden here to allow swapping of C (channel) and M
         (filter) axes in block 0 so that it can be concatenated on
@@ -1750,8 +1751,8 @@ class ConvBPDNMaskDcpl(ConvTwoBlockCnstrnt):
 
     where :math:`D \mathbf{x} = \sum_m \mathbf{d}_m * \mathbf{x}_m`.
 
-    After termination of the :meth:`solve` method, attribute :attr:`itstat` is
-    a list of tuples representing statistics of each iteration. The
+    After termination of the :meth:`solve` method, attribute :attr:`itstat`
+    is a list of tuples representing statistics of each iteration. The
     fields of the named tuple ``IterationStats`` are:
 
        ``Iter`` : Iteration number
@@ -1785,8 +1786,8 @@ class ConvBPDNMaskDcpl(ConvTwoBlockCnstrnt):
         r"""ConvBPDNMaskDcpl algorithm options
 
         Options include all of those defined in
-        :class:`sporco.admm.cbpdn.ConvTwoBlockCnstrnt.Options`, together with
-        additional options:
+        :class:`sporco.admm.cbpdn.ConvTwoBlockCnstrnt.Options`, together
+        with additional options:
 
           ``L1Weight`` : An array of weights for the :math:`\ell_1`
           norm. The array shape must be such that the array is
