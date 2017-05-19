@@ -858,6 +858,35 @@ class ConvBPDNJoint(ConvBPDN):
     """
 
 
+    class Options(ConvBPDN.Options):
+        r"""ConvBPDNJoint algorithm options
+
+        Options include all of those defined in :class:`ConvBPDN.Options`,
+        together with additional options:
+
+          ``L21Weight`` : An array of weights for the :math:`\ell_{2,1}`
+          norm. The array shape must be such that the array is
+          compatible for multiplication with the X/Y variables *after*
+          the sum over ``axisC`` performed during the computation of the
+          :math:`\ell_{2,1}` norm. If this option is defined, the
+          regularization term is :math:`\mu \sum_i w_i \sqrt{ \sum_c
+          \mathbf{x}_{i,c}^2 }` where :math:`w_i` are the elements of the
+          weight array, subscript :math:`c` indexes the channel axis and
+          subscript :math:`i` indexes all other axes.
+        """
+
+        defaults = copy.deepcopy(ConvBPDN.Options.defaults)
+        defaults.update({'L21Weight' : 1.0})
+
+
+        def __init__(self, opt=None):
+            """Initialise ConvBPDNJoint algorithm options object."""
+
+            if opt is None:
+                opt = {}
+            ConvBPDN.Options.__init__(self, opt)
+
+
 
     itstat_fields_objfn = ('ObjFun', 'DFid', 'RegL1', 'RegL21')
     hdrtxt_objfn = ('Fnc', 'DFid', u('Regℓ1'), u('Regℓ2,1'))
@@ -880,7 +909,7 @@ class ConvBPDNJoint(ConvBPDN):
           Regularisation parameter (l1)
         mu : float
           Regularisation parameter (l2,1)
-        opt : :class:`ConvBPDN.Options` object
+        opt : :class:`ConvBPDNJoint.Options` object
           Algorithm options
         dimK : 0, 1, or None, optional (default None)
           Number of dimensions in input signal corresponding to multiple
@@ -894,6 +923,7 @@ class ConvBPDNJoint(ConvBPDN):
         super(ConvBPDNJoint, self).__init__(D, S, lmbda, opt, dimK=dimK,
                                             dimN=dimN)
         self.mu = self.dtype.type(mu)
+        self.wl21 = np.asarray(opt['L21Weight'], dtype=self.dtype)
 
 
 
@@ -903,7 +933,7 @@ class ConvBPDNJoint(ConvBPDN):
         """
 
         self.Y = sl.shrink12(self.AX + self.U, (self.lmbda/self.rho)*self.wl1,
-                             self.mu/self.rho, axis=self.cri.axisC)
+                        (self.mu/self.rho)*self.wl21, axis=self.cri.axisC)
         GenericConvBPDN.ystep(self)
 
 
@@ -915,7 +945,8 @@ class ConvBPDNJoint(ConvBPDN):
         """
 
         rl1 = linalg.norm((self.wl1 * self.obfn_gvar()).ravel(), 1)
-        rl21 = np.sum(np.sqrt(np.sum(self.obfn_gvar()**2, axis=self.cri.axisC)))
+        rl21 = np.sum(self.wl21 * np.sqrt(np.sum(self.obfn_gvar()**2,
+                                          axis=self.cri.axisC)))
         return (self.lmbda*rl1 + self.mu*rl21, rl1, rl21)
 
 
