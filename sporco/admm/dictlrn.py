@@ -345,7 +345,8 @@ class DictLearn(with_metaclass(_DictLearn_Meta, object)):
 
             # Call callback function if defined
             if self.opt['Callback'] is not None:
-                self.opt['Callback'](self)
+                if self.opt['Callback'](self):
+                    break
 
 
         # Increment iteration count
