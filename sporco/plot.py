@@ -65,7 +65,7 @@ def plot(dat, x=None, title=None, xlbl=None, ylbl=None, lgnd=None, lglc=None,
         Marker style (see :mod:`matplotlib.markers`)
     block : boolean, optional (default False)
         If True, the function only returns when the figure is closed
-    fgrf : figure object reference, optional (default None)
+    fgrf : :class:`matplotlib.figure.Figure` object, optional (default None)
         Draw in specified figure instead of creating one
     fgnm : integer, optional (default None)
         Figure number of figure
@@ -76,8 +76,8 @@ def plot(dat, x=None, title=None, xlbl=None, ylbl=None, lgnd=None, lglc=None,
 
     Returns
     -------
-    fig : matplotlib.figure.Figure
-      Figure object for this figure.
+    fig : :class:`matplotlib.figure.Figure`
+      Figure object for this figure
     """
 
     if fgrf is None:
@@ -149,23 +149,23 @@ def surf(z, x=None, y=None, title=None, xlbl=None, ylbl=None, zlbl=None,
         Label padding
     block : boolean, optional (default False)
         If True, the function only returns when the figure is closed
-    cmap : matplotlib.cm colormap, optional (default None)
+    cmap : :class:`matplotlib.colors.Colormap`, optional (default None)
         Colour map for surface. If none specifed, defaults to cm.coolwarm
-    fgrf : figure object reference, optional (default None)
+    fgrf : :class:`matplotlib.figure.Figure` object, optional (default None)
         Draw in specified figure instead of creating one
-    axrf : axes object reference, optional (default None)
+    axrf : :class:`matplotlib.axes.Axes` object, optional (default None)
         Plot in specified axes instead of creating one
     fgnm : integer, optional (default None)
         Figure number of figure
     fgsz : tuple (width,height), optional (default None)
-        Specify figure dimensions in inches.
+        Specify figure dimensions in inches
 
     Returns
     -------
-    fig : matplotlib.figure.Figure
-      Figure object for this figure.
-    ax : matplotlib.axes.Axes
-      Axes for this figure.
+    fig : :class:`matplotlib.figure.Figure`
+      Figure object for this figure
+    ax : :class:`matplotlib.axes.Axes`
+      Axes for this figure
     """
 
     if fgrf is None:
@@ -212,9 +212,9 @@ def surf(z, x=None, y=None, title=None, xlbl=None, ylbl=None, zlbl=None,
 
 
 
-def imview(img, title=None, block=False, copy=True, fltscl=False, cmap=None,
-           fgrf=None, fgnm=None, fgsz=(12, 12), intrp='nearest', cbar=False,
-           axes=None):
+def imview(img, title=None, block=False, copy=True, fltscl=False, fgrf=None,
+           fgnm=None, fgsz=(12, 12), norm=None, cmap=None, intrp='nearest',
+           cbar=False, axes=None):
     """
     Display an image.
 
@@ -226,7 +226,7 @@ def imview(img, title=None, block=False, copy=True, fltscl=False, cmap=None,
     Parameters
     ----------
     img : array_like, shape (Nr, Nc) or (Nr, Nc, 3) or (Nr, Nc, 4)
-        Image to display.
+        Image to display
     title : string, optional (default None)
         Figure title
     block : boolean, optional (default False)
@@ -237,29 +237,35 @@ def imview(img, title=None, block=False, copy=True, fltscl=False, cmap=None,
         array changes in the calling scope. Set this flag to False if the
         overhead of an additional copy of the input image is not acceptable.
     fltscl : boolean, optional (default False)
-        If True, rescale and shift floating point arrays to [0,1].
-    cmap : matplotlib.cm colormap, optional (default None)
-        Colour map for image. If none specifed, defaults to cm.Greys_r
-        for monochrome image
-    fgrf : figure object reference, optional (default None)
+        If True, rescale and shift floating point arrays to [0,1]
+    fgrf : :class:`matplotlib.figure.Figure` object, optional (default None)
         Draw in specified figure instead of creating one
     fgnm : integer, optional (default None)
         Figure number of figure
     fgsz : tuple (width,height), optional (default (12,12))
-        Specify figure dimensions in inches.
+        Specify figure dimensions in inches
+    norm : :class:`matplotlib.colors.Normalize` object, optional (default None)
+        Specify the :class:`matplotlib.colors.Normalize` instance used to
+        scale pixel values for input to the colour map
+    cmap : :class:`matplotlib.colors.Colormap`, optional (default None)
+        Colour map for image. If none specifed, defaults to cm.Greys_r
+        for monochrome image
+    intrp : string, optional (default 'nearest')
+        Specify type of interpolation used to display image (see
+        ``interpolation`` parameter of :meth:`matplotlib.axes.Axes.imshow`)
     cbar : boolean, optional (default False)
         Flag indicating whether to display colorbar
-    axes : matplotlib.axes.Axes object, optional (default None)
+    axes : :class:`matplotlib.axes.Axes` object, optional (default None)
         If specified the new figure shares axes with the specified axes of
         an existing figure so that a zoom is shared across both figures
 
     Returns
     -------
-    fig : matplotlib.figure.Figure
-      Figure object for this figure.
-    ax : matplotlib.axes.Axes
+    fig : :class:`matplotlib.figure.Figure`
+      Figure object for this figure
+    ax : :class:`matplotlib.axes.Axes`
       Axes for this figure suitable for passing as ``axes`` parameter of
-      another imview call.
+      another imview call
     """
 
     if img.ndim > 2 and img.shape[2] != 3:
@@ -299,8 +305,11 @@ def imview(img, title=None, block=False, copy=True, fltscl=False, cmap=None,
         axes.set_adjustable('box-forced')
         ax.set_adjustable('box-forced')
 
-    plt.imshow(imgd, cmap=cmap, interpolation=intrp, vmin=imgd.min(),
-               vmax=imgd.max())
+    if norm is None:
+        plt.imshow(imgd, cmap=cmap, interpolation=intrp, vmin=imgd.min(),
+                   vmax=imgd.max())
+    else:
+        plt.imshow(imgd, cmap=cmap, interpolation=intrp, norm=norm)
 
     if title is not None:
         plt.title(title)
@@ -348,9 +357,10 @@ def close(fgrf=None):
 
     Parameters
     ----------
-    fgrf : figure object reference or integer or None, optional (default None)
+    fgrf : :class:`matplotlib.figure.Figure` object or integer or None, \
+           optional (default None)
         If a figure object reference or figure number is provided, close the
-        specified figure, otherwise close all figures.
+        specified figure, otherwise close all figures
     """
 
     if fgrf is None:
