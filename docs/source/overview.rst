@@ -2,8 +2,8 @@ Overview
 ========
 
 SParse Optimization Research COde (SPORCO) is a Python package for
-solving optimisation problems with sparsity-inducing
-regularisation. These consist primarily of sparse coding
+solving optimisation problems with sparsity-inducing regularisation
+:cite:`mairal-2014-sparse`. These consist primarily of sparse coding
 :cite:`chen-1998-atomic` and dictionary learning
 :cite:`engan-1999-method` problems, including convolutional sparse
 coding and dictionary learning :cite:`wohlberg-2016-efficient`, but

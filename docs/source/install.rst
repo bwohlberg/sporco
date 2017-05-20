@@ -52,7 +52,7 @@ Test Images
 The :ref:`usage examples <usage-section>` make use of a number of
 standard test images, which can be installed using the
 ``sporco_get_images`` script. To download these images from the root
-directory of the source distribition (i.e. prior to installation) do
+directory of the source distribution (i.e. prior to installation) do
 
 ::
 

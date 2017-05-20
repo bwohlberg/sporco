@@ -64,6 +64,6 @@ class:
 
   .. math::
     \mathrm{argmin}_\mathbf{x} \;
-    g_0(D \mathbf{x} - \mathbf{s}) + g_1(\mathbf{x}) \;\;,
+    g_0(D \mathbf{x} - \mathbf{s}) + g_1(\mathbf{x})
 
   prior to variable splitting.
