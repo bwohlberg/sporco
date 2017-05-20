@@ -93,9 +93,9 @@ class ConvRepIndexing(object):
     """
 
     def __init__(self, dsz, S, dimK=None, dimN=2):
-        """Initialise a ConvRepIndexing object representing dimensions of S
-        (input signal), D (dictionary), and X (coefficient array) in a
-        convolutional representation. These dimensions are inferred
+        """Initialise a ConvRepIndexing object representing dimensions
+        of S (input signal), D (dictionary), and X (coefficient array)
+        in a convolutional representation. These dimensions are inferred
         from the input `dsz` and `S` as well as from parameters `dimN`
         and `dimK`. Management and inferrence of these problem
         dimensions is not entirely straightforward because
@@ -109,19 +109,19 @@ class ConvRepIndexing(object):
         X, and Z.
 
         The most fundamental parameter is `dimN`, which specifies the
-        dimensionality of the spatial/temporal samples being
-        represented (e.g. `dimN` = 2 for representations of 2D
-        images). This should be common to *input* `S` and `dsz`, and is also
-        common to *internal* S, D, and X. The remaining dimensions of
-        input `S` can correspond to multiple channels (e.g. for RGB
-        images) and/or multiple signals (e.g. the array contains
-        multiple independent images). If input `S` contains two
-        additional dimensions (in addition to the `dimN` spatial
-        dimensions), then those are considered to correspond, in
-        order, to channel and signal indices. If there is only a
-        single additional dimension, then determination whether it
-        represents a channel or signal index is more complicated. The
-        rule for making this determination is as follows:
+        dimensionality of the spatial/temporal samples being represented
+        (e.g. `dimN` = 2 for representations of 2D images). This should
+        be common to *input* `S` and `dsz`, and is also common to
+        *internal* S, D, and X. The remaining dimensions of input `S`
+        can correspond to multiple channels (e.g. for RGB images) and/or
+        multiple signals (e.g. the array contains multiple independent
+        images). If input `S` contains two additional dimensions (in
+        addition to the `dimN` spatial dimensions), then those are
+        considered to correspond, in order, to channel and signal
+        indices. If there is only a single additional dimension, then
+        determination whether it represents a channel or signal index is
+        more complicated. The rule for making this determination is as
+        follows:
 
         * if `dimK` is set to 0 or 1 instead of the default ``None``, then
           that value is taken as the number of signal indices in input `S`
@@ -279,7 +279,8 @@ class ConvCnstrMOD(admm.ADMMEqual):
     |
 
     ADMM algorithm for Convolutional Constrained MOD problem
-    :cite:`wohlberg-2016-efficient` :cite:`wohlberg-2016-convolutional`.
+    :cite:`wohlberg-2016-efficient`
+    :cite:`wohlberg-2016-convolutional`.
 
     Solve the optimisation problem
 
@@ -322,8 +323,8 @@ class ConvCnstrMOD(admm.ADMMEqual):
     latter case, normalisation of filters :math:`\mathbf{d}_{c,m}` is
     performed jointly over index :math:`c` for each filter :math:`m`.
 
-    After termination of the :meth:`solve` method, attribute :attr:`itstat` is
-    a list of tuples representing statistics of each iteration. The
+    After termination of the :meth:`solve` method, attribute :attr:`itstat`
+    is a list of tuples representing statistics of each iteration. The
     fields of the named tuple ``IterationStats`` are:
 
        ``Iter`` : Iteration number
@@ -1509,8 +1510,9 @@ def bcrop(v, dsz, dimN=2):
                     # Construct slice corresponding to cropped part of
                     # current block of filters in output array and set from
                     # input array
-                    cbslc = tuple([slice(0, x) for x in dsz[mb][cb][0:dimN]]) \
-                            + (slice(c0, c1),) + (Ellipsis,) + (slice(m0, m1),)
+                    cbslc = tuple([slice(0, x) for x in
+                            dsz[mb][cb][0:dimN]]) + (slice(c0, c1),) + \
+                                 (Ellipsis,) + (slice(m0, m1),)
                     vc[cbslc] = v[cbslc]
                     c0 = c1  # Update initial index for start of next block
             else:
