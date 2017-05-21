@@ -25,6 +25,7 @@ Version 0.1.6   (Not yet released)
 - New parameters in plot.plot for selecting marker size and style, and in
   plot.imview for specifying matplotlib.colors.Normalize object
 - Added L21Weight option for cbpdn.ConvBPDNJoint
+- Fixed bug in cbpdn.AddMaskSim handling of multi-channel dictionaries
 
 
 
