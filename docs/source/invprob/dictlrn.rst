@@ -79,15 +79,3 @@ Usage Examples
     .. literalinclude:: ../../../examples/cnvsparse/demo_dictlrn_cbpdn_md.py
        :language: python
        :lines: 17-
-
-
-.. container:: toggle
-
-    .. container:: header
-
-        :class:`.DictLearn` usage (:class:`.cbpdn.AddMaskSim` sparse
-	coding, greyscale images, as in :cite:`wohlberg-2016-boundary`)
-
-    .. literalinclude:: ../../../examples/cnvsparse/demo_dictlrn_cbpdn_ams.py
-       :language: python
-       :lines: 17-
