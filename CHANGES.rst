@@ -14,6 +14,17 @@ Version 0.1.6   (Not yet released)
   with mask decoupling
 - Corrected serious error in demo_dictlrn_cbpdn_md.py
 - Fixed bug causing non-deterministic 'AuxVarObj' option behaviour
+- New functions util.transpose_ntpl_list, util.complex_randn,
+  util.idle_cpu_count
+- In cmod and ccmod modules, renamed sparse representation variable from A
+  to Z
+- Changed callback function mechanism in admm.ADMM.solve and
+  dictlrn.DictLearn.solve: callback function no longer takes iteration number
+  as an argument (it is not available as a class attribute), and can terminate
+  solve iterations by returning a boolean True value.
+- New parameters in plot.plot for selecting marker size and style, and in
+  plot.imview for specifying matplotlib.colors.Normalize object
+- Added L21Weight option for cbpdn.ConvBPDNJoint
 
 
 
