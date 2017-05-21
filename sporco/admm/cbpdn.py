@@ -2004,7 +2004,7 @@ class AddMaskSim(object):
         else:
             self.imp = np.zeros(D.shape[0:dimN] + (self.cri.Cd,)*2)
             for c in range(0, self.cri.Cd):
-                self.imp[(0,)*dimN+(c, c,)] = 1.0
+                self.imp[(0,)*dimN + (c, c,)] = 1.0
         Di = np.concatenate((D, self.imp), axis=D.ndim-1)
 
         # Construct inner cbpdn object
@@ -2063,7 +2063,7 @@ class AddMaskSim(object):
         # filter (the impulse inserted for the AMS method) to zero so
         # that it does not affect the results (e.g. l1 norm) computed
         # from this variable by the inner cbpdn object
-        gv[..., -1] = 0
+        gv[..., -self.cri.Cd:] = 0
 
         return gv
 
