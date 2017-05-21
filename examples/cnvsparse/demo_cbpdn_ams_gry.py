@@ -40,10 +40,10 @@ D[:,L,1] = 1.0
 # Set up ConvBPDN options
 lmbda = 1e-3
 opt = cbpdn.ConvBPDN.Options({'Verbose' : True, 'MaxMainIter' : 500,
-                              'HighMemSolve' : True, 'RelStopTol' : 1e-3,
-                              'AuxVarObj' : False, 'RelaxParam' : 1.0,
-                              'rho' : 2e2*lmbda,
-                              'AutoRho' : {'Enabled' : False}})
+                        'HighMemSolve' : True, 'RelStopTol' : 1e-3,
+                        'AuxVarObj' : False, 'RelaxParam' : 1.8,
+                        'rho' : 2e2*lmbda, 'AutoRho' : {'Enabled' : False,
+                        'StdResiduals' : True}})
 
 
 # Construct cbpdn.AddMaskSim wrapper for cbpdn.ConvBPDN
