@@ -3,8 +3,8 @@ SPORCO Release Notes
 ====================
 
 
-Version 0.1.6   (Not yet released)
-----------------------------------
+Version 0.1.6   (2017-05-22)
+----------------------------
 
 - Fixed functional evaluation error in cbpdn.ConvBPDNMaskDcpl
 - Fixed bug in cbpdn.ConvTwoBlockCnstrnt with multi-channel dictionary
