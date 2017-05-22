@@ -8,7 +8,10 @@ problem
    \mathrm{argmin}_{\mathbf{d}, \mathbf{x}} \;
    \frac{1}{2} \sum_k \left \|  \sum_m \mathbf{d}_m * \mathbf{x}_{k,m} -
    \mathbf{s}_k \right \|_2^2 + \lambda \sum_k \sum_m \| \mathbf{x}_{k,m} \|_1
-   \quad \text{ s.t } \quad \|\mathbf{d}_m\|_2 = 1
+   \quad \text{ s.t. } \quad \mathbf{d}_m \in C
+
+where :math:`C` is the feasible set consisting of filters with unit norm
+and constrained support.
 
 
 

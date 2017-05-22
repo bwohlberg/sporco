@@ -10,8 +10,8 @@ problem
    \mathbf{s}_k \right \|_2^2 \quad \text{ such that } \quad \mathbf{d}_m
    \in C
 
-where :math:`C` is the feasible set :math:`C` consisting of filters
-with unit norm and constrained support.
+where :math:`C` is the feasible set consisting of filters with unit norm
+and constrained support.
 
 
 

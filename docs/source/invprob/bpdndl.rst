@@ -6,7 +6,7 @@ problem
 
 .. math::
    \mathrm{argmin}_{D, X} \;
-   (1/2) \| D X - S \|_F^2 + \lambda \| X \|_1 \quad \text{ s.t }
+   (1/2) \| D X - S \|_F^2 + \lambda \| X \|_1 \quad \text{ s.t. }
    \quad \|\mathbf{d}_m\|_2 = 1
 
 

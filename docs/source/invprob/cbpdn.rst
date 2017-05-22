@@ -69,10 +69,11 @@ This module includes the following classes:
   where :math:`W` is a mask array.
 
 
-* :class:`.AddMaskSim` (see :cite:`wohlberg-2016-boundary`)
+* :class:`.AddMaskSim`
 
   A wrapper class for applying the Additive Mask Simulation boundary
-  handling technique to any of the other :mod:`.cbpdn` classes.
+  handling technique (see :cite:`wohlberg-2016-boundary`) to any of the
+  other :mod:`.cbpdn` classes.
 
 
 

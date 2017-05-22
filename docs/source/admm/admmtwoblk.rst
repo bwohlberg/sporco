@@ -37,7 +37,7 @@ The ``__init__`` method of the derived class should call
 :meth:`.ADMMTwoBlockCnstrnt.__init__` to ensure proper
 initialisation. The interface is similar to that of
 :meth:`.ADMM.__init__` except for the introduction of parameters
-``blkaxis`` and ``blkdx`` that specify how the blocks of
+``blkaxis`` and ``blkidx`` that specify how the blocks of
 :math:`\mathbf{y}` are concatenated into a single array.
 
 
