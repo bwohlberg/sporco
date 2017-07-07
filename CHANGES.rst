@@ -6,6 +6,8 @@ SPORCO Release Notes
 Version 0.1.7   (Not yet released)
 ----------------------------------
 
+- New module cbpdntv with classes for CBPDN with additional Total
+  Variation regularization terms
 
 
 Version 0.1.6   (2017-05-22)
