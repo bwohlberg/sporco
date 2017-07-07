@@ -315,11 +315,11 @@ class DictLearn(with_metaclass(_DictLearn_Meta, object)):
 
             # X update
             self.xstep.solve()
-            self.dstep.setcoef(self.xstep.getcoef())
+            self.post_xstep()
 
             # D update
             self.dstep.solve()
-            self.xstep.setdict(self.dstep.getdict())
+            self.post_dstep()
 
             # Evaluate functional
             self.timer.stop('solve_wo_eval')
@@ -361,6 +361,20 @@ class DictLearn(with_metaclass(_DictLearn_Meta, object)):
 
         # Return final dictionary
         return self.getdict()
+
+
+
+    def post_xstep(self):
+        """Handle passing result of xstep to dstep"""
+
+        self.dstep.setcoef(self.xstep.getcoef())
+
+
+
+    def post_dstep(self):
+        """Handle passing result of dstep to xstep"""
+
+        self.xstep.setdict(self.dstep.getdict())
 
 
 
