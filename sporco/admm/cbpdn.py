@@ -1952,8 +1952,12 @@ class AddMaskSim(object):
     """Boundary masking for convolutional representations using the
     Additive Mask Simulation (AMS) technique described in
     :cite:`wohlberg-2016-boundary`. Implemented as a wrapper about a
-    cbpdn.ConvBPDN or derived object (or any other object with sufficiently
-    similar interface and internals).
+    cbpdn.ConvBPDN or derived object (or any other object with
+    sufficiently similar interface and internals). The wrapper is largely
+    transparent, but must be taken into account when setting some of the
+    options for the inner object, e.g. the shape of the ``L1Weight``
+    option array must take into account the extra dictionary atom appended
+    by the wrapper.
     """
 
     def __init__(self, cbpdnclass, D, S, W, *args, **kwargs):
