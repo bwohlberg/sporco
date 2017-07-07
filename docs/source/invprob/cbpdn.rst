@@ -1,7 +1,7 @@
-Module cbpdn
-============
+Modules cbpdn and cbpdntv
+=========================
 
-This module includes the following classes:
+Module :mod:`.admm.cbpdn` includes the following classes:
 
 * :class:`.ConvBPDN`
 
@@ -73,7 +73,62 @@ This module includes the following classes:
 
   A wrapper class for applying the Additive Mask Simulation boundary
   handling technique (see :cite:`wohlberg-2016-boundary`) to any of the
-  other :mod:`.cbpdn` classes.
+  other :mod:`.admm.cbpdn` classes.
+
+
+|
+
+Module :mod:`.admm.cbpdntv` includes the following classes:
+
+* :class:`.ConvBPDNScalarTV`
+
+  Solve Convolutional BPDN with an additional term penalising the total
+  variation of each coefficient map (see :cite:`wohlberg-2017-convolutional`)
+
+    .. math::
+       \mathrm{argmin}_\mathbf{x} \; \frac{1}{2}
+       \left\| \sum_m \mathbf{d}_m * \mathbf{x}_m - \mathbf{s}
+       \right\|_2^2 + \lambda \sum_m \| \mathbf{x}_m \|_1 +
+       \mu \sum_m \left\| \sqrt{\sum_i (G_i \mathbf{x}_m)^2} \right\|_1
+       \;\;,
+
+  where :math:`G_i` is an operator computing the derivative along index
+  :math:`i`.
+
+
+* :class:`.ConvBPDNVectorTV`
+
+  Solve Convolutional BPDN with an additional term penalising the vector
+  total variation of the coefficient maps (see
+  :cite:`wohlberg-2017-convolutional`)
+
+    .. math::
+       \mathrm{argmin}_\mathbf{x} \; \frac{1}{2}
+       \left\| \sum_m \mathbf{d}_m * \mathbf{x}_m - \mathbf{s}
+       \right\|_2^2 + \lambda \sum_m \| \mathbf{x}_m \|_1 +
+       \mu \left\| \sqrt{\sum_m \sum_i (G_i \mathbf{x}_m)^2} \right\|_1
+       \;\;,
+
+  where :math:`G_i` is an operator computing the derivative along index
+  :math:`i`.
+
+
+* :class:`.ConvBPDNRecTV`
+
+  Solve Convolutional BPDN with an additional term penalising the total
+  variation of the reconstruction from the sparse representation (see
+  :cite:`wohlberg-2017-convolutional`)
+
+    .. math::
+       \mathrm{argmin}_\mathbf{x} \; \frac{1}{2}
+       \left\| \sum_m \mathbf{d}_m * \mathbf{x}_m - \mathbf{s}
+       \right\|_2^2 + \lambda \sum_m \| \mathbf{x}_m \|_1 +
+       \mu \left\| \sqrt{\sum_i \left( G_i \left( \sum_m \mathbf{d}_m *
+       \mathbf{x}_m  \right) \right)^2} \right\|_1 \;\;,
+
+  where :math:`G_i` is an operator computing the derivative along index
+  :math:`i`.
+
 
 
 
@@ -84,7 +139,7 @@ Single-Channel (Greyscale) Input
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The following example scripts demonstrate usage for each of the
-classes in the :mod:`.cbpdn` module with single-channel (greyscale)
+classes in the :mod:`.admm.cbpdn` module with single-channel (greyscale)
 input images.
 
 
@@ -148,7 +203,7 @@ Multi-Channel (Colour) Input
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The following example scripts demonstrate usage of the classes in the
-:mod:`.cbpdn` module with multi-channel (all of these examples are for
+:mod:`.admm.cbpdn` module with multi-channel (all of these examples are for
 RGB colour images, but an arbitrary number of channels is supported)
 input images. Multi-channel input examples are not provided for all
 classes since the usage differences for single- and multi-channel
