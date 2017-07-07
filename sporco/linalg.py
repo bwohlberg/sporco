@@ -474,12 +474,19 @@ def solvemdbi_ism(ah, rho, b, axisM, axisK):
       Linear system solution :math:`\mathbf{x}`
     """
 
+    if axisM < 0:
+        axisM += ah.ndim
+    if axisK < 0:
+        axisK += ah.ndim
+
     K = ah.shape[axisK]
     a = np.conj(ah)
     gamma = np.zeros(a.shape, a.dtype)
-    delta = np.zeros(a.shape[0:axisM] + (1,), a.dtype)
+    dltshp = list(a.shape)
+    dltshp[axisM] = 1
+    delta = np.zeros(dltshp, a.dtype)
     slcnc = (slice(None),) * axisK
-    alpha = a[slcnc + (slice(0, 1),)] / rho
+    alpha = np.take(a, [0], axisK) / rho
     beta = b / rho
 
     del b
@@ -493,7 +500,7 @@ def solvemdbi_ism(ah, rho, b, axisM, axisK):
         beta[:] -= d / delta[slck]
 
         if k < K-1:
-            alpha[:] = a[slcnc + (slice(k+1, k+2),)] / rho
+            alpha[:] = np.take(a, [k+1], axisK) / rho
             for l in range(0, k+1):
                 slcl = slcnc + (slice(l, l+1),)
                 d = gamma[slcl] * inner(ah[slcl], alpha, axis=axisM)
