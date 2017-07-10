@@ -5,7 +5,7 @@
 # and user license can be found in the 'LICENSE.txt' file distributed
 # with the package.
 
-"""ADMM algorithm for the CCMOD problem"""
+"""ADMM algorithms for the Convolutional Constrained MOD problem"""
 
 from __future__ import division
 from __future__ import absolute_import
@@ -536,6 +536,7 @@ class ConvCnstrMOD(admm.ADMMEqual):
         xfshp[dimN-1] = xfshp[dimN-1]//2 + 1
         self.Xf = sl.pyfftw_empty_aligned(xfshp,
                             dtype=sl.complex_dtype(self.dtype))
+        self.Xf[:] = 0.0
 
         if Z is not None:
             self.setcoef(Z)
