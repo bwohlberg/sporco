@@ -67,9 +67,10 @@ or run interactively at `binder <http://mybinder.org/repo/bwohlberg/sporco>`_.
 Citing
 ------
 
-If you use this library for published work, please cite it as in
-:cite:`wohlberg-2016-sporco` (see bibtex entry ``wohlberg-2016-sporco`` in
-``docs/source/references.bib`` in the source distribution). If you make
+If you use this library for published work, please cite
+:cite:`wohlberg-2016-sporco` or :cite:`wohlberg-2017-sporco` (see
+bibtex entries ``wohlberg-2016-sporco`` and ``wohlberg-2017-sporco``
+in ``docs/source/references.bib`` in the source distribution). If you
 use of any of the convolutional sparse representation functions,
 please also cite :cite:`wohlberg-2016-efficient` and any other papers
 relevant to the specific functionality that is used, e.g.
