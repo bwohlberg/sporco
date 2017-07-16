@@ -1174,7 +1174,7 @@ class ConvCnstrMODMaskDcpl(admm.ADMMTwoBlockCnstrnt):
         else:
             Df = sl.rfftn(D, None, self.cri.axisN)
 
-        Sf = np.sum(self.Zf * Xf, axis=self.cri.axisM)
+        Sf = np.sum(self.Zf * Df, axis=self.cri.axisM)
         return sl.irfftn(Sf, self.cri.Nv, self.cri.axisN)
 
 

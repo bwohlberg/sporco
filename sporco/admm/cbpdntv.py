@@ -16,7 +16,6 @@ from builtins import object
 import numpy as np
 from scipy import linalg
 import copy
-from types import MethodType
 
 from sporco.admm import admm
 from sporco.admm import cbpdn
@@ -445,7 +444,7 @@ class ConvBPDNScalarTV(admm.ADMM):
         constraint. In this case :math:`A_1 \mathbf{x} = \mathbf{x}`.
         """
 
-        return X[...,np.newaxis]
+        return X[..., np.newaxis]
 
 
 
@@ -455,7 +454,7 @@ class ConvBPDNScalarTV(admm.ADMM):
         :math:`A_1^T \mathbf{x} = \mathbf{x}`.
         """
 
-        return X[...,-1]
+        return X[..., -1]
 
 
 
@@ -465,7 +464,7 @@ class ConvBPDNScalarTV(admm.ADMM):
         \Gamma_1^T \;\; \ldots \;\; I)^T \mathbf{x}`.
         """
 
-        return np.concatenate((self.cnst_A0(X, self.Xf),
+        return np.concatenate((self.cnst_A0(X, Xf),
                                self.cnst_A1(X)), axis=-1)
 
 
@@ -1152,7 +1151,7 @@ class ConvBPDNRecTV(admm.ADMM):
         \;\; \Gamma_1^T \;\; \ldots)^T \mathbf{x}`.
         """
 
-        return self.block_cat(self.cnst_A0(X), self.cnst_A1(X, self.Xf))
+        return self.block_cat(self.cnst_A0(X), self.cnst_A1(X, Xf))
 
 
 
