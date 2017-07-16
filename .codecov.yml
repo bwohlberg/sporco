@@ -13,6 +13,8 @@ coverage:
     changes: no
 
 ignore:
+  - "sporco/tests"
+  - "sporco/admm/tests"
   - "test_*.py"
 
 parsers:
