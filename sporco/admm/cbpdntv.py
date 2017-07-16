@@ -879,6 +879,7 @@ class ConvBPDNRecTV(admm.ADMM):
         return Y1
 
 
+
     def block_cat(self, Y0, Y1):
         """Concatenate components corresponding to Y0 and Y1 blocks
         into Y.
