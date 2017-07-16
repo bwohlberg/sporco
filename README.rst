@@ -68,7 +68,7 @@ To run these scripts prior to installing the package it will be necessary to fir
 from the root directory of the package.
 
 
-`Jupyter Notebook <http://jupyter.org/>`_ versions of some of the demos in ``examples`` are also available in the same directories as the corresponding demo scripts. The scripts can also be viewed online via `nbviewer <https://nbviewer.jupyter.org/github/bwohlberg/sporco/blob/master/index.ipynb>`_, or run interactively at `binder <http://mybinder.org/repo/bwohlberg/sporco>`_ (but note that this service seems to be intermittently functional).
+`Jupyter Notebook <http://jupyter.org/>`_ versions of some of the demos in ``examples`` are also available in the same directories as the corresponding demo scripts. The scripts can also be viewed online via `nbviewer <https://nbviewer.jupyter.org/github/bwohlberg/sporco/blob/master/index.ipynb>`_, or run interactively at `binder <http://mybinder.org/repo/bwohlberg/sporco>`_ (but note that this `service <http://mybinder.org/status>`_ seems to be only intermittently functional).
 
 
 
