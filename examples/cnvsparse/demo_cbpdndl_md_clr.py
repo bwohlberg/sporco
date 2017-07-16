@@ -15,7 +15,6 @@ from builtins import range
 import numpy as np
 
 from sporco.admm import cbpdndl
-import sporco.linalg as spl
 from sporco import util
 from sporco import plot
 
