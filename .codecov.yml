@@ -12,6 +12,9 @@ coverage:
     patch: yes
     changes: no
 
+ignore:
+  - "test_*.py"
+
 parsers:
   gcov:
     branch_detection:

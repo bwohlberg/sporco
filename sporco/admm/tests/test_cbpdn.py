@@ -299,8 +299,8 @@ class TestSet01(object):
         s = np.random.randn(N, N, K)
         dt = np.float32
         opt = cbpdn.ConvElasticNet.Options({'Verbose' : False,
-                        'MaxMainIter' : 20, 'AutoRho' : {'Enabled' : True},
-                        'DataType' : dt})
+                        'LinSolveCheck' : True, 'MaxMainIter' : 20,
+                        'AutoRho' : {'Enabled' : True}, 'DataType' : dt})
         lmbda = 1e-1
         mu = 1e-2
         b = cbpdn.ConvElasticNet(D, s, lmbda, mu, opt=opt)
@@ -335,8 +335,8 @@ class TestSet01(object):
         s = np.random.randn(N, N, K)
         dt = np.float32
         opt = cbpdn.ConvBPDNGradReg.Options({'Verbose' : False,
-                        'MaxMainIter' : 20, 'AutoRho' : {'Enabled' : True},
-                        'DataType' : dt})
+                        'LinSolveCheck' : True, 'MaxMainIter' : 20,
+                        'AutoRho' : {'Enabled' : True}, 'DataType' : dt})
         lmbda = 1e-1
         mu = 1e-2
         b = cbpdn.ConvBPDNGradReg(D, s, lmbda, mu, opt=opt)
@@ -436,8 +436,8 @@ class TestSet01(object):
         s = np.random.randn(N, N, K)
         dt = np.float32
         opt = cbpdn.ConvBPDNMaskDcpl.Options({'Verbose' : False,
-                    'MaxMainIter' : 20, 'AutoRho' : {'Enabled' : True},
-                    'DataType' : dt})
+                    'LinSolveCheck' : True, 'MaxMainIter' : 20,
+                    'AutoRho' : {'Enabled' : True}, 'DataType' : dt})
         lmbda = 1e-1
         b = cbpdn.ConvBPDNMaskDcpl(D, s, lmbda, opt=opt)
         b.solve()
@@ -457,6 +457,7 @@ class TestSet01(object):
         try:
             b = cbpdn.AddMaskSim(cbpdn.ConvBPDN, D, s, w, lmbda)
             b.solve()
+            b.reconstruct()
         except Exception as e:
             print(e)
             assert(0)
