@@ -76,9 +76,6 @@ class _ADMM_Meta(type):
         # Initialise named tuple type for recording ADMM iteration statistics
         cls.IterationStats = collections.namedtuple('IterationStats',
                                                     cls.itstat_fields())
-        # Ensure that timer attribute has been initialised
-        cls.timer = util.Timer(['init', 'solve', 'solve_wo_func',
-                                'solve_wo_rsdl'])
         # Apply _module_name_nested function to class after creation
         _module_name_nested(cls)
 
@@ -264,6 +261,8 @@ class ADMM(with_metaclass(_ADMM_Meta, object)):
         """Create an ADMM object and start its initialisation timer."""
 
         instance = super(ADMM, cls).__new__(cls)
+        instance.timer = util.Timer(['init', 'solve', 'solve_wo_func',
+                                    'solve_wo_rsdl'])
         instance.timer.start('init')
         return instance
 
