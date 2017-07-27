@@ -159,12 +159,6 @@ class _DictLearn_Meta(type):
     initialisation.
     """
 
-    def __init__(cls, *args):
-
-        # Ensure that timer attribute has been initialised
-        cls.timer = util.Timer()
-
-
     def __call__(cls, *args, **kwargs):
 
         # Initialise instance
@@ -220,6 +214,7 @@ class DictLearn(with_metaclass(_DictLearn_Meta, object)):
         """Create a DictLearn object and start its initialisation timer."""
 
         instance = super(DictLearn, cls).__new__(cls)
+        instance.timer = util.Timer(['init', 'solve', 'solve_wo_eval'])
         instance.timer.start('init')
         return instance
 
