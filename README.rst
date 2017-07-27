@@ -128,7 +128,7 @@ To install the development version from `GitHub <https://github.com/bwohlberg/sp
 
 ::
 
-    git clone git://github.com/bwohlberg/sporco.git
+    git clone https://github.com/bwohlberg/sporco.git
 
 followed by
 
