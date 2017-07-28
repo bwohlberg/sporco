@@ -11,6 +11,14 @@ from sporco.admm import bpdn
 import sporco.linalg as sl
 
 
+
+def CallbackTest(obj):
+    if obj.k > 5:
+        return True
+    else:
+        return False
+
+
 class TestSet01(object):
 
     def setup_method(self, method):
@@ -218,3 +226,21 @@ class TestSet01(object):
         assert(opt['fEvalX'] is False and opt['gEvalY'] is True)
         opt['AuxVarObj'] = False
         assert(opt['fEvalX'] is True and opt['gEvalY'] is False)
+
+
+    def test_19(self):
+        N = 8
+        M = 16
+        D = np.random.randn(N, M)
+        s = np.random.randn(N, 1)
+        lmbda = 1e-1
+        opt = bpdn.BPDN.Options({'Verbose' : False, 'MaxMainIter' : 10,
+                        'Callback' : CallbackTest, 'RelaxParam' : 1.0})
+        b = bpdn.BPDN(D, s, lmbda, opt=opt)
+        assert(b.getitstat() is None)
+        b.solve()
+        assert(b.runtime > 0.0)
+        assert(b.k == 7)
+        assert(b.var_x() is not None)
+        assert(b.var_y() is not None)
+        assert(b.var_u() is not None)

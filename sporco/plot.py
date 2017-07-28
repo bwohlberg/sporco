@@ -291,7 +291,7 @@ def imview(img, title=None, block=False, copy=True, fltscl=False, fgrf=None,
     elif img.dtype == np.uint16:
         imgd = np.float16(imgd) / np.iinfo(np.uint16).max
     elif img.dtype == np.int16:
-        imgd = np.float16(imgd) - imgd().min()
+        imgd = np.float16(imgd) - imgd.min()
         imgd /= imgd.max()
 
     if fgrf is None:
