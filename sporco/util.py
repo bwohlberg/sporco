@@ -850,6 +850,41 @@ class Timer(object):
 
 
 
+    def reset(self, labels=None):
+        """Reset specified timer(s).
+
+        Parameters
+        ----------
+        labels : string or list, optional (default None)
+          Specify the label(s) of the timer(s) to be stopped. If it is
+          ``None``, stop the default timer with label specified by the
+          ``dfltlbl`` parameter of :meth:`__init__`. If it is equal to
+          the string specified by the ``alllbl`` parameter of
+          :meth:`__init__`, stop all timers.
+        """
+
+        # Get current time
+        t = timer()
+        # Default label is self.dfltlbl
+        if labels is None:
+            labels = self.dfltlbl
+        # All timers are affected if label is equal to self.alllbl,
+        # otherwise only the timer(s) specified by label
+        if labels == self.alllbl:
+            labels = self.t0.keys()
+        elif not isinstance(labels, (list, tuple)):
+            labels = [labels,]
+        # Iterate over specified label(s)
+        for lbl in labels:
+            if lbl not in self.t0:
+                raise KeyError('Unrecognized timer key %s' % lbl)
+            # Set start time to None to indicate timer is not running
+            self.t0[lbl] = None
+            # Set time accumulator to zero
+            self.td[lbl] = 0.0
+
+
+
     def elapsed(self, label=None, total=True):
         """Get elapsed time since timer start.
 
@@ -878,6 +913,9 @@ class Timer(object):
         # Default label is self.dfltlbl
         if label is None:
             label = self.dfltlbl
+            # Return 0.0 if default timer selected and it is not initialised
+            if label not in self.t0:
+                return 0.0
         # Raise exception if timer with specified label does not exist
         if label not in self.t0:
             raise KeyError('Unrecognized timer key %s' % label)
@@ -921,7 +959,7 @@ class Timer(object):
         # Get current time
         t = timer()
         # Length of label field, calculated from max label length
-        lfldln = max([len(lbl) for lbl in self.t0]) + 2
+        lfldln = max([len(lbl) for lbl in self.t0] + [len(self.dfltlbl),]) + 2
         # Header string for table of timers
         s = '%-*s  Accum.       Current\n' % (lfldln, 'Label')
         s += '-' * (lfldln + 25) + '\n'
