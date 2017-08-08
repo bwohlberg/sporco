@@ -166,4 +166,4 @@ which will usually have to be performed with root privileges.
 License
 -------
 
-This package is distributed with a BSD license; see the ``LICENSE`` file for details.
+This package is distributed with a 3-Clause BSD license; see the ``LICENSE`` file for details.
