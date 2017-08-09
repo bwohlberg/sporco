@@ -32,58 +32,65 @@ class TestSet01(object):
 
 
     def test_02(self):
+        nt = collections.namedtuple('NT', ('A', 'B', 'C'))
+        lst = [nt(0, 1, 2), nt(3, 4, 5)]
+        lsttp = util.transpose_ntpl_list(lst)
+        assert(lst[0].A == lsttp.A[0])
+
+
+    def test_03(self):
         D = np.random.randn(64, 64)
         im = util.tiledict(D, sz=(8, 8))
 
 
-    def test_03(self):
+    def test_04(self):
         D = np.random.randn(8, 8, 64)
         im = util.tiledict(D)
 
 
-    def test_04(self):
+    def test_05(self):
         D = np.random.randn(8, 8, 64)
         im = util.tiledict(D, sz=((6, 6, 32), (8, 8, 32)))
 
 
-    def test_05(self):
+    def test_06(self):
         D = np.random.randn(8, 8, 3, 64)
         im = util.tiledict(D)
 
 
-    def test_06(self):
+    def test_07(self):
         img = np.random.randn(64, 64)
         blk = util.imageblocks(img, (8, 8))
 
 
-    def test_07(self):
+    def test_08(self):
         rgb = np.random.randn(64, 64, 3)
         gry = util.rgb2gray(rgb)
 
 
-    def test_08(self):
+    def test_09(self):
         img = np.random.randn(64, 64)
         imgn = util.spnoise(img, 0.5)
 
 
-    def test_09(self):
+    def test_10(self):
         img = np.random.randn(64, 64)
         iml, imh = util.tikhonov_filter(img, 5.0)
 
 
-    def test_10(self):
+    def test_11(self):
         img = np.random.randn(16, 16, 16)
         iml, imh = util.tikhonov_filter(img, 2.0, npd=8)
 
 
-    def test_11(self):
+    def test_12(self):
         x = np.linspace(-1, 1, 21)
         sprm, sfvl, fvmx, sidx = util.grid_search(fn, (x,))
         assert(np.abs(sprm[0] - 0.1) < 1e-14)
         assert(sidx[0] == 11)
 
 
-    def test_12(self):
+    def test_13(self):
         x = np.linspace(-1, 1, 21)
         sprm, sfvl, fvmx, sidx = util.grid_search(fnv, (x,))
         assert(np.abs(sprm[0][0] - 0.1) < 1e-14)
@@ -92,12 +99,12 @@ class TestSet01(object):
         assert(sidx[0][1] == 15)
 
 
-    def test_13(self):
+    def test_14(self):
         D = util.convdicts()['G:12x12x72']
         assert(D.shape == (12,12,72))
 
 
-    def test_14(self):
+    def test_15(self):
         bpth = tempfile.mkdtemp()
         os.mkdir(os.path.join(bpth, 'a'))
         ipth = os.path.join(bpth, 'a', 'b.png')
@@ -116,7 +123,7 @@ class TestSet01(object):
         os.rmdir(bpth)
 
 
-    def test_15(self):
+    def test_16(self):
         t = util.Timer()
         t.start()
         t0 = t.elapsed()
@@ -128,7 +135,7 @@ class TestSet01(object):
         assert(len(t.labels()) > 0)
 
 
-    def test_16(self):
+    def test_17(self):
         t = util.Timer('a')
         t.start(['a', 'b'])
         t0 = t.elapsed('a')
@@ -140,14 +147,23 @@ class TestSet01(object):
         assert(t.elapsed('a', total=False) == 0.0)
 
 
-    def test_17(self):
+    def test_18(self):
+        t = util.Timer('a')
+        t.start(['a', 'b'])
+        t.reset('a')
+        assert(t.elapsed('a') == 0.0)
+        t.reset('all')
+        assert(t.elapsed('b') == 0.0)
+
+
+    def test_19(self):
         t = util.Timer()
         with util.ContextTimer(t):
             t0 = t.elapsed()
         assert(t.elapsed() >= 0.0)
 
 
-    def test_18(self):
+    def test_20(self):
         t = util.Timer()
         t.start()
         with util.ContextTimer(t, action='StopStart'):
@@ -156,11 +172,11 @@ class TestSet01(object):
         assert(t.elapsed() >= 0.0)
 
 
-    def test_19(self):
+    def test_21(self):
         with pytest.raises(ValueError):
             dat = util.netgetdata('http://devnull', maxtry=0)
 
 
-    def test_20(self):
+    def test_22(self):
         with pytest.raises(util.urlerror.URLError):
             dat = util.netgetdata('http://devnull')
