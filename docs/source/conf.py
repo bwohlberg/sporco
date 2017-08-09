@@ -19,8 +19,6 @@ from builtins import filter
 from ast import parse
 import re, shutil, tempfile
 
-autodoc_mock_imports = ['_tkinter']
-
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
@@ -326,6 +324,10 @@ if on_rtd:
     print("Current working directory: {}" . format(os.path.abspath(os.curdir)))
 
 if on_rtd:
+
+    import matplotlib
+    matplotlib.use('agg')
+
     if sys.version[0] == '3':
         from unittest.mock import MagicMock
     elif sys.version[0] == '2':
