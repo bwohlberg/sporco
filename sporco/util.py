@@ -409,7 +409,12 @@ def idle_cpu_count(mincpu=1):
       Estimate of number of idle CPUs
     """
 
-    idle = int(os.cpu_count() - np.floor(os.getloadavg()[0]))
+    if PY2:
+        import psutil
+        ncpu = psutil.cpu_count()
+    else:
+        ncpu = os.cpu_count()
+    idle = int(ncpu - np.floor(os.getloadavg()[0]))
     return max(mincpu, idle)
 
 
