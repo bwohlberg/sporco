@@ -19,6 +19,7 @@ from builtins import filter
 from ast import parse
 import re, shutil, tempfile
 
+autodoc_mock_imports = ['_tkinter']
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -337,7 +338,7 @@ if on_rtd:
         def __getattr__(cls, name):
             return MagicMock()
 
-    MOCK_MODULES = ['pyfftw', '_tkinter']
+    MOCK_MODULES = ['pyfftw']
     sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
 
 # See https://developer.ridgerun.com/wiki/index.php/How_to_generate_sphinx_documentation_for_python_code_running_in_an_embedded_system
