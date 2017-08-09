@@ -410,8 +410,7 @@ def idle_cpu_count(mincpu=1):
     """
 
     if PY2:
-        import psutil
-        ncpu = psutil.cpu_count()
+        ncpu = mp.cpu_count()
     else:
         ncpu = os.cpu_count()
     idle = int(ncpu - np.floor(os.getloadavg()[0]))
