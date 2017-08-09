@@ -180,3 +180,7 @@ class TestSet01(object):
     def test_22(self):
         with pytest.raises(util.urlerror.URLError):
             dat = util.netgetdata('http://devnull')
+
+
+    def test_23(self):
+        assert(util.idle_cpu_count() >= 1)
