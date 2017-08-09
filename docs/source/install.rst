@@ -93,7 +93,7 @@ for Python 2
    sudo apt-get install python-numpy python-scipy python-numexpr
    sudo apt-get install python-matplotlib python-pip python-future
    sudo apt-get install libfftw3-dev
-   sudo pip install pyfftw
+   sudo -H pip install pyfftw
 
 or Python 3
 
@@ -102,7 +102,7 @@ or Python 3
    sudo apt-get install python3-numpy python3-scipy python3-numexpr
    sudo apt-get install python3-matplotlib python3-pip python3-future
    sudo apt-get install libfftw3-dev
-   sudo pip3 install pyfftw
+   sudo -H pip3 install pyfftw
 
 
 Some additional dependencies are required for running the unit tests
@@ -113,13 +113,11 @@ for Python 2
 ::
 
    sudo apt-get install python-pytest python-numpydoc
-   sudo pip install pytest-runner
-   sudo pip install sphinxcontrib-bibtex
+   sudo -H pip install pytest-runner sphinxcontrib-bibtex
 
 or Python 3
 
 ::
 
    sudo apt-get install python3-pytest python3-numpydoc
-   sudo pip3 install pytest-runner
-   sudo pip3 install sphinxcontrib-bibtex
+   sudo -H pip3 install pytest-runner sphinxcontrib-bibtex
