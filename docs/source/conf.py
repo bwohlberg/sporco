@@ -337,7 +337,7 @@ if on_rtd:
         def __getattr__(cls, name):
             return MagicMock()
 
-    MOCK_MODULES = ['pyfftw, _tkinter']
+    MOCK_MODULES = ['pyfftw', '_tkinter']
     sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
 
 # See https://developer.ridgerun.com/wiki/index.php/How_to_generate_sphinx_documentation_for_python_code_running_in_an_embedded_system
