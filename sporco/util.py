@@ -18,6 +18,7 @@ from timeit import default_timer as timer
 import os
 import imghdr
 import io
+import platform
 import multiprocessing as mp
 import itertools
 import collections
@@ -425,7 +426,9 @@ def grid_search(fn, grd, fmin=True, nproc=None):
     identified. If the function returns a tuple of values, each of
     these is taken to define a separate function on the search grid,
     with optimum function values and corresponding parameter values
-    being identified for each of them.
+    being identified for each of them. On all platforms except Windows
+    (where ``mp.Pool`` usage has some limitations), the computation
+    of the function at the grid points is computed in parallel.
 
     **Warning:** This function will hang if `fn` makes use of :mod:`pyfftw`
     with multi-threading enabled (the
@@ -470,13 +473,16 @@ def grid_search(fn, grd, fmin=True, nproc=None):
         slct = np.argmin
     else:
         slct = np.argmax
-    if nproc is None:
-        nproc = mp.cpu_count()
     fprm = itertools.product(*grd)
-    pool = mp.Pool(processes=nproc)
-    fval = pool.map(fn, fprm)
-    pool.close()
-    pool.join()
+    if platform.system() == 'Windows':
+        fval = list(map(fn, fprm))
+    else:
+        if nproc is None:
+            nproc = mp.cpu_count()
+        pool = mp.Pool(processes=nproc)
+        fval = pool.map(fn, fprm)
+        pool.close()
+        pool.join()
     if isinstance(fval[0], (tuple, list, np.ndarray)):
         nfnv = len(fval[0])
         fvmx = np.reshape(fval, [a.size for a in grd] + [nfnv,])
