@@ -228,6 +228,7 @@ class TestSet01(object):
         assert(opt['fEvalX'] is True and opt['gEvalY'] is False)
 
 
+    @pytest.mark.filterwarnings('ignore:admm.ADMM.runtime')
     def test_19(self):
         N = 8
         M = 16
