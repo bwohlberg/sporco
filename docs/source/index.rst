@@ -16,7 +16,7 @@ SPORCO Documentation
 
 .. toctree::
    :hidden:
-   
+
    overview
    install
    invprob
@@ -41,8 +41,8 @@ SPORCO Documentation
    modules
    zreferences
 
-      
-   
+
+
 
 Indices and tables
 ==================
