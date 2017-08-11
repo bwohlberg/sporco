@@ -95,6 +95,12 @@ or Python 3
    sudo apt-get install libfftw3-dev
    sudo -H pip3 install pyfftw
 
+For some versions of SciPy it might also be necessary to install `Pillow <https://python-pillow.org/>`_
+
+::
+
+   sudo -H pip3 install pillow
+
 
 Some additional dependencies are required for running the unit tests or building the documentation from the package source. For example, under Ubuntu Linux 16.04, the following commands should be sufficient for Python 2
 
