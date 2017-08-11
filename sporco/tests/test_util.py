@@ -6,6 +6,7 @@ import pytest
 import numpy as np
 from scipy import misc
 import os
+import platform
 import tempfile
 import collections
 
@@ -182,5 +183,7 @@ class TestSet01(object):
             dat = util.netgetdata('http://devnull')
 
 
+    @pytest.mark.skipif(platform.system() == 'Windows',
+                        reason='Feature not supported under Windows')
     def test_23(self):
         assert(util.idle_cpu_count() >= 1)

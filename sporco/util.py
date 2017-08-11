@@ -397,7 +397,8 @@ def tikhonov_filter(s, lmbda, npd=16):
 def idle_cpu_count(mincpu=1):
     """Estimate number of idle CPUs, for use by multiprocessing code
     needing to determine how many processes can be run without excessive
-    load.
+    load. This function uses :func:`os.getloadavg` which is only available
+    under a Unix OS.
 
     Parameters
     ----------
