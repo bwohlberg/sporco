@@ -73,9 +73,9 @@ which will usually have to be performed with root privileges.
 Requirements
 ------------
 
-The primary requirements are Python itself, and modules `numpy
-<http://www.numpy.org>`_, `scipy <https://www.scipy.org>`_, `future
-<http://python-future.org>`_, `pyfftw
+The primary requirements are Python itself, and modules `future
+<http://python-future.org>`_, `numpy
+<http://www.numpy.org>`_, `scipy <https://www.scipy.org>`_, `pyfftw
 <https://hgomersall.github.io/pyFFTW>`_, and `matplotlib
 <http://matplotlib.org>`_. Module `numexpr
 <https://github.com/pydata/numexpr>`_ is not required, but some
