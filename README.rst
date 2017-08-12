@@ -75,47 +75,9 @@ from the root directory of the package.
 Requirements
 ------------
 
-The primary requirements are Python itself, and modules `numpy <http://www.numpy.org>`_, `scipy <https://www.scipy.org>`_, `future <http://python-future.org>`_, `pyfftw <https://hgomersall.github.io/pyFFTW>`_, and `matplotlib <http://matplotlib.org>`_. Module `numexpr <https://github.com/pydata/numexpr>`_ is not required, but some functions will be faster if it is installed. If module `mpldatacursor <https://github.com/joferkington/mpldatacursor>`_ is installed, functions plot.plot and plot.imview will support the data cursor that it provides.
+The primary requirements are Python itself, and modules `numpy <http://www.numpy.org>`_, `scipy <https://www.scipy.org>`_, `future <http://python-future.org>`_, `pyfftw <https://hgomersall.github.io/pyFFTW>`_, and `matplotlib <http://matplotlib.org>`_. Module `numexpr <https://github.com/pydata/numexpr>`_ is not required, but some functions will be faster if it is installed. If module `mpldatacursor <https://github.com/joferkington/mpldatacursor>`_ is installed, functions ``plot.plot`` and ``plot.imview`` will support the data cursor that it provides.
 
-Installation of these requirements is system dependent. For example, under Ubuntu Linux 16.04, the following commands should be sufficient for Python 2
-
-::
-
-   sudo apt-get install python-numpy python-scipy python-numexpr
-   sudo apt-get install python-matplotlib python-pip python-future
-   sudo apt-get install libfftw3-dev
-   sudo -H pip install pyfftw
-
-or Python 3
-
-::
-
-   sudo apt-get install python3-numpy python3-scipy python3-numexpr
-   sudo apt-get install python3-matplotlib python3-pip python3-future
-   sudo apt-get install libfftw3-dev
-   sudo -H pip3 install pyfftw
-
-For some versions of SciPy it might also be necessary to install `Pillow <https://python-pillow.org/>`_
-
-::
-
-   sudo -H pip3 install pillow
-
-
-Some additional dependencies are required for running the unit tests or building the documentation from the package source. For example, under Ubuntu Linux 16.04, the following commands should be sufficient for Python 2
-
-::
-
-   sudo apt-get install python-pytest python-numpydoc
-   sudo -H pip install pytest-runner sphinxcontrib-bibtex
-
-or Python 3
-
-::
-
-   sudo apt-get install python3-pytest python3-numpydoc
-   sudo -H pip3 install pytest-runner sphinxcontrib-bibtex
-
+Instructions for installing these requirements are provided in the `Requirements <http://sporco.readthedocs.io/en/latest/install.html#requirements>`_ section of the package documentation.
 
 
 Installation

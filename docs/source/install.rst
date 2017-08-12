@@ -80,8 +80,8 @@ The primary requirements are Python itself, and modules `numpy
 <http://matplotlib.org>`_. Module `numexpr
 <https://github.com/pydata/numexpr>`_ is not required, but some
 functions will be faster if it is installed. If module `mpldatacursor
-<https://github.com/joferkington/mpldatacursor>`_ is installed,
-:func:`.plot.plot` will support the data cursor that it provides.
+<https://github.com/joferkington/mpldatacursor>`_ is installed, functions
+:func:`.plot.plot` and :func:`.plot.imview` will support the data cursor that it provides.
 
 
 Installation of these requirements is system dependent. For example,
