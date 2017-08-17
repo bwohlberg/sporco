@@ -9,6 +9,7 @@ Version 0.1.7   (Not yet released)
 - New module cbpdntv with classes for CBPDN with additional Total
   Variation regularization terms
 - Fixed bug in object initialisation timing
+- Changed problematic image URLs in bin/sporco_get_images
 
 
 

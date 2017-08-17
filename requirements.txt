@@ -6,5 +6,6 @@ pyfftw>=0.10.4
 pytest-runner
 pytest
 sphinx>=1.2.2
-sphinxcontrib-bibtex
 numpydoc
+sphinxcontrib-bibtex
+sphinx_tabs
