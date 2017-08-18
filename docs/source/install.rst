@@ -27,10 +27,10 @@ followed by
 
    cd sporco
    python setup.py build
+   python setup.py test
    python setup.py install
 
-The install command will usually have to be performed with root
-permissions, e.g. on Ubuntu Linux
+Please report any test failures. The install command will usually have to be performed with root permissions, e.g. on Ubuntu Linux
 
 ::
 
@@ -84,46 +84,148 @@ functions will be faster if it is installed. If module `mpldatacursor
 :func:`.plot.plot` and :func:`.plot.imview` will support the data cursor that it provides.
 
 
-Installation of these requirements is system dependent. For example,
-under Ubuntu Linux 16.04, the following commands should be sufficient
-for Python 2
+Installation of these requirements is system dependent.
 
-::
+.. tabs::
 
-   sudo apt-get install python-numpy python-scipy python-numexpr
-   sudo apt-get install python-matplotlib python-pip python-future
-   sudo apt-get install libfftw3-dev
-   sudo -H pip install pyfftw
+   .. group-tab:: Linux
 
-or Python 3
+      Under Ubuntu Linux 16.04, the following commands should be sufficient for Python 2
 
-::
+      ::
 
-   sudo apt-get install python3-numpy python3-scipy python3-numexpr
-   sudo apt-get install python3-matplotlib python3-pip python3-future
-   sudo apt-get install libfftw3-dev
-   sudo -H pip3 install pyfftw
+	sudo apt-get install python-numpy python-scipy python-numexpr
+	sudo apt-get install python-matplotlib python-pip python-future
+	sudo apt-get install libfftw3-dev python-pytest
+	sudo -H pip install pyfftw pytest-runner
 
-For some versions of SciPy it might also be necessary to install `Pillow <https://python-pillow.org/>`_
+      or Python 3
 
-::
+      ::
 
-   sudo -H pip3 install pillow
+	sudo apt-get install python3-numpy python3-scipy python3-numexpr
+	sudo apt-get install python3-matplotlib python3-pip python3-future
+	sudo apt-get install libfftw3-dev python3-pytest
+	sudo -H pip3 install pyfftw pytest-runner
+
+      For some versions of SciPy it might also be necessary to install `Pillow <https://python-pillow.org/>`_
+
+      ::
+
+	sudo -H pip3 install pillow
 
 
-Some additional dependencies are required for running the unit tests
-or building the documentation from the package source. For example,
-under Ubuntu Linux 16.04, the following commands should be sufficient
-for Python 2
+      Some additional dependencies are required for building the
+      documentation from the package source. For example, under Ubuntu
+      Linux 16.04, the following commands should be sufficient for Python 2
 
-::
+      ::
 
-   sudo apt-get install python-pytest python-numpydoc
-   sudo -H pip install pytest-runner sphinxcontrib-bibtex
+	sudo apt-get install python-sphinx python-numpydoc
+	sudo -H pip install sphinxcontrib-bibtex sphinx_tabs
 
-or Python 3
+      or Python 3
 
-::
+      ::
 
-   sudo apt-get install python3-pytest python3-numpydoc
-   sudo -H pip3 install pytest-runner sphinxcontrib-bibtex
+	sudo apt-get install python3-sphinx python3-numpydoc
+	sudo -H pip3 install sphinxcontrib-bibtex sphinx_tabs
+
+
+   .. group-tab:: Mac OS
+
+      The first step is to install Python 2.7
+
+      ::
+
+	brew install python
+
+      or the current version of Python 3.x
+
+      ::
+
+	brew install python3
+
+      The `FFTW library <http://www.fftw.org/>`_ is also required
+
+      ::
+
+	brew install fftw
+
+
+      The Python modules required by SPORCO can be installed using `pip`
+
+      ::
+
+	pip install numpy scipy Pillow matplotlib pyfftw
+	pip install six future subprocess functools python-dateutil
+	pip install pyparsing cycler pytz pytest pytest-runner
+
+      (For Python 3, replace `pip` above with `pip3`.)
+
+
+      Some additional dependencies are required for building the
+      documentation from the package source
+
+      ::
+
+	pip install sphinx numpydoc sphinxcontrib-bibtex sphinx_tabs
+
+      (For Python 3, replace `pip` above with `pip3`.)
+
+
+   .. group-tab:: Windows
+
+      A version of Python that includes NumPy and SciPy
+      is required. The instructions given here are for installing a
+      reference version from `python.org
+      <https://www.python.org/downloads/windows/>`_, but a potentially
+      simpler alternative would be to install one of the Windows
+      versions of Python distributed with the SciPy stack that are
+      listed at `scipy.org <https://scipy.org/install.html>`_.
+
+      The first step is to install Python itself, e.g. for version
+      3.6.2, download `python-3.6.2-amd64.exe
+      <https://www.python.org/ftp/python/3.6.2/python-3.6.2-amd64.exe>`_
+      and run the graphical installer. The easiest way of installing
+      the main required packages is to download the binaries from the
+      list of `Unofficial Windows Binaries for Python Extension
+      Packages <http://www.lfd.uci.edu/~gohlke/pythonlibs/>`_. At the
+      time of writing this documentation, the current versions of
+      these binaries for each main package are
+
+	* `NumPy <http://www.lfd.uci.edu/~gohlke/pythonlibs/tuft5p8b/numpy-1.13.1+mkl-cp36-cp36m-win_amd64.whl>`__
+	* `SciPy <http://www.lfd.uci.edu/~gohlke/pythonlibs/tuft5p8b/scipy-0.19.1-cp36-cp36m-win_amd64.whl>`__
+	* `Matplotlib <http://www.lfd.uci.edu/~gohlke/pythonlibs/tuft5p8b/matplotlib-2.0.2-cp36-cp36m-win_amd64.whl>`__
+	* `pyFFTW <http://www.lfd.uci.edu/~gohlke/pythonlibs/tuft5p8b/pyFFTW-0.10.4-cp36-cp36m-win_amd64.whl>`__
+
+      After downloading and saving each of these binaries, open a
+      Command Prompt, change directory to the folder in which the
+      binaries were saved, and enter
+
+      ::
+
+	pip install numpy-1.13.1+mkl-cp36-cp36m-win_amd64.whl
+	pip install scipy-0.19.1-cp36-cp36m-win_amd64.whl
+	pip install matplotlib-2.0.2-cp36-cp36m-win_amd64.whl
+	pip install pyFFTW-0.10.4-cp36-cp36m-win_amd64.whl
+	pip install future Pillow
+
+
+      Some additional dependencies are required for building the
+      documentation from the package source
+
+      ::
+
+	pip install sphinx numpydoc sphinxcontrib-bibtex sphinx_tabs
+
+
+      It is also necessary to download and install
+      `Graphviz <http://www.graphviz.org/Download_windows.php>`__ and then
+      set the Windows ``PATH`` environment variable to include the ``dot``
+      command, e.g. to do this on the command line, for the current version
+      of Graphviz
+
+      ::
+
+	set PATH=%PATH%;"C:\Program Files (x86)\Graphviz2.38\bin"

@@ -10,6 +10,7 @@ Version 0.1.7   (Not yet released)
   Variation regularization terms
 - Fixed bug in object initialisation timing
 - Changed problematic image URLs in bin/sporco_get_images
+- Added installation instructions for Mac OS and Windows
 
 
 
