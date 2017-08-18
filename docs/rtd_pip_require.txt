@@ -1,5 +1,6 @@
 future
-sphinx
-sphinxcontrib-bibtex
-numpydoc
 scipy
+sphinx
+numpydoc
+sphinxcontrib-bibtex
+sphinx_tabs
