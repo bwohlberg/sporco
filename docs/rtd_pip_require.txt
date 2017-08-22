@@ -4,3 +4,4 @@ sphinx
 numpydoc
 sphinxcontrib-bibtex
 sphinx_tabs
+sphinx_fontawesome

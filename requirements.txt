@@ -9,3 +9,4 @@ sphinx>=1.2.2
 numpydoc
 sphinxcontrib-bibtex
 sphinx_tabs
+sphinx_fontawesome

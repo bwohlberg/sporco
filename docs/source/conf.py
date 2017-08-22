@@ -45,7 +45,8 @@ extensions = [
     'sphinx.ext.intersphinx',
     'sphinxcontrib.bibtex',
     'sphinx.ext.inheritance_diagram',
-    'sphinx_tabs.tabs'
+    'sphinx_tabs.tabs',
+    'sphinx_fontawesome'
 ]
 
 # generate autosummary pages

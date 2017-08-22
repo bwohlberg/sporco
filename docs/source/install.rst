@@ -88,7 +88,7 @@ Installation of these requirements is system dependent.
 
 .. tabs::
 
-   .. group-tab:: Linux
+   .. group-tab:: :fa:`linux` Linux
 
       Under Ubuntu Linux 16.04, the following commands should be sufficient for Python 2
 
@@ -122,17 +122,17 @@ Installation of these requirements is system dependent.
       ::
 
 	sudo apt-get install python-sphinx python-numpydoc
-	sudo -H pip install sphinxcontrib-bibtex sphinx_tabs
+	sudo -H pip install sphinxcontrib-bibtex sphinx_tabs sphinx_fontawesome
 
       or Python 3
 
       ::
 
 	sudo apt-get install python3-sphinx python3-numpydoc
-	sudo -H pip3 install sphinxcontrib-bibtex sphinx_tabs
+	sudo -H pip3 install sphinxcontrib-bibtex sphinx_tabs sphinx_fontawesome
 
 
-   .. group-tab:: Mac OS
+   .. group-tab:: :fa:`apple` Mac OS
 
       The first step is to install Python 2.7
 
@@ -170,11 +170,12 @@ Installation of these requirements is system dependent.
       ::
 
 	pip install sphinx numpydoc sphinxcontrib-bibtex sphinx_tabs
+	pip install sphinx_fontawesome
 
       (For Python 3, replace `pip` above with `pip3`.)
 
 
-   .. group-tab:: Windows
+   .. group-tab:: :fa:`windows` Windows
 
       A version of Python that includes NumPy and SciPy
       is required. The instructions given here are for installing a
@@ -218,6 +219,7 @@ Installation of these requirements is system dependent.
       ::
 
 	pip install sphinx numpydoc sphinxcontrib-bibtex sphinx_tabs
+	pip install sphinx_fontawesome
 
 
       It is also necessary to download and install
