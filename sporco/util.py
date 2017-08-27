@@ -354,13 +354,25 @@ def spnoise(s, frc, smn=0.0, smx=1.0):
 
 
 def tikhonov_filter(s, lmbda, npd=16):
-    """Lowpass filter based on Tikhonov regularization.
+    r"""Lowpass filter based on Tikhonov regularization.
 
-    Lowpass filter image(s) and return low and high frequency components,
-    consisting of the lowpass filtered image and its difference with
-    the input image. The lowpass filter is equivalent to Tikhonov
-    regularization with `lmbda` as the regularization parameter and a
-    discrete gradient as the operator in the regularization term.
+    Lowpass filter image(s) and return low and high frequency
+    components, consisting of the lowpass filtered image and its
+    difference with the input image. The lowpass filter is equivalent to
+    Tikhonov regularization with `lmbda` as the regularization parameter
+    and a discrete gradient as the operator in the regularization term,
+    i.e. the lowpass component is the solution to
+
+    .. math::
+      \mathrm{argmin}_\mathbf{x} \; (1/2) \left\|\mathbf{x} - \mathbf{s}
+      \right\|_2^2 + (\lambda / 2) \sum_i \| G_i \mathbf{x} \|_2^2 \;\;,
+
+    where :math:`\mathbf{s}` is the input image, :math:`\lambda` is the
+    regularization parameter, and :math:`G_i` is an operator that
+    computes the discrete gradient along image axis :math:`i`. Once the
+    lowpass component :math:`\mathbf{x}` has been computed, the highpass
+    component is just :math:`\mathbf{s} - \mathbf{x}`.
+
 
     Parameters
     ----------
