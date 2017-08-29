@@ -579,7 +579,7 @@ class ConvCnstrMOD(admm.ADMMEqual):
     def getdict(self):
         """Get final dictionary."""
 
-        return bcrop(self.Y, self.cri.dsz)
+        return bcrop(self.Y, self.cri.dsz, self.cri.dimN)
 
 
 
@@ -1196,8 +1196,8 @@ class ConvCnstrMODMaskDcpl(admm.ADMMTwoBlockCnstrnt):
 
 
 def stdformD(D, Cd, M, dimN=2):
-    """Reshape dictionary array (X here, D in cbpdn module) to internal
-    standard form.
+    """Reshape dictionary array (`X` here, `D` in :mod:`admm.cbpdn` module)
+    to internal standard form.
 
     Parameters
     ----------
@@ -1244,7 +1244,7 @@ def getPcn0(zm, dsz, dimN=2, dimC=1):
     """
 
     if zm:
-        return lambda x: normalise(zeromean(bcrop(x, dsz), dsz, dimN),
+        return lambda x: normalise(zeromean(bcrop(x, dsz, dimN), dsz, dimN),
                                    dimN+dimC)
     else:
         return lambda x: normalise(bcrop(x, dsz, dimN), dimN+dimC)
@@ -1253,7 +1253,7 @@ def getPcn0(zm, dsz, dimN=2, dimC=1):
 
 def getPcn(zm, dsz, Nv, dimN=2, dimC=1):
     """Construct the constraint set projection function utilised by
-    ystep. The `dsz` parameter specifies the support sizes of each
+    ``ystep``. The `dsz` parameter specifies the support sizes of each
     filter using the same format as the `dsz` parameter of :func:`bcrop`.
 
     Parameters
