@@ -42,16 +42,18 @@ __author__ = """Brendt Wohlberg <brendt@ieee.org>"""
 import warnings
 
 def plot(*args, **kwargs):
-    warnings.warn("sporco.util.plot is deprecated: please use sporco.plot.plot")
+    warnings.warn("sporco.util.plot is deprecated: use sporco.plot.plot",
+                  PendingDeprecationWarning)
     return spl.plot(*args, **kwargs)
 
 def surf(*args, **kwargs):
-    warnings.warn("sporco.util.surf is deprecated: please use sporco.plot.surf")
+    warnings.warn("sporco.util.surf is deprecated: use sporco.plot.surf",
+                  PendingDeprecationWarning)
     return spl.surf(*args, **kwargs)
 
 def imview(*args, **kwargs):
-    warnings.warn("sporco.util.imview is deprecated: please use "
-                  "sporco.plot.imview")
+    warnings.warn("sporco.util.imview is deprecated: use sporco.plot.imview",
+                  PendingDeprecationWarning)
     return spl.imview(*args, **kwargs)
 
 

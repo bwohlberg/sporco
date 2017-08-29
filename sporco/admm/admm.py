@@ -513,7 +513,8 @@ class ADMM(with_metaclass(_ADMM_Meta, object)):
 
         warnings.warn("admm.ADMM.runtime attribute has been replaced by "\
             "an upgraded timer class: please see the documentation for "\
-            "admm.ADMM.solve method and util.Timer class")
+            "admm.ADMM.solve method and util.Timer class",
+                      PendingDeprecationWarning)
         return self.timer.elapsed('init') + self.timer.elapsed('solve')
 
 

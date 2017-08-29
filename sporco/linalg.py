@@ -1220,21 +1220,21 @@ import warnings
 import sporco.metric as sm
 
 def mae(*args, **kwargs):
-    warnings.warn("sporco.linalg.mae is deprecated: please use"
-                  " sporco.metric.mae")
+    warnings.warn("sporco.linalg.mae is deprecated: use sporco.metric.mae",
+                  PendingDeprecationWarning)
     return sm.mae(*args, **kwargs)
 
 def mse(*args, **kwargs):
-    warnings.warn("sporco.linalg.mse is deprecated: please use"
-                  " sporco.metric.mse")
+    warnings.warn("sporco.linalg.mse is deprecated: use sporco.metric.mse",
+                  PendingDeprecationWarning)
     return sm.mse(*args, **kwargs)
 
 def snr(*args, **kwargs):
-    warnings.warn("sporco.linalg.snr is deprecated: please use"
-                  " sporco.metric.snr")
+    warnings.warn("sporco.linalg.snr is deprecated: use sporco.metric.snr",
+                  PendingDeprecationWarning)
     return sm.snr(*args, **kwargs)
 
 def psnr(*args, **kwargs):
-    warnings.warn("sporco.linalg.psnr is deprecated: please use"
-                  " sporco.metric.psnr")
+    warnings.warn("sporco.linalg.psnr is deprecated: use sporco.metric.psnr",
+                  PendingDeprecationWarning)
     return sm.psnr(*args, **kwargs)
