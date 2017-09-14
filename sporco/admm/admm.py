@@ -1560,3 +1560,265 @@ class ADMMTwoBlockCnstrnt(ADMM):
         """
 
         return self.rho*linalg.norm(self.cnst_AT(U))
+
+
+
+
+
+class ADMMConsensus(ADMM):
+    r"""**Class inheritance structure**
+
+     .. inheritance-diagram:: ADMMConsensus
+        :parts: 2
+
+    |
+
+    Base class for ADMM algorithms with a global variable consensus
+    structure (see Ch. 7 of :cite:`boyd-2010-distributed`).
+
+    Solve optimisation problems of the form
+
+    .. math::
+       \mathrm{argmin}_{\mathbf{x}} \; \sum_i f_i(\mathbf{x}) + g(\mathbf{x})
+
+    via an ADMM problem of the form
+
+    .. math::
+       \mathrm{argmin}_{\mathbf{x}_i,\mathbf{y}} \;
+       \sum_i f(\mathbf{x}_i) + g(\mathbf{y}) \;\mathrm{such\;that}\;
+       \left( \begin{array}{c} \mathbf{x}_0 \\ \mathbf{x}_1 \\
+       \vdots \end{array} \right) = \left( \begin{array}{c}
+       I \\ I \\ \vdots \end{array} \right) \mathbf{y} \;\;.
+
+    This class specialises class ADMM, but remains a base class for
+    other classes that specialise to specific optimisation problems.
+    """
+
+    class Options(ADMM.Options):
+        """ADMMConsensus algorithm options.
+
+        Options include all of those defined in :class:`ADMM.Options`,
+        together with additional options:
+
+          ``fEvalX`` : Flag indicating whether the :math:`f` component
+          of the objective function should be evaluated using variable
+          X (``True``) or Y (``False``) as its argument.
+
+          ``gEvalY`` : Flag indicating whether the :math:`g` component of
+          the objective function should be evaluated using variable Y
+          (``True``) or X (``False``) as its argument.
+
+          ``AuxVarObj`` : Flag selecting choices of ``fEvalX`` and
+          ``gEvalY`` that give meaningful functional values. If ``True``,
+          ``fEvalX`` and ``gEvalY`` are set to ``False`` and ``True``
+          respectively, and vice versa if ``False``. Setting this flag
+          to ``True`` often gives a better estimate of the objective
+          function, at some additional computational cost.
+        """
+
+        defaults = copy.deepcopy(ADMM.Options.defaults)
+        defaults.update({'fEvalX' : False, 'gEvalY' : True,
+                         'AuxVarObj' : True})
+
+
+        def __init__(self, opt=None):
+            """Initialise ADMMConsensus algorithm options object."""
+
+            if opt is None:
+                opt = {}
+            ADMM.Options.__init__(self, opt)
+
+
+
+        def __setitem__(self, key, value):
+            """Set options 'fEvalX' and 'gEvalY' appropriately when option
+            'AuxVarObj' is set.
+            """
+
+            ADMM.Options.__setitem__(self, key, value)
+
+            if key == 'AuxVarObj':
+                if value is True:
+                    self['fEvalX'] = False
+                    self['gEvalY'] = True
+                else:
+                    self['fEvalX'] = True
+                    self['gEvalY'] = False
+
+
+
+
+    def __init__(self, Nb, yshape, dtype, opt=None):
+        r"""
+        Initialise an ADMMConsensus object with problem size and options.
+
+        Parameters
+        ----------
+        yshape : tuple
+          Shape of variable :math:`\mathbf{y}` in objective function
+        Nb : int
+          Number of blocks / consensus components
+        opt : :class:`ADMMConsensus.Options` object
+          Algorithm options
+        """
+
+        if opt is None:
+            opt = ADMMConsensus.Options()
+        self.Nb = Nb
+        self.xshape = yshape + (Nb,)
+        self.yshape = yshape
+        Nx = Nb * np.prod(yshape)
+        super(ADMMConsensus, self).__init__(Nx, yshape, self.xshape,
+                                            dtype, opt)
+
+
+
+    def getmin(self):
+        """Get minimizer after optimisation."""
+
+        return self.Y
+
+
+
+    def xstep(self):
+        r"""Minimise Augmented Lagrangian with respect to block vector
+        :math:`\mathbf{x} = \left( \begin{array}{ccc} \mathbf{x}_0^T &
+        \mathbf{x}_1^T & \ldots \end{array} \right)^T\;`.
+        """
+
+        for i in range(self.Nb):
+            self.xistep(i)
+
+
+
+    def xistep(self, i):
+        r"""Minimise Augmented Lagrangian with respect to :math:`\mathbf{x}`
+        component :math:`\mathbf{x}_i`.
+
+        Overriding this method is required.
+        """
+
+        raise NotImplementedError()
+
+
+
+    def ystep(self):
+        r"""Minimise Augmented Lagrangian with respect to :math:`\mathbf{y}`.
+        """
+
+        rho = self.Nb * self.rho
+        mAXU = np.mean(self.AX + self.U, axis=-1)
+        self.Y[:] = self.prox_g(mAXU, rho)
+
+
+
+    def prox_g(self, X, rho):
+        """Proximal operator of :math:`g`.
+
+        Overriding this method is required.
+        """
+
+        raise NotImplementedError()
+
+
+
+    def relax_AX(self):
+        """Implement relaxation if option ``RelaxParam`` != 1.0."""
+
+        self.AXnr = self.X
+        if self.rlx == 1.0:
+            self.AX = self.X
+        else:
+            alpha = self.rlx
+            self.AX = alpha*self.X + (1-alpha)*self.Y[..., np.newaxis]
+
+
+
+    def eval_objfn(self):
+        """Compute components of objective function as well as total
+        contribution to objective function.
+        """
+
+        fval = self.obfn_f()
+        gval = self.obfn_g(self.obfn_gvar())
+        obj = fval + gval
+        return (obj, fval, gval)
+
+
+
+    def obfn_fvar(self, i):
+        """Variable to be evaluated in computing :math:`f_i(\cdot)`,
+        depending on the ``fEvalX`` option value.
+        """
+
+        return self.X[..., i] if self.opt['fEvalX'] else self.Y
+
+
+
+    def obfn_gvar(self):
+        """Variable to be evaluated in computing :math:`g(\cdot)`,
+        depending on the ``gEvalY`` option value.
+        """
+
+        return self.Y if self.opt['gEvalY'] else np.mean(self.X, axis=-1)
+
+
+
+    def obfn_f(self):
+        r"""Compute :math:`f(\mathbf{x}) = \sum_i f(\mathbf{x}_i)`
+        component of ADMM objective function.
+        """
+
+        obf = 0.0
+        for i in range(self.Nb):
+            obf += self.obfn_fi(self.obfn_fvar(i), i)
+        return obf
+
+
+
+    def obfn_fi(self, X, i):
+        r"""Compute :math:`f(\mathbf{x}_i)` component of ADMM objective
+        function.
+
+        Overriding this method is required.
+        """
+
+        raise NotImplementedError()
+
+
+
+    def rsdl_r(self, AX, Y):
+        """Compute primal residual vector."""
+
+        return AX - Y[..., np.newaxis]
+
+
+
+    def rsdl_s(self, Yprev, Y):
+        """Compute dual residual vector."""
+
+        # Since s = rho A^T B (y^(k+1) - y^(k)) and B = -(I I I ...)^T,
+        # the correct calculation here would involve replicating (Yprev - Y)
+        # on the axis on which the blocks of X are stacked. Since this would
+        # require allocating additional memory, and since it is only the norm
+        # of s that is required, instead of replicating the vector it is
+        # scaled to have the same l2 norm as the replicated vector
+        return np.sqrt(self.Nb)*self.rho*(Yprev - Y)
+
+
+
+    def rsdl_rn(self, AX, Y):
+        """Compute primal residual normalisation term."""
+
+        # The primal residual normalisation term is
+        # max( ||A x^(k)||_2, ||B y^(k)||_2 ) and B = -(I I I ...)^T.
+        # The scaling by sqrt(Nb) of the l2 norm of Y accounts for the
+        # block replication introduced by multiplication by B
+        return max((linalg.norm(AX), np.sqrt(self.Nb)*linalg.norm(Y)))
+
+
+
+    def rsdl_sn(self, U):
+        """Compute dual residual normalisation term."""
+
+        return self.rho*linalg.norm(U)
