@@ -24,11 +24,10 @@ from sporco import plot
 
 # Training images
 exim = util.ExampleImages(scaled=True, zoom=0.5)
-img1 = exim.image('standard', 'lena.png')
-img2 = exim.image('standard', 'mandrill.png')
-img3 = exim.image('standard', 'barbara.png')[10:266, 50:306, :]
-S = np.concatenate((img1[...,np.newaxis], img2[...,np.newaxis],
-                    img3[...,np.newaxis]), axis=3)
+img1 = exim.image('barbara.png', idxexp=np.s_[10:522, 100:612])
+img2 = exim.image('kodim23.png', idxexp=np.s_[:, 60:572])
+img3 = exim.image('monarch.png', idxexp=np.s_[:, 160:672])
+S = np.stack((img1, img2, img3), axis=3)
 
 
 # Highpass filter test images

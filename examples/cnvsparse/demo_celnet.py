@@ -21,7 +21,8 @@ import sporco.metric as sm
 
 
 # Load demo image
-img = util.ExampleImages().image('standard', 'barbara.grey.png', scaled=True)
+img = util.ExampleImages().image('barbara.png', idxexp=np.s_[10:522, 100:612],
+                                 scaled=True, gray=True)
 
 
 # Highpass filter test image
