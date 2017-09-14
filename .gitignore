@@ -7,7 +7,6 @@ venv
 .hg
 .hgignore
 *.bak
-sporco/data/*.png
 sporco/data/*/*.png
 
 # Byte-compiled / optimized / DLL files

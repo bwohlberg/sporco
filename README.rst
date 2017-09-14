@@ -51,7 +51,7 @@ An overview of the package design and functionality is also available in
 Usage
 -----
 
-Scripts illustrating usage of the package can be found in the ``examples`` directory of the source distribution. (Many of these examples require standard test images, the installation of which is described in section Test Images below.) These examples can be run from the root directory of the package by, for example
+Scripts illustrating usage of the package can be found in the ``examples`` directory of the source distribution. These examples can be run from the root directory of the package by, for example
 
 ::
 
@@ -109,24 +109,6 @@ The install commands will usually have to be performed with root privileges.
 
 A summary of the most significant changes between SPORCO releases can be found in the ``CHANGES.rst`` file. It is strongly recommended to consult this summary when updating from a previous version.
 
-
-
-Test Images
------------
-
-The usage examples, described above, make use of a number of standard test images, which can be installed using the ``sporco_get_images`` script. To download these images from the root directory of the source distribition (i.e. prior to installation) do
-
-::
-
-   bin/sporco_get_images --libdest
-
-after setting the ``PYTHONPATH`` environment variable as described below. To download the images as part of a package that has already been installed, do
-
-::
-
-  sporco_get_images --libdest
-
-which will usually have to be performed with root privileges.
 
 
 License

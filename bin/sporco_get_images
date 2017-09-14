@@ -120,10 +120,6 @@ if __name__ == "__main__":
             'kodak' :
               {'kodim%02d.png' % n:
               'http://r0k.us/graphics/kodak/kodak/kodim%02d.png' % n
-              for n in range(1,25)},
-            'bigkodak' :
-              {'kodim%02d.png' % n:
-              'http://scarlet.stanford.edu/scien/images/labsite/k%02d.bmp' % n
               for n in range(1,25)}
           }
 
@@ -131,13 +127,11 @@ if __name__ == "__main__":
     # Parse command line arguments
     parser = argparse.ArgumentParser()
     parser.add_argument('--group', action='store',
-                        help="Image group name")
+                        help="Image group name (\"standard\" or \"kodak\")")
     parser.add_argument('--allgroup', action='store_true',
                         help="Download all groups")
     parser.add_argument('--destpth', action='store', default=None,
                         help="Destination path")
-    parser.add_argument('--libdest', action='store_true',
-                        help="Save images to SPORCO install path")
     parser.add_argument('--verbose', action='store_true',
                         help="Verbose operation")
     args = parser.parse_args()
@@ -147,30 +141,16 @@ if __name__ == "__main__":
     if args.allgroup and args.group is not None:
         sys.exit("error: cannot use --allgroup and --group")
 
-    if args.libdest and args.destpth is not None:
-        sys.exit("error: cannot use --libdest and --destpth")
-
 
     # Select destination root path
-    if args.libdest:
-        # Destination root is the 'data' subdirectory of the SPORCO package
-        # (either a pre-installation source package, or the post-installation
-        # system package)
-        dstroot = os.path.join(os.path.dirname(sporco.__file__), 'data')
+    if args.destpth is None:
+        # Default destination root if none specified is a subdirectory
+        # 'images' of the current working directory
+        dstroot = 'images'
+        if not os.path.isdir(dstroot):
+            os.mkdir(dstroot)
     else:
-        if args.destpth is None:
-            # Default destination root if none specified: if current
-            # directory is the root directory of the SPORCO source
-            # package, download to the library data directory,
-            # otherwise download to a directory 'images'
-            if os.path.isdir('sporco/data'):
-                dstroot = 'sporco/data'
-            else:
-                dstroot = 'images'
-            if not os.path.isdir(dstroot):
-                os.mkdir(dstroot)
-        else:
-            dstroot = args.destpth
+        dstroot = args.destpth
     if not os.path.isdir(dstroot):
         sys.exit("error: destination path %s does not exist" % dstroot)
 
