@@ -45,6 +45,7 @@ extensions = [
     'sphinx.ext.intersphinx',
     'sphinxcontrib.bibtex',
     'sphinx.ext.inheritance_diagram',
+    'sphinx.ext.graphviz',
     'sphinx_tabs.tabs',
     'sphinx_fontawesome'
 ]
@@ -416,21 +417,29 @@ def run_apidoc(_):
     module = '../../sporco' if on_rtd else 'sporco'
     cpath = os.path.abspath(os.path.dirname(__file__))
     opath = cpath
+
+    # Insert documentation for inherited solve methods
+    insert_solve_docs()
+
+    # Remove auto-generated sporco.rst and sporco.admm.rst
     rst = os.path.join(cpath, 'sporco.rst')
     if os.path.exists(rst):
         os.remove(rst)
     rst = os.path.join(cpath, 'sporco.admm.rst')
     if os.path.exists(rst):
         os.remove(rst)
+
+    # Run sphinx-apidoc
     print("Running sphinx-apidoc with output path " + opath)
     sys.stdout.flush()
     sphinx.apidoc.main(['sphinx-apidoc', '-e', '-d', '2', '-o', opath, module])
-    rst = os.path.join(cpath, 'sporco.rst')
-    if os.path.exists(rst):
-        rmsection(rst, r'^Module contents')
-    rst = os.path.join(cpath, 'sporco.admm.rst')
-    if os.path.exists(rst):
-        rmsection(rst, r'^Module contents')
+
+    # Remove "Module contents" sections from specified autodoc generated files
+    rmmodlst = ['sporco.rst', 'sporco.admm.rst']
+    for fnm in rmmodlst:
+        rst = os.path.join(cpath, fnm)
+        if os.path.exists(rst):
+            rmsection(rst, r'^Module contents')
 
 
 
@@ -444,3 +453,79 @@ def setup(app):
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 #exclude_patterns = ['_build', '**tests**', '**spi**']
+
+
+# Construct a trivial function with a docstring that includes a
+# specified call graph image
+def make_doc_func(fnm):
+
+    def doc_fun():
+        pass
+
+    doc_fun.__doc__ = """
+
+        **Call graph**
+
+        .. image:: _static/jonga/%s
+           :width: 20%%
+           :target: _static/jonga/%s\n""" % (fnm, fnm)
+
+    return doc_fun
+
+
+
+def insert_solve_docs():
+    global sporco
+
+    import sporco.admm.bpdn
+    import sporco.admm.cbpdn
+    import sporco.admm.cbpdntv
+    import sporco.admm.cmod
+    import sporco.admm.ccmod
+    import sporco.admm.ccmodmd
+    import sporco.admm.bpdndl
+    import sporco.admm.cbpdndl
+
+
+    # Classes that require a call graph for their solve method, and
+    # corresponding call graph images
+    clsgrph = {
+        'sporco.admm.bpdn.BPDN': 'bpdn_solve.svg',
+        'sporco.admm.bpdn.BPDNJoint': 'bpdnjnt_solve.svg',
+        'sporco.admm.bpdn.ElasticNet': 'elnet_solve.svg',
+        'sporco.admm.cbpdn.ConvBPDN': 'cbpdn_solve.svg',
+        'sporco.admm.cbpdn.ConvBPDNJoint': 'cbpdnjnt_solve.svg',
+        'sporco.admm.cbpdn.ConvElasticNet': 'cbpdnjnt_solve.svg',
+        'sporco.admm.cbpdn.ConvBPDNGradReg': 'cbpdngrd_solve.svg',
+        'sporco.admm.cbpdn.ConvBPDNMaskDcpl': 'cbpdnmd_solve.svg',
+        'sporco.admm.cbpdntv.ConvBPDNScalarTV': 'cbpdnstv_solve.svg',
+        'sporco.admm.cbpdntv.ConvBPDNVectorTV': 'cbpdnvtv_solve.svg',
+        'sporco.admm.cbpdntv.ConvBPDNRecTV': 'cbpdnrtv_solve.svg',
+        'sporco.admm.cmod.CnstrMOD': 'cmod_solve.svg',
+        'sporco.admm.ccmod.ConvCnstrMOD_IterSM': 'ccmodism_solve.svg',
+        'sporco.admm.ccmod.ConvCnstrMOD_CG': 'ccmodcg_solve.svg',
+        'sporco.admm.ccmod.ConvCnstrMOD_Consensus': 'ccmodcnsns_solve.svg',
+        'sporco.admm.ccmodmd.ConvCnstrMODMaskDcpl_IterSM':
+            'ccmodmdism_solve.svg',
+        'sporco.admm.ccmodmd.ConvCnstrMODMaskDcpl_CG': 'ccmodmdcg_solve.svg',
+        'sporco.admm.ccmodmd.ConvCnstrMODMaskDcpl_Consensus':
+            'ccmodmdcnsns_solve.svg',
+        'sporco.admm.bpdndl.BPDNDictLearn': 'bpdndl_solve.svg',
+        'sporco.admm.cbpdndl.ConvBPDNDictLearn': 'cbpdndl_solve.svg',
+        'sporco.admm.cbpdndl.ConvBPDNMaskDcplDictLearn':
+            'cbpdnmddl_solve.svg',
+        }
+
+    # Iterate over fully qualified class names in class/call graph image dict
+    for fqclsnm in clsgrph:
+        clspth =  fqclsnm.split('.')
+        # Name of module
+        mdnm = '.'.join(clspth[0:-1])
+        # Name of class
+        clsnm = clspth[-1]
+        # Get class reference
+        cls = getattr(sys.modules[mdnm], clsnm)
+        # Construct trivial function with appropriate docstring
+        fnc = make_doc_func(clsgrph[fqclsnm])
+        # Set solve method of current class to constructed function
+        setattr(cls, 'solve', fnc)
