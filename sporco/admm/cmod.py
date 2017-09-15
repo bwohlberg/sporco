@@ -144,6 +144,17 @@ class CnstrMOD(admm.ADMMEqual):
         """
         Initialise a CnstrMOD object with problem parameters.
 
+        |
+
+        **Call graph**
+
+        .. image:: _static/jonga/cmod_init.svg
+           :width: 20%
+           :target: _static/jonga/cmod_init.svg
+
+        |
+
+
         Parameters
         ----------
         Z : array_like, shape (M, K)

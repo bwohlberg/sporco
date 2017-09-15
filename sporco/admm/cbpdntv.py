@@ -154,6 +154,18 @@ class ConvBPDNScalarTV(admm.ADMM):
         """
         Initialise a ConvBPDNScalarTV object with problem parameters.
 
+
+        |
+
+        **Call graph**
+
+        .. image:: _static/jonga/cbpdnstv_init.svg
+           :width: 20%
+           :target: _static/jonga/cbpdnstv_init.svg
+
+        |
+
+
         Parameters
         ----------
         D : array_like
@@ -624,6 +636,46 @@ class ConvBPDNVectorTV(ConvBPDNScalarTV):
     """
 
 
+    def __init__(self, D, S, lmbda, mu=0.0, opt=None, dimK=None, dimN=2):
+        """
+        Initialise a ConvBPDNVectorTV object with problem parameters.
+
+
+        |
+
+        **Call graph**
+
+        .. image:: _static/jonga/cbpdnvtv_init.svg
+           :width: 20%
+           :target: _static/jonga/cbpdnvtv_init.svg
+
+        |
+
+
+        Parameters
+        ----------
+        D : array_like
+          Dictionary matrix
+        S : array_like
+          Signal vector or matrix
+        lmbda : float
+          Regularisation parameter (l1)
+        mu : float
+          Regularisation parameter (gradient)
+        opt : :class:`ConvBPDNScalarTV.Options` object
+          Algorithm options
+        dimK : 0, 1, or None, optional (default None)
+          Number of dimensions in input signal corresponding to multiple
+          independent signals
+        dimN : int, optional (default 2)
+          Number of spatial dimensions
+        """
+
+        super(ConvBPDNVectorTV, self).__init__(D, S, lmbda, mu, opt,
+                                               dimK, dimN)
+
+
+
     def ystep(self):
         """Minimise Augmented Lagrangian with respect to
         :math:`\mathbf{y}`."""
@@ -782,6 +834,39 @@ class ConvBPDNRecTV(admm.ADMM):
 
 
     def __init__(self, D, S, lmbda, mu=0.0, opt=None, dimK=None, dimN=2):
+        """
+        Initialise a ConvBPDNRecTV object with problem parameters.
+
+
+        |
+
+        **Call graph**
+
+        .. image:: _static/jonga/cbpdnrtv_init.svg
+           :width: 20%
+           :target: _static/jonga/cbpdnrtv_init.svg
+
+        |
+
+
+        Parameters
+        ----------
+        D : array_like
+          Dictionary matrix
+        S : array_like
+          Signal vector or matrix
+        lmbda : float
+          Regularisation parameter (l1)
+        mu : float
+          Regularisation parameter (gradient)
+        opt : :class:`ConvBPDNRecTV.Options` object
+          Algorithm options
+        dimK : 0, 1, or None, optional (default None)
+          Number of dimensions in input signal corresponding to multiple
+          independent signals
+        dimN : int, optional (default 2)
+          Number of spatial dimensions
+        """
 
         if opt is None:
             opt = ConvBPDNRecTV.Options()
