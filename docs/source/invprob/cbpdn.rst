@@ -57,8 +57,7 @@ Module :mod:`.admm.cbpdn` includes the following classes:
 
 * :class:`.ConvBPDNMaskDcpl`
 
-  Solve Convolutional BPDN with Mask Decoupling (see
-  :cite:`heide-2015-fast` :cite:`wohlberg-2016-boundary`)
+  Solve Convolutional BPDN with Mask Decoupling (see :cite:`heide-2015-fast`)
 
     .. math::
        \mathrm{argmin}_\mathbf{x} \;
