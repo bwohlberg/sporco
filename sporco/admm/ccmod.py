@@ -89,7 +89,7 @@ class DictionarySize(object):
 class ConvRepIndexing(object):
     """Manage the inference of problem dimensions and the roles of
     :class:`numpy.ndarray` indices for convolutional representations
-    as in :class:`.ConvBPDN` and related classes.
+    as in :class:`.ConvCnstrMODBase` and related classes.
     """
 
     def __init__(self, dsz, S, dimK=None, dimN=2):
