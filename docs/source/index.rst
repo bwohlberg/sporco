@@ -34,6 +34,7 @@ SPORCO Documentation
    admm
    admm/admm
    admm/admmequal
+   admm/admmcnsns
    admm/admmtwoblk
    admm/convtwoblk
    util
