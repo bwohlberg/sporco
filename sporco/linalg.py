@@ -248,6 +248,38 @@ def idctii(x, axes=None):
 
 
 
+def fftconv(a, b, axes=(0,1)):
+    """
+    Compute a multi-dimensional convolution via the Discrete Fourier Transform.
+
+    Parameters
+    ----------
+    a : array_like
+      Input array
+    b : array_like
+      Input array
+    axes : sequence of ints, optional (default (0,1))
+      Axes on which to perform convolution
+
+    Returns
+    -------
+    ab : ndarray
+      Convolution of input arrays, a and b, along specified axes
+    """
+
+    if np.isrealobj(a) and np.isrealobj(b):
+        fft = rfftn
+        ifft = irfftn
+    else:
+        fft = fftn
+        ifft = ifftn
+    dims = np.maximum([a.shape[i] for i in axes], [b.shape[i] for i in axes])
+    af = fft(a, dims, axes)
+    bf = fft(b, dims, axes)
+    return ifft(af*bf, dims, axes)
+
+
+
 def inner(x, y, axis=-1):
     """
     Compute inner product of x and y on specified axis, equivalent to
