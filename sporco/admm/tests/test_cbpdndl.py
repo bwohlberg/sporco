@@ -11,11 +11,11 @@ from sporco.admm import cbpdndl
 class TestSet01(object):
 
     def setup_method(self, method):
-        np.random.seed(12345)
         N = 16
         Nd = 5
         M = 4
         K = 3
+        np.random.seed(12345)
         self.D0 = np.random.randn(Nd, Nd, M)
         self.S = np.random.randn(N, N, K)
 
@@ -44,9 +44,12 @@ class TestSet01(object):
 
 
     def test_03(self):
-        opt = cbpdndl.ConvBPDNDictLearn.Options({'MaxMainIter' : 10})
+        lmbda = 1e-1
+        opt = cbpdndl.ConvBPDNDictLearn.Options({'MaxMainIter' : 10},
+                                                method='cg')
         try:
-            b = cbpdndl.ConvBPDNDictLearn(self.D0, self.S, opt=opt)
+            b = cbpdndl.ConvBPDNDictLearn(self.D0, self.S,
+                                lmbda, opt=opt, method='cg')
             b.solve()
         except Exception as e:
             print(e)
@@ -54,6 +57,19 @@ class TestSet01(object):
 
 
     def test_04(self):
+        lmbda = 1e-1
+        opt = cbpdndl.ConvBPDNDictLearn.Options({'MaxMainIter' : 10},
+                                                method='cns')
+        try:
+            b = cbpdndl.ConvBPDNDictLearn(self.D0, self.S, lmbda, opt=opt,
+                                          method='cns')
+            b.solve()
+        except Exception as e:
+            print(e)
+            assert(0)
+
+
+    def test_05(self):
         N = 16
         Nc = 3
         Nd = 5
@@ -71,7 +87,7 @@ class TestSet01(object):
             assert(0)
 
 
-    def test_05(self):
+    def test_06(self):
         lmbda = 1e-1
         opt = cbpdndl.ConvBPDNDictLearn.Options({'AccurateDFid' : True,
                                                  'MaxMainIter' : 10})
@@ -83,7 +99,7 @@ class TestSet01(object):
             assert(0)
 
 
-    def test_06(self):
+    def test_07(self):
         lmbda = 1e-1
         W = np.ones(self.S.shape[0:2] + (1, self.S.shape[2], 1))
         opt = cbpdndl.ConvBPDNMaskDcplDictLearn.Options({'MaxMainIter' : 10})
@@ -96,7 +112,36 @@ class TestSet01(object):
             assert(0)
 
 
-    def test_07(self):
+    def test_08(self):
+        lmbda = 1e-1
+        W = np.ones(self.S.shape[0:2] + (1, self.S.shape[2], 1))
+        opt = cbpdndl.ConvBPDNMaskDcplDictLearn.Options(
+            {'MaxMainIter' : 5, 'CCMOD' : {'CG' : {'MaxIter' : 1}}},
+             method='cg')
+        try:
+            b = cbpdndl.ConvBPDNMaskDcplDictLearn(self.D0, self.S,
+                                        lmbda, W, opt=opt, method='cg')
+            b.solve()
+        except Exception as e:
+            print(e)
+            assert(0)
+
+
+    def test_09(self):
+        lmbda = 1e-1
+        W = np.ones(self.S.shape[0:2] + (1, self.S.shape[2], 1))
+        opt = cbpdndl.ConvBPDNMaskDcplDictLearn.Options({'MaxMainIter' : 10},
+                                                        method='cns')
+        try:
+            b = cbpdndl.ConvBPDNMaskDcplDictLearn(self.D0, self.S, lmbda, W,
+                                                  opt=opt, method='cns')
+            b.solve()
+        except Exception as e:
+            print(e)
+            assert(0)
+
+
+    def test_10(self):
         lmbda = 1e-1
         W = np.ones(self.S.shape[0:2] + (1, self.S.shape[2], 1))
         opt = cbpdndl.ConvBPDNMaskDcplDictLearn.Options(
@@ -110,7 +155,7 @@ class TestSet01(object):
             assert(0)
 
 
-    def test_08(self):
+    def test_11(self):
         N = 16
         Nc = 3
         Nd = 5
@@ -129,7 +174,7 @@ class TestSet01(object):
             assert(0)
 
 
-    def test_09(self):
+    def test_12(self):
         N = 16
         Nc = 3
         Nd = 5
