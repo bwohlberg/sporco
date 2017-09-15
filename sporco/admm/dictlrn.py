@@ -232,7 +232,7 @@ class DictLearn(with_metaclass(_DictLearn_Meta, object)):
           Object handling D update step
         opt : :class:`DictLearn.Options` object
           Algorithm options
-        isc : :class:`DictLearn.IterStatsConfig` object
+        isc : :class:`IterStatsConfig` object
           Iteration statistics and header display configuration
         """
 
