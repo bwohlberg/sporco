@@ -6,7 +6,8 @@
 # and user license can be found in the 'LICENSE.txt' file distributed
 # with the package.
 
-"""Usage example: ccmod.ConvCnstrMOD (colour images, colour dictionary)"""
+"""Usage example: ccmod.ConvCnstrMOD_IterSM (colour images,
+colour dictionary)"""
 
 from __future__ import print_function
 from builtins import input
@@ -21,10 +22,10 @@ from sporco import plot
 
 
 # Training images
-exim = util.ExampleImages(scaled=True, zoom=0.5)
-img1 = exim.image('standard', 'lena.png')
-img2 = exim.image('standard', 'mandrill.png')
-S = np.concatenate((img1[...,np.newaxis], img2[...,np.newaxis]), axis=3)
+exim = util.ExampleImages(scaled=True, zoom=0.25)
+img1 = exim.image('barbara.png', idxexp=np.s_[10:522, 100:612])
+img2 = exim.image('kodim23.png', idxexp=np.s_[:, 60:572])
+S = np.stack((img1, img2), axis=3)
 
 
 # Highpass filter test images
@@ -40,15 +41,16 @@ D0 = ccmod.normalise(D0)
 
 # Compute sparse representation on current dictionary
 lmbda = 0.01
-opt = cbpdn.ConvBPDN.Options({'Verbose' : True, 'MaxMainIter' : 200})
+opt = cbpdn.ConvBPDN.Options({'Verbose' : True, 'MaxMainIter' : 200,
+                              'RelStopTol' : 5e-3})
 b = cbpdn.ConvBPDN(D0, sh, lmbda, opt)
 b.solve()
 
 
 # Update dictionary for training set sh
-opt = ccmod.ConvCnstrMOD.Options({'Verbose' : True, 'MaxMainIter' : 100,
+opt = ccmod.ConvCnstrMOD_IterSM.Options({'Verbose' : True, 'MaxMainIter' : 100,
                                   'rho' : 5.0})
-c = ccmod.ConvCnstrMOD(b.Y, sh, D0.shape, opt)
+c = ccmod.ConvCnstrMOD_IterSM(b.Y, sh, D0.shape, opt)
 c.solve()
 print("ConvCnstrMOD solve time: %.2fs" % c.timer.elapsed('solve'))
 D1 = c.getdict().squeeze()

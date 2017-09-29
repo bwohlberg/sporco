@@ -50,23 +50,18 @@ Test Images
 -----------
 
 The :ref:`usage examples <usage-section>` make use of a number of
-standard test images, which can be installed using the
-``sporco_get_images`` script. To download these images from the root
-directory of the source distribution (i.e. prior to installation) do
+standard test images, which are included with the package. Additional test images may be downloaded using the ``sporco_get_images`` script. Usage details may be obtained by doing
+::
+
+   bin/sporco_get_images --help
+
+from the root directory of the source distribution (i.e. prior to installation, in which case the ``PYTHONPATH`` environment variable should be set as described in :ref:`example-scripts-section`), or
 
 ::
 
-   bin/sporco_get_images --libdest
+  sporco_get_images --help
 
-after setting the ``PYTHONPATH`` environment variable as described in
-:ref:`example-scripts-section`.  To download the images as part of a
-package that has already been installed, do
-
-::
-
-  sporco_get_images --libdest
-
-which will usually have to be performed with root privileges.
+after installation. If the destination path is not explicitly set, the images will be downloaded into a subdirectory ``images`` of the current working directory.
 
 
 
@@ -157,7 +152,7 @@ Installation of these requirements is system dependent.
 
       ::
 
-	pip install numpy scipy Pillow matplotlib pyfftw
+	pip install numpy scipy pillow matplotlib pyfftw
 	pip install six future subprocess functools python-dateutil
 	pip install pyparsing cycler pytz pytest pytest-runner
 
@@ -210,7 +205,7 @@ Installation of these requirements is system dependent.
 	pip install scipy-0.19.1-cp36-cp36m-win_amd64.whl
 	pip install matplotlib-2.0.2-cp36-cp36m-win_amd64.whl
 	pip install pyFFTW-0.10.4-cp36-cp36m-win_amd64.whl
-	pip install future Pillow
+	pip install future pillow
 
 
       Some additional dependencies are required for building the

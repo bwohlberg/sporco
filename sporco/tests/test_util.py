@@ -116,9 +116,10 @@ class TestSet01(object):
         assert(len(im) > 0)
         gp = ei.groups()
         assert(len(gp) > 0)
-        img = ei.image('a', 'b.png')
+        img = ei.image('b.png', group='a')
         assert(img.shape == (32,32))
-        im = ei.image('a', 'b.png', scaled=True, dtype=np.float32, zoom=0.5)
+        im = ei.image('b.png', group='a', scaled=True, dtype=np.float32,
+                      zoom=0.5)
         os.remove(ipth)
         os.rmdir(os.path.join(bpth, 'a'))
         os.rmdir(bpth)

@@ -52,7 +52,7 @@ Jupyter Notebooks
 Citing
 ------
 
-If you use this library for published work, please cite :cite:`wohlberg-2016-sporco` or :cite:`wohlberg-2017-sporco` (see bibtex entries ``wohlberg-2016-sporco`` and ``wohlberg-2017-sporco`` in ``docs/source/references.bib`` in the source distribution). If you use of any of the convolutional sparse representation functions, please also cite :cite:`wohlberg-2016-efficient` and any other papers relevant to the specific functionality that is used, e.g.  :cite:`wohlberg-2016-convolutional`, :cite:`wohlberg-2016-convolutional2`, :cite:`wohlberg-2016-boundary`.
+If you use this library for published work, please cite :cite:`wohlberg-2016-sporco` or :cite:`wohlberg-2017-sporco` (see bibtex entries ``wohlberg-2016-sporco`` and ``wohlberg-2017-sporco`` in ``docs/source/references.bib`` in the source distribution). If you use of any of the convolutional sparse representation functions, please also cite :cite:`wohlberg-2016-efficient` and any other papers relevant to the specific functionality that is used, e.g.  :cite:`wohlberg-2016-convolutional`, :cite:`wohlberg-2016-convolutional2`, :cite:`wohlberg-2016-boundary`, :cite:`garcia-2017-convolutional`.
 
 
 

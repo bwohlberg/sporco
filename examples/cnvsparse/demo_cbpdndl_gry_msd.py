@@ -22,13 +22,12 @@ from sporco import plot
 
 
 # Training images
-exim = util.ExampleImages(scaled=True, zoom=0.25)
-S1 = exim.image('standard', 'lena.grey.png')
-S2 = exim.image('standard', 'barbara.grey.png')
-S3 = util.rgb2gray(exim.image('standard', 'monarch.png',
-                                idxexp=np.s_[:,160:672]))
-S4 = util.rgb2gray(exim.image('standard', 'mandrill.png'))
-S5 = exim.image('standard', 'man.grey.png', idxexp=np.s_[100:612, 100:612])
+exim = util.ExampleImages(scaled=True, zoom=0.25, gray=True)
+S1 = exim.image('barbara.png', idxexp=np.s_[10:522, 100:612])
+S2 = exim.image('kodim23.png', idxexp=np.s_[:, 60:572])
+S3 = exim.image('monarch.png', idxexp=np.s_[:, 160:672])
+S4 = exim.image('sail.png', idxexp=np.s_[:, 210:722])
+S5 = exim.image('tulips.png', idxexp=np.s_[:, 30:542])
 S = np.dstack((S1,S2,S3,S4,S5))
 
 

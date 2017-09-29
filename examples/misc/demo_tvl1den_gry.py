@@ -20,8 +20,8 @@ from sporco.admm import tvl1
 
 
 # Load reference image
-img = util.rgb2gray(util.ExampleImages().image('standard', 'monarch.png',
-                                               scaled=True))[:,160:672]
+img = util.ExampleImages().image('monarch.png', scaled=True,
+                                 idxexp=np.s_[:,160:672], gray=True)
 
 
 # Construct test image

@@ -215,7 +215,9 @@ class GenericConvBPDN(admm.ADMMEqual):
     |
 
     Base class for ADMM algorithm for solving variants of the
-    Convolutional BPDN (CBPDN) :cite:`wohlberg-2016-efficient` problem.
+    Convolutional BPDN (CBPDN) :cite:`wohlberg-2014-efficient`
+    :cite:`wohlberg-2016-efficient` :cite:`wohlberg-2016-convolutional`
+    problem.
 
     The generic problem form is
 
@@ -705,6 +707,17 @@ class ConvBPDN(GenericConvBPDN):
         :class:`ConvRepIndexing`.
 
 
+        |
+
+        **Call graph**
+
+        .. image:: _static/jonga/cbpdn_init.svg
+           :width: 20%
+           :target: _static/jonga/cbpdn_init.svg
+
+        |
+
+
         Parameters
         ----------
         D : array_like
@@ -899,6 +912,17 @@ class ConvBPDNJoint(ConvBPDN):
         """
         Initialise a ConvBPDNJoint object with problem parameters.
 
+        |
+
+        **Call graph**
+
+        .. image:: _static/jonga/cbpdnjnt_init.svg
+           :width: 20%
+           :target: _static/jonga/cbpdnjnt_init.svg
+
+        |
+
+
         Parameters
         ----------
         D : array_like
@@ -1027,6 +1051,17 @@ class ConvElasticNet(ConvBPDN):
     def __init__(self, D, S, lmbda=None, mu=0.0, opt=None, dimK=None, dimN=2):
         """
         Initialise a ConvElasticNet object with problem parameters.
+
+        |
+
+        **Call graph**
+
+        .. image:: _static/jonga/celnet_init.svg
+           :width: 20%
+           :target: _static/jonga/celnet_init.svg
+
+        |
+
 
         Parameters
         ----------
@@ -1226,6 +1261,17 @@ class ConvBPDNGradReg(ConvBPDN):
     def __init__(self, D, S, lmbda=None, mu=0.0, opt=None, dimK=None, dimN=2):
         """
         Initialise a ConvBPDNGradReg object with problem parameters.
+
+        |
+
+        **Call graph**
+
+        .. image:: _static/jonga/cbpdngrd_init.svg
+           :width: 20%
+           :target: _static/jonga/cbpdngrd_init.svg
+
+        |
+
 
         Parameters
         ----------
@@ -1759,7 +1805,7 @@ class ConvBPDNMaskDcpl(ConvTwoBlockCnstrnt):
     |
 
     ADMM algorithm for Convolutional BPDN with Mask Decoupling
-    :cite:`heide-2015-fast` :cite:`wohlberg-2016-boundary`.
+    :cite:`heide-2015-fast`.
 
     Solve the optimisation problem
 
@@ -1850,6 +1896,17 @@ class ConvBPDNMaskDcpl(ConvTwoBlockCnstrnt):
 
     def __init__(self, D, S, lmbda, W=None, opt=None, dimK=None, dimN=2):
         """Initialise a ConvBPDNMaskDcpl object with problem parameters.
+
+        |
+
+        **Call graph**
+
+        .. image:: _static/jonga/cbpdnmd_init.svg
+           :width: 20%
+           :target: _static/jonga/cbpdnmd_init.svg
+
+        |
+
 
         Parameters
         ----------
@@ -2013,6 +2070,10 @@ class AddMaskSim(object):
 
         # Construct inner cbpdn object
         self.cbpdn = cbpdnclass(Di, S, *args, **kwargs)
+
+        # Required because dictlrn.DictLearn assumes that all valid
+        # xstep objects have an IterationStats attribute
+        self.IterationStats = self.cbpdn.IterationStats
 
         # Mask matrix
         self.W = np.asarray(sl.atleast_nd(self.cri.dimN+3, W),

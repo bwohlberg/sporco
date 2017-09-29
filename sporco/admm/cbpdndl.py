@@ -19,6 +19,7 @@ from sporco.util import u
 import sporco.linalg as sl
 from sporco.admm import cbpdn
 from sporco.admm import ccmod
+from sporco.admm import ccmodmd
 from sporco.admm import dictlrn
 
 __author__ = """Brendt Wohlberg <brendt@ieee.org>"""
@@ -32,8 +33,15 @@ class ConvBPDNDictLearn(dictlrn.DictLearn):
 
     |
 
-    Dictionary learning based on :class:`.ConvBPDN` and
-    :class:`.ConvCnstrMOD` :cite:`wohlberg-2016-efficient`.
+    Dictionary learning by alternating between sparse coding and
+    dictionary update stages, using :class:`.ConvBPDN` and
+    :func:`.ConvCnstrMOD` respectively, with the coupling between
+    stages as in :cite:`garcia-2017-subproblem`
+    :cite:`garcia-2017-convolutional`. The sparse coding algorithm is
+    as in :cite:`wohlberg-2014-efficient`, and the dictionary update
+    supports algorithms from :cite:`wohlberg-2016-efficient` and
+    :cite:`sorel-2016-fast`.
+
 
     Solve the optimisation problem
 
@@ -42,13 +50,14 @@ class ConvBPDNDictLearn(dictlrn.DictLearn):
        (1/2) \sum_k \left \|  \sum_m \mathbf{d}_m * \mathbf{x}_{k,m} -
        \mathbf{s}_k \right \|_2^2 + \lambda \sum_k \sum_m
        \| \mathbf{x}_{k,m} \|_1 \quad \text{such that}
-       \quad \mathbf{d}_m \in C \;\;,
+       \quad \mathbf{d}_m \in C  \;\; \forall m \;,
 
     where :math:`C` is the feasible set consisting of filters with
     unit norm and constrained support, via interleaved alternation
     between the ADMM steps of the :class:`.ConvBPDN` and
     :func:`.ConvCnstrMOD` problems. The multi-channel variants
-    supported by :func:`.ConvCnstrMOD` classes are also supported.
+    :cite:`wohlberg-2016-convolutional` supported by :class:`.ConvBPDN`
+    and :func:`.ConvCnstrMOD` are also supported.
 
     After termination of the :meth:`solve` method, attribute :attr:`itstat`
     is a list of tuples representing statistics of each iteration. The
@@ -103,20 +112,27 @@ class ConvBPDNDictLearn(dictlrn.DictLearn):
 
         defaults = copy.deepcopy(dictlrn.DictLearn.Options.defaults)
         defaults.update({'DictSize' : None, 'AccurateDFid' : False,
-                'CBPDN' : copy.deepcopy(cbpdn.ConvBPDN.Options.defaults),
-                'CCMOD' : copy.deepcopy(ccmod.ConvCnstrMOD.Options.defaults)})
+            'CBPDN' : copy.deepcopy(cbpdn.ConvBPDN.Options.defaults)})
 
 
-        def __init__(self, opt=None):
-            """Initialise ConvBPDN dictionary learning algorithm options."""
+        def __init__(self, opt=None, method='ism'):
+            """Initialise ConvBPDN dictionary learning algorithm options.
+
+            Valid values for parameter ``method`` are documented in function
+            :func:`.ConvCnstrMOD`.
+            """
+
+            self.defaults.update({'CCMOD' : copy.deepcopy(
+                ccmod.ConvCnstrMODOptions(method=method).defaults)})
 
             dictlrn.DictLearn.Options.__init__(self, {
                 'CBPDN' : cbpdn.ConvBPDN.Options({'MaxMainIter' : 1,
                     'AutoRho' : {'Period' : 10, 'AutoScaling' : False,
                     'RsdlRatio' : 10.0, 'Scaling': 2.0, 'RsdlTarget' : 1.0}}),
-                'CCMOD' : ccmod.ConvCnstrMOD.Options({'MaxMainIter' : 1,
+                'CCMOD' : ccmod.ConvCnstrMODOptions({'MaxMainIter' : 1,
                     'AutoRho' : {'Period' : 10, 'AutoScaling' : False,
-                    'RsdlRatio' : 10.0, 'Scaling': 2.0, 'RsdlTarget' : 1.0}})
+                    'RsdlRatio' : 10.0, 'Scaling': 2.0, 'RsdlTarget' : 1.0}},
+                    method=method)
                 })
 
             if opt is None:
@@ -125,9 +141,21 @@ class ConvBPDNDictLearn(dictlrn.DictLearn):
 
 
 
-    def __init__(self, D0, S, lmbda=None, opt=None, dimK=1, dimN=2):
+    def __init__(self, D0, S, lmbda=None, opt=None, method='ism',
+                 dimK=1, dimN=2):
         """
         Initialise a ConvBPDNDictLearn object with problem size and options.
+
+        |
+
+        **Call graph**
+
+        .. image:: _static/jonga/cbpdndl_init.svg
+           :width: 20%
+           :target: _static/jonga/cbpdndl_init.svg
+
+        |
+
 
         Parameters
         ----------
@@ -139,6 +167,9 @@ class ConvBPDNDictLearn(dictlrn.DictLearn):
           Regularisation parameter
         opt : :class:`ConvBPDNDictLearn.Options` object
           Algorithm options
+        method : string, optional (default 'ism')
+          String selecting dictionary update solver. Valid values are
+          documented in function :func:`.ConvCnstrMOD`.
         dimK : int, optional (default 1)
           Number of signal dimensions. If there is only a single input
           signal (e.g. if `S` is a 2D array representing a single image)
@@ -148,7 +179,7 @@ class ConvBPDNDictLearn(dictlrn.DictLearn):
         """
 
         if opt is None:
-            opt = ConvBPDNDictLearn.Options()
+            opt = ConvBPDNDictLearn.Options(method=method)
         self.opt = opt
 
         # Get dictionary size
@@ -166,16 +197,15 @@ class ConvBPDNDictLearn(dictlrn.DictLearn):
 
         # Modify D update options to include initial values for Y and U
         opt['CCMOD'].update({'Y0' : ccmod.zpad(
-            ccmod.stdformD(D0, cri.C, cri.M, dimN), cri.Nv),
-                             'U0' : np.zeros(cri.shpD)})
+            ccmod.stdformD(D0, cri.C, cri.M, dimN), cri.Nv)})
 
         # Create X update object
         xstep = cbpdn.ConvBPDN(D0, S, lmbda, opt['CBPDN'], dimK=dimK,
                                dimN=dimN)
 
         # Create D update object
-        dstep = ccmod.ConvCnstrMOD(None, S, dsz, opt['CCMOD'], dimK=dimK,
-                                    dimN=dimN)
+        dstep = ccmod.ConvCnstrMOD(None, S, dsz, opt['CCMOD'], method=method,
+                                   dimK=dimK, dimN=dimN)
 
         # Configure iteration statistics reporting
         if self.opt['AccurateDFid']:
@@ -251,9 +281,14 @@ class ConvBPDNMaskDcplDictLearn(dictlrn.DictLearn):
 
     |
 
-    Dictionary learning based on :class:`.ConvBPDNMaskDcpl` and
-    :class:`.ConvCnstrMODMaskDcpl` :cite:`heide-2015-fast`
-    :cite:`wohlberg-2016-boundary`
+    Dictionary learning by alternating between sparse coding and
+    dictionary update stages, using :class:`.ConvBPDNMaskDcpl` and
+    :func:`.ConvCnstrMODMaskDcpl` respectively, with the coupling between
+    stages as in :cite:`garcia-2017-subproblem`
+    :cite:`garcia-2017-convolutional`. The sparse coding algorithm is
+    as in :cite:`heide-2015-fast`, and the dictionary update
+    supports algorithms from :cite:`garcia-2017-convolutional`.
+
 
     Solve the optimisation problem
 
@@ -262,13 +297,15 @@ class ConvBPDNMaskDcplDictLearn(dictlrn.DictLearn):
        (1/2) \sum_k \left \|  W (\sum_m \mathbf{d}_m * \mathbf{x}_{k,m} -
        \mathbf{s}_k ) \right \|_2^2 + \lambda \sum_k \sum_m
        \| \mathbf{x}_{k,m} \|_1 \quad \text{such that}
-       \quad \mathbf{d}_m \in C \;\;,
+       \quad \mathbf{d}_m \in C \;\; \forall m \;,
 
     where :math:`C` is the feasible set consisting of filters with
     unit norm and constrained support, via interleaved alternation
     between the ADMM steps of the :class:`.ConvBPDNMaskDcpl` and
-    :class:`.ConvCnstrMODMaskDcpl` problems. The multi-channel variants
-    supported by :class:`.ConvCnstrMODMaskDcpl` are also supported.
+    :func:`.ConvCnstrMODMaskDcpl` problems. The multi-channel variants
+    :cite:`wohlberg-2016-convolutional` supported by
+    :class:`.ConvBPDNMaskDcpl` and :func:`.ConvCnstrMODMaskDcpl` are
+    also supported.
 
     After termination of the :meth:`solve` method, attribute :attr:`itstat`
     is a list of tuples representing statistics of each iteration. The
@@ -318,7 +355,7 @@ class ConvBPDNMaskDcplDictLearn(dictlrn.DictLearn):
 
           ``CBPDN`` : Options :class:`.ConvBPDNMaskDcpl.Options`
 
-          ``CCMOD`` : Options :class:`.ConvCnstrMODMaskDcpl.Options`
+          ``CCMOD`` : Options :func:`.ConvCnstrMODMaskDcplOptions`
         """
 
         defaults = copy.deepcopy(dictlrn.DictLearn.Options.defaults)
@@ -326,20 +363,25 @@ class ConvBPDNMaskDcplDictLearn(dictlrn.DictLearn):
             'CBPDN' : copy.deepcopy(cbpdn.ConvBPDNMaskDcpl.Options.defaults)})
 
 
-        def __init__(self, opt=None):
+        def __init__(self, opt=None, method='ism'):
             """Initialise ConvBPDNMaskDcpl dictionary learning algorithm
-            options."""
+            options.
+
+            Valid values for parameter ``method`` are documented in function
+            :func:`.ConvCnstrMOD`.
+            """
 
             self.defaults.update({'CCMOD' : copy.deepcopy(
-                ccmod.ConvCnstrMODMaskDcpl.Options.defaults)})
+                ccmodmd.ConvCnstrMODMaskDcplOptions(method=method).defaults)})
 
             dictlrn.DictLearn.Options.__init__(self, {
                 'CBPDN' : cbpdn.ConvBPDNMaskDcpl.Options({'MaxMainIter' : 1,
                     'AutoRho' : {'Period' : 10, 'AutoScaling' : False,
                     'RsdlRatio' : 10.0, 'Scaling': 2.0, 'RsdlTarget' : 1.0}}),
-                'CCMOD' : ccmod.ConvCnstrMODMaskDcpl.Options({'MaxMainIter' : 1,
-                    'AutoRho' : {'Period' : 10, 'AutoScaling' : False,
-                    'RsdlRatio' : 10.0, 'Scaling': 2.0, 'RsdlTarget' : 1.0}})
+                'CCMOD' : ccmodmd.ConvCnstrMODMaskDcplOptions(
+                    {'MaxMainIter' : 1, 'AutoRho' : {'Period' : 10,
+                    'AutoScaling' : False, 'RsdlRatio' : 10.0,
+                    'Scaling': 2.0, 'RsdlTarget' : 1.0}}, method=method)
                 })
 
             if opt is None:
@@ -348,10 +390,22 @@ class ConvBPDNMaskDcplDictLearn(dictlrn.DictLearn):
 
 
 
-    def __init__(self, D0, S, lmbda, W, opt=None, dimK=1, dimN=2):
+    def __init__(self, D0, S, lmbda, W, opt=None, method='ism',
+                 dimK=1, dimN=2):
         """
         Initialise a ConvBPDNMaskDcplDictLearn object with problem size and
         options.
+
+        |
+
+        **Call graph**
+
+        .. image:: _static/jonga/cbpdnmddl_init.svg
+           :width: 20%
+           :target: _static/jonga/cbpdnmddl_init.svg
+
+        |
+
 
         Parameters
         ----------
@@ -364,13 +418,14 @@ class ConvBPDNMaskDcplDictLearn(dictlrn.DictLearn):
         W : array_like
           Mask array. The array shape must be such that the array is
           compatible for multiplication with the *internal* shape of
-          input array S (see :class:`.ccmod.ConvRepIndexing` for a
+          input array S (see :class:`.admm.ccmod.ConvRepIndexing` for a
           discussion of the distinction between *external* and *internal*
           data layouts).
         opt : :class:`ConvBPDNMaskDcplDictLearn.Options` object
           Algorithm options
         method : string, optional (default 'ism')
-          String selecting dictionary update solver
+          String selecting dictionary update solver. Valid values are
+          documented in function :func:`.ConvCnstrMOD`.
         dimK : int, optional (default 1)
           Number of signal dimensions. If there is only a single input
           signal (e.g. if `S` is a 2D array representing a single image)
@@ -380,7 +435,7 @@ class ConvBPDNMaskDcplDictLearn(dictlrn.DictLearn):
         """
 
         if opt is None:
-            opt = ConvBPDNMaskDcplDictLearn.Options()
+            opt = ConvBPDNMaskDcplDictLearn.Options(method=method)
         self.opt = opt
 
         # Get dictionary size
@@ -402,16 +457,19 @@ class ConvBPDNMaskDcplDictLearn(dictlrn.DictLearn):
         else:
             Y0b0 = np.zeros(cri.Nv + (1, 1, cri.C * cri.K))
         Y0b1 = ccmod.zpad(ccmod.stdformD(D0, cri.Cd, cri.M, dimN), cri.Nv)
-        opt['CCMOD'].update({'Y0' : np.concatenate((Y0b0, Y0b1),
-                            axis=cri.axisM)})
+        if method == 'cns':
+            Y0 = Y0b1
+        else:
+            Y0 = np.concatenate((Y0b0, Y0b1), axis=cri.axisM)
+        opt['CCMOD'].update({'Y0' : Y0})
 
         # Create X update object
         xstep = cbpdn.ConvBPDNMaskDcpl(D0, S, lmbda, W, opt['CBPDN'],
                                        dimK=dimK, dimN=dimN)
 
         # Create D update object
-        dstep = ccmod.ConvCnstrMODMaskDcpl(None, S, W, dsz, opt['CCMOD'],
-                                           dimK=dimK, dimN=dimN)
+        dstep = ccmodmd.ConvCnstrMODMaskDcpl(None, S, W, dsz, opt['CCMOD'],
+                                    method=method, dimK=dimK, dimN=dimN)
 
         # Configure iteration statistics reporting
         if self.opt['AccurateDFid']:
@@ -439,7 +497,8 @@ class ConvBPDNMaskDcplDictLearn(dictlrn.DictLearn):
             )
 
         # Call parent constructor
-        super(ConvBPDNMaskDcplDictLearn, self).__init__(xstep, dstep, opt, isc)
+        super(ConvBPDNMaskDcplDictLearn, self).__init__(xstep, dstep,
+                                                        opt, isc)
 
 
 

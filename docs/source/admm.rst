@@ -26,6 +26,22 @@ class:
     \mathbf{x} = \mathbf{y} \;\;.
 
 
+* :doc:`ADMMConsensus <admm/admmcnsns>` A partial specialisation of
+  :class:`.ADMM`, for solving optimisation problems of the form
+
+  .. math::
+     \mathrm{argmin}_{\mathbf{x}} \; \sum_i f_i(\mathbf{x}) + g(\mathbf{x})
+
+  via an ADMM problem of the form
+
+  .. math::
+    \mathrm{argmin}_{\mathbf{x}_i,\mathbf{y}} \;
+    \sum_i f(\mathbf{x}_i) + g(\mathbf{y}) \;\mathrm{such\;that}\;
+    \left( \begin{array}{c} \mathbf{x}_0 \\ \mathbf{x}_1 \\
+    \vdots \end{array} \right) = \left( \begin{array}{c}
+    I \\ I \\ \vdots \end{array} \right) \mathbf{y} \;\;.
+
+
 * :doc:`ADMMTwoBlockCnstrnt <admm/admmtwoblk>` A partial
   specialisation of :class:`.ADMM`, for ADMM problems of the form
 

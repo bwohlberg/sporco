@@ -348,6 +348,17 @@ class BPDN(GenericBPDN):
         """
         Initialise a BPDN object with problem parameters.
 
+        |
+
+        **Call graph**
+
+        .. image:: _static/jonga/bpdn_init.svg
+           :width: 20%
+           :target: _static/jonga/bpdn_init.svg
+
+        |
+
+
         Parameters
         ----------
         D : array_like, shape (N, M)
@@ -495,6 +506,17 @@ class BPDNJoint(BPDN):
         """
         Initialise a BPDNJoint object with problem parameters.
 
+        |
+
+        **Call graph**
+
+        .. image:: _static/jonga/bpdnjnt_init.svg
+           :width: 20%
+           :target: _static/jonga/bpdnjnt_init.svg
+
+        |
+
+
         Parameters
         ----------
         D : array_like, shape (N, M)
@@ -610,6 +632,17 @@ class ElasticNet(BPDN):
     def __init__(self, D, S, lmbda=None, mu=0.0, opt=None):
         """
         Initialise an ElasticNet object with problem parameters.
+
+        |
+
+        **Call graph**
+
+        .. image:: _static/jonga/elnet_init.svg
+           :width: 20%
+           :target: _static/jonga/elnet_init.svg
+
+        |
+
 
         Parameters
         ----------

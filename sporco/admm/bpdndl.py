@@ -117,6 +117,17 @@ class BPDNDictLearn(dictlrn.DictLearn):
         """
         Initialise a BPDNDictLearn object with problem size and options.
 
+        |
+
+        **Call graph**
+
+        .. image:: _static/jonga/bpdndl_init.svg
+           :width: 20%
+           :target: _static/jonga/bpdndl_init.svg
+
+        |
+
+
         Parameters
         ----------
         D0 : array_like, shape (N, M)

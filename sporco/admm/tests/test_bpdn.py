@@ -69,18 +69,17 @@ class TestSet01(object):
 
     def test_04(self):
         N = 8
-        M = 16
+        M = 8
         D = np.random.randn(N, M)
         s = np.random.randn(N, 1)
-        dt = np.float16
-        opt = bpdn.BPDN.Options({'Verbose' : False, 'MaxMainIter' : 20,
-                                 'AutoRho' : {'Enabled' : True},
-                                 'DataType' : dt})
-        b = bpdn.BPDN(D, s, lmbda=1.0, opt=opt)
-        b.solve()
-        assert(b.X.dtype == dt)
-        assert(b.Y.dtype == dt)
-        assert(b.U.dtype == dt)
+        try:
+            opt = bpdn.BPDN.Options({'FastSolve' : True, 'Verbose' : False,
+                'MaxMainIter' : 10, 'AutoRho' : {'Enabled' : False}})
+            b = bpdn.BPDN(D, s, lmbda=1.0, opt=opt)
+            b.solve()
+        except Exception as e:
+            print(e)
+            assert(0)
 
 
     def test_05(self):
@@ -88,7 +87,7 @@ class TestSet01(object):
         M = 16
         D = np.random.randn(N, M)
         s = np.random.randn(N, 1)
-        dt = np.float32
+        dt = np.float16
         opt = bpdn.BPDN.Options({'Verbose' : False, 'MaxMainIter' : 20,
                                  'AutoRho' : {'Enabled' : True},
                                  'DataType' : dt})
@@ -104,7 +103,7 @@ class TestSet01(object):
         M = 16
         D = np.random.randn(N, M)
         s = np.random.randn(N, 1)
-        dt = np.float64
+        dt = np.float32
         opt = bpdn.BPDN.Options({'Verbose' : False, 'MaxMainIter' : 20,
                                  'AutoRho' : {'Enabled' : True},
                                  'DataType' : dt})
@@ -116,6 +115,22 @@ class TestSet01(object):
 
 
     def test_07(self):
+        N = 8
+        M = 16
+        D = np.random.randn(N, M)
+        s = np.random.randn(N, 1)
+        dt = np.float64
+        opt = bpdn.BPDN.Options({'Verbose' : False, 'MaxMainIter' : 20,
+                                 'AutoRho' : {'Enabled' : True},
+                                 'DataType' : dt})
+        b = bpdn.BPDN(D, s, lmbda=1.0, opt=opt)
+        b.solve()
+        assert(b.X.dtype == dt)
+        assert(b.Y.dtype == dt)
+        assert(b.U.dtype == dt)
+
+
+    def test_08(self):
         N = 64
         M = 2*N
         L = 4
@@ -137,7 +152,7 @@ class TestSet01(object):
         assert(linalg.norm(x1-x0) < 1e-3)
 
 
-    def test_08(self):
+    def test_09(self):
         N = 8
         M = 16
         D = np.random.randn(N, M)
@@ -152,7 +167,7 @@ class TestSet01(object):
             assert(0)
 
 
-    def test_09(self):
+    def test_10(self):
         N = 8
         M = 16
         D = np.random.randn(N, M)
@@ -168,7 +183,7 @@ class TestSet01(object):
         assert(b.U.dtype == dt)
 
 
-    def test_10(self):
+    def test_11(self):
         N = 8
         M = 16
         D = np.random.randn(N, M)
@@ -183,7 +198,7 @@ class TestSet01(object):
             assert(0)
 
 
-    def test_11(self):
+    def test_12(self):
         N = 8
         M = 16
         D = np.random.randn(N, M)

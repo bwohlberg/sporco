@@ -30,8 +30,8 @@ conv = lambda h, x: np.fft.ifft2(np.fft.fft2(h, s=x.shape[0:2], axes=(0,1))
 
 
 # Load reference image
-img = util.ExampleImages().image('standard', 'monarch.png',
-                                 scaled=True)[:,160:672]
+img = util.ExampleImages().image('monarch.png', scaled=True,
+                                 idxexp=np.s_[:,160:672])
 
 
 # Construct smoothing filter

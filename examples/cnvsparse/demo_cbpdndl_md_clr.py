@@ -21,9 +21,9 @@ from sporco import plot
 
 # Training images
 exim = util.ExampleImages(scaled=True, zoom=0.25)
-S1 = exim.image('standard', 'lena.png')
-S2 = exim.image('standard', 'barbara.png', idxexp=np.s_[10:522, 198:710])
-S = np.concatenate((S1[...,np.newaxis],S2[...,np.newaxis]), axis=3)
+S1 = exim.image('barbara.png', idxexp=np.s_[10:522, 100:612])
+S2 = exim.image('kodim23.png', idxexp=np.s_[:, 60:572])
+S = np.stack((S1,S2), axis=3)
 
 
 # Initial dictionary

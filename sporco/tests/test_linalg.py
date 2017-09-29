@@ -281,3 +281,11 @@ class TestSet01(object):
         ip1 = np.sum(x * y, axis=-1, keepdims=True)
         ip2 = linalg.inner(x, y, axis=-1)
         assert(np.linalg.norm(ip1 - ip2) < 1e-13)
+
+
+
+    def test_20(self):
+        x = np.array([[0, 1], [2, 3]])
+        y = np.array([[4, 5], [6, 7]])
+        xy = np.array([[38, 36], [30, 28]])
+        assert(np.allclose(linalg.fftconv(x, y), xy))

@@ -11,6 +11,23 @@ Version 0.1.7   (Not yet released)
 - Fixed bug in object initialisation timing
 - Changed problematic image URLs in bin/sporco_get_images
 - Added installation instructions for Mac OS and Windows
+- Minimum required Numpy version is now 1.10
+- Fixed bugs in admm.ccmod module
+- Test images required by usage examples are now included with the package
+- Modifications to util.ExampleImages interface (these changes will break
+  code that uses the previous interface)
+- Added call graph diagrams for many classes (see `Notes` in the package
+  documentation)
+- New class admm.ADMMConsensus for ADMM consensus problems
+- Major changes to ccmod module, including restructuring class hierarchy,
+  a new ADMM consensus solver, and moving of ccmod.ConvCnstrMODMaskDcpl to
+  a separate module
+- Changes to cbpdndl module related to ccmod module restructuring
+- New module ccmodmd supporting multiple algorithms for the dictionary
+  update with mask decoupling
+- New module parcnsdl with a parallel processing implementation of
+  convolutional dictionary learning with the ADMM consensus dictionary
+  update
 
 
 

@@ -289,7 +289,7 @@ def imageblocks(imgs, blksz):
 
 
 def rgb2gray(rgb):
-    """Convert RGB image to grayscale.
+    """Convert an RGB image (or images) to grayscale.
 
     Parameters
     ----------
@@ -531,7 +531,7 @@ def convdicts():
 
     >>> from sporco import util
     >>> cd = util.convdicts()
-    >>> print(cdd.keys())
+    >>> print(cd.keys())
     ['G:12x12x72', 'G:8x8x16,12x12x32,16x16x48', ...]
 
     Select a specific example dictionary using the corresponding identifier
@@ -593,7 +593,8 @@ def netgetdata(url, maxtry=3, timeout=10):
 class ExampleImages(object):
     """Access a set of example images."""
 
-    def __init__(self, scaled=False, dtype=None, zoom=None, pth=None):
+    def __init__(self, scaled=False, dtype=None, zoom=None, gray=False,
+                 pth=None):
         """Initialise an ExampleImages object.
 
         Parameters
@@ -607,15 +608,18 @@ class ExampleImages(object):
           integer type, the output data type is np.float32
         zoom : float or None, optional (default None)
           Optional support rescaling factor to apply to the images
+        gray : bool, optional (default False)
+          Flag indicating whether RGB images should be converted to grayscale
         pth : string or None (default None)
           Path to directory containing image files. If the value is None the
-          path points to a set of example images that can be downloaded using
-          a script provided with the package.
+          path points to a set of example images that are included with the
+          package.
         """
 
         self.scaled = scaled
         self.dtype = dtype
         self.zoom = zoom
+        self.gray = gray
         if pth is None:
             self.bpth = os.path.join(os.path.dirname(__file__), 'data')
         else:
@@ -681,17 +685,17 @@ class ExampleImages(object):
 
 
 
-    def image(self, group, fname=None, scaled=None, dtype=None, idxexp=None,
-              zoom=None):
+    def image(self, fname, group=None, scaled=None, dtype=None, idxexp=None,
+              zoom=None, gray=None):
         """Get named image.
 
         Parameters
         ----------
-        group : string
-          Name of image group
         fname : string
           Filename of image
-        scaled : bool or None, optional
+        group : string or None, optional (default None)
+          Name of image group
+        scaled : bool or None, optional (default None)
           Flag indicating whether images should be on the range [0,...,255]
           with np.uint8 dtype (False), or on the range [0,...,1] with
           np.float32 dtype (True). If the value is None, scaling behaviour
@@ -712,6 +716,10 @@ class ExampleImages(object):
           None, support rescaling behaviour is determined by the `zoom`
           parameter passed to the object initializer, otherwise that selection
           is overridden.
+        gray : bool or None, optional (default None)
+          Flag indicating whether RGB images should be converted to grayscale.
+          If the value is None, behaviour is determined by the `gray`
+          parameter passed to the object initializer.
 
         Returns
         -------
@@ -724,15 +732,6 @@ class ExampleImages(object):
           If the image is not accessible
         """
 
-        # This is a temporary measure to catch attempts to use the old
-        # interface of this method
-        if fname is None:
-            raise RuntimeError('Example images are no longer downloaded as '
-                'part of the build process, and the interface of '
-                'ExampleImages.image has changed. Please see section "Test '
-                'Images" in the SPORCO package README.rst file, and consult '
-                'the documentation for ExampleImages.image.')
-
         if scaled is None:
             scaled = self.scaled
         if dtype is None:
@@ -744,7 +743,12 @@ class ExampleImages(object):
             dtype = np.float32
         if zoom is None:
             zoom = self.zoom
-        pth = os.path.join(self.bpth, group, fname)
+        if gray is None:
+            gray = self.gray
+        if group is None:
+            pth = os.path.join(self.bpth, fname)
+        else:
+            pth = os.path.join(self.bpth, group, fname)
 
         try:
             img = np.asarray(misc.imread(pth), dtype=dtype)
@@ -761,6 +765,8 @@ class ExampleImages(object):
                 img = sni.zoom(img, zoom)
             else:
                 img = sni.zoom(img, (zoom,)*2 + (1,)*(img.ndim-2))
+        if gray:
+            img = rgb2gray(img)
 
         return img
 

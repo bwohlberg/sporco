@@ -6,7 +6,7 @@
 # and user license can be found in the 'LICENSE.txt' file distributed
 # with the package.
 
-"""Usage example: ccmod.ConvCnstrMOD (greyscale images)"""
+"""Usage example: ccmod.ConvCnstrMOD_IterSM (greyscale images)"""
 
 from __future__ import print_function
 from builtins import input
@@ -21,12 +21,12 @@ from sporco import plot
 
 
 # Training images (size reduced to speed up demo script)
-exim = util.ExampleImages(scaled=True, zoom=0.5)
-S1 = exim.image('standard', 'lena.grey.png')
-S2 = exim.image('standard', 'barbara.grey.png')
-S3 = util.rgb2gray(exim.image('standard', 'monarch.png'))[:,80:336]
-S4 = util.rgb2gray(exim.image('standard', 'mandrill.png'))
-S5 = exim.image('standard', 'man.grey.png')[50:306, 50:306]
+exim = util.ExampleImages(scaled=True, zoom=0.25, gray=True)
+S1 = exim.image('barbara.png', idxexp=np.s_[10:522, 100:612])
+S2 = exim.image('kodim23.png', idxexp=np.s_[:, 60:572])
+S3 = exim.image('monarch.png', idxexp=np.s_[:, 160:672])
+S4 = exim.image('sail.png', idxexp=np.s_[:, 210:722])
+S5 = exim.image('tulips.png', idxexp=np.s_[:, 30:542])
 S = np.dstack((S1,S2,S3,S4,S5))
 
 
@@ -49,11 +49,11 @@ b.solve()
 
 
 # Update dictionary for training set sh
-opt = ccmod.ConvCnstrMOD.Options({'Verbose' : True, 'MaxMainIter' : 100,
+opt = ccmod.ConvCnstrMOD_IterSM.Options({'Verbose' : True, 'MaxMainIter' : 100,
                                   'rho' : 5.0})
-c = ccmod.ConvCnstrMOD(b.Y, sh, D0.shape, opt)
+c = ccmod.ConvCnstrMOD_IterSM(b.Y, sh, D0.shape, opt)
 c.solve()
-print("ConvCnstrMOD solve time: %.2fs" % c.timer.elapsed('solve'))
+print("ConvCnstrMOD_IterSM solve time: %.2fs" % c.timer.elapsed('solve'))
 D1 = c.getdict().squeeze()
 
 

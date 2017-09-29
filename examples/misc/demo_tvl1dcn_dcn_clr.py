@@ -31,8 +31,8 @@ conv = lambda h, x : np.fft.ifft2(np.fft.fft2(h, s=x.shape[0:2], axes=(0,1))
 
 
 # Load reference image
-img = util.ExampleImages().image('standard', 'monarch.png',
-                                 scaled=True)[:,160:672]
+img = util.ExampleImages().image('monarch.png', scaled=True,
+                                 idxexp=np.s_[:,160:672])
 
 
 # Construct smoothing filter
@@ -51,7 +51,7 @@ imgcn = util.spnoise(imgc, 0.2)
 lmbda = 2e-2
 wdf = np.ones(imgcn.shape[0:2] + (1,))
 opt = tvl1.TVL1Deconv.Options({'Verbose' : True, 'MaxMainIter' : 200,
-                               'rho' : 1e0, 'gEvalY' : False, 
+                               'rho' : 1e0, 'gEvalY' : False,
                                'RelStopTol' : 2e-3, 'DFidWeight' : zpad(wdf)})
 
 
