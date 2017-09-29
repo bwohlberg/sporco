@@ -45,7 +45,7 @@ in which case the HTML documentation can be found in the ``build/sphinx/html`` d
 
 An overview of the package design and functionality is also available in
 
-  Brendt Wohlberg, `SPORCO: A Python package for standard and convolutional sparse representations <http://conference.scipy.org/proceedings/scipy2017/brendt_wohlberg.html>`_, in Proceedings of the 15th Python in Science Conference, (Austin, TX, USA), pp. 1--8, Jul 2017
+  Brendt Wohlberg, `SPORCO: A Python package for standard and convolutional sparse representations <http://conference.scipy.org/proceedings/scipy2017/brendt_wohlberg.html>`_, in Proceedings of the 15th Python in Science Conference, (Austin, TX, USA), doi:`10.25080/shinma-7f4c6e7-001 <http://dx.doi.org/10.25080/shinma-7f4c6e7-001>`_, pp. 1--8, Jul 2017
 
 
 Usage
