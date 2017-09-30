@@ -45,6 +45,18 @@ class TestSet01(object):
 
 
     def test_03(self):
+        lmbda = 1e-1
+        opt = parcnsdl.ConvBPDNDictLearn_Consensus.Options({'MaxMainIter': 10})
+        try:
+            b = parcnsdl.ConvBPDNDictLearn_Consensus(self.D0, self.S, lmbda,
+                                                     opt=opt, nproc=0)
+            b.solve()
+        except Exception as e:
+            print(e)
+            assert(0)
+
+
+    def test_04(self):
         N = 16
         Nc = 3
         Nd = 5

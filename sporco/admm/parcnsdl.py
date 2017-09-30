@@ -454,7 +454,8 @@ class ConvBPDNDictLearn_Consensus(cbpdndl.ConvBPDNDictLearn):
         self.timer.start(['solve', 'solve_wo_eval'])
 
         # Create process pool
-        self.pool = mp.Pool(processes=self.nproc)
+        if self.nproc > 0:
+            self.pool = mp.Pool(processes=self.nproc)
 
         for self.j in range(self.j, self.j + self.opt['MaxMainIter']):
 
@@ -481,8 +482,9 @@ class ConvBPDNDictLearn_Consensus(cbpdndl.ConvBPDNDictLearn):
                     break
 
         # Clean up process pool
-        self.pool.close()
-        self.pool.join()
+        if self.nproc > 0:
+            self.pool.close()
+            self.pool.join()
 
         # Increment iteration count
         self.j += 1
