@@ -13,7 +13,6 @@ from __future__ import absolute_import
 from builtins import range
 
 import copy
-import pprint
 import numpy as np
 from scipy import linalg
 
@@ -521,7 +520,7 @@ class ConvCnstrMODMaskDcplBase(admm.ADMMTwoBlockCnstrnt):
         else:
             Df = sl.rfftn(D, None, self.cri.axisN)
 
-        Sf = np.sum(self.Zf * Xf, axis=self.cri.axisM)
+        Sf = np.sum(self.Zf * Df, axis=self.cri.axisM)
         return sl.irfftn(Sf, self.cri.Nv, self.cri.axisN)
 
 

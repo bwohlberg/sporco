@@ -16,7 +16,6 @@ import numpy as np
 
 from sporco.admm import admm
 import sporco.linalg as spl
-from sporco import util
 from sporco import plot
 
 
@@ -59,7 +58,7 @@ class ConsensusTest(admm.ADMMConsensus):
 
     def obfn_fi(self, Xi, i):
 
-       return 0.5*np.linalg.norm(self.A[i].dot(Xi) - self.s[i])**2
+        return 0.5*np.linalg.norm(self.A[i].dot(Xi) - self.s[i])**2
 
 
 
