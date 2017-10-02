@@ -261,6 +261,10 @@ class ConvBPDNDictLearn_Consensus(cbpdndl.ConvBPDNDictLearn):
     use of inherited functionality. Variables initialised by the parent
     class that are non-singleton on axis ``axisK`` have this axis swapped
     with axis 0 for simpler and more computationally efficient indexing.
+    Note that relaxation and automatic penalty parameter selection (see
+    options ``RelaxParam`` and ``AutoRho`` respectively in
+    :class:`.admm.ADMM.Options`) are currently not supported, the
+    corresponding options settings being silently ignored.
 
     After termination of the :meth:`solve` method, attribute :attr:`itstat`
     is a list of tuples representing statistics of each iteration. The
