@@ -5,6 +5,7 @@ import pytest
 import numpy as np
 
 from sporco.admm import parcnsdl
+from sporco.admm import cbpdndl
 
 
 
@@ -73,3 +74,23 @@ class TestSet01(object):
         except Exception as e:
             print(e)
             assert(0)
+
+
+    def test_05(self):
+        lmbda = 1e-1
+        Nit = 10
+        opts = cbpdndl.ConvBPDNDictLearn.Options(
+            {'MaxMainIter': Nit, 'AccurateDFid': True,
+             'CBPDN': {'RelaxParam': 1.0, 'AutoRho': {'Enabled': False}},
+             'CCMOD': {'RelaxParam': 1.0, 'AutoRho': {'Enabled': False}}})
+        bs = cbpdndl.ConvBPDNDictLearn(self.D0, self.S, lmbda, opt=opts,
+                                       method='cns')
+        Ds = bs.solve()
+        optp = parcnsdl.ConvBPDNDictLearn_Consensus.Options(
+            {'MaxMainIter': Nit})
+        bp = parcnsdl.ConvBPDNDictLearn_Consensus(self.D0, self.S, lmbda,
+                                                  opt=optp, nproc=2)
+        Dp = bp.solve()
+        assert(np.linalg.norm(Ds - Dp) < 1e-7)
+        assert(np.abs(bs.getitstat().ObjFun[-1] - bp.getitstat().ObjFun[-1])
+               < 1e-7)

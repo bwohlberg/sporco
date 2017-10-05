@@ -326,7 +326,7 @@ class ConvBPDNDictLearn_Consensus(cbpdndl.ConvBPDNDictLearn):
 
         # Call parent constructor
         super(ConvBPDNDictLearn_Consensus, self).__init__(D0, S, lmbda,
-                                    opt=opt, dimK=dimK, dimN=dimN)
+                    opt=opt, method='cns', dimK=dimK, dimN=dimN)
 
         # Set up iterations statistics
         itstat_fields = ['Iter', 'ObjFun', 'DFid', 'RegL1', 'Time']
@@ -393,8 +393,7 @@ class ConvBPDNDictLearn_Consensus(cbpdndl.ConvBPDNDictLearn):
         global mp_D_Y
         init_mpraw('mp_D_Y', self.dstep.Y)
         global mp_D_U
-        mp_D_U = mpraw_as_np(mp_D_X.shape, mp_D_X.dtype)
-        mp_D_U[:] = 0
+        init_mpraw('mp_D_U', np.moveaxis(self.dstep.U, -1, 0))
 
 
 
