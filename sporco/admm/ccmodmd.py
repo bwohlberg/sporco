@@ -492,7 +492,7 @@ class ConvCnstrMODMaskDcplBase(admm.ADMMTwoBlockCnstrnt):
         function.
         """
 
-        return (linalg.norm(self.W * self.obfn_g0var())**2) / 2.0
+        return (linalg.norm(self.W * Y0)**2) / 2.0
 
 
 
@@ -501,7 +501,7 @@ class ConvCnstrMODMaskDcplBase(admm.ADMMTwoBlockCnstrnt):
         function.
         """
 
-        return linalg.norm((self.Pcn(self.obfn_g1var()) - self.obfn_g1var()))
+        return linalg.norm((self.Pcn(Y1) - Y1))
 
 
 
@@ -744,7 +744,7 @@ class ConvCnstrMODMaskDcpl_Consensus(ccmod.ConvCnstrMOD_Consensus):
     .. math::
        \mathrm{argmin}_\mathbf{d} \;
        (1/2) \left\|  W \left(\sum_m \mathbf{d}_m * \mathbf{x}_m -
-       \mathbf{s}\right) \right\|_2^2 \quad \text{such that} \quad
+       \mathbf{s} \right) \right\|_2^2 \quad \text{such that} \quad
        \mathbf{d}_m \in C \;\; \forall m
 
     where :math:`C` is the feasible set consisting of filters with unit

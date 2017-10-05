@@ -1990,7 +1990,7 @@ class ConvBPDNMaskDcpl(ConvTwoBlockCnstrnt):
         function.
         """
 
-        return (linalg.norm(self.W * self.obfn_g0var())**2) / 2.0
+        return (linalg.norm(self.W * Y0)**2) / 2.0
 
 
 
@@ -1999,7 +1999,7 @@ class ConvBPDNMaskDcpl(ConvTwoBlockCnstrnt):
         function.
         """
 
-        return linalg.norm((self.wl1 * self.obfn_g1var()).ravel(), 1)
+        return linalg.norm((self.wl1 * Y1).ravel(), 1)
 
 
 
