@@ -910,6 +910,18 @@ class ConvCnstrMODMaskDcpl_Consensus(ccmod.ConvCnstrMOD_Consensus):
 
 
 
+    def obfn_dfd(self):
+        r"""Compute data fidelity term :math:`(1/2) \| W \left( \sum_m
+        \mathbf{d}_m * \mathbf{x}_m - \mathbf{s} \right) \|_2^2`.
+        """
+
+        Ef = sl.inner(self.Zf, self.obfn_fvarf(), axis=self.cri.axisM) \
+          - self.Sf
+        return (linalg.norm(self.W * sl.irfftn(Ef, self.cri.Nv,
+                            self.cri.axisN))**2) / 2.0
+
+
+
     def compute_residuals(self):
         """Compute residuals and stopping thresholds. The parent class
         method is overridden to ensure that the residual calculations
