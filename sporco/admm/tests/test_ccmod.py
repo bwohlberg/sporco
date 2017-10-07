@@ -5,6 +5,7 @@ import numpy as np
 
 from sporco.admm import ccmod
 import sporco.linalg as sl
+import sporco.cnvrep as cr
 
 
 
@@ -18,7 +19,7 @@ class TestSet01(object):
         N = 32
         M = 4
         Nd = 5
-        D0 = ccmod.normalise(ccmod.zeromean(
+        D0 = cr.normalise(cr.zeromean(
             np.random.randn(Nd, Nd, M), (Nd, Nd, M), dimN=2), dimN=2)
         X = np.zeros((N, N, M))
         xr = np.random.randn(N, N, M)
@@ -35,7 +36,7 @@ class TestSet01(object):
         Sr = S.reshape(S.shape + (1,))
         c = ccmod.ConvCnstrMOD_IterSM(Xr, Sr, D0.shape, opt)
         c.solve()
-        D1 = ccmod.bcrop(c.Y, D0.shape).squeeze()
+        D1 = cr.bcrop(c.Y, D0.shape).squeeze()
         assert(sl.rrs(D0, D1) < 1e-5)
         assert(np.array(c.getitstat().XSlvRelRes).max() < 1e-5)
 
@@ -44,7 +45,7 @@ class TestSet01(object):
         N = 32
         M = 4
         Nd = 5
-        D0 = ccmod.normalise(ccmod.zeromean(
+        D0 = cr.normalise(cr.zeromean(
             np.random.randn(Nd, Nd, M), (Nd, Nd, M), dimN=2), dimN=2)
         X = np.zeros((N, N, M))
         xr = np.random.randn(N, N, M)
@@ -62,7 +63,7 @@ class TestSet01(object):
         Sr = S.reshape(S.shape + (1,))
         c = ccmod.ConvCnstrMOD_CG(Xr, Sr, D0.shape, opt)
         c.solve()
-        D1 = ccmod.bcrop(c.Y, D0.shape).squeeze()
+        D1 = cr.bcrop(c.Y, D0.shape).squeeze()
         assert(sl.rrs(D0, D1) < 1e-4)
         assert(np.array(c.getitstat().XSlvRelRes).max() < 1e-3)
 
@@ -71,7 +72,7 @@ class TestSet01(object):
         N = 64
         M = 4
         Nd = 8
-        D0 = ccmod.normalise(ccmod.zeromean(
+        D0 = cr.normalise(cr.zeromean(
             np.random.randn(Nd, Nd, M), (Nd, Nd, M), dimN=2), dimN=2)
         X = np.zeros((N, N, M))
         xr = np.random.randn(N, N, M)
@@ -88,7 +89,7 @@ class TestSet01(object):
         Sr = S.reshape(S.shape + (1,))
         c = ccmod.ConvCnstrMOD_Consensus(Xr, Sr, D0.shape, opt)
         c.solve()
-        D1 = ccmod.bcrop(c.Y, D0.shape).squeeze()
+        D1 = cr.bcrop(c.Y, D0.shape).squeeze()
         assert(sl.rrs(D0,D1) < 1e-5)
         assert(np.array(c.getitstat().XSlvRelRes).max() < 1e-5)
 

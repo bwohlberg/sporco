@@ -18,6 +18,7 @@ from scipy import linalg
 
 from sporco.admm import admm
 from sporco.admm import ccmod
+import sporco.cnvrep as cr
 import sporco.linalg as sl
 
 __author__ = """Brendt Wohlberg <brendt@ieee.org>"""
@@ -215,7 +216,7 @@ class ConvCnstrMODMaskDcplBase(admm.ADMMTwoBlockCnstrnt):
         W : array_like
           Mask array. The array shape must be such that the array is
           compatible for multiplication with the *internal* shape of
-          input array S (see :class:`admm.ccmod.ConvRepIndexing` for a
+          input array S (see :class:`.cnvrep.CDU_ConvRepIndexing` for a
           discussion of the distinction between *external* and
           *internal* data layouts).
         dsz : tuple
@@ -234,7 +235,7 @@ class ConvCnstrMODMaskDcplBase(admm.ADMMTwoBlockCnstrnt):
             opt = ConvCnstrMODMaskDcplBase.Options()
 
         # Infer problem dimensions and set relevant attributes of self
-        self.cri = ccmod.ConvRepIndexing(dsz, S, dimK=dimK, dimN=dimN)
+        self.cri = cr.CDU_ConvRepIndexing(dsz, S, dimK=dimK, dimN=dimN)
 
         # Append singleton dimensions to W if necessary
         if hasattr(W, 'ndim'):
@@ -323,7 +324,7 @@ class ConvCnstrMODMaskDcplBase(admm.ADMMTwoBlockCnstrnt):
     def getdict(self):
         """Get final dictionary."""
 
-        return ccmod.bcrop(self.block_sep1(self.Y), self.cri.dsz)
+        return cr.bcrop(self.block_sep1(self.Y), self.cri.dsz)
 
 
 
@@ -781,7 +782,7 @@ class ConvCnstrMODMaskDcpl_Consensus(ccmod.ConvCnstrMOD_Consensus):
         W : array_like
           Mask array. The array shape must be such that the array is
           compatible for multiplication with the *internal* shape of
-          input array S (see :class:`admm.ccmod.ConvRepIndexing` for a
+          input array S (see :class:`.cnvrep.CDU_ConvRepIndexing` for a
           discussion of the distinction between *external* and *internal*
           data layouts).
         dsz : tuple

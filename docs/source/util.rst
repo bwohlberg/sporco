@@ -16,16 +16,21 @@ the following modules:
 
   Functions for plotting graphs or 3D surfaces and visualising images.
 
+* :mod:`.metric`
+
+  Various image quality metrics including standard metrics such as
+  MSE, SNR, and PSNR.
+
 * :mod:`.linalg`
 
   Various linear algebra and related functions, including solvers for
   specific forms of linear system and filters for computing image
   gradients.
 
-* :mod:`.metric`
+* :mod:`.cnvrep`
 
-  Various image quality metrics including standard metrics such as
-  MSE, SNR, and PSNR.
+  Support classes and functions for working with convolutional
+  representations.
 
 * :mod:`.cdict`
 

@@ -16,13 +16,15 @@ import sporco.linalg as spl
 # Required due to pyFFTW bug #135 - see "Notes" section of SPORCO docs.
 spl.pyfftw_threads = 1
 from sporco.admm import cbpdndl
+import sporco.cnvrep as cr
 from sporco.util import u
 from sporco import util
 
 
 
 # Initialise global variables required by multiprocessing mechanism
-mp_cri = None    # A cbpdn.ConvRepIndexing object describing problem dimensions
+mp_cri = None    # A cnvrep.CSC_ConvRepIndexing object describing problem
+                 # dimensions
 mp_lmbda = None  # Regularisation parameter lambda
 mp_dprox = None  # Projection operator of the dictionary update
 mp_xrho = None   # Penalty parameter of the X (cbpdn) step
@@ -508,7 +510,7 @@ class ConvBPDNDictLearn_Consensus(cbpdndl.ConvBPDNDictLearn):
         """Get final dictionary."""
 
         global mp_D_Y
-        return cbpdndl.ccmod.bcrop(mp_D_Y, self.dstep.cri.dsz)
+        return cr.bcrop(mp_D_Y, self.dstep.cri.dsz)
 
 
 

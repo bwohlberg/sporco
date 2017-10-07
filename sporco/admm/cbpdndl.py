@@ -17,6 +17,7 @@ import numpy as np
 
 from sporco.util import u
 import sporco.linalg as sl
+import sporco.cnvrep as cr
 from sporco.admm import cbpdn
 from sporco.admm import ccmod
 from sporco.admm import ccmodmd
@@ -189,15 +190,15 @@ class ConvBPDNDictLearn(dictlrn.DictLearn):
             dsz = self.opt['DictSize']
 
         # Construct object representing problem dimensions
-        cri = ccmod.ConvRepIndexing(dsz, S, dimK, dimN)
+        cri = cr.CDU_ConvRepIndexing(dsz, S, dimK, dimN)
 
         # Normalise dictionary
         D0 = ccmod.getPcn0(opt['CCMOD', 'ZeroMean'], dsz, dimN,
                            dimC=cri.dimCd)(D0)
 
         # Modify D update options to include initial values for Y and U
-        opt['CCMOD'].update({'Y0' : ccmod.zpad(
-            ccmod.stdformD(D0, cri.C, cri.M, dimN), cri.Nv)})
+        opt['CCMOD'].update({'Y0' : cr.zpad(
+            cr.stdformD(D0, cri.C, cri.M, dimN), cri.Nv)})
 
         # Create X update object
         xstep = cbpdn.ConvBPDN(D0, S, lmbda, opt['CBPDN'], dimK=dimK,
@@ -418,7 +419,7 @@ class ConvBPDNMaskDcplDictLearn(dictlrn.DictLearn):
         W : array_like
           Mask array. The array shape must be such that the array is
           compatible for multiplication with the *internal* shape of
-          input array S (see :class:`.admm.ccmod.ConvRepIndexing` for a
+          input array S (see :class:`.cnvrep.CDU_ConvRepIndexing` for a
           discussion of the distinction between *external* and *internal*
           data layouts).
         opt : :class:`ConvBPDNMaskDcplDictLearn.Options` object
@@ -445,7 +446,7 @@ class ConvBPDNMaskDcplDictLearn(dictlrn.DictLearn):
             dsz = self.opt['DictSize']
 
         # Construct object representing problem dimensions
-        cri = ccmod.ConvRepIndexing(dsz, S, dimK, dimN)
+        cri = cr.CDU_ConvRepIndexing(dsz, S, dimK, dimN)
 
         # Normalise dictionary
         D0 = ccmod.getPcn0(opt['CCMOD', 'ZeroMean'], dsz, dimN=dimN,
@@ -456,7 +457,7 @@ class ConvBPDNMaskDcplDictLearn(dictlrn.DictLearn):
             Y0b0 = np.zeros(cri.Nv + (cri.C, 1, cri.K))
         else:
             Y0b0 = np.zeros(cri.Nv + (1, 1, cri.C * cri.K))
-        Y0b1 = ccmod.zpad(ccmod.stdformD(D0, cri.Cd, cri.M, dimN), cri.Nv)
+        Y0b1 = cr.zpad(cr.stdformD(D0, cri.Cd, cri.M, dimN), cri.Nv)
         if method == 'cns':
             Y0 = Y0b1
         else:

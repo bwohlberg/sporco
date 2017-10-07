@@ -28,6 +28,8 @@ Version 0.1.7   (Not yet released)
 - New module parcnsdl with a parallel processing implementation of
   convolutional dictionary learning with the ADMM consensus dictionary
   update
+- Moved class ConvRepIndexing from cbpdn and ccmod modules to new module
+  cnvrep. Additional classes from ccmod module also moved into cnvrep.
 
 
 

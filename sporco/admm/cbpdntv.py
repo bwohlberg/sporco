@@ -18,6 +18,7 @@ from scipy import linalg
 import copy
 
 from sporco.admm import admm
+import sporco.cnvrep as cr
 from sporco.admm import cbpdn
 import sporco.linalg as sl
 from sporco.util import u
@@ -189,7 +190,7 @@ class ConvBPDNScalarTV(admm.ADMM):
             opt = ConvBPDNScalarTV.Options()
 
         # Infer problem dimensions and set relevant attributes of self
-        self.cri = cbpdn.ConvRepIndexing(D, S, dimK=dimK, dimN=dimN)
+        self.cri = cr.CSC_ConvRepIndexing(D, S, dimK=dimK, dimN=dimN)
 
         # Call parent class __init__
         Nx = np.product(self.cri.shpX)
@@ -872,7 +873,7 @@ class ConvBPDNRecTV(admm.ADMM):
             opt = ConvBPDNRecTV.Options()
 
         # Infer problem dimensions and set relevant attributes of self
-        self.cri = cbpdn.ConvRepIndexing(D, S, dimK=dimK, dimN=dimN)
+        self.cri = cr.CSC_ConvRepIndexing(D, S, dimK=dimK, dimN=dimN)
 
         # Call parent class __init__
         Nx = np.product(self.cri.shpX)
