@@ -33,12 +33,9 @@ before_install:
     - conda info -a
 
 install:
-    - conda install --yes nomkl
-    - conda install --yes python=$TRAVIS_PYTHON_VERSION
-    - conda install --yes future numpy scipy matplotlib pytest
-    - pip install pillow
-    - pip install pyfftw
-    - pip install codecov
+    - conda create --yes -q -n test-environment python=$TRAVIS_PYTHON_VERSION python=$TRAVIS_PYTHON_VERSION nomkl future numpy scipy matplotlib pytest
+    - source activate test-environment
+    - pip install pillow pyfftw codecov
     - python setup.py build
     - python setup.py install
 
