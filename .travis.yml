@@ -33,8 +33,7 @@ before_install:
     - conda info -a
 
 install:
-    - conda create --yes -q -n test-env python=$TRAVIS_PYTHON_VERSION \
-      nomkl future numpy scipy matplotlib pytest
+    - conda create --yes -q -n test-env python=$TRAVIS_PYTHON_VERSION nomkl future numpy scipy matplotlib pytest
     - source activate test-env
     - pip install pillow pyfftw codecov
     - python setup.py build
