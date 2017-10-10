@@ -7,12 +7,12 @@ from sporco import cdict
 
 class Options(cdict.ConstrainedDict):
 
-    defaults = {'C' : { 'CA' : { 'CAA' : 'caa', 'CAB' : None },
-                        'CB' : 'cb' }}
+    defaults = {'C': { 'CA': { 'CAA': 'caa', 'CAB': None },
+                        'CB': 'cb' }}
 
     def __init__(self, opts={}):
         super(self.__class__, self).__init__(
-            {'C' : { 'CA' : { 'CAB' : 'cab' }}}
+            {'C': { 'CA': { 'CAB': 'cab' }}}
             )
         self.update(opts)
 
@@ -23,15 +23,15 @@ class TestSet01(object):
 
     def setup_method(self, method):
         cdict.ConstrainedDict.defaults = \
-            {'A' : 'a',
-                'B' : { 'BA' : 'ba', 'BB' : 'bb'},
-                'C' : { 'CA' : { 'CAA' : 'caa' }},
-                'D' : { 'DA' : { 'DAA' : {'DAAA' : 'daaa'},
-                                 'DAB' : 'dab', 'DAC' : 'dac'}}}
+            {'A': 'a',
+                'B': { 'BA': 'ba', 'BB': 'bb'},
+                'C': { 'CA': { 'CAA': 'caa' }},
+                'D': { 'DA': { 'DAA': {'DAAA': 'daaa'},
+                                 'DAB': 'dab', 'DAC': 'dac'}}}
 
         self.a = cdict.ConstrainedDict()
         self.b = Options()
-        self.c = Options({'C' : { 'CB' : 'cb2'}})
+        self.c = Options({'C': { 'CB': 'cb2'}})
 
 
     def test_01(self):
@@ -58,7 +58,7 @@ class TestSet01(object):
         assert(isinstance(self.a['C','CA'], cdict.ConstrainedDict))
 
     def test_07(self):
-        self.a['D', 'DA'].update({'DAB' : 'dab2'})
+        self.a['D', 'DA'].update({'DAB': 'dab2'})
         assert(self.a['D', 'DA', 'DAA', 'DAAA'] == 'daaa')
 
     def test_08(self):
@@ -74,8 +74,8 @@ class TestSet01(object):
         assert(self.c['C', 'CA', 'CAB'] == 'cab')
 
     def test_12(self):
-        a = {'A' : {'B' : {'C' : 1, 'CC' : 3}}, 'AA' : 2}
-        b = {'A' : {'B' : {'C' : 1, 'CC' : 3}}, 'AA' : 2}
+        a = {'A': {'B': {'C': 1, 'CC': 3}}, 'AA': 2}
+        b = {'A': {'B': {'C': 1, 'CC': 3}}, 'AA': 2}
         try:
             cdict.keycmp(a,b)
         except Exception as e:
@@ -83,8 +83,8 @@ class TestSet01(object):
             assert(0)
 
     def test_13(self):
-        a = {'A' : {'B' : {'C' : 1, 'CC' : 3}}, 'AA' : 2}
-        b = {'A' : {'B' : {'C' : 1, 'CCC' : 3}}, 'AA' : 2}
+        a = {'A': {'B': {'C': 1, 'CC': 3}}, 'AA': 2}
+        b = {'A': {'B': {'C': 1, 'CCC': 3}}, 'AA': 2}
         try:
             cdict.keycmp(a,b)
         except Exception as e:

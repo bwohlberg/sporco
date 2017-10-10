@@ -50,9 +50,9 @@ class TestSet01(object):
         X = np.random.randn(M, K)
         S = np.random.randn(N, K)
         dt = np.float16
-        opt = cmod.CnstrMOD.Options({'Verbose' : False, 'MaxMainIter' : 20,
-                                     'AutoRho' : {'Enabled' : True},
-                                     'DataType' : dt})
+        opt = cmod.CnstrMOD.Options({'Verbose': False, 'MaxMainIter': 20,
+                                     'AutoRho': {'Enabled': True},
+                                     'DataType': dt})
         b = cmod.CnstrMOD(X, S, opt=opt)
         b.solve()
         assert(b.X.dtype == dt)
@@ -67,9 +67,9 @@ class TestSet01(object):
         X = np.random.randn(M, K)
         S = np.random.randn(N, K)
         dt = np.float32
-        opt = cmod.CnstrMOD.Options({'Verbose' : False, 'MaxMainIter' : 20,
-                                     'AutoRho' : {'Enabled' : True},
-                                     'DataType' : dt})
+        opt = cmod.CnstrMOD.Options({'Verbose': False, 'MaxMainIter': 20,
+                                     'AutoRho': {'Enabled': True},
+                                     'DataType': dt})
         b = cmod.CnstrMOD(X, S, opt=opt)
         b.solve()
         assert(b.X.dtype == dt)
@@ -84,9 +84,9 @@ class TestSet01(object):
         X = np.random.randn(M, K)
         S = np.random.randn(N, K)
         dt = np.float64
-        opt = cmod.CnstrMOD.Options({'Verbose' : False, 'MaxMainIter' : 20,
-                                     'AutoRho' : {'Enabled' : True},
-                                     'DataType' : dt})
+        opt = cmod.CnstrMOD.Options({'Verbose': False, 'MaxMainIter': 20,
+                                     'AutoRho': {'Enabled': True},
+                                     'DataType': dt})
         b = cmod.CnstrMOD(X, S, opt=opt)
         b.solve()
         assert(b.X.dtype == dt)
@@ -95,14 +95,14 @@ class TestSet01(object):
 
 
     def test_06(self):
-        opt = cmod.CnstrMOD.Options({'AuxVarObj' : False})
+        opt = cmod.CnstrMOD.Options({'AuxVarObj': False})
         assert(opt['fEvalX'] is True and opt['gEvalY'] is False)
         opt['AuxVarObj'] = True
         assert(opt['fEvalX'] is False and opt['gEvalY'] is True)
 
 
     def test_07(self):
-        opt = cmod.CnstrMOD.Options({'AuxVarObj' : True})
+        opt = cmod.CnstrMOD.Options({'AuxVarObj': True})
         assert(opt['fEvalX'] is False and opt['gEvalY'] is True)
         opt['AuxVarObj'] = False
         assert(opt['fEvalX'] is True and opt['gEvalY'] is False)

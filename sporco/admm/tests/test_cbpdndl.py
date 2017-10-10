@@ -22,7 +22,7 @@ class TestSet01(object):
 
     def test_01(self):
         lmbda = 1e-1
-        opt = cbpdndl.ConvBPDNDictLearn.Options({'MaxMainIter' : 10})
+        opt = cbpdndl.ConvBPDNDictLearn.Options({'MaxMainIter': 10})
         try:
             b = cbpdndl.ConvBPDNDictLearn(self.D0, self.S[...,0], lmbda,
                                           opt=opt, dimK=0)
@@ -34,7 +34,7 @@ class TestSet01(object):
 
     def test_02(self):
         lmbda = 1e-1
-        opt = cbpdndl.ConvBPDNDictLearn.Options({'MaxMainIter' : 10})
+        opt = cbpdndl.ConvBPDNDictLearn.Options({'MaxMainIter': 10})
         try:
             b = cbpdndl.ConvBPDNDictLearn(self.D0, self.S, lmbda, opt=opt)
             b.solve()
@@ -45,7 +45,7 @@ class TestSet01(object):
 
     def test_03(self):
         lmbda = 1e-1
-        opt = cbpdndl.ConvBPDNDictLearn.Options({'MaxMainIter' : 10},
+        opt = cbpdndl.ConvBPDNDictLearn.Options({'MaxMainIter': 10},
                                                 method='cg')
         try:
             b = cbpdndl.ConvBPDNDictLearn(self.D0, self.S,
@@ -58,7 +58,7 @@ class TestSet01(object):
 
     def test_04(self):
         lmbda = 1e-1
-        opt = cbpdndl.ConvBPDNDictLearn.Options({'MaxMainIter' : 10},
+        opt = cbpdndl.ConvBPDNDictLearn.Options({'MaxMainIter': 10},
                                                 method='cns')
         try:
             b = cbpdndl.ConvBPDNDictLearn(self.D0, self.S, lmbda, opt=opt,
@@ -89,8 +89,8 @@ class TestSet01(object):
 
     def test_06(self):
         lmbda = 1e-1
-        opt = cbpdndl.ConvBPDNDictLearn.Options({'AccurateDFid' : True,
-                                                 'MaxMainIter' : 10})
+        opt = cbpdndl.ConvBPDNDictLearn.Options({'AccurateDFid': True,
+                                                 'MaxMainIter': 10})
         try:
             b = cbpdndl.ConvBPDNDictLearn(self.D0, self.S, lmbda, opt=opt)
             b.solve()
@@ -102,7 +102,7 @@ class TestSet01(object):
     def test_07(self):
         lmbda = 1e-1
         W = np.ones(self.S.shape[0:2] + (1, self.S.shape[2], 1))
-        opt = cbpdndl.ConvBPDNMaskDcplDictLearn.Options({'MaxMainIter' : 10})
+        opt = cbpdndl.ConvBPDNMaskDcplDictLearn.Options({'MaxMainIter': 10})
         try:
             b = cbpdndl.ConvBPDNMaskDcplDictLearn(self.D0, self.S, lmbda, W,
                                                   opt=opt)
@@ -116,7 +116,7 @@ class TestSet01(object):
         lmbda = 1e-1
         W = np.ones(self.S.shape[0:2] + (1, self.S.shape[2], 1))
         opt = cbpdndl.ConvBPDNMaskDcplDictLearn.Options(
-            {'MaxMainIter' : 5, 'CCMOD' : {'CG' : {'MaxIter' : 1}}},
+            {'MaxMainIter': 5, 'CCMOD': {'CG': {'MaxIter': 1}}},
              method='cg')
         try:
             b = cbpdndl.ConvBPDNMaskDcplDictLearn(self.D0, self.S,
@@ -130,7 +130,7 @@ class TestSet01(object):
     def test_09(self):
         lmbda = 1e-1
         W = np.ones(self.S.shape[0:2] + (1, self.S.shape[2], 1))
-        opt = cbpdndl.ConvBPDNMaskDcplDictLearn.Options({'MaxMainIter' : 10},
+        opt = cbpdndl.ConvBPDNMaskDcplDictLearn.Options({'MaxMainIter': 10},
                                                         method='cns')
         try:
             b = cbpdndl.ConvBPDNMaskDcplDictLearn(self.D0, self.S, lmbda, W,
@@ -145,7 +145,7 @@ class TestSet01(object):
         lmbda = 1e-1
         W = np.ones(self.S.shape[0:2] + (1, self.S.shape[2], 1))
         opt = cbpdndl.ConvBPDNMaskDcplDictLearn.Options(
-            {'AccurateDFid' : True,'MaxMainIter' : 10})
+            {'AccurateDFid': True,'MaxMainIter': 10})
         try:
             b = cbpdndl.ConvBPDNMaskDcplDictLearn(self.D0, self.S, lmbda, W,
                                                   opt=opt)

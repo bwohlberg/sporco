@@ -91,9 +91,9 @@ class TestSet01(object):
         D = np.random.randn(Nd, Nd, M)
         s = np.random.randn(N, N, K)
         dt = np.float32
-        opt = cbpdn.ConvBPDN.Options({'Verbose' : False, 'MaxMainIter' : 20,
-                                 'AutoRho' : {'Enabled' : True},
-                                 'DataType' : dt})
+        opt = cbpdn.ConvBPDN.Options({'Verbose': False, 'MaxMainIter': 20,
+                                 'AutoRho': {'Enabled': True},
+                                 'DataType': dt})
         lmbda = 1e-1
         b = cbpdn.ConvBPDN(D, s, lmbda, opt=opt)
         b.solve()
@@ -110,9 +110,9 @@ class TestSet01(object):
         D = np.random.randn(Nd, Nd, M)
         s = np.random.randn(N, N, K)
         dt = np.float64
-        opt = cbpdn.ConvBPDN.Options({'Verbose' : False, 'MaxMainIter' : 20,
-                                 'AutoRho' : {'Enabled' : True},
-                                 'DataType' : dt})
+        opt = cbpdn.ConvBPDN.Options({'Verbose': False, 'MaxMainIter': 20,
+                                 'AutoRho': {'Enabled': True},
+                                 'DataType': dt})
         lmbda = 1e-1
         b = cbpdn.ConvBPDN(D, s, lmbda, opt=opt)
         b.solve()
@@ -129,7 +129,7 @@ class TestSet01(object):
         s = np.random.randn(N, N)
         lmbda = 1e-1
         try:
-            opt = cbpdn.ConvBPDN.Options({'LinSolveCheck' : True})
+            opt = cbpdn.ConvBPDN.Options({'LinSolveCheck': True})
             b = cbpdn.ConvBPDN(D, s, lmbda, opt=opt)
             b.solve()
         except Exception as e:
@@ -165,9 +165,9 @@ class TestSet01(object):
                    sl.fftn(X0, None, (0,1)), None, (0,1)).real, axis=2)
         lmbda = 1e-4
         rho = 1e-1
-        opt = cbpdn.ConvBPDN.Options({'Verbose' : False, 'MaxMainIter' : 500,
-                                      'RelStopTol' : 1e-3, 'rho' : rho,
-                                      'AutoRho' : {'Enabled' : False}})
+        opt = cbpdn.ConvBPDN.Options({'Verbose': False, 'MaxMainIter': 500,
+                                      'RelStopTol': 1e-3, 'rho': rho,
+                                      'AutoRho': {'Enabled': False}})
         b = cbpdn.ConvBPDN(D, S, lmbda, opt)
         b.solve()
         X1 = b.Y.squeeze()
@@ -189,9 +189,9 @@ class TestSet01(object):
                    sl.fftn(X0, None, (0,1)), None, (0,1)).real, axis=2)
         lmbda = 1e-4
         rho = 1e-1
-        opt = cbpdn.ConvBPDN.Options({'Verbose' : False, 'MaxMainIter' : 500,
-                                      'RelStopTol' : 1e-3, 'rho' : rho,
-                                      'AutoRho' : {'Enabled' : False}})
+        opt = cbpdn.ConvBPDN.Options({'Verbose': False, 'MaxMainIter': 500,
+                                      'RelStopTol': 1e-3, 'rho': rho,
+                                      'AutoRho': {'Enabled': False}})
         b = cbpdn.ConvBPDN(D, S, lmbda, opt)
         b.solve()
         X1 = b.Y.squeeze()
@@ -209,7 +209,7 @@ class TestSet01(object):
         s = np.random.randn(N, N, Cs)
         lmbda = 1e-1
         try:
-            opt = cbpdn.ConvBPDN.Options({'LinSolveCheck' : True})
+            opt = cbpdn.ConvBPDN.Options({'LinSolveCheck': True})
             b = cbpdn.ConvBPDN(D, s, lmbda, opt=opt, dimK=0)
             b.solve()
         except Exception as e:
@@ -227,7 +227,7 @@ class TestSet01(object):
         s = np.random.randn(N, N, Cd)
         lmbda = 1e-1
         try:
-            opt = cbpdn.ConvBPDN.Options({'LinSolveCheck' : True})
+            opt = cbpdn.ConvBPDN.Options({'LinSolveCheck': True})
             b = cbpdn.ConvBPDN(D, s, lmbda, opt=opt, dimK=0)
             b.solve()
         except Exception as e:
@@ -245,7 +245,7 @@ class TestSet01(object):
         s = np.random.randn(N, N, Cs)
         lmbda = 1e-1
         try:
-            opt = cbpdn.ConvBPDNJoint.Options({'LinSolveCheck' : True})
+            opt = cbpdn.ConvBPDNJoint.Options({'LinSolveCheck': True})
             b = cbpdn.ConvBPDNJoint(D, s, lmbda, opt=opt, dimK=0)
             b.solve()
         except Exception as e:
@@ -262,9 +262,9 @@ class TestSet01(object):
         D = np.random.randn(Nd, Nd, M)
         s = np.random.randn(N, N, K)
         dt = np.float32
-        opt = cbpdn.ConvBPDNJoint.Options({'Verbose' : False,
-                        'MaxMainIter' : 20, 'AutoRho' : {'Enabled' : True},
-                        'DataType' : dt})
+        opt = cbpdn.ConvBPDNJoint.Options({'Verbose': False,
+                        'MaxMainIter': 20, 'AutoRho': {'Enabled': True},
+                        'DataType': dt})
         lmbda = 1e-1
         mu = 1e-2
         b = cbpdn.ConvBPDNJoint(D, s, lmbda, mu, opt=opt)
@@ -298,9 +298,9 @@ class TestSet01(object):
         D = np.random.randn(Nd, Nd, M)
         s = np.random.randn(N, N, K)
         dt = np.float32
-        opt = cbpdn.ConvElasticNet.Options({'Verbose' : False,
-                        'LinSolveCheck' : True, 'MaxMainIter' : 20,
-                        'AutoRho' : {'Enabled' : True}, 'DataType' : dt})
+        opt = cbpdn.ConvElasticNet.Options({'Verbose': False,
+                        'LinSolveCheck': True, 'MaxMainIter': 20,
+                        'AutoRho': {'Enabled': True}, 'DataType': dt})
         lmbda = 1e-1
         mu = 1e-2
         b = cbpdn.ConvElasticNet(D, s, lmbda, mu, opt=opt)
@@ -334,9 +334,9 @@ class TestSet01(object):
         D = np.random.randn(Nd, Nd, M)
         s = np.random.randn(N, N, K)
         dt = np.float32
-        opt = cbpdn.ConvBPDNGradReg.Options({'Verbose' : False,
-                        'LinSolveCheck' : True, 'MaxMainIter' : 20,
-                        'AutoRho' : {'Enabled' : True}, 'DataType' : dt})
+        opt = cbpdn.ConvBPDNGradReg.Options({'Verbose': False,
+                        'LinSolveCheck': True, 'MaxMainIter': 20,
+                        'AutoRho': {'Enabled': True}, 'DataType': dt})
         lmbda = 1e-1
         mu = 1e-2
         b = cbpdn.ConvBPDNGradReg(D, s, lmbda, mu, opt=opt)
@@ -435,9 +435,9 @@ class TestSet01(object):
         D = np.random.randn(Nd, Nd, M)
         s = np.random.randn(N, N, K)
         dt = np.float32
-        opt = cbpdn.ConvBPDNMaskDcpl.Options({'Verbose' : False,
-                    'LinSolveCheck' : True, 'MaxMainIter' : 20,
-                    'AutoRho' : {'Enabled' : True}, 'DataType' : dt})
+        opt = cbpdn.ConvBPDNMaskDcpl.Options({'Verbose': False,
+                    'LinSolveCheck': True, 'MaxMainIter': 20,
+                    'AutoRho': {'Enabled': True}, 'DataType': dt})
         lmbda = 1e-1
         b = cbpdn.ConvBPDNMaskDcpl(D, s, lmbda, opt=opt)
         b.solve()
@@ -471,9 +471,9 @@ class TestSet01(object):
         s = np.random.randn(N, N)
         w = np.ones(s.shape)
         dt = np.float32
-        opt = cbpdn.ConvBPDN.Options({'Verbose' : False, 'MaxMainIter' : 20,
-                                 'AutoRho' : {'Enabled' : True},
-                                 'DataType' : dt})
+        opt = cbpdn.ConvBPDN.Options({'Verbose': False, 'MaxMainIter': 20,
+                                 'AutoRho': {'Enabled': True},
+                                 'DataType': dt})
         lmbda = 1e-1
         b = cbpdn.AddMaskSim(cbpdn.ConvBPDN, D, s, w, lmbda, opt=opt)
         b.solve()
@@ -489,7 +489,7 @@ class TestSet01(object):
         D = np.random.randn(Nd, Nd, M)
         s = np.random.randn(N, N)
         lmbda = 1e-1
-        opt = cbpdn.ConvBPDN.Options({'Verbose' : False, 'MaxMainIter' : 10})
+        opt = cbpdn.ConvBPDN.Options({'Verbose': False, 'MaxMainIter': 10})
         b = cbpdn.ConvBPDN(D, s, lmbda, opt)
         bp = pickle.dumps(b)
         c = pickle.loads(bp)
@@ -499,14 +499,14 @@ class TestSet01(object):
 
 
     def test_32(self):
-        opt = cbpdn.GenericConvBPDN.Options({'AuxVarObj' : False})
+        opt = cbpdn.GenericConvBPDN.Options({'AuxVarObj': False})
         assert(opt['fEvalX'] is True and opt['gEvalY'] is False)
         opt['AuxVarObj'] = True
         assert(opt['fEvalX'] is False and opt['gEvalY'] is True)
 
 
     def test_33(self):
-        opt = cbpdn.GenericConvBPDN.Options({'AuxVarObj' : True})
+        opt = cbpdn.GenericConvBPDN.Options({'AuxVarObj': True})
         assert(opt['fEvalX'] is False and opt['gEvalY'] is True)
         opt['AuxVarObj'] = False
         assert(opt['fEvalX'] is True and opt['gEvalY'] is False)

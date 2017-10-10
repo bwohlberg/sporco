@@ -23,8 +23,8 @@ class TestSet01(object):
         W = 1.0
         try:
             opt = ccmodmd.ConvCnstrMODMaskDcpl_IterSM.Options(
-                           {'Verbose' : False, 'MaxMainIter' : 20,
-                            'LinSolveCheck' : True})
+                           {'Verbose': False, 'MaxMainIter': 20,
+                            'LinSolveCheck': True})
             c = ccmodmd.ConvCnstrMODMaskDcpl_IterSM(X, S, W, (Nd, Nd, 1, M),
                                            opt=opt, dimK=0)
             c.solve()
@@ -43,8 +43,8 @@ class TestSet01(object):
         W = 1.0
         try:
             opt = ccmodmd.ConvCnstrMODMaskDcpl_IterSM.Options(
-                           {'Verbose' : False, 'MaxMainIter' : 20,
-                            'LinSolveCheck' : True})
+                           {'Verbose': False, 'MaxMainIter': 20,
+                            'LinSolveCheck': True})
             c = ccmodmd.ConvCnstrMODMaskDcpl_IterSM(X, S, W,
                                     (Nd, Nd, 1, M), opt=opt)
             c.solve()
@@ -63,8 +63,8 @@ class TestSet01(object):
         W = 1.0
         try:
             opt = ccmodmd.ConvCnstrMODMaskDcpl_IterSM.Options(
-                           {'Verbose' : False, 'MaxMainIter' : 20,
-                            'LinSolveCheck' : True})
+                           {'Verbose': False, 'MaxMainIter': 20,
+                            'LinSolveCheck': True})
             c = ccmodmd.ConvCnstrMODMaskDcpl_IterSM(X, S, W, (Nd, Nd, 1, M),
                                            opt=opt, dimK=0)
             c.solve()
@@ -84,8 +84,8 @@ class TestSet01(object):
         W = 1.0
         try:
             opt = ccmodmd.ConvCnstrMODMaskDcpl_IterSM.Options(
-                           {'Verbose' : False, 'MaxMainIter' : 20,
-                            'LinSolveCheck' : True})
+                           {'Verbose': False, 'MaxMainIter': 20,
+                            'LinSolveCheck': True})
             c = ccmodmd.ConvCnstrMODMaskDcpl_IterSM(X, S, W, (Nd, Nd, 1, M),
                                            opt=opt)
             c.solve()
@@ -105,8 +105,8 @@ class TestSet01(object):
         W = 1.0
         try:
             opt = ccmodmd.ConvCnstrMODMaskDcpl_IterSM.Options(
-                           {'Verbose' : False, 'MaxMainIter' : 20,
-                            'LinSolveCheck' : True})
+                           {'Verbose': False, 'MaxMainIter': 20,
+                            'LinSolveCheck': True})
             c = ccmodmd.ConvCnstrMODMaskDcpl_IterSM(X, S, W, (Nd, Nd, Nc, M),
                                            opt=opt)
             c.solve()
@@ -124,8 +124,8 @@ class TestSet01(object):
         W = 1.0
         try:
             opt = ccmodmd.ConvCnstrMODMaskDcpl_CG.Options(
-                           {'Verbose' : False, 'MaxMainIter' : 20,
-                            'LinSolveCheck' : True})
+                           {'Verbose': False, 'MaxMainIter': 20,
+                            'LinSolveCheck': True})
             c = ccmodmd.ConvCnstrMODMaskDcpl_CG(X, S, W, (Nd, Nd, 1, M),
                                            opt=opt, dimK=0)
             c.solve()
@@ -144,8 +144,8 @@ class TestSet01(object):
         W = 1.0
         try:
             opt = ccmodmd.ConvCnstrMODMaskDcpl_CG.Options(
-                           {'Verbose' : False, 'MaxMainIter' : 20,
-                            'LinSolveCheck' : True})
+                           {'Verbose': False, 'MaxMainIter': 20,
+                            'LinSolveCheck': True})
             c = ccmodmd.ConvCnstrMODMaskDcpl_CG(X, S, W,
                                     (Nd, Nd, 1, M), opt=opt)
             c.solve()
@@ -164,8 +164,8 @@ class TestSet01(object):
         W = 1.0
         try:
             opt = ccmodmd.ConvCnstrMODMaskDcpl_CG.Options(
-                           {'Verbose' : False, 'MaxMainIter' : 20,
-                            'LinSolveCheck' : True})
+                           {'Verbose': False, 'MaxMainIter': 20,
+                            'LinSolveCheck': True})
             c = ccmodmd.ConvCnstrMODMaskDcpl_CG(X, S, W, (Nd, Nd, 1, M),
                                            opt=opt, dimK=0)
             c.solve()
@@ -183,8 +183,8 @@ class TestSet01(object):
         W = 1.0
         try:
             opt = ccmodmd.ConvCnstrMODMaskDcpl_Consensus.Options(
-                {'Verbose' : False, 'MaxMainIter' : 20,
-                 'LinSolveCheck' : True})
+                {'Verbose': False, 'MaxMainIter': 20,
+                 'LinSolveCheck': True})
             c = ccmodmd.ConvCnstrMODMaskDcpl_Consensus(X, S, W,
                                 (Nd, Nd, 1, M), opt=opt, dimK=0)
             c.solve()
@@ -203,8 +203,8 @@ class TestSet01(object):
         W = 1.0
         try:
             opt = ccmodmd.ConvCnstrMODMaskDcpl_Consensus.Options(
-                {'Verbose' : False, 'MaxMainIter' : 20,
-                 'LinSolveCheck' : True})
+                {'Verbose': False, 'MaxMainIter': 20,
+                 'LinSolveCheck': True})
             c = ccmodmd.ConvCnstrMODMaskDcpl_Consensus(X, S, W,
                                         (Nd, Nd, 1, M), opt=opt)
             c.solve()
@@ -223,8 +223,8 @@ class TestSet01(object):
         W = 1.0
         try:
             opt = ccmodmd.ConvCnstrMODMaskDcpl_Consensus.Options(
-                {'Verbose' : False, 'MaxMainIter' : 20,
-                 'LinSolveCheck' : True})
+                {'Verbose': False, 'MaxMainIter': 20,
+                 'LinSolveCheck': True})
             c = ccmodmd.ConvCnstrMODMaskDcpl_Consensus(X, S, W,
                                 (Nd, Nd, 1, M), opt=opt, dimK=0)
             c.solve()
@@ -244,8 +244,8 @@ class TestSet01(object):
         W = 1.0
         try:
             opt = ccmodmd.ConvCnstrMODMaskDcpl_Consensus.Options(
-                {'Verbose' : False, 'MaxMainIter' : 20,
-                 'LinSolveCheck' : True})
+                {'Verbose': False, 'MaxMainIter': 20,
+                 'LinSolveCheck': True})
             c = ccmodmd.ConvCnstrMODMaskDcpl_Consensus(X, S, W,
                                 (Nd, Nd, 1, M), opt=opt)
             c.solve()
@@ -265,8 +265,8 @@ class TestSet01(object):
         W = 1.0
         try:
             opt = ccmodmd.ConvCnstrMODMaskDcpl_Consensus.Options(
-                {'Verbose' : False,  'MaxMainIter' : 20,
-                 'LinSolveCheck' : True})
+                {'Verbose': False,  'MaxMainIter': 20,
+                 'LinSolveCheck': True})
             c = ccmodmd.ConvCnstrMODMaskDcpl_Consensus(X, S, W,
                                 (Nd, Nd, Nc, M), opt=opt)
             c.solve()
@@ -276,14 +276,14 @@ class TestSet01(object):
 
 
     def test_14(self):
-        opt = ccmodmd.ConvCnstrMODMaskDcplBase.Options({'AuxVarObj' : False})
+        opt = ccmodmd.ConvCnstrMODMaskDcplBase.Options({'AuxVarObj': False})
         assert(opt['fEvalX'] is True and opt['gEvalY'] is False)
         opt['AuxVarObj'] = True
         assert(opt['fEvalX'] is False and opt['gEvalY'] is True)
 
 
     def test_15(self):
-        opt = ccmodmd.ConvCnstrMODMaskDcplBase.Options({'AuxVarObj' : True})
+        opt = ccmodmd.ConvCnstrMODMaskDcplBase.Options({'AuxVarObj': True})
         assert(opt['fEvalX'] is False and opt['gEvalY'] is True)
         opt['AuxVarObj'] = False
         assert(opt['fEvalX'] is True and opt['gEvalY'] is False)
@@ -298,8 +298,8 @@ class TestSet01(object):
         S = np.random.randn(N, N, Nc)
         W = 1.0
         try:
-            opt = ccmodmd.ConvCnstrMODMaskDcplOptions({'Verbose' : False,
-                            'MaxMainIter' : 20, 'LinSolveCheck' : True})
+            opt = ccmodmd.ConvCnstrMODMaskDcplOptions({'Verbose': False,
+                            'MaxMainIter': 20, 'LinSolveCheck': True})
             c = ccmodmd.ConvCnstrMODMaskDcpl(X, S, W, (Nd, Nd, 1, M),
                                              opt=opt, dimK=0)
             c.solve()

@@ -24,10 +24,10 @@ class TestSet01(object):
         V[np.abs(V) < t] = 0
         D = U + V
         lmbda = 0.1
-        opt = spline.SplineL1.Options({'Verbose' : False, 'gEvalY' : False,
-                              'MaxMainIter' : 250, 'RelStopTol' : 5e-4,
-                              'DFidWeight' : V == 0,
-                              'AutoRho' : {'Enabled' : True}})
+        opt = spline.SplineL1.Options({'Verbose': False, 'gEvalY': False,
+                              'MaxMainIter': 250, 'RelStopTol': 5e-4,
+                              'DFidWeight': V == 0,
+                              'AutoRho': {'Enabled': True}})
         b = spline.SplineL1(D, lmbda, opt)
         X = b.solve()
         assert(np.abs(b.itstat[-1].ObjFun - 0.333606246) < 1e-6)
@@ -51,8 +51,8 @@ class TestSet01(object):
         D = np.random.randn(N, N)
         lmbda = 0.1
         dt = np.float32
-        opt = spline.SplineL1.Options({'Verbose' : False, 'MaxMainIter' : 20,
-                              'AutoRho' : {'Enabled' : True}, 'DataType' : dt})
+        opt = spline.SplineL1.Options({'Verbose': False, 'MaxMainIter': 20,
+                              'AutoRho': {'Enabled': True}, 'DataType': dt})
         b = spline.SplineL1(D, lmbda, opt=opt)
         b.solve()
         assert(b.X.dtype == dt)
@@ -65,8 +65,8 @@ class TestSet01(object):
         D = np.random.randn(N, N)
         lmbda = 0.1
         dt = np.float64
-        opt = spline.SplineL1.Options({'Verbose' : False, 'MaxMainIter' : 20,
-                              'AutoRho' : {'Enabled' : True}, 'DataType' : dt})
+        opt = spline.SplineL1.Options({'Verbose': False, 'MaxMainIter': 20,
+                              'AutoRho': {'Enabled': True}, 'DataType': dt})
         b = spline.SplineL1(D, lmbda, opt=opt)
         b.solve()
         assert(b.X.dtype == dt)

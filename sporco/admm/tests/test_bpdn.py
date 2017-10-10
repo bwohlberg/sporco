@@ -58,8 +58,8 @@ class TestSet01(object):
         D = np.random.randn(N, M)
         s = np.random.randn(N, 1)
         try:
-            opt = bpdn.BPDN.Options({'Verbose' : True, 'MaxMainIter' : 20,
-                                     'AutoRho' : {'StdResiduals' : True}})
+            opt = bpdn.BPDN.Options({'Verbose': True, 'MaxMainIter': 20,
+                                     'AutoRho': {'StdResiduals': True}})
             b = bpdn.BPDN(D, s, lmbda=1.0, opt=opt)
             b.solve()
         except Exception as e:
@@ -73,8 +73,8 @@ class TestSet01(object):
         D = np.random.randn(N, M)
         s = np.random.randn(N, 1)
         try:
-            opt = bpdn.BPDN.Options({'FastSolve' : True, 'Verbose' : False,
-                'MaxMainIter' : 10, 'AutoRho' : {'Enabled' : False}})
+            opt = bpdn.BPDN.Options({'FastSolve': True, 'Verbose': False,
+                'MaxMainIter': 10, 'AutoRho': {'Enabled': False}})
             b = bpdn.BPDN(D, s, lmbda=1.0, opt=opt)
             b.solve()
         except Exception as e:
@@ -88,9 +88,9 @@ class TestSet01(object):
         D = np.random.randn(N, M)
         s = np.random.randn(N, 1)
         dt = np.float16
-        opt = bpdn.BPDN.Options({'Verbose' : False, 'MaxMainIter' : 20,
-                                 'AutoRho' : {'Enabled' : True},
-                                 'DataType' : dt})
+        opt = bpdn.BPDN.Options({'Verbose': False, 'MaxMainIter': 20,
+                                 'AutoRho': {'Enabled': True},
+                                 'DataType': dt})
         b = bpdn.BPDN(D, s, lmbda=1.0, opt=opt)
         b.solve()
         assert(b.X.dtype == dt)
@@ -104,9 +104,9 @@ class TestSet01(object):
         D = np.random.randn(N, M)
         s = np.random.randn(N, 1)
         dt = np.float32
-        opt = bpdn.BPDN.Options({'Verbose' : False, 'MaxMainIter' : 20,
-                                 'AutoRho' : {'Enabled' : True},
-                                 'DataType' : dt})
+        opt = bpdn.BPDN.Options({'Verbose': False, 'MaxMainIter': 20,
+                                 'AutoRho': {'Enabled': True},
+                                 'DataType': dt})
         b = bpdn.BPDN(D, s, lmbda=1.0, opt=opt)
         b.solve()
         assert(b.X.dtype == dt)
@@ -120,9 +120,9 @@ class TestSet01(object):
         D = np.random.randn(N, M)
         s = np.random.randn(N, 1)
         dt = np.float64
-        opt = bpdn.BPDN.Options({'Verbose' : False, 'MaxMainIter' : 20,
-                                 'AutoRho' : {'Enabled' : True},
-                                 'DataType' : dt})
+        opt = bpdn.BPDN.Options({'Verbose': False, 'MaxMainIter': 20,
+                                 'AutoRho': {'Enabled': True},
+                                 'DataType': dt})
         b = bpdn.BPDN(D, s, lmbda=1.0, opt=opt)
         b.solve()
         assert(b.X.dtype == dt)
@@ -141,8 +141,8 @@ class TestSet01(object):
         x0[si[0:L]] = np.random.randn(L, 1)
         s0 = D.dot(x0)
         lmbda = 5e-3
-        opt = bpdn.BPDN.Options({'Verbose' : False, 'MaxMainIter' : 500,
-                                 'RelStopTol' : 5e-4})
+        opt = bpdn.BPDN.Options({'Verbose': False, 'MaxMainIter': 500,
+                                 'RelStopTol': 5e-4})
         b = bpdn.BPDN(D, s0, lmbda, opt)
         b.solve()
         x1 = b.Y
@@ -173,9 +173,9 @@ class TestSet01(object):
         D = np.random.randn(N, M)
         s = np.random.randn(N, 1)
         dt = np.float16
-        opt = bpdn.BPDNJoint.Options({'Verbose' : False, 'MaxMainIter' : 20,
-                                 'AutoRho' : {'Enabled' : True},
-                                 'DataType' : dt})
+        opt = bpdn.BPDNJoint.Options({'Verbose': False, 'MaxMainIter': 20,
+                                 'AutoRho': {'Enabled': True},
+                                 'DataType': dt})
         b = bpdn.BPDNJoint(D, s, lmbda=1.0, mu=0.1, opt=opt)
         b.solve()
         assert(b.X.dtype == dt)
@@ -204,9 +204,9 @@ class TestSet01(object):
         D = np.random.randn(N, M)
         s = np.random.randn(N, 1)
         dt = np.float16
-        opt = bpdn.ElasticNet.Options({'Verbose' : False, 'MaxMainIter' : 20,
-                                 'AutoRho' : {'Enabled' : True},
-                                 'DataType' : dt})
+        opt = bpdn.ElasticNet.Options({'Verbose': False, 'MaxMainIter': 20,
+                                 'AutoRho': {'Enabled': True},
+                                 'DataType': dt})
         b = bpdn.ElasticNet(D, s, lmbda=1.0, mu=0.1, opt=opt)
         b.solve()
         assert(b.X.dtype == dt)
@@ -220,7 +220,7 @@ class TestSet01(object):
         D = np.random.randn(N, M)
         s = np.random.randn(N, 1)
         lmbda = 1e-1
-        opt = bpdn.BPDN.Options({'Verbose' : False, 'MaxMainIter' : 10})
+        opt = bpdn.BPDN.Options({'Verbose': False, 'MaxMainIter': 10})
         b = bpdn.BPDN(D, s, lmbda, opt)
         bp = pickle.dumps(b)
         c = pickle.loads(bp)
@@ -230,14 +230,14 @@ class TestSet01(object):
 
 
     def test_17(self):
-        opt = bpdn.GenericBPDN.Options({'AuxVarObj' : False})
+        opt = bpdn.GenericBPDN.Options({'AuxVarObj': False})
         assert(opt['fEvalX'] is True and opt['gEvalY'] is False)
         opt['AuxVarObj'] = True
         assert(opt['fEvalX'] is False and opt['gEvalY'] is True)
 
 
     def test_18(self):
-        opt = bpdn.GenericBPDN.Options({'AuxVarObj' : True})
+        opt = bpdn.GenericBPDN.Options({'AuxVarObj': True})
         assert(opt['fEvalX'] is False and opt['gEvalY'] is True)
         opt['AuxVarObj'] = False
         assert(opt['fEvalX'] is True and opt['gEvalY'] is False)
@@ -250,8 +250,8 @@ class TestSet01(object):
         D = np.random.randn(N, M)
         s = np.random.randn(N, 1)
         lmbda = 1e-1
-        opt = bpdn.BPDN.Options({'Verbose' : False, 'MaxMainIter' : 10,
-                        'Callback' : CallbackTest, 'RelaxParam' : 1.0})
+        opt = bpdn.BPDN.Options({'Verbose': False, 'MaxMainIter': 10,
+                        'Callback': CallbackTest, 'RelaxParam': 1.0})
         b = bpdn.BPDN(D, s, lmbda, opt=opt)
         assert(b.getitstat() is None)
         b.solve()

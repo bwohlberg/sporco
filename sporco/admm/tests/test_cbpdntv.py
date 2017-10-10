@@ -24,7 +24,7 @@ class TestSet01(object):
         lmbda = 1e-1
         mu = 1e-2
         try:
-            opt = cbpdntv.ConvBPDNScalarTV.Options({'LinSolveCheck' : True})
+            opt = cbpdntv.ConvBPDNScalarTV.Options({'LinSolveCheck': True})
             b = cbpdntv.ConvBPDNScalarTV(D, s, lmbda, mu, opt=opt)
             b.solve()
         except Exception as e:
@@ -42,7 +42,7 @@ class TestSet01(object):
         lmbda = 1e-1
         mu = 1e-2
         try:
-            opt = cbpdntv.ConvBPDNVectorTV.Options({'LinSolveCheck' : True})
+            opt = cbpdntv.ConvBPDNVectorTV.Options({'LinSolveCheck': True})
             b = cbpdntv.ConvBPDNVectorTV(D, s, lmbda, mu, opt=opt)
             b.solve()
         except Exception as e:
@@ -60,7 +60,7 @@ class TestSet01(object):
         lmbda = 1e-1
         mu = 1e-2
         try:
-            opt = cbpdntv.ConvBPDNRecTV.Options({'LinSolveCheck' : True})
+            opt = cbpdntv.ConvBPDNRecTV.Options({'LinSolveCheck': True})
             b = cbpdntv.ConvBPDNRecTV(D, s, lmbda, mu, opt=opt)
             b.solve()
         except Exception as e:
@@ -79,7 +79,7 @@ class TestSet01(object):
         lmbda = 1e-1
         mu = 1e-2
         try:
-            opt = cbpdntv.ConvBPDNScalarTV.Options({'LinSolveCheck' : True})
+            opt = cbpdntv.ConvBPDNScalarTV.Options({'LinSolveCheck': True})
             b = cbpdntv.ConvBPDNScalarTV(D, s, lmbda, mu, opt=opt, dimK=0)
             b.solve()
         except Exception as e:
@@ -98,7 +98,7 @@ class TestSet01(object):
         lmbda = 1e-1
         mu = 1e-2
         try:
-            opt = cbpdntv.ConvBPDNVectorTV.Options({'LinSolveCheck' : True})
+            opt = cbpdntv.ConvBPDNVectorTV.Options({'LinSolveCheck': True})
             b = cbpdntv.ConvBPDNVectorTV(D, s, lmbda, mu, opt=opt, dimK=0)
             b.solve()
         except Exception as e:
@@ -117,7 +117,7 @@ class TestSet01(object):
         lmbda = 1e-1
         mu = 1e-2
         try:
-            opt = cbpdntv.ConvBPDNRecTV.Options({'LinSolveCheck' : True})
+            opt = cbpdntv.ConvBPDNRecTV.Options({'LinSolveCheck': True})
             b = cbpdntv.ConvBPDNRecTV(D, s, lmbda, mu, opt=opt, dimK=0)
             b.solve()
         except Exception as e:
@@ -135,7 +135,7 @@ class TestSet01(object):
         s = np.random.randn(N, N, Cd)
         lmbda = 1e-1
         try:
-            opt = cbpdntv.ConvBPDNScalarTV.Options({'LinSolveCheck' : True})
+            opt = cbpdntv.ConvBPDNScalarTV.Options({'LinSolveCheck': True})
             b = cbpdntv.ConvBPDNScalarTV(D, s, lmbda, opt=opt, dimK=0)
             b.solve()
         except Exception as e:
@@ -153,7 +153,7 @@ class TestSet01(object):
         s = np.random.randn(N, N, Cd)
         lmbda = 1e-1
         try:
-            opt = cbpdntv.ConvBPDNVectorTV.Options({'LinSolveCheck' : True})
+            opt = cbpdntv.ConvBPDNVectorTV.Options({'LinSolveCheck': True})
             b = cbpdntv.ConvBPDNVectorTV(D, s, lmbda, opt=opt, dimK=0)
             b.solve()
         except Exception as e:
@@ -171,7 +171,7 @@ class TestSet01(object):
         s = np.random.randn(N, N, Cd)
         lmbda = 1e-1
         try:
-            opt = cbpdntv.ConvBPDNRecTV.Options({'LinSolveCheck' : True})
+            opt = cbpdntv.ConvBPDNRecTV.Options({'LinSolveCheck': True})
             b = cbpdntv.ConvBPDNRecTV(D, s, lmbda, opt=opt, dimK=0)
             b.solve()
         except Exception as e:

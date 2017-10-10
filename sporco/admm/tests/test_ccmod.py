@@ -28,10 +28,10 @@ class TestSet01(object):
         S = np.sum(sl.ifftn(sl.fftn(D0, (N, N), (0,1)) *
                    sl.fftn(X, None, (0,1)), None, (0,1)).real, axis=2)
         rho = 1e-1
-        opt = ccmod.ConvCnstrMOD_IterSM.Options({'Verbose' : False,
-                    'MaxMainIter' : 500, 'LinSolveCheck' : True,
-                    'ZeroMean' : True, 'RelStopTol' : 1e-5, 'rho' : rho,
-                    'AutoRho' : {'Enabled' : False}})
+        opt = ccmod.ConvCnstrMOD_IterSM.Options({'Verbose': False,
+                    'MaxMainIter': 500, 'LinSolveCheck': True,
+                    'ZeroMean': True, 'RelStopTol': 1e-5, 'rho': rho,
+                    'AutoRho': {'Enabled': False}})
         Xr = X.reshape(X.shape[0:2] + (1,1,) + X.shape[2:])
         Sr = S.reshape(S.shape + (1,))
         c = ccmod.ConvCnstrMOD_IterSM(Xr, Sr, D0.shape, opt)
@@ -54,11 +54,11 @@ class TestSet01(object):
         S = np.sum(sl.ifftn(sl.fftn(D0, (N, N), (0,1)) *
                    sl.fftn(X, None, (0,1)), None, (0,1)).real, axis=2)
         rho = 1e-1
-        opt = ccmod.ConvCnstrMOD_CG.Options({'Verbose' : False,
-                    'MaxMainIter' : 500, 'LinSolveCheck' : True,
-                    'ZeroMean' : True, 'RelStopTol' : 1e-5, 'rho' : rho,
-                    'AutoRho' : {'Enabled' : False},
-                    'CG' : {'StopTol' : 1e-5}})
+        opt = ccmod.ConvCnstrMOD_CG.Options({'Verbose': False,
+                    'MaxMainIter': 500, 'LinSolveCheck': True,
+                    'ZeroMean': True, 'RelStopTol': 1e-5, 'rho': rho,
+                    'AutoRho': {'Enabled': False},
+                    'CG': {'StopTol': 1e-5}})
         Xr = X.reshape(X.shape[0:2] + (1,1,) + X.shape[2:])
         Sr = S.reshape(S.shape + (1,))
         c = ccmod.ConvCnstrMOD_CG(Xr, Sr, D0.shape, opt)
@@ -81,10 +81,10 @@ class TestSet01(object):
         S = np.sum(sl.ifftn(sl.fftn(D0, (N, N), (0,1)) *
                    sl.fftn(X, None, (0,1)), None, (0,1)).real, axis=2)
         rho = 1e1
-        opt = ccmod.ConvCnstrMOD_Consensus.Options({'Verbose' : False,
-                    'MaxMainIter' : 500, 'LinSolveCheck' : True,
-                    'ZeroMean' : True, 'RelStopTol' : 1e-3, 'rho' : rho,
-                    'AutoRho' : {'Enabled' : False}})
+        opt = ccmod.ConvCnstrMOD_Consensus.Options({'Verbose': False,
+                    'MaxMainIter': 500, 'LinSolveCheck': True,
+                    'ZeroMean': True, 'RelStopTol': 1e-3, 'rho': rho,
+                    'AutoRho': {'Enabled': False}})
         Xr = X.reshape(X.shape[0:2] + (1,1,) + X.shape[2:])
         Sr = S.reshape(S.shape + (1,))
         c = ccmod.ConvCnstrMOD_Consensus(Xr, Sr, D0.shape, opt)
@@ -129,8 +129,8 @@ class TestSet01(object):
         X = np.random.randn(N, N, Nc, 1, M)
         S = np.random.randn(N, N, Nc)
         try:
-            opt = ccmod.ConvCnstrMODOptions({'Verbose' : False,
-                            'MaxMainIter' : 20, 'LinSolveCheck' : True})
+            opt = ccmod.ConvCnstrMODOptions({'Verbose': False,
+                            'MaxMainIter': 20, 'LinSolveCheck': True})
             c = ccmod.ConvCnstrMOD(X, S, (Nd, Nd, 1, M), opt=opt, dimK=0)
             c.solve()
         except Exception as e:
@@ -147,9 +147,9 @@ class TestSet01(object):
         S = np.random.randn(N, N, 1)
         dt = np.float32
         opt = ccmod.ConvCnstrMODOptions(
-            {'Verbose' : False, 'MaxMainIter' : 20,
-             'AutoRho' : {'Enabled' : True},
-             'DataType' : dt})
+            {'Verbose': False, 'MaxMainIter': 20,
+             'AutoRho': {'Enabled': True},
+             'DataType': dt})
         c = ccmod.ConvCnstrMOD(X, S, (Nd, Nd, M), opt=opt)
         c.solve()
         assert(c.X.dtype == dt)
@@ -165,9 +165,9 @@ class TestSet01(object):
         S = np.random.randn(N, N, 1)
         dt = np.float64
         opt = ccmod.ConvCnstrMODOptions(
-            {'Verbose' : False, 'MaxMainIter' : 20,
-             'AutoRho' : {'Enabled' : True},
-             'DataType' : dt})
+            {'Verbose': False, 'MaxMainIter': 20,
+             'AutoRho': {'Enabled': True},
+             'DataType': dt})
         c = ccmod.ConvCnstrMOD(X, S, (Nd, Nd, M), opt=opt)
         c.solve()
         assert(c.X.dtype == dt)
@@ -182,8 +182,8 @@ class TestSet01(object):
         X = np.random.randn(N, N, 1, 1, M)
         S = np.random.randn(N, N)
         try:
-            opt = ccmod.ConvCnstrMOD_Consensus.Options({'Verbose' : False,
-                            'MaxMainIter' : 20, 'LinSolveCheck' : True})
+            opt = ccmod.ConvCnstrMOD_Consensus.Options({'Verbose': False,
+                            'MaxMainIter': 20, 'LinSolveCheck': True})
             c = ccmod.ConvCnstrMOD_Consensus(X, S, (Nd, Nd, 1, M),
                                            opt=opt, dimK=0)
             c.solve()
@@ -200,8 +200,8 @@ class TestSet01(object):
         X = np.random.randn(N, N, 1, K, M)
         S = np.random.randn(N, N, K)
         try:
-            opt = ccmod.ConvCnstrMOD_Consensus.Options({'Verbose' : False,
-                            'MaxMainIter' : 20, 'LinSolveCheck' : True})
+            opt = ccmod.ConvCnstrMOD_Consensus.Options({'Verbose': False,
+                            'MaxMainIter': 20, 'LinSolveCheck': True})
             c = ccmod.ConvCnstrMOD_Consensus(X, S, (Nd, Nd, 1, M), opt=opt)
             c.solve()
         except Exception as e:
@@ -217,8 +217,8 @@ class TestSet01(object):
         X = np.random.randn(N, N, Nc, 1, M)
         S = np.random.randn(N, N, Nc)
         try:
-            opt = ccmod.ConvCnstrMOD_Consensus.Options({'Verbose' : False,
-                            'MaxMainIter' : 20, 'LinSolveCheck' : True})
+            opt = ccmod.ConvCnstrMOD_Consensus.Options({'Verbose': False,
+                            'MaxMainIter': 20, 'LinSolveCheck': True})
             c = ccmod.ConvCnstrMOD_Consensus(X, S, (Nd, Nd, 1, M),
                                            opt=opt, dimK=0)
             c.solve()
@@ -236,8 +236,8 @@ class TestSet01(object):
         X = np.random.randn(N, N, Nc, K, M)
         S = np.random.randn(N, N, Nc, K)
         try:
-            opt = ccmod.ConvCnstrMOD_Consensus.Options({'Verbose' : False,
-                            'MaxMainIter' : 20, 'LinSolveCheck' : True})
+            opt = ccmod.ConvCnstrMOD_Consensus.Options({'Verbose': False,
+                            'MaxMainIter': 20, 'LinSolveCheck': True})
             c = ccmod.ConvCnstrMOD_Consensus(X, S, (Nd, Nd, 1, M),
                                            opt=opt)
             c.solve()
@@ -255,8 +255,8 @@ class TestSet01(object):
         X = np.random.randn(N, N, Nc, K, M)
         S = np.random.randn(N, N, Nc, K)
         try:
-            opt = ccmod.ConvCnstrMOD_Consensus.Options({'Verbose' : False,
-                            'MaxMainIter' : 20, 'LinSolveCheck' : True})
+            opt = ccmod.ConvCnstrMOD_Consensus.Options({'Verbose': False,
+                            'MaxMainIter': 20, 'LinSolveCheck': True})
             c = ccmod.ConvCnstrMOD_Consensus(X, S, (Nd, Nd, Nc, M),
                                            opt=opt)
             c.solve()
@@ -266,14 +266,14 @@ class TestSet01(object):
 
 
     def test_14(self):
-        opt = ccmod.ConvCnstrMODBase.Options({'AuxVarObj' : False})
+        opt = ccmod.ConvCnstrMODBase.Options({'AuxVarObj': False})
         assert(opt['fEvalX'] is True and opt['gEvalY'] is False)
         opt['AuxVarObj'] = True
         assert(opt['fEvalX'] is False and opt['gEvalY'] is True)
 
 
     def test_15(self):
-        opt = ccmod.ConvCnstrMODBase.Options({'AuxVarObj' : True})
+        opt = ccmod.ConvCnstrMODBase.Options({'AuxVarObj': True})
         assert(opt['fEvalX'] is False and opt['gEvalY'] is True)
         opt['AuxVarObj'] = False
         assert(opt['fEvalX'] is True and opt['gEvalY'] is False)

@@ -38,8 +38,8 @@ class TestSet01(object):
 
     def test_03(self):
         lmbda = 1e-1
-        opt = bpdndl.BPDNDictLearn.Options({'AccurateDFid' : True,
-                                            'MaxMainIter' : 10})
+        opt = bpdndl.BPDNDictLearn.Options({'AccurateDFid': True,
+                                            'MaxMainIter': 10})
         try:
             b = bpdndl.BPDNDictLearn(self.D0, self.S, lmbda, opt=opt)
             b.solve()

@@ -23,9 +23,9 @@ class TestSet01(object):
         t = np.sort(np.abs(V).ravel())[V.size-L]
         V[np.abs(V) < t] = 0
         D = U + V
-        opt = rpca.RobustPCA.Options({'Verbose' : False, 'gEvalY' : False,
-                              'MaxMainIter' : 250,
-                              'AutoRho' : {'Enabled' : True}})
+        opt = rpca.RobustPCA.Options({'Verbose': False, 'gEvalY': False,
+                              'MaxMainIter': 250,
+                              'AutoRho': {'Enabled': True}})
         b = rpca.RobustPCA(D, None, opt)
         X, Y = b.solve()
         assert(np.abs(b.itstat[-1].ObjFun - 321.493968419) < 1e-6)
@@ -48,8 +48,8 @@ class TestSet01(object):
         N = 8
         D = np.random.randn(N, N)
         dt = np.float16
-        opt = rpca.RobustPCA.Options({'Verbose' : False, 'MaxMainIter' : 20,
-                            'AutoRho' : {'Enabled' : True}, 'DataType' : dt})
+        opt = rpca.RobustPCA.Options({'Verbose': False, 'MaxMainIter': 20,
+                            'AutoRho': {'Enabled': True}, 'DataType': dt})
         b = rpca.RobustPCA(D, opt=opt)
         b.solve()
         assert(b.X.dtype == dt)
@@ -61,8 +61,8 @@ class TestSet01(object):
         N = 8
         D = np.random.randn(N, N)
         dt = np.float32
-        opt = rpca.RobustPCA.Options({'Verbose' : False, 'MaxMainIter' : 20,
-                            'AutoRho' : {'Enabled' : True}, 'DataType' : dt})
+        opt = rpca.RobustPCA.Options({'Verbose': False, 'MaxMainIter': 20,
+                            'AutoRho': {'Enabled': True}, 'DataType': dt})
         b = rpca.RobustPCA(D, opt=opt)
         b.solve()
         assert(b.X.dtype == dt)
@@ -74,8 +74,8 @@ class TestSet01(object):
         N = 8
         D = np.random.randn(N, N)
         dt = np.float64
-        opt = rpca.RobustPCA.Options({'Verbose' : False, 'MaxMainIter' : 20,
-                            'AutoRho' : {'Enabled' : True}, 'DataType' : dt})
+        opt = rpca.RobustPCA.Options({'Verbose': False, 'MaxMainIter': 20,
+                            'AutoRho': {'Enabled': True}, 'DataType': dt})
         b = rpca.RobustPCA(D, opt=opt)
         b.solve()
         assert(b.X.dtype == dt)
