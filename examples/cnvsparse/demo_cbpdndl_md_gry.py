@@ -20,7 +20,7 @@ from sporco import plot
 
 
 # Training images
-exim = util.ExampleImages(scaled=True, zoom=0.25)
+exim = util.ExampleImages(scaled=True, zoom=0.25, gray=True)
 S1 = exim.image('barbara.png', idxexp=np.s_[10:522, 100:612])
 S2 = exim.image('kodim23.png', idxexp=np.s_[:, 60:572])
 S = np.dstack((S1, S2))
