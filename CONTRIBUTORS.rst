@@ -3,6 +3,7 @@
   - Primary author
 
 * Cristina Garcia-Cardona
+
   - MacOS installation instructions
   - Comments, suggestions, and bug reports
 
