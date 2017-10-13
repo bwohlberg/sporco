@@ -237,11 +237,11 @@ class ConvBPDNDictLearn_Consensus(cbpdndl.ConvBPDNDictLearn):
     :cite:`wohlberg-2014-efficient` and an ADMM Consensus solution of the
     constrained dictionary update problem :cite:`sorel-2016-fast`. The
     dictionary learning algorithm itself is as in described
-    :cite:`garcia-2017-convolutional`. The individual consensus problem
-    components are computed in parallel, giving a substantial computational
-    advantage, on a multi-core host, over :class:`.cbpdndl.ConvBPDNDictLearn`
-    with the consensus solver (``method`` = ``'cns'``) for the constrained
-    dictionary update problem.
+    :cite:`garcia-2017-convolutional`. The sparse coding of each training
+    image and the individual consensus problem components are computed in
+    parallel, giving a substantial computational advantage, on a multi-core
+    host, over :class:`.cbpdndl.ConvBPDNDictLearn` with the consensus solver
+    (``method`` = ``'cns'``) for the constrained dictionary update problem.
 
     Solve the optimisation problem
 
