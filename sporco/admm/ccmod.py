@@ -316,10 +316,15 @@ class ConvCnstrMODBase(admm.ADMMEqual):
 
 
 
-    def getdict(self):
-        """Get final dictionary."""
+    def getdict(self, crop=True):
+        """Get final dictionary. If ``crop`` is ``True``, apply
+        :func:`.cnvrep.bcrop` to returned array.
+        """
 
-        return cr.bcrop(self.Y, self.cri.dsz, self.cri.dimN)
+        D = self.Y
+        if crop:
+            D = cr.bcrop(D, self.cri.dsz, self.cri.dimN)
+        return D
 
 
 
@@ -803,10 +808,15 @@ class ConvCnstrMOD_Consensus(admm.ADMMConsensus):
 
 
 
-    def getdict(self):
-        """Get final dictionary."""
+    def getdict(self, crop=True):
+        """Get final dictionary. If ``crop`` is ``True``, apply
+        :func:`.cnvrep.bcrop` to returned array.
+        """
 
-        return cr.bcrop(self.Y, self.cri.dsz)
+        D = self.Y
+        if crop:
+            D = cr.bcrop(D, self.cri.dsz, self.cri.dimN)
+        return D
 
 
 

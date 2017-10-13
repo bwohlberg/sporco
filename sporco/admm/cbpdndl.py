@@ -238,13 +238,22 @@ class ConvBPDNDictLearn(dictlrn.DictLearn):
 
 
 
+    def getdict(self, crop=True):
+        """Get final dictionary. If ``crop`` is ``True``, apply
+        :func:`.cnvrep.bcrop` to returned array.
+        """
+
+        return self.dstep.getdict(crop=crop)
+
+
+
     def reconstruct(self, D=None, X=None):
         """Reconstruct representation."""
 
         if D is None:
-            D = self.dstep.var_y()
+            D = self.getdict(crop=False)
         if X is None:
-            X = self.xstep.var_y()
+            X = self.getcoef()
         Df = sl.rfftn(D, self.xstep.cri.Nv, self.xstep.cri.axisN)
         Xf = sl.rfftn(X, self.xstep.cri.Nv, self.xstep.cri.axisN)
         DXf = sl.inner(Df, Xf, axis=self.xstep.cri.axisM)
@@ -503,13 +512,22 @@ class ConvBPDNMaskDcplDictLearn(dictlrn.DictLearn):
 
 
 
+    def getdict(self, crop=True):
+        """Get final dictionary. If ``crop`` is ``True``, apply
+        :func:`.cnvrep.bcrop` to returned array.
+        """
+
+        return self.dstep.getdict(crop=crop)
+
+
+
     def reconstruct(self, D=None, X=None):
         """Reconstruct representation."""
 
         if D is None:
-            D = self.dstep.var_y1()
+            D = self.getdict(crop=False)
         if X is None:
-            X = self.xstep.var_y1()
+            X = self.getcoef()
         Df = sl.rfftn(D, self.xstep.cri.Nv, self.xstep.cri.axisN)
         Xf = sl.rfftn(X, self.xstep.cri.Nv, self.xstep.cri.axisN)
         DXf = sl.inner(Df, Xf, axis=self.xstep.cri.axisM)

@@ -321,10 +321,15 @@ class ConvCnstrMODMaskDcplBase(admm.ADMMTwoBlockCnstrnt):
 
 
 
-    def getdict(self):
-        """Get final dictionary."""
+    def getdict(self, crop=True):
+        """Get final dictionary. If ``crop`` is ``True``, apply
+        :func:`.cnvrep.bcrop` to returned array.
+        """
 
-        return cr.bcrop(self.block_sep1(self.Y), self.cri.dsz)
+        D = self.block_sep1(self.Y)
+        if crop:
+            D = cr.bcrop(D, self.cri.dsz, self.cri.dimN)
+        return D
 
 
 
