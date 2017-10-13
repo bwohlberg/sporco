@@ -169,7 +169,7 @@ class CSC_ConvRepIndexing(object):
 
         # Number of signals in S
         if self.dimK == 1:
-            self.K = S.shape[self.dimN+self.dimC]
+            self.K = S.shape[self.dimN + self.dimC]
         else:
             self.K = 1
 
@@ -420,7 +420,7 @@ class CDU_ConvRepIndexing(object):
 
         # Number of signals in S
         if self.dimK == 1:
-            self.K = S.shape[self.dimN+self.dimC]
+            self.K = S.shape[self.dimN + self.dimC]
         else:
             self.K = 1
 

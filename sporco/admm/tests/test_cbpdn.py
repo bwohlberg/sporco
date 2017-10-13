@@ -346,6 +346,40 @@ class TestSet01(object):
         assert(b.U.dtype == dt)
 
 
+    def test_20(self):
+        N = 16
+        Nd = 5
+        M = 4
+        D = np.random.randn(Nd, Nd, M)
+        s = np.random.randn(N, N)
+        epsilon = 1e0
+        try:
+            b = cbpdn.ConvMinL1InL2Ball(D, s, epsilon)
+            b.solve()
+        except Exception as e:
+            print(e)
+            assert(0)
+
+
+    def test_21(self):
+        N = 16
+        Nd = 5
+        K = 2
+        M = 4
+        D = np.random.randn(Nd, Nd, M)
+        s = np.random.randn(N, N, K)
+        dt = np.float32
+        opt = cbpdn.ConvMinL1InL2Ball.Options({'Verbose': False,
+                        'MaxMainIter': 20, 'AutoRho': {'Enabled': True},
+                        'DataType': dt})
+        epsilon = 1e0
+        b = cbpdn.ConvMinL1InL2Ball(D, s, epsilon, opt=opt)
+        b.solve()
+        assert(b.X.dtype == dt)
+        assert(b.Y.dtype == dt)
+        assert(b.U.dtype == dt)
+
+
     def test_22(self):
         N = 16
         Nd = 5

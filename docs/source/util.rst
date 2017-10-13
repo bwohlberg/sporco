@@ -27,6 +27,11 @@ the following modules:
   specific forms of linear system and filters for computing image
   gradients.
 
+* :mod:`.prox`
+
+  Evaluation of various norms and their proximal operators and projection
+  operators.
+
 * :mod:`.cnvrep`
 
   Support classes and functions for working with convolutional

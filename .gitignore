@@ -71,6 +71,7 @@ docs/source/sporco.cdict.rst
 docs/source/sporco.linalg.rst
 docs/source/sporco.cnvrep.rst
 docs/source/sporco.metric.rst
+docs/source/sporco.prox.rst
 docs/source/sporco.util.rst
 docs/source/sporco.plot.rst
 docs/source/sporco.*.*.rst

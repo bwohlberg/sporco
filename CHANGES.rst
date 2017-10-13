@@ -30,6 +30,11 @@ Version 0.1.7   (Not yet released)
   update
 - Moved class ConvRepIndexing from cbpdn and ccmod modules to new module
   cnvrep. Additional classes from ccmod module also moved into cnvrep.
+- New module prox supporting evaluation of various norms and their proximal
+  and projection operators
+- New classes bpdn.BPDNProjL1, bpdn.MinL1InL2Ball, cbpdn.ConvBPDNProjL1,
+  and cbpdn.ConvMinL1InL2Ball supporting constrained forms of the BPDN
+  and CBPDN problems
 
 
 

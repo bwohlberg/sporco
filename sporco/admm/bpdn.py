@@ -16,6 +16,7 @@ from scipy import linalg
 
 from sporco.admm import admm
 import sporco.linalg as sl
+import sporco.prox as sp
 from sporco.util import u
 
 
@@ -708,3 +709,422 @@ class ElasticNet(BPDN):
 
         self.lu, self.piv = sl.lu_factor(self.D, self.mu + self.rho)
         self.lu = np.asarray(self.lu, dtype=self.dtype)
+
+
+
+
+
+class BPDNProjL1(GenericBPDN):
+    r"""**Class inheritance structure**
+
+    .. inheritance-diagram:: BPDNProjL1
+       :parts: 2
+
+    |
+
+
+    ADMM algorithm for the a BPDN variant with projection onto the
+    :math:`\ell_1` ball instead of an :math:`\ell_1` penalty.
+
+    Solve the problem
+
+    .. math::
+       \mathrm{argmin}_\mathbf{x} \;
+       (1/2) \| D \mathbf{x} - \mathbf{s} \|_2^2 \; \text{such that} \;
+       \| \mathbf{x} \|_1 \leq \gamma
+
+    via the ADMM problem
+
+    .. math::
+       \mathrm{argmin}_\mathbf{x} \;
+       (1/2) \| D \mathbf{x} - \mathbf{s} \|_2^2 + \iota_{C(\mathbf{y}, \gamma)}
+       \quad \text{such that} \quad \mathbf{x} = \mathbf{y} \;\;,
+
+    where :math:`\iota_{C(\mathbf{x}, \gamma)}` is the indicator
+    function of the :math:`\ell_1` ball of radius :math:`\gamma` about
+    the origin. The algorithm is very similar to that for the BPDN problem
+    (see :class:`BPDN`), the only difference being in the replacement in the
+    :math:`\mathbf{y}` step of the proximal operator of the :math:`\ell_1`
+    norm with the projection operator of the :math:`\ell_1` norm.
+
+    After termination of the :meth:`solve` method, attribute
+    :attr:`itstat` is a list of tuples representing statistics of each
+    iteration. The fields of the named tuple ``IterationStats`` are:
+
+       ``Iter`` : Iteration number
+
+       ``ObjFun`` : Objective function value :math:`(1/2) \| D
+       \mathbf{x} - \mathbf{s} \|_2^2`
+
+       ``Cnstr`` : Constraint violation measure
+
+       ``PrimalRsdl`` : Norm of primal residual
+
+       ``DualRsdl`` : Norm of dual residual
+
+       ``EpsPrimal`` : Primal residual stopping tolerance
+       :math:`\epsilon_{\mathrm{pri}}`
+
+       ``EpsDual`` : Dual residual stopping tolerance
+       :math:`\epsilon_{\mathrm{dua}}`
+
+       ``Rho`` : Penalty parameter
+
+       ``Time`` : Cumulative run time
+    """
+
+
+    class Options(GenericBPDN.Options):
+        """BPDNProjL1 algorithm options
+
+        Options are the same as those defined in
+        :class:`.GenericBPDN.Options`.
+        """
+
+        defaults = copy.deepcopy(GenericBPDN.Options.defaults)
+        defaults['AutoRho'].update({'RsdlTarget' : 1.0})
+
+
+        def __init__(self, opt=None):
+            """Initialise BPDNProjL1 algorithm options object."""
+
+            if opt is None:
+                opt = {}
+            GenericBPDN.Options.__init__(self, opt)
+
+
+
+    itstat_fields_objfn = ('ObjFun', 'Cnstr')
+    hdrtxt_objfn = ('Fnc', 'Cnstr')
+    hdrval_objfun = {'Fnc' : 'ObjFun', 'Cnstr' : 'Cnstr'}
+
+
+
+    def __init__(self, D, S, gamma, opt=None):
+        """
+        Initialise a BPDNProjL1 object with problem parameters.
+
+        |
+
+        **Call graph**
+
+        .. image:: _static/jonga/bpdnprjl1_init.svg
+           :width: 20%
+           :target: _static/jonga/bpdnprjl1_init.svg
+
+        |
+
+
+        Parameters
+        ----------
+        D : array_like, shape (N, M)
+          Dictionary matrix
+        S : array_like, shape (N, K)
+          Signal vector or matrix
+        gamma : float
+          Constraint parameter
+        opt : :class:`BPDNProjL1.Options` object
+          Algorithm options
+        """
+
+        # Set default options if necessary
+        if opt is None:
+            opt = BPDNProjL1.Options()
+
+        super(BPDNProjL1, self).__init__(D, S, opt)
+        self.gamma = self.dtype.type(gamma)
+
+
+
+    def uinit(self, ushape):
+        """Return initialiser for working variable U."""
+
+        if self.opt['Y0'] is None:
+            return np.zeros(ushape, dtype=self.dtype)
+        else:
+            # If initial Y is non-zero, initial U is chosen so that
+            # the relevant dual optimality criterion (see (3.10) in
+            # boyd-2010-distributed) is satisfied.
+            # NB: still needs to be worked out.
+            return np.zeros(ushape, dtype=self.dtype)
+
+
+
+    def ystep(self):
+        r"""Minimise Augmented Lagrangian with respect to
+        :math:`\mathbf{y}`.
+        """
+
+        self.Y = np.asarray(sp.proj_l1(self.AX + self.U, self.gamma, axis=0),
+                            dtype=self.dtype)
+        super(BPDNProjL1, self).ystep()
+
+
+
+    def eval_objfn(self):
+        """Compute components of regularisation function as well as total
+        contribution to objective function.
+        """
+
+        dfd = self.obfn_dfd()
+        prj = sp.proj_l1(self.obfn_gvar(), self.gamma, axis=0)
+        cns = linalg.norm(prj - self.obfn_gvar())
+        return (dfd, cns)
+
+
+
+
+
+class MinL1InL2Ball(admm.ADMMTwoBlockCnstrnt):
+    r"""
+    **Class inheritance structure**
+
+    .. inheritance-diagram:: MinL1InL2Ball
+       :parts: 2
+
+    |
+
+
+    ADMM algorithm for the problem with an :math:`\ell_1` objective and
+    an :math:`\ell_2` constraint, following the approach proposed in
+    :cite:`afonso-2011-augmented`.
+
+    Solve the Single Measurement Vector (SMV) problem
+
+    .. math::
+       \mathrm{argmin}_\mathbf{x} \| \mathbf{x} \|_1 \; \text{such that} \;
+       \| D \mathbf{x} - \mathbf{s} \|_2 \leq \epsilon
+
+    via the ADMM problem
+
+    .. math::
+       \mathrm{argmin}_{\mathbf{x},\mathbf{y}_0,\mathbf{y}_1} \;
+       \| \mathbf{y}_0 \|_1 + \iota_{E(\epsilon,I,\mathbf{s})}(\mathbf{y}_1)
+       \;\text{such that}\;
+       \left( \begin{array}{c} I \\ D \end{array} \right) \mathbf{x}
+       - \left( \begin{array}{c} \mathbf{y}_0 \\ \mathbf{y}_1 \end{array}
+       \right) = \left( \begin{array}{c} \mathbf{0} \\
+       \mathbf{0} \end{array} \right) \;\;,
+
+    where :math:`\iota_{E(\epsilon,I,\mathbf{s})}` is the indicator function
+    of the :math:`\ell_2` ball of radius :math:`\epsilon` about
+    :math:`\mathbf{s}`. The Multiple Measurement Vector (MMV) problem
+
+    .. math::
+       \mathrm{argmin}_X \| X \|_1 \; \text{such that} \;
+       \| [D X - S]_k \|_2 \leq \epsilon \;\;\; \forall k \;\;,
+
+    where :math:`[X]_k` denotes column :math:`k` of matrix :math:`X`,
+    is also supported.
+
+    After termination of the :meth:`solve` method, attribute :attr:`itstat`
+    is a list of tuples representing statistics of each iteration. The
+    fields of the named tuple ``IterationStats`` are:
+
+       ``Iter`` : Iteration number
+
+       ``ObjFun`` : Objective function value :math:`\| \mathbf{x} \|_1`
+
+       ``Cnstr`` : Constraint violation measure
+
+       ``PrimalRsdl`` : Norm of primal residual
+
+       ``DualRsdl`` : Norm of dual residual
+
+       ``EpsPrimal`` : Primal residual stopping tolerance
+       :math:`\epsilon_{\mathrm{pri}}`
+
+       ``EpsDual`` : Dual residual stopping tolerance
+       :math:`\epsilon_{\mathrm{dua}}`
+
+       ``Rho`` : Penalty parameter
+
+       ``Time`` : Cumulative run time
+    """
+
+
+    class Options(admm.ADMMTwoBlockCnstrnt.Options):
+        r"""MinL1InL2Ball algorithm options
+
+        Options include all of those defined in
+        :class:`.admm.ADMMTwoBlockCnstrnt.Options`, together
+        with additional options:
+
+          ``L1Weight`` : An array of weights for the :math:`\ell_1`
+          norm. The array shape must be such that the array is
+          compatible for multiplication with the X/Y variables. If this
+          option is defined, the objective function is :math:`\lambda \|
+          \mathbf{w} \odot \mathbf{x} \|_1` where :math:`\mathbf{w}`
+          denotes the weighting array.
+
+          ``NonNegCoef`` : If ``True``, force solution to be non-negative.
+        """
+
+        defaults = copy.deepcopy(admm.ADMMTwoBlockCnstrnt.Options.defaults)
+        defaults.update({'AuxVarObj' : False, 'fEvalX' : True,
+                         'gEvalY' : False, 'RelaxParam' : 1.8,
+                         'L1Weight' : 1.0, 'NonNegCoef' : False,
+                         'ReturnVar' : 'X'})
+        defaults['AutoRho'].update({'Enabled' : True, 'Period' : 10,
+                                    'AutoScaling' : True, 'Scaling' : 1000.0,
+                                    'RsdlRatio' : 1.2, 'RsdlTarget' : 1.0})
+
+        def __init__(self, opt=None):
+            """Initialise MinL1InL2Ball algorithm options object."""
+
+            if opt is None:
+                opt = {}
+            admm.ADMMTwoBlockCnstrnt.Options.__init__(self, opt)
+
+
+
+    itstat_fields_objfn = ('ObjFun', 'Cnstr')
+    hdrtxt_objfn = ('Fnc', 'Cnstr')
+    hdrval_objfun = {'Fnc' : 'ObjFun', 'Cnstr' : 'Cnstr'}
+
+
+
+    def __init__(self, D, S, epsilon, opt=None):
+        r"""
+        Initialise an MinL1InL2Ball object with problem parameters.
+
+        |
+
+        **Call graph**
+
+        .. image:: _static/jonga/bpdnml1l2_init.svg
+           :width: 20%
+           :target: _static/jonga/bpdnml1l2_init.svg
+
+        |
+
+
+        Parameters
+        ----------
+        D : array_like, shape (N, M)
+          Dictionary matrix
+        S : array_like, shape (N, K)
+          Signal vector or matrix
+        epsilon : float
+          :math:`\ell_2` ball radius
+        opt : :class:`MinL1InL2Ball.Options` object
+          Algorithm options
+        """
+
+        Nr, Nc = D.shape
+        Nm = S.shape[1]
+        if opt is None:
+            opt = MinL1InL2Ball.Options()
+        super(MinL1InL2Ball, self).__init__(Nc*Nm, (Nc+Nr, Nm), 0, Nc,
+                                            S.dtype, opt)
+
+        # Record epsilon value and l1 weight array
+        self.epsilon = self.dtype.type(epsilon)
+        self.wl1 = np.asarray(opt['L1Weight'], dtype=self.dtype)
+
+        self.S = np.asarray(S, dtype=self.dtype)
+        self.setdict(D)
+
+
+
+    def uinit(self, ushape):
+        """Return initialiser for working variable U."""
+
+        if  self.opt['Y0'] is None:
+            return np.zeros(ushape, dtype=self.dtype)
+        else:
+            # If initial Y is non-zero, initial U is chosen so that
+            # the relevant dual optimality criterion (see (3.10) in
+            # boyd-2010-distributed) is satisfied.
+            U0 = np.sign(self.block_sep0(self.Y)) / self.rho
+            U1 = self.block_sep1(self.Y) - self.S
+            return self.block_cat(U0, U1)
+
+
+
+    def setdict(self, D):
+        """Set dictionary array."""
+
+        self.D = np.asarray(D, dtype=self.dtype)
+        # Factorise dictionary for efficient solves
+        self.lu, self.piv = sl.lu_factor(self.D, 1.0)
+        self.lu = np.asarray(self.lu, dtype=self.dtype)
+
+
+
+    def getcoef(self):
+        """Get final coefficient array."""
+
+        return self.X
+
+
+
+    def xstep(self):
+        r"""Minimise Augmented Lagrangian with respect to
+        :math:`\mathbf{x}`.
+        """
+
+        YU = self.Y - self.U
+        self.X = np.asarray(sl.lu_solve_ATAI(self.D, 1.0, self.block_sep0(YU) +
+                    self.D.T.dot(self.block_sep1(YU)), self.lu, self.piv),
+                    dtype=self.dtype)
+
+
+
+    def ystep(self):
+        r"""Minimise Augmented Lagrangian with respect to
+        :math:`\mathbf{y}`.
+        """
+
+        AXU = self.AX + self.U
+        Y0 = np.asarray(sl.shrink1(self.block_sep0(AXU), self.wl1 / self.rho),
+                        dtype=self.dtype)
+        if self.opt['NonNegCoef']:
+            Y0[Y0 < 0.0] = 0.0
+        Y1 = sl.proj_l2ball(self.block_sep1(AXU), self.S, self.epsilon, axes=0)
+        self.Y = self.block_cat(Y0, Y1)
+
+
+
+    def cnst_A1(self, X):
+        r"""Compute :math:`A_1 \mathbf{x}` component of ADMM problem
+        constraint."""
+
+        return self.D.dot(X)
+
+
+
+    def cnst_A1T(self, X):
+        r"""Compute :math:`A_1^T \mathbf{x}` where :math:`A_1 \mathbf{x}`
+        is a component of ADMM problem constraint."""
+
+        return self.D.T.dot(X)
+
+
+
+    def eval_objfn(self):
+        r"""Compute components of objective function as well as total
+        contribution to objective function. The objective function is
+        :math:`\| \mathbf{x} \|_1` and the constraint violation measure is
+        :math:`P(\mathbf{x}) - \mathbf{x}` where :math:`P(\mathbf{x})` is
+        the projection into the constraint set.
+        """
+
+        obj = linalg.norm((self.wl1 * self.obfn_g0var()).ravel(), 1)
+        cns = linalg.norm(sl.proj_l2ball(self.obfn_g1var(), self.S,
+                            self.epsilon, axes=0) - self.obfn_g1var())
+        return (obj, cns)
+
+
+
+    def rsdl_s(self, Yprev, Y):
+        """Compute dual residual vector."""
+
+        return self.rho*linalg.norm(self.cnst_AT(self.U))
+
+
+
+    def rsdl_sn(self, U):
+        """Compute dual residual normalisation term."""
+
+        return self.rho*linalg.norm(U)

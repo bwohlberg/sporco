@@ -15,6 +15,7 @@ import numpy as np
 
 from sporco.admm import admm
 import sporco.linalg as sl
+import sporco.prox as sp
 from sporco.util import u
 
 
@@ -170,7 +171,8 @@ class RobustPCA(admm.ADMM):
         :math:`\mathbf{x}`.
         """
 
-        self.X, self.ss = shrinksv(self.S - self.Y - self.U, 1 / self.rho)
+        self.X, self.ss = sp.prox_nuclear(self.S - self.Y - self.U,
+                                          1/self.rho)
 
 
 
@@ -213,12 +215,11 @@ class RobustPCA(admm.ADMM):
         contribution to objective function.
         """
 
-        gvr = self.obfn_gvar()
         if self.opt['fEvalX']:
             rnn = np.sum(self.ss)
         else:
-            rnn = nucnorm(self.X)
-        rl1 = np.sum(np.abs(gvr))
+            rnn = sp.norm_nuclear(self.obfn_fvar())
+        rl1 = np.sum(np.abs(self.obfn_gvar()))
         cns = np.linalg.norm(self.X + self.Y - self.S)
         obj = rnn + self.lmbda*rl1
         return (obj, rnn, rl1, cns)
@@ -258,19 +259,3 @@ class RobustPCA(admm.ADMM):
         """
 
         return self.S
-
-
-
-def shrinksv(v, alpha):
-    """Shrinkage of singular values"""
-
-    U, s, V = sl.promote16(v, fn=np.linalg.svd, full_matrices=False)
-    ss = np.maximum(0, s - alpha)
-    return np.dot(U, np.dot(np.diag(ss), V)), ss
-
-
-
-def nucnorm(x):
-    """Nuclear norm"""
-
-    return np.sum(np.linalg.svd(sl.promote16(x), compute_uv=False))

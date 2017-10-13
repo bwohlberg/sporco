@@ -55,6 +55,29 @@ Module :mod:`.admm.cbpdn` includes the following classes:
   :math:`i`.
 
 
+* :class:`.ConvBPDNProjL1`
+
+  Solve the convolutional sparse representation problem with an
+  :math:`\ell_2` objective and an :math:`\ell_1` constraint
+
+    .. math::
+       \mathrm{argmin}_\mathbf{x} \;
+       \frac{1}{2} \left\| \sum_m \mathbf{d}_m * \mathbf{x}_m - \mathbf{s}
+       \right\|_2^2 \; \text{such that} \; \| \mathbf{x}_m \|_1
+       \leq \gamma
+
+
+* :class:`.ConvMinL1InL2Ball`
+
+  Solve the convolutional sparse representation problem with an
+  :math:`\ell_1` objective and an :math:`\ell_2` constraint
+
+    .. math::
+       \mathrm{argmin}_\mathbf{x} \sum_m \| \mathbf{x}_m \|_1 \;
+       \text{such that} \;  \left\| \sum_m \mathbf{d}_m * \mathbf{x}_m
+       - \mathbf{s} \right\|_2 \leq \epsilon
+
+
 * :class:`.ConvBPDNMaskDcpl`
 
   Solve Convolutional BPDN with Mask Decoupling (see :cite:`heide-2015-fast`)
@@ -171,6 +194,28 @@ input images.
         :class:`.ConvBPDNGradReg` usage
 
     .. literalinclude:: ../../../examples/cnvsparse/demo_cbpdn_grd_gry.py
+       :language: python
+       :lines: 9-
+
+
+.. container:: toggle
+
+    .. container:: header
+
+        :class:`.ConvBPDNProjL1` usage
+
+    .. literalinclude:: ../../../examples/cnvsparse/demo_cbpdnl1prj.py
+       :language: python
+       :lines: 9-
+
+
+.. container:: toggle
+
+    .. container:: header
+
+        :class:`.ConvMinL1InL2Ball` usage
+
+    .. literalinclude:: ../../../examples/cnvsparse/demo_cnvminl1.py
        :language: python
        :lines: 9-
 

@@ -7,4 +7,5 @@ import sporco.util
 import sporco.plot
 import sporco.linalg
 import sporco.metric
+import sporco.prox
 import sporco.admm

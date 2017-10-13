@@ -214,7 +214,67 @@ class TestSet01(object):
         assert(b.U.dtype == dt)
 
 
+    def test_13(self):
+        N = 8
+        M = 16
+        D = np.random.randn(N, M)
+        s = np.random.randn(N, 1)
+        gamma = 1e0
+        try:
+            b = bpdn.BPDNProjL1(D, s, gamma)
+            b.solve()
+        except Exception as e:
+            print(e)
+            assert(0)
+
+
+    def test_14(self):
+        N = 8
+        M = 16
+        D = np.random.randn(N, M)
+        s = np.random.randn(N, 1)
+        dt = np.float16
+        opt = bpdn.BPDNProjL1.Options({'Verbose': False, 'MaxMainIter': 20,
+                                 'AutoRho': {'Enabled': True},
+                                 'DataType': dt})
+        b = bpdn.BPDNProjL1(D, s, gamma=1.0, opt=opt)
+        b.solve()
+        assert(b.X.dtype == dt)
+        assert(b.Y.dtype == dt)
+        assert(b.U.dtype == dt)
+
+
+    def test_15(self):
+        N = 8
+        M = 16
+        D = np.random.randn(N, M)
+        s = np.random.randn(N, 1)
+        epsilon = 1e-1
+        try:
+            b = bpdn.MinL1InL2Ball(D, s, epsilon)
+            b.solve()
+        except Exception as e:
+            print(e)
+            assert(0)
+
+
     def test_16(self):
+        N = 8
+        M = 16
+        D = np.random.randn(N, M)
+        s = np.random.randn(N, 1)
+        dt = np.float16
+        opt = bpdn.MinL1InL2Ball.Options({'Verbose': False, 'MaxMainIter': 20,
+                                 'AutoRho': {'Enabled': True},
+                                 'DataType': dt})
+        b = bpdn.MinL1InL2Ball(D, s, epsilon=1.0, opt=opt)
+        b.solve()
+        assert(b.X.dtype == dt)
+        assert(b.Y.dtype == dt)
+        assert(b.U.dtype == dt)
+
+
+    def test_17(self):
         N = 8
         M = 16
         D = np.random.randn(N, M)
@@ -229,14 +289,14 @@ class TestSet01(object):
         assert(linalg.norm(Xb-Xc)==0.0)
 
 
-    def test_17(self):
+    def test_18(self):
         opt = bpdn.GenericBPDN.Options({'AuxVarObj': False})
         assert(opt['fEvalX'] is True and opt['gEvalY'] is False)
         opt['AuxVarObj'] = True
         assert(opt['fEvalX'] is False and opt['gEvalY'] is True)
 
 
-    def test_18(self):
+    def test_19(self):
         opt = bpdn.GenericBPDN.Options({'AuxVarObj': True})
         assert(opt['fEvalX'] is False and opt['gEvalY'] is True)
         opt['AuxVarObj'] = False
@@ -244,7 +304,7 @@ class TestSet01(object):
 
 
     @pytest.mark.filterwarnings('ignore:admm.ADMM.runtime')
-    def test_19(self):
+    def test_20(self):
         N = 8
         M = 16
         D = np.random.randn(N, M)
