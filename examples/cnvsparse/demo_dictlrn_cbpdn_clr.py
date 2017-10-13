@@ -25,6 +25,7 @@ import numpy as np
 from sporco.admm import cbpdn
 from sporco.admm import ccmod
 from sporco.admm import dictlrn
+from sporco import cnvrep
 from sporco import util
 from sporco import plot
 
@@ -49,16 +50,16 @@ D0 = np.random.randn(8, 8, 3, 64)
 
 
 # Construct object representing problem dimensions
-cri = ccmod.ConvRepIndexing(D0.shape, sh)
+cri = cnvrep.CDU_ConvRepIndexing(D0.shape, sh)
 
 # X and D update options
 lmbda = 0.2
 optx = cbpdn.ConvBPDN.Options({'Verbose' : False, 'MaxMainIter' : 1,
-                               'rho' : 50.0*lmbda + 0.5,
+                    'rho' : 50.0*lmbda + 0.5,
                     'AutoRho' : {'Period' : 10, 'AutoScaling' : False,
                     'RsdlRatio' : 10.0, 'Scaling': 2.0, 'RsdlTarget' : 1.0}})
 optd = ccmod.ConvCnstrMODOptions({'Verbose' : False, 'MaxMainIter' : 1,
-                                   'rho' : cri.K,
+                    'rho' : cri.K,
                     'AutoRho' : {'Period' : 10, 'AutoScaling' : False,
                     'RsdlRatio' : 10.0, 'Scaling': 2.0, 'RsdlTarget' : 1.0}})
 
@@ -66,7 +67,7 @@ optd = ccmod.ConvCnstrMODOptions({'Verbose' : False, 'MaxMainIter' : 1,
 D0n = ccmod.getPcn0(optd['ZeroMean'], D0.shape, dimN=2, dimC=1)(D0)
 
 # Update D update options to include initial values for Y and U
-optd.update({'Y0' : ccmod.zpad(ccmod.stdformD(D0n, cri.C, cri.M), cri.Nv),
+optd.update({'Y0' : cnvrep.zpad(cnvrep.stdformD(D0n, cri.C, cri.M), cri.Nv),
              'U0' : np.zeros(cri.shpD)})
 
 # Create X update object

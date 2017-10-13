@@ -25,6 +25,7 @@ import numpy as np
 from sporco.admm import cbpdn
 from sporco.admm import ccmod
 from sporco.admm import dictlrn
+from sporco import cnvrep
 from sporco import util
 from sporco import plot
 
@@ -51,7 +52,7 @@ D0 = np.random.randn(8, 8, 64)
 
 
 # Construct object representing problem dimensions
-cri = ccmod.ConvRepIndexing(D0.shape, sh)
+cri = cnvrep.CDU_ConvRepIndexing(D0.shape, sh)
 
 # X and D update options
 lmbda = 0.2
@@ -68,7 +69,7 @@ optd = ccmod.ConvCnstrMODOptions({'Verbose' : False, 'MaxMainIter' : 1,
 D0n = ccmod.getPcn0(optd['ZeroMean'], D0.shape, dimN=2, dimC=0)(D0)
 
 # Update D update options to include initial values for Y and U
-optd.update({'Y0' : ccmod.zpad(ccmod.stdformD(D0n, cri.C, cri.M), cri.Nv),
+optd.update({'Y0' : cnvrep.zpad(cnvrep.stdformD(D0n, cri.C, cri.M), cri.Nv),
              'U0' : np.zeros(cri.shpD)})
 
 # Create X update object

@@ -25,6 +25,7 @@ from sporco.admm import cbpdn
 from sporco.admm import ccmod
 from sporco.admm import ccmodmd
 from sporco.admm import dictlrn
+from sporco import cnvrep
 from sporco import util
 from sporco import plot
 
@@ -57,7 +58,7 @@ W = np.reshape(W, W.shape + (1,1,1))
 
 
 # Construct object representing problem dimensions
-cri = ccmod.ConvRepIndexing(D0.shape, shp)
+cri = cnvrep.CDU_ConvRepIndexing(D0.shape, shp)
 
 
 # X and D update options
@@ -76,7 +77,7 @@ D0n = ccmod.getPcn0(optd['ZeroMean'], D0.shape, dimN=2, dimC=0)(D0)
 # Modify D update options to include initial value for Y (this procedure
 # is essential to correct algorithm performance)
 Y0b0 = np.zeros(cri.Nv + (cri.C, 1, cri.K))
-Y0b1 = ccmod.zpad(ccmod.stdformD(D0n, cri.C, cri.M), cri.Nv)
+Y0b1 = cnvrep.zpad(cnvrep.stdformD(D0n, cri.C, cri.M), cri.Nv)
 optd.update({'Y0' : np.concatenate((Y0b0, Y0b1), axis=cri.axisM)})
 
 

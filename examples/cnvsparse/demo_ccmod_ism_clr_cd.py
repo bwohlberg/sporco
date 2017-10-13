@@ -17,6 +17,7 @@ import numpy as np
 
 from sporco.admm import cbpdn
 from sporco.admm import ccmod
+from sporco import cnvrep
 from sporco import util
 from sporco import plot
 
@@ -36,7 +37,7 @@ sl, sh = util.tikhonov_filter(S, fltlmbd, npd)
 
 # Construct initial dictionary
 D0 = np.ones((1,1,3,1)) * util.convdicts()['G:12x12x36'][...,np.newaxis,:]
-D0 = ccmod.normalise(D0)
+D0 = cnvrep.normalise(D0)
 
 
 # Compute sparse representation on current dictionary
