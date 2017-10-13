@@ -473,6 +473,55 @@ def stdformD(D, Cd, M, dimN=2):
 
 
 
+def mskWshape(W, cri):
+    """Get appropriate internal shape (see :class:`CSC_ConvRepIndexing` and
+    :class:`CDU_ConvRepIndexing`) for data fidelity term mask array `W`. The
+    external shape of `W` depends on the external shape of input data array
+    `S`. The simplest criterion for ensuring that the external `W` is
+    compatible with `S` is to ensure that `W` has the same shape as `S`,
+    except that non-singleton dimensions in `S` may be singleton dimensions
+    in `W`. If `W` has a single non-spatial axis, it is assigned as a channel
+    or multi-signal axis depending on the corresponding assignement in `S`.
+
+    Parameters
+    ----------
+    W : array_like
+      Data fidelity term weight/mask array
+    cri : :class:`CSC_ConvRepIndexing` object or :class:`CDU_ConvRepIndexing`\
+    object
+      Object specifying convolutional representation dimensions
+
+    Returns
+    -------
+    W : ndarray
+      Reshaped mask array
+    """
+
+    ckdim = W.ndim - cri.dimN
+    if ckdim >= 2:
+        # Both C and K axes are present in W
+        shpW = W.shape
+    elif ckdim == 1:
+        # Exactly one of C or K axes is present in W
+        if cri.C == 1 and cri.K > 1:
+            # Input S has a single channel and multiple signals
+            shpW = W.shape[0:cri.dimN] + (1, W.shape[cri.dimN])
+        elif cri.C > 1 and cri.K == 1:
+            # Input S has multiple channels and a single signal
+            shpW = W.shape[0:cri.dimN] + (W.shape[cri.dimN], 1)
+        else:
+            # Input S has multiple channels and signals: resolve abiguity by
+            # taking extra axis in W as a channel axis
+            shpW = W.shape[0:cri.dimN] + (W.shape[cri.dimN], 1)
+    else:
+        # Neither C nor K axis is present in W
+        shpW = W.shape + (1, 1)
+
+    if ckdim > 2:
+        return shpW
+    else:
+        return shpW + (1,)
+
 
 
 def zeromean(v, dsz, dimN=2):

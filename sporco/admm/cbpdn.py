@@ -2137,9 +2137,8 @@ class ConvBPDNMaskDcpl(ConvTwoBlockCnstrnt):
           Regularisation parameter
         W : array_like
           Mask array. The array shape must be such that the array is
-          compatible for multiplication with the *internal* shape of input
-          array S (see :class:`.cnvrep.CSC_ConvRepIndexing` for a discussion
-          of the distinction between *external* and *internal* data layouts).
+          compatible for multiplication with input array S (see
+          :func:`.cnvrep.mskWshape` for more details).
         opt : :class:`ConvBPDNMaskDcpl.Options` object
           Algorithm options
         dimK : 0, 1, or None, optional (default None)
@@ -2157,7 +2156,8 @@ class ConvBPDNMaskDcpl(ConvTwoBlockCnstrnt):
         self.lmbda = self.dtype.type(lmbda)
         if W is None:
             W = np.array([1.0], dtype=self.dtype)
-        self.W = np.asarray(sl.atleast_nd(self.S.ndim, W), dtype=self.dtype)
+        self.W = np.asarray(W.reshape(cr.mskWshape(W, self.cri)),
+                            dtype=self.dtype)
         self.wl1 = np.asarray(opt['L1Weight'], dtype=self.dtype)
 
 
@@ -2249,10 +2249,8 @@ class AddMaskSim(object):
           Signal array
         W : array_like
           Mask array. The array shape must be such that the array is
-          compatible for multiplication with the *internal* shape of
-          input array S (see :class:`.cnvrep.CSC_ConvRepIndexing` for a
-          discussion of the distinction between *external* and *internal*
-          data layouts).
+          compatible for multiplication with input array S (see
+          :func:`.cnvrep.mskWshape` for more details).
         *args
           Variable length list of arguments for constructor of internal
           cbpdn object
@@ -2294,7 +2292,7 @@ class AddMaskSim(object):
         self.IterationStats = self.cbpdn.IterationStats
 
         # Mask matrix
-        self.W = np.asarray(sl.atleast_nd(self.cri.dimN+3, W),
+        self.W = np.asarray(W.reshape(cr.mskWshape(W, self.cri)),
                             dtype=self.cbpdn.dtype)
         # If Cd > 1 (i.e. a multi-channel dictionary) and mask has a
         # non-singleton channel dimension, swap that axis onto the

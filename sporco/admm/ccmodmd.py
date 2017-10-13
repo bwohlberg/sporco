@@ -215,10 +215,8 @@ class ConvCnstrMODMaskDcplBase(admm.ADMMTwoBlockCnstrnt):
           Signal array
         W : array_like
           Mask array. The array shape must be such that the array is
-          compatible for multiplication with the *internal* shape of
-          input array S (see :class:`.cnvrep.CDU_ConvRepIndexing` for a
-          discussion of the distinction between *external* and
-          *internal* data layouts).
+          compatible for multiplication with input array S (see
+          :func:`.cnvrep.mskWshape` for more details).
         dsz : tuple
           Filter support size(s)
         opt : :class:`ConvCnstrMODMaskDcplBase.Options` object
@@ -237,12 +235,29 @@ class ConvCnstrMODMaskDcplBase(admm.ADMMTwoBlockCnstrnt):
         # Infer problem dimensions and set relevant attributes of self
         self.cri = cr.CDU_ConvRepIndexing(dsz, S, dimK=dimK, dimN=dimN)
 
-        # Append singleton dimensions to W if necessary
-        if hasattr(W, 'ndim'):
-            W = sl.atleast_nd(self.cri.dimN+3, W)
+        # Convert W to internal shape
+        W = np.asarray(W.reshape(cr.mskWshape(W, self.cri)),
+                       dtype=S.dtype)
 
         # Reshape W if necessary (see discussion of reshape of S below)
-        if self.cri.Cd == 1 and self.cri.C > 1 and hasattr(W, 'ndim'):
+        if self.cri.Cd == 1 and self.cri.C > 1:
+            # In most cases broadcasting rules make it possible for W
+            # to have a singleton dimension corresponding to a non-singleton
+            # dimension in S. However, when S is reshaped to interleave axisC
+            # and axisK on the same axis, broadcasting is no longer sufficient
+            # unless axisC and axisK of W are either both singleton or both
+            # of the same size as the corresponding axes of S. If neither of
+            # these cases holds, it is necessary to replicate the axis of W
+            # (axisC or axisK) that does not have the same size as the
+            # corresponding axis of S.
+            shpw = list(W.shape)
+            swck = shpw[self.cri.axisC] * shpw[self.cri.axisK]
+            if swck > 1 and swck < self.cri.C * self.cri.K:
+                if W.shape[self.cri.axisK] == 1 and self.cri.K > 1:
+                    shpw[self.cri.axisK] = self.cri.K
+                else:
+                    shpw[self.cri.axisC] = self.cri.C
+                W = np.broadcast_to(W, shpw)
             self.W = W.reshape(W.shape[0:self.cri.dimN] +
                 (1, W.shape[self.cri.axisC] * W.shape[self.cri.axisK], 1))
         else:
@@ -786,10 +801,8 @@ class ConvCnstrMODMaskDcpl_Consensus(ccmod.ConvCnstrMOD_Consensus):
           Signal array
         W : array_like
           Mask array. The array shape must be such that the array is
-          compatible for multiplication with the *internal* shape of
-          input array S (see :class:`.cnvrep.CDU_ConvRepIndexing` for a
-          discussion of the distinction between *external* and *internal*
-          data layouts).
+          compatible for multiplication with input array S (see
+          :func:`.cnvrep.mskWshape` for more details).
         dsz : tuple
           Filter support size(s)
         opt : :class:`.ConvCnstrMOD_Consensus.Options` object
@@ -808,8 +821,32 @@ class ConvCnstrMODMaskDcpl_Consensus(ccmod.ConvCnstrMOD_Consensus):
         super(ConvCnstrMODMaskDcpl_Consensus, self).__init__(Z, S, dsz,
                                         opt=opt, dimK=dimK, dimN=dimN)
 
-        # Reshape W if necessary (see discussion of reshape of S below)
-        if self.cri.Cd == 1 and self.cri.C > 1 and hasattr(W, 'ndim'):
+        # Convert W to internal shape
+        W = np.asarray(W.reshape(cr.mskWshape(W, self.cri)),
+                       dtype=S.dtype)
+
+        # Reshape W if necessary (see discussion of reshape of S in
+        # ccmod.ConvCnstrMOD_Consensus.__init__)
+        if self.cri.Cd == 1 and self.cri.C > 1:
+            # In most cases broadcasting rules make it possible for W
+            # to have a singleton dimension corresponding to a non-singleton
+            # dimension in S. However, when S is reshaped to interleave axisC
+            # and axisK on the same axis, broadcasting is no longer sufficient
+            # unless axisC and axisK of W are either both singleton or both
+            # of the same size as the corresponding axes of S. If neither of
+            # these cases holds, it is necessary to replicate the axis of W
+            # (axisC or axisK) that does not have the same size as the
+            # corresponding axis of S.
+            shpw = list(W.shape)
+            swck = shpw[self.cri.axisC] * shpw[self.cri.axisK]
+            if swck > 1 and swck < self.cri.C * self.cri.K:
+                if W.shape[self.cri.axisK] == 1 and self.cri.K > 1:
+                    shpw[self.cri.axisK] = self.cri.K
+                else:
+                    shpw[self.cri.axisC] = self.cri.C
+                W = np.broadcast_to(W, shpw)
+            self.W = W.reshape(W.shape[0:self.cri.dimN] +
+                (1, W.shape[self.cri.axisC] * W.shape[self.cri.axisK], 1))
             self.W = W.reshape(W.shape[0:self.cri.dimN] +
                 (1, W.shape[self.cri.axisC] * W.shape[self.cri.axisK], 1))
         else:
