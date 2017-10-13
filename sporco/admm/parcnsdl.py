@@ -506,11 +506,16 @@ class ConvBPDNDictLearn_Consensus(cbpdndl.ConvBPDNDictLearn):
 
 
 
-    def getdict(self):
-        """Get final dictionary."""
+    def getdict(self, crop=True):
+        """Get final dictionary. If ``crop`` is ``True``, apply
+        :func:`.cnvrep.bcrop` to returned array.
+        """
 
         global mp_D_Y
-        return cr.bcrop(mp_D_Y, self.dstep.cri.dsz)
+        D = mp_D_Y
+        if crop:
+            D = cr.bcrop(D, self.dstep.cri.dsz, self.dstep.cri.dimN)
+        return D
 
 
 
