@@ -48,8 +48,8 @@ imgcn = imgc + np.random.normal(0.0, 0.02, img.shape)
 
 # Set up TVDeconv options
 lmbda = 5e-3
-opt = tvl2.TVL2Deconv.Options({'Verbose' : True, 'MaxMainIter' : 200,
-                               'gEvalY' : False, 'RelStopTol' : 5e-3})
+opt = tvl2.TVL2Deconv.Options({'Verbose': True, 'MaxMainIter': 200,
+                               'gEvalY': False, 'RelStopTol': 5e-3})
 
 
 # Initialise and run TVL2Deconv object

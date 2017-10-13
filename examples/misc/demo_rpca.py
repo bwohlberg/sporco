@@ -29,9 +29,9 @@ s1 = np.random.uniform(low=0.0, high=1.0, size=S0.shape)
 S1 = S0.copy()
 S1[s1 > 0.75] = 0.0
 
-opt = rpca.RobustPCA.Options({'Verbose' : True, 'gEvalY' : False,
-                              'MaxMainIter' : 200, 'RelStopTol' : 5e-4,
-                              'AutoRho' : {'Enabled' : True}})
+opt = rpca.RobustPCA.Options({'Verbose': True, 'gEvalY': False,
+                              'MaxMainIter': 200, 'RelStopTol': 5e-4,
+                              'AutoRho': {'Enabled': True}})
 b = rpca.RobustPCA(S1, None, opt)
 X, Y = b.solve()
 print("RobustPCA solve time: %.2fs" % b.timer.elapsed('solve'))

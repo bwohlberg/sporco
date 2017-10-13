@@ -37,10 +37,10 @@ D = util.convdicts()['G:12x12x36']
 
 # Set up ConvMinL1InL2Ball options
 epsilon = 1e0
-opt = cbpdn.ConvMinL1InL2Ball.Options({'Verbose' : True, 'MaxMainIter' : 250,
-                    'HighMemSolve' : True, 'LinSolveCheck' : True,
-                    'RelStopTol' : 5e-3, 'AuxVarObj' : False, 'rho' : 20.0,
-                    'AutoRho' : {'Enabled' : False}})
+opt = cbpdn.ConvMinL1InL2Ball.Options({'Verbose': True, 'MaxMainIter': 250,
+                    'HighMemSolve': True, 'LinSolveCheck': True,
+                    'RelStopTol': 5e-3, 'AuxVarObj': False, 'rho': 20.0,
+                    'AutoRho': {'Enabled': False}})
 
 
 # Initialise and run ConvBPDN object

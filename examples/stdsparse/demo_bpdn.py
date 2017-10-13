@@ -40,8 +40,8 @@ s = s0 + sigma*np.random.randn(N,1)
 
 
 # Set BPDN options
-opt = bpdn.BPDN.Options({'Verbose' : False, 'MaxMainIter' : 500,
-                    'RelStopTol' : 1e-3, 'AutoRho' : {'RsdlTarget' : 1.0}})
+opt = bpdn.BPDN.Options({'Verbose': False, 'MaxMainIter': 500,
+                    'RelStopTol': 1e-3, 'AutoRho': {'RsdlTarget': 1.0}})
 
 
 # Function computing reconstruction error at lmbda

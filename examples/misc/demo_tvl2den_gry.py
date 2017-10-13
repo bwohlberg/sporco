@@ -31,8 +31,8 @@ imgn = img + np.random.normal(0.0, 0.05, img.shape)
 
 # Set up TVL2Denoise options
 lmbda = 0.04
-opt = tvl2.TVL2Denoise.Options({'Verbose' : True, 'MaxMainIter' : 200,
-                'gEvalY' : False, 'AutoRho' : {'Enabled' : True}})
+opt = tvl2.TVL2Denoise.Options({'Verbose': True, 'MaxMainIter': 200,
+                'gEvalY': False, 'AutoRho': {'Enabled': True}})
 
 
 # Initialise and run TVL2Denoise object

@@ -42,15 +42,15 @@ D0 = util.convdicts()['G:12x12x36']
 
 # Compute sparse representation on current dictionary
 lmbda = 0.05
-opt = cbpdn.ConvBPDN.Options({'Verbose' : True, 'MaxMainIter' : 100,
-                     'HighMemSolve' : True})
+opt = cbpdn.ConvBPDN.Options({'Verbose': True, 'MaxMainIter': 100,
+                     'HighMemSolve': True})
 b = cbpdn.ConvBPDN(D0, sh, lmbda, opt)
 b.solve()
 
 
 # Update dictionary for training set sh
-opt = ccmod.ConvCnstrMOD_Consensus.Options({'Verbose' : True,
-            'MaxMainIter' : 100, 'rho' : 20.0})
+opt = ccmod.ConvCnstrMOD_Consensus.Options({'Verbose': True,
+            'MaxMainIter': 100, 'rho': 20.0})
 c = ccmod.ConvCnstrMOD_Consensus(b.Y, sh, D0.shape, opt)
 c.solve()
 print("ConvCnstrMOD_Consensus solve time: %.2fs" % c.timer.elapsed('solve'))

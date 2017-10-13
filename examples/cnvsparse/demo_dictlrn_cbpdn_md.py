@@ -63,11 +63,11 @@ cri = cnvrep.CDU_ConvRepIndexing(D0.shape, shp)
 
 # X and D update options
 lmbda = 0.2
-optx = cbpdn.ConvBPDNMaskDcpl.Options({'Verbose' : False, 'MaxMainIter' : 1,
-                    'rho' : 20.0*lmbda, 'AutoRho' : {'Enabled' : False}})
-optd = ccmodmd.ConvCnstrMODMaskDcplOptions({'Verbose' : False,
-                    'MaxMainIter' : 1, 'rho' : 2*cri.K,
-                    'AutoRho' : {'Enabled' : False}})
+optx = cbpdn.ConvBPDNMaskDcpl.Options({'Verbose': False, 'MaxMainIter': 1,
+                    'rho': 20.0*lmbda, 'AutoRho': {'Enabled': False}})
+optd = ccmodmd.ConvCnstrMODMaskDcplOptions({'Verbose': False,
+                    'MaxMainIter': 1, 'rho': 2*cri.K,
+                    'AutoRho': {'Enabled': False}})
 
 
 # Normalise dictionary according to Y update options
@@ -78,7 +78,7 @@ D0n = ccmod.getPcn0(optd['ZeroMean'], D0.shape, dimN=2, dimC=0)(D0)
 # is essential to correct algorithm performance)
 Y0b0 = np.zeros(cri.Nv + (cri.C, 1, cri.K))
 Y0b1 = cnvrep.zpad(cnvrep.stdformD(D0n, cri.C, cri.M), cri.Nv)
-optd.update({'Y0' : np.concatenate((Y0b0, Y0b1), axis=cri.axisM)})
+optd.update({'Y0': np.concatenate((Y0b0, Y0b1), axis=cri.axisM)})
 
 
 # Create X update object
@@ -90,7 +90,7 @@ dstep = ccmodmd.ConvCnstrMODMaskDcpl(None, shp, W, D0.shape, optd)
 
 
 # Create DictLearn object
-opt = dictlrn.DictLearn.Options({'Verbose' : True, 'MaxMainIter' : 100})
+opt = dictlrn.DictLearn.Options({'Verbose': True, 'MaxMainIter': 100})
 d = dictlrn.DictLearn(xstep, dstep, opt)
 D1 = d.solve()
 print("DictLearn solve time: %.2fs" % d.timer.elapsed('solve'), "\n")

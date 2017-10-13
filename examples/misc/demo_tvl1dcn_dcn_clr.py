@@ -23,10 +23,10 @@ from sporco.admm import tvl1
 # Utility functions
 n = 13
 n2 = n // 2
-spad = lambda x : np.pad(x, ((n,n),(n,n),(0,0)), mode='symmetric')
-zpad = lambda x : np.pad(x, ((n-n2,n+n2),(n-n2,n+n2),(0,0)), mode='constant')
-crop = lambda x : x[n+n2:-n+n2,n+n2:-n+n2,:]
-conv = lambda h, x : np.fft.ifft2(np.fft.fft2(h, s=x.shape[0:2], axes=(0,1))
+spad = lambda x: np.pad(x, ((n,n),(n,n),(0,0)), mode='symmetric')
+zpad = lambda x: np.pad(x, ((n-n2,n+n2),(n-n2,n+n2),(0,0)), mode='constant')
+crop = lambda x: x[n+n2:-n+n2,n+n2:-n+n2,:]
+conv = lambda h, x: np.fft.ifft2(np.fft.fft2(h, s=x.shape[0:2], axes=(0,1))
                 [...,np.newaxis]*np.fft.fft2(x, axes=(0,1)), axes=(0,1)).real
 
 
@@ -50,9 +50,9 @@ imgcn = util.spnoise(imgc, 0.2)
 # Set up TVDeconv options
 lmbda = 2e-2
 wdf = np.ones(imgcn.shape[0:2] + (1,))
-opt = tvl1.TVL1Deconv.Options({'Verbose' : True, 'MaxMainIter' : 200,
-                               'rho' : 1e0, 'gEvalY' : False,
-                               'RelStopTol' : 2e-3, 'DFidWeight' : zpad(wdf)})
+opt = tvl1.TVL1Deconv.Options({'Verbose': True, 'MaxMainIter': 200,
+                               'rho': 1e0, 'gEvalY': False,
+                               'RelStopTol': 2e-3, 'DFidWeight': zpad(wdf)})
 
 
 # Initialise and run TVL1Deconv object

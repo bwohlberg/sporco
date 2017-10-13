@@ -31,8 +31,8 @@ imgn = util.spnoise(img, 0.2)
 
 # Set up TVL1Denoise options
 lmbda = 8e-1
-opt = tvl1.TVL1Denoise.Options({'Verbose' : True, 'MaxMainIter' : 200,
-                                'RelStopTol' : 5e-3, 'gEvalY' : False})
+opt = tvl1.TVL1Denoise.Options({'Verbose': True, 'MaxMainIter': 200,
+                                'RelStopTol': 5e-3, 'gEvalY': False})
 
 
 # Initialise and run TVL1Denoise object

@@ -42,9 +42,9 @@ s = s0 + sigma*np.random.randn(N,K)
 
 
 # Set BPDNJoint options
-opt = bpdn.BPDNJoint.Options({'Verbose' : False, 'MaxMainIter' : 500,
-                              'RelStopTol' : 1e-3, 'rho' : 10.0,
-                              'AutoRho' : {'RsdlTarget' : 1.0}})
+opt = bpdn.BPDNJoint.Options({'Verbose': False, 'MaxMainIter': 500,
+                              'RelStopTol': 1e-3, 'rho': 10.0,
+                              'AutoRho': {'RsdlTarget': 1.0}})
 
 
 # Function computing reconstruction error for (lmbda, mu) pair

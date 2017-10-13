@@ -23,9 +23,9 @@ from sporco.admm import tvl2
 # Utility functions
 n = 13
 n2 = n // 2
-spad = lambda x : np.pad(x, n, mode='symmetric')
-crop = lambda x : x[n+n2:-n+n2,n+n2:-n+n2]
-conv = lambda h, x : np.fft.ifft2(np.fft.fft2(h, x.shape)*np.fft.fft2(x)).real
+spad = lambda x: np.pad(x, n, mode='symmetric')
+crop = lambda x: x[n+n2:-n+n2,n+n2:-n+n2]
+conv = lambda h, x: np.fft.ifft2(np.fft.fft2(h, x.shape)*np.fft.fft2(x)).real
 
 
 # Load reference image
@@ -47,9 +47,9 @@ imgcn = imgc + np.random.normal(0.0, 0.02, img.shape)
 
 # Set up TVDeconv options
 lmbda = 5e-3
-opt = tvl2.TVL2Deconv.Options({'Verbose' : True, 'MaxMainIter' : 200,
-                        'gEvalY' : False, 'RelStopTol' : 5e-3,
-                        'AutoRho' : {'RsdlTarget' : 5e-1}})
+opt = tvl2.TVL2Deconv.Options({'Verbose': True, 'MaxMainIter': 200,
+                        'gEvalY': False, 'RelStopTol': 5e-3,
+                        'AutoRho': {'RsdlTarget': 5e-1}})
 
 
 # Initialise and run TVL2Deconv object

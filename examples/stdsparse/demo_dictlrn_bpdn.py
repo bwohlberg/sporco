@@ -43,16 +43,16 @@ D0 = np.random.randn(S.shape[0], 128)
 
 # X and D update options
 lmbda = 0.1
-optx = bpdn.BPDN.Options({'Verbose' : False, 'MaxMainIter' : 1,
-                          'rho' : 50.0*lmbda + 0.5})
-optd = cmod.CnstrMOD.Options({'Verbose' : False, 'MaxMainIter' : 1,
-                              'rho' : S.shape[1] / 200.0})
+optx = bpdn.BPDN.Options({'Verbose': False, 'MaxMainIter': 1,
+                          'rho': 50.0*lmbda + 0.5})
+optd = cmod.CnstrMOD.Options({'Verbose': False, 'MaxMainIter': 1,
+                              'rho': S.shape[1] / 200.0})
 
 # Normalise dictionary according to D update options
 D0 = cmod.getPcn(optd['ZeroMean'])(D0)
 
 # Update D update options to include initial values for Y and U
-optd.update({'Y0' : D0, 'U0' : np.zeros((S.shape[0], D0.shape[1]))})
+optd.update({'Y0': D0, 'U0': np.zeros((S.shape[0], D0.shape[1]))})
 
 # Create X update object
 xstep = bpdn.BPDN(D0, S, lmbda, optx)
@@ -61,7 +61,7 @@ xstep = bpdn.BPDN(D0, S, lmbda, optx)
 dstep = cmod.CnstrMOD(None, S, (D0.shape[1], S.shape[1]), optd)
 
 # Create DictLearn object
-opt = dictlrn.DictLearn.Options({'Verbose' : True, 'MaxMainIter' : 100})
+opt = dictlrn.DictLearn.Options({'Verbose': True, 'MaxMainIter': 100})
 d = dictlrn.DictLearn(xstep, dstep, opt)
 Dmx = d.solve()
 print("DictLearn solve time: %.2fs" % d.timer.elapsed('solve'))

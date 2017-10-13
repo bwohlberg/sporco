@@ -92,10 +92,10 @@ if __name__ == "__main__":
 
 
     lmbda = 1e-1
-    opt = ConsensusTest.Options({'Verbose' : True, 'MaxMainIter' : 250,
-                                   'AutoRho' : {'Enabled' : False},
-                                   'rho': 2e-1, 'RelaxParam' : 1.2,
-                                   'fEvalX' : False})
+    opt = ConsensusTest.Options({'Verbose': True, 'MaxMainIter': 250,
+                                   'AutoRho': {'Enabled': False},
+                                   'rho': 2e-1, 'RelaxParam': 1.2,
+                                   'fEvalX': False})
     b = ConsensusTest(A, s, lmbda, opt)
     yr = b.solve()
     print("ConsensusTest solve time: %.2fs" % b.timer.elapsed('solve'))

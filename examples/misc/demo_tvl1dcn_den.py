@@ -31,9 +31,9 @@ imgn = util.spnoise(img, 0.2)
 
 # Set up TVL1Deconv options
 lmbda = 8e-1
-opt = tvl1.TVL1Deconv.Options({'Verbose' : True, 'MaxMainIter' : 200,
-                               'RelStopTol' : 5e-3, 'gEvalY' : False,
-                               'AutoRho' : {'Enabled' : True}})
+opt = tvl1.TVL1Deconv.Options({'Verbose': True, 'MaxMainIter': 200,
+                               'RelStopTol': 5e-3, 'gEvalY': False,
+                               'AutoRho': {'Enabled': True}})
 
 
 # Initialise and run TVDeconv object

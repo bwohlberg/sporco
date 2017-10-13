@@ -65,12 +65,12 @@ D0 = np.random.randn(5, 5, 3, 75)
 
 # Set ConvBPDNDictLearn parameters
 lmbda = 0.1
-opt = cbpdndl.ConvBPDNDictLearn.Options({'Verbose' : True, 'MaxMainIter' : 200,
-                                         'CBPDN' : {'rho' : 1e3*lmbda,
-                                            'AutoRho' : {'Enabled' : True}},
-                                         'CCMOD' : {'rho' : 5, 
-                                           'AutoRho' : {'Enabled' : True},
-                                                    'ZeroMean' : True}})
+opt = cbpdndl.ConvBPDNDictLearn.Options({'Verbose': True, 'MaxMainIter': 200,
+                                         'CBPDN': {'rho': 1e3*lmbda,
+                                            'AutoRho': {'Enabled': True}},
+                                         'CCMOD': {'rho': 5, 
+                                           'AutoRho': {'Enabled': True},
+                                                    'ZeroMean': True}})
 
 
 # Run optimisation

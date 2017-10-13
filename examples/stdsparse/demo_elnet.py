@@ -41,9 +41,9 @@ s = s0 + sigma*np.random.randn(N,1)
 # Set BPDN options
 lmbda = 20.0
 mu = 1.0
-opt = bpdn.ElasticNet.Options({'Verbose' : True, 'MaxMainIter' : 500,
-                               'RelStopTol' : 1e-6, 'AuxVarObj' : True,
-                               'AutoRho' : {'RsdlTarget' : 1.0}})
+opt = bpdn.ElasticNet.Options({'Verbose': True, 'MaxMainIter': 500,
+                               'RelStopTol': 1e-6, 'AuxVarObj': True,
+                               'AutoRho': {'RsdlTarget': 1.0}})
 
 
 # Initialise and run BPDN object

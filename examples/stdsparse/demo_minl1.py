@@ -40,9 +40,9 @@ s = s0 + sigma*np.random.randn(N,1)
 
 # Set BPDN options
 epsilon = 1.1 * np.linalg.norm(s0 - s)
-opt = bpdn.MinL1InL2Ball.Options({'Verbose' : True, 'MaxMainIter' : 500,
-                                  'RelStopTol' : 1e-6, 'rho' : 1e0,
-                                  'AutoRho' : {'Enabled' : False}})
+opt = bpdn.MinL1InL2Ball.Options({'Verbose': True, 'MaxMainIter': 500,
+                                  'RelStopTol': 1e-6, 'rho': 1e0,
+                                  'AutoRho': {'Enabled': False}})
 
 
 # Initialise and run BPDN object

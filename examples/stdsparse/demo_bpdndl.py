@@ -42,9 +42,9 @@ D0 = np.random.randn(S.shape[0], 128)
 
 # Set BPDNDictLearn parameters
 lmbda = 0.1
-opt = bpdndl.BPDNDictLearn.Options({'Verbose' : True, 'MaxMainIter' : 100,
-                      'BPDN' : {'rho' : 50.0*lmbda + 0.5},
-                      'CMOD' : {'rho' : S.shape[1] / 200.0}})
+opt = bpdndl.BPDNDictLearn.Options({'Verbose': True, 'MaxMainIter': 100,
+                      'BPDN': {'rho': 50.0*lmbda + 0.5},
+                      'CMOD': {'rho': S.shape[1] / 200.0}})
 
 # Run optimisation
 d = bpdndl.BPDNDictLearn(D0, S, lmbda, opt)

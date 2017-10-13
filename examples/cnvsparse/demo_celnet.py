@@ -38,9 +38,9 @@ D = util.convdicts()['G:12x12x36']
 # Set up ConvBPDN options
 lmbda = 1e-2
 mu = 1e-3
-opt = cbpdn.ConvElasticNet.Options({'Verbose' : True, 'MaxMainIter' : 250,
-                    'HighMemSolve' : True, 'LinSolveCheck' : True,
-                    'RelStopTol' : 2e-3, 'AuxVarObj' : False})
+opt = cbpdn.ConvElasticNet.Options({'Verbose': True, 'MaxMainIter': 250,
+                    'HighMemSolve': True, 'LinSolveCheck': True,
+                    'RelStopTol': 2e-3, 'AuxVarObj': False})
 
 
 # Initialise and run ConvBPDN object

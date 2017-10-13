@@ -40,11 +40,11 @@ W[L:-L,L:-L] = 1.0
 
 # Set up ConvBPDNMaskDcpl options
 lmbda = 1e-3
-opt = cbpdn.ConvBPDNMaskDcpl.Options({'Verbose' : True, 'MaxMainIter' : 500,
-                    'HighMemSolve' : False, 'RelStopTol' : 1e-3,
-                    'AuxVarObj' : False, 'RelaxParam' : 1.8,
-                    'rho' : 1e-1, 'LinSolveCheck' : True,
-                    'AutoRho' : {'Enabled' : False, 'StdResiduals' : True}})
+opt = cbpdn.ConvBPDNMaskDcpl.Options({'Verbose': True, 'MaxMainIter': 500,
+                    'HighMemSolve': False, 'RelStopTol': 1e-3,
+                    'AuxVarObj': False, 'RelaxParam': 1.8,
+                    'rho': 1e-1, 'LinSolveCheck': True,
+                    'AutoRho': {'Enabled': False, 'StdResiduals': True}})
 
 # Initialise and run ConvBPDNMaskDcpl object
 b = cbpdn.ConvBPDNMaskDcpl(D, S, lmbda, W, opt)

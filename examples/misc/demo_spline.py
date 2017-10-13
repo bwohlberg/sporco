@@ -31,7 +31,7 @@ imgn = util.spnoise(img, 0.2)
 
 # Set up SplineL1 options
 lmbda = 5.0
-opt = spline.SplineL1.Options({'Verbose' : True, 'gEvalY' : False})
+opt = spline.SplineL1.Options({'Verbose': True, 'gEvalY': False})
 
 
 # Initialise and run SplineL1 object

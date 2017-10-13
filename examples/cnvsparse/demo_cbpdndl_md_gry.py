@@ -54,10 +54,10 @@ shpw = W * shp
 # Solve ConvBPDNDictLearn problem
 lmbda = 0.05
 opt1 = cbpdndl.ConvBPDNDictLearn.Options(
-                     {'Verbose' : True, 'MaxMainIter' : 200,
-                      'AccurateDFid' : True,
-                      'CBPDN' : {'rho' : 50.0*lmbda + 0.5},
-                      'CCMOD' : {'ZeroMean' : True}})
+                     {'Verbose': True, 'MaxMainIter': 200,
+                      'AccurateDFid': True,
+                      'CBPDN': {'rho': 50.0*lmbda + 0.5},
+                      'CCMOD': {'ZeroMean': True}})
 d1 = cbpdndl.ConvBPDNDictLearn(D0, shpw, lmbda, opt1)
 D1 = d1.solve()
 
@@ -68,10 +68,10 @@ sr1 = d1.reconstruct()[:-Npr, :-Npc].squeeze() + sl
 
 # Solve ConvBPDNMaskDcplDictLearn problem
 opt2 = cbpdndl.ConvBPDNMaskDcplDictLearn.Options(
-                     {'Verbose' : True, 'MaxMainIter' : 200,
-                      'AccurateDFid' : True,
-                      'CBPDN' : {'rho' : 50.0*lmbda + 0.5},
-                      'CCMOD' : {'ZeroMean' : True}})
+                     {'Verbose': True, 'MaxMainIter': 200,
+                      'AccurateDFid': True,
+                      'CBPDN': {'rho': 50.0*lmbda + 0.5},
+                      'CCMOD': {'ZeroMean': True}})
 Wr = np.reshape(W, W.shape[0:2] + (1, W.shape[2], 1))
 d2 = cbpdndl.ConvBPDNMaskDcplDictLearn(D0, shpw, lmbda, Wr, opt2)
 D2 = d2.solve()

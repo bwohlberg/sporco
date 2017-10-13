@@ -37,9 +37,9 @@ D = util.convdicts()['RGB:8x8x3x64']
 
 # Set up ConvBPDN options
 lmbda = 1e-2
-opt = cbpdn.ConvBPDN.Options({'Verbose' : True, 'MaxMainIter' : 200,
-                    'LinSolveCheck' : True, 'RelStopTol' : 5e-3,
-                    'AuxVarObj' : False})
+opt = cbpdn.ConvBPDN.Options({'Verbose': True, 'MaxMainIter': 200,
+                    'LinSolveCheck': True, 'RelStopTol': 5e-3,
+                    'AuxVarObj': False})
 
 
 # Initialise and run ConvBPDN object

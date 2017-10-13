@@ -44,9 +44,9 @@ D0 = np.random.randn(8, 8, 3, 64)
 # Set ConvBPDNDictLearn parameters
 lmbda = 0.2
 opt = parcnsdl.ConvBPDNDictLearn_Consensus.Options(
-    {'Verbose' : True, 'MaxMainIter' : 200,
-     'CBPDN' : {'rho' : 50.0*lmbda + 0.5},
-     'CCMOD' : {'ZeroMean' : True}})
+    {'Verbose': True, 'MaxMainIter': 200,
+     'CBPDN': {'rho': 50.0*lmbda + 0.5},
+     'CCMOD': {'ZeroMean': True}})
 
 
 # Run optimisation

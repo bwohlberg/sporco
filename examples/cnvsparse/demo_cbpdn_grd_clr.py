@@ -43,12 +43,12 @@ wgr[0:3] = 1.0
 # Set up ConvBPDNGradReg options
 lmbda = 1e-2
 mu = 5e-1
-opt = cbpdn.ConvBPDNGradReg.Options({'Verbose' : True, 'MaxMainIter' : 200,
-                    'HighMemSolve' : True, 'LinSolveCheck' : True,
-                    'RelStopTol' : 1e-2, 'AuxVarObj' : False,
-                    'rho' : 1e0, 'AutoRho' : {'Enabled' : True,
-                    'Period' : 10,  'RsdlTarget' : 0.04},
-                    'L1Weight' : wl1, 'GradWeight' : wgr})
+opt = cbpdn.ConvBPDNGradReg.Options({'Verbose': True, 'MaxMainIter': 200,
+                    'HighMemSolve': True, 'LinSolveCheck': True,
+                    'RelStopTol': 1e-2, 'AuxVarObj': False,
+                    'rho': 1e0, 'AutoRho': {'Enabled': True,
+                    'Period': 10,  'RsdlTarget': 0.04},
+                    'L1Weight': wl1, 'GradWeight': wgr})
 
 # Initialise and run ConvBPDNGradReg object
 b = cbpdn.ConvBPDNGradReg(D, img, lmbda, mu, opt)

@@ -40,8 +40,8 @@ s = s0 + sigma*np.random.randn(N,1)
 
 # Set BPDNProjL1 options
 gamma = 5.0
-opt = bpdn.BPDNProjL1.Options({'Verbose' : True, 'MaxMainIter' : 500,
-                    'RelStopTol' : 1e-6, 'AutoRho' : {'RsdlTarget' : 1.0}})
+opt = bpdn.BPDNProjL1.Options({'Verbose': True, 'MaxMainIter': 500,
+                    'RelStopTol': 1e-6, 'AutoRho': {'RsdlTarget': 1.0}})
 
 
 # Initialise and run BPDNProjL1 object

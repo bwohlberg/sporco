@@ -45,10 +45,10 @@ D0 = np.random.randn(10, 10, 48)
 # Set ConvBPDNDictLearn parameters, including multi-scale dictionary size
 lmbda = 0.2
 dsz = ((6,6,16), (8,8,16), (10,10,16))
-opt = cbpdndl.ConvBPDNDictLearn.Options({'Verbose' : True, 'MaxMainIter' : 200,
-                                         'DictSize' : dsz,
-                                    'CBPDN' : {'rho' : 50.0*lmbda + 0.5},
-                                    'CCMOD' : {'rho' : 10, 'ZeroMean' : True}})
+opt = cbpdndl.ConvBPDNDictLearn.Options({'Verbose': True, 'MaxMainIter': 200,
+                                         'DictSize': dsz,
+                                    'CBPDN': {'rho': 50.0*lmbda + 0.5},
+                                    'CCMOD': {'rho': 10, 'ZeroMean': True}})
 
 
 # Run optimisation

@@ -55,21 +55,21 @@ cri = cnvrep.CDU_ConvRepIndexing(D0.shape, sh)
 # X and D update options
 lmbda = 0.2
 mu = 0.1
-optx = cbpdn.ConvBPDNJoint.Options({'Verbose' : False, 'MaxMainIter' : 1,
-                               'rho' : 50.0*lmbda + 0.5,
-                    'AutoRho' : {'Period' : 10, 'AutoScaling' : False,
-                    'RsdlRatio' : 10.0, 'Scaling': 2.0, 'RsdlTarget' : 1.0}})
-optd = ccmod.ConvCnstrMODOptions({'Verbose' : False, 'MaxMainIter' : 1,
-                                   'rho' : cri.K,
-                    'AutoRho' : {'Period' : 10, 'AutoScaling' : False,
-                    'RsdlRatio' : 10.0, 'Scaling': 2.0, 'RsdlTarget' : 1.0}})
+optx = cbpdn.ConvBPDNJoint.Options({'Verbose': False, 'MaxMainIter': 1,
+                               'rho': 50.0*lmbda + 0.5,
+                    'AutoRho': {'Period': 10, 'AutoScaling': False,
+                    'RsdlRatio': 10.0, 'Scaling': 2.0, 'RsdlTarget': 1.0}})
+optd = ccmod.ConvCnstrMODOptions({'Verbose': False, 'MaxMainIter': 1,
+                                   'rho': cri.K,
+                    'AutoRho': {'Period': 10, 'AutoScaling': False,
+                    'RsdlRatio': 10.0, 'Scaling': 2.0, 'RsdlTarget': 1.0}})
 
 # Normalise dictionary according to Y update options
 D0n = ccmod.getPcn0(optd['ZeroMean'], D0.shape, dimN=2, dimC=0)(D0)
 
 # Update D update options to include initial values for Y and U
-optd.update({'Y0' : cnvrep.zpad(cnvrep.stdformD(D0n, cri.Cd, cri.M), cri.Nv),
-             'U0' : np.zeros(cri.shpD)})
+optd.update({'Y0': cnvrep.zpad(cnvrep.stdformD(D0n, cri.Cd, cri.M), cri.Nv),
+             'U0': np.zeros(cri.shpD)})
 
 # Create X update object
 xstep = cbpdn.ConvBPDNJoint(D0n, sh, lmbda, mu, optx)
@@ -78,7 +78,7 @@ xstep = cbpdn.ConvBPDNJoint(D0n, sh, lmbda, mu, optx)
 dstep = ccmod.ConvCnstrMOD(None, sh, D0.shape, optd)
 
 # Create DictLearn object
-opt = dictlrn.DictLearn.Options({'Verbose' : True, 'MaxMainIter' : 100})
+opt = dictlrn.DictLearn.Options({'Verbose': True, 'MaxMainIter': 100})
 d = dictlrn.DictLearn(xstep, dstep, opt)
 D1 = d.solve()
 print("DictLearn solve time: %.2fs" % d.timer.elapsed('solve'), "\n")
