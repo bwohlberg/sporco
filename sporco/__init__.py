@@ -1,6 +1,6 @@
 from __future__ import absolute_import
 
-__version__ = '0.1.7b2'
+__version__ = '0.1.7'
 
 import sporco.cdict
 import sporco.util
