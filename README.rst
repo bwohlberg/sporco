@@ -34,7 +34,7 @@ SPORCO is a Python package for solving optimisation problems with sparsity-induc
 Documentation
 -------------
 
-Documentation is available online at `Read the Docs <http://sporco.rtfd.io/>`_ and `PyPI <http://pythonhosted.org/sporco/>`_, or can be built from the root directory of the source distribution by the command
+Documentation is available online at `Read the Docs <http://sporco.rtfd.io/>`_, or can be built from the root directory of the source distribution by the command
 
 ::
 
