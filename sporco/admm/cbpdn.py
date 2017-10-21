@@ -94,8 +94,7 @@ class GenericConvBPDN(admm.ADMMEqual):
         """ConvBPDN algorithm options
 
         Options include all of those defined in
-        :class:`sporco.admm.admm.ADMMEqual.Options`, together with
-        additional options:
+        :class:`.admm.ADMMEqual.Options`, together with additional options:
 
           ``AuxVarObj`` : Flag indicating whether the objective
           function should be evaluated using variable X (``False``) or
@@ -262,7 +261,7 @@ class GenericConvBPDN(admm.ADMMEqual):
     def getcoef(self):
         """Get final coefficient array."""
 
-        return self.Y
+        return self.getmin()
 
 
 
@@ -480,8 +479,7 @@ class ConvBPDN(GenericConvBPDN):
         r"""ConvBPDN algorithm options
 
         Options include all of those defined in
-        :class:`sporco.admm.admm.ADMMEqual.Options`, together with
-        additional options:
+        :class:`.admm.ADMMEqual.Options`, together with additional options:
 
           ``L1Weight`` : An array of weights for the :math:`\ell_1`
           norm. The array shape must be such that the array is
@@ -1047,9 +1045,8 @@ class ConvBPDNGradReg(ConvBPDN):
     class Options(ConvBPDN.Options):
         r"""ConvBPDNGradReg algorithm options
 
-        Options include all of those defined in
-        :class:`sporco.admm.cbpdn.ConvBPDN.Options`, together with
-        additional options:
+        Options include all of those defined in :class:`ConvBPDN.Options`,
+        together with additional options:
 
           ``GradWeight`` : An array of weights :math:`w_m` for the term
           penalising the gradient of the coefficient maps. If this
@@ -2082,8 +2079,8 @@ class ConvBPDNMaskDcpl(ConvTwoBlockCnstrnt):
         r"""ConvBPDNMaskDcpl algorithm options
 
         Options include all of those defined in
-        :class:`.cbpdn.ConvTwoBlockCnstrnt.Options`, together
-        with additional options:
+        :class:`ConvTwoBlockCnstrnt.Options`, together with additional
+        options:
 
           ``L1Weight`` : An array of weights for the :math:`\ell_1`
           norm. The array shape must be such that the array is
