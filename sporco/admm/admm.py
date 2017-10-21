@@ -520,7 +520,7 @@ class ADMM(with_metaclass(_ADMM_Meta, object)):
 
 
     def getmin(self):
-        """Get minimizer after optimisation."""
+        """Get minimiser after optimisation."""
 
         return self.X
 
@@ -995,7 +995,7 @@ class ADMMEqual(ADMM):
 
 
     def getmin(self):
-        """Get minimizer after optimisation."""
+        """Get minimiser after optimisation."""
 
         return self.X if self.opt['ReturnX'] else self.Y
 
@@ -1235,7 +1235,7 @@ class ADMMTwoBlockCnstrnt(ADMM):
 
 
     def getmin(self):
-        """Get minimizer after optimisation."""
+        """Get minimiser after optimisation."""
 
         if self.opt['ReturnVar'] == 'X':
             return self.var_x()
@@ -1674,7 +1674,7 @@ class ADMMConsensus(ADMM):
 
 
     def getmin(self):
-        """Get minimizer after optimisation."""
+        """Get minimiser after optimisation."""
 
         return self.Y
 
