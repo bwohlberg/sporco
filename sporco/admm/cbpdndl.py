@@ -116,7 +116,7 @@ class ConvBPDNDictLearn(dictlrn.DictLearn):
             'CBPDN' : copy.deepcopy(cbpdn.ConvBPDN.Options.defaults)})
 
 
-        def __init__(self, opt=None, method='ism'):
+        def __init__(self, opt=None, method='cns'):
             """Initialise ConvBPDN dictionary learning algorithm options.
 
             Valid values for parameter ``method`` are documented in function
@@ -142,7 +142,7 @@ class ConvBPDNDictLearn(dictlrn.DictLearn):
 
 
 
-    def __init__(self, D0, S, lmbda=None, opt=None, method='ism',
+    def __init__(self, D0, S, lmbda=None, opt=None, method='cns',
                  dimK=1, dimN=2):
         """
         Initialise a ConvBPDNDictLearn object with problem size and options.
@@ -168,7 +168,7 @@ class ConvBPDNDictLearn(dictlrn.DictLearn):
           Regularisation parameter
         opt : :class:`ConvBPDNDictLearn.Options` object
           Algorithm options
-        method : string, optional (default 'ism')
+        method : string, optional (default 'cns')
           String selecting dictionary update solver. Valid values are
           documented in function :func:`.ConvCnstrMOD`.
         dimK : int, optional (default 1)
@@ -373,12 +373,12 @@ class ConvBPDNMaskDcplDictLearn(dictlrn.DictLearn):
             'CBPDN' : copy.deepcopy(cbpdn.ConvBPDNMaskDcpl.Options.defaults)})
 
 
-        def __init__(self, opt=None, method='ism'):
+        def __init__(self, opt=None, method='cns'):
             """Initialise ConvBPDNMaskDcpl dictionary learning algorithm
             options.
 
             Valid values for parameter ``method`` are documented in function
-            :func:`.ConvCnstrMOD`.
+            :func:`.ConvCnstrMODMaskDcpl`.
             """
 
             self.defaults.update({'CCMOD' : copy.deepcopy(
@@ -400,7 +400,7 @@ class ConvBPDNMaskDcplDictLearn(dictlrn.DictLearn):
 
 
 
-    def __init__(self, D0, S, lmbda, W, opt=None, method='ism',
+    def __init__(self, D0, S, lmbda, W, opt=None, method='cns',
                  dimK=1, dimN=2):
         """
         Initialise a ConvBPDNMaskDcplDictLearn object with problem size and
@@ -433,9 +433,9 @@ class ConvBPDNMaskDcplDictLearn(dictlrn.DictLearn):
           data layouts).
         opt : :class:`ConvBPDNMaskDcplDictLearn.Options` object
           Algorithm options
-        method : string, optional (default 'ism')
+        method : string, optional (default 'cns')
           String selecting dictionary update solver. Valid values are
-          documented in function :func:`.ConvCnstrMOD`.
+          documented in function :func:`.ConvCnstrMODMaskDcpl`.
         dimK : int, optional (default 1)
           Number of signal dimensions. If there is only a single input
           signal (e.g. if `S` is a 2D array representing a single image)
