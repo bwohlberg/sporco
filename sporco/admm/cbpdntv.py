@@ -355,6 +355,20 @@ class ConvBPDNScalarTV(admm.ADMM):
 
 
 
+    def getmin(self):
+        """Get minimiser after optimisation."""
+
+        return self.X if self.opt['ReturnX'] else self.var_y1()
+
+
+
+    def getcoef(self):
+        """Get final coefficient array."""
+
+        return self.getmin()
+
+
+
     def obfn_g0var(self):
         """Variable to be evaluated in computing the TV regularisation
         term, depending on the ``gEvalY`` option value.
@@ -1113,6 +1127,20 @@ class ConvBPDNRecTV(admm.ADMM):
         """
 
         return np.s_[..., 0:self.cri.M]
+
+
+
+    def getmin(self):
+        """Get minimiser after optimisation."""
+
+        return self.X if self.opt['ReturnX'] else self.var_y0()
+
+
+
+    def getcoef(self):
+        """Get final coefficient array."""
+
+        return self.getmin()
 
 
 
