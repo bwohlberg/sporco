@@ -884,11 +884,18 @@ def ConvCnstrMOD(*args, **kwargs):
     argument 'method'. Valid values are:
 
     - ``'ism'`` :
-      Use the implementation defined in :class:`.ConvCnstrMOD_IterSM`
+      Use the implementation defined in :class:`.ConvCnstrMOD_IterSM`. This
+      method works well for a small number of training images, but is very
+      slow for larger training sets.
     - ``'cg'`` :
-      Use the implementation defined in :class:`.ConvCnstrMOD_CG`
+      Use the implementation defined in :class:`.ConvCnstrMOD_CG`. This
+      method is slower than ``'ism'`` for small training sets, but has better
+      run time scaling as the training set grows.
     - ``'cns'`` :
-      Use the implementation defined in :class:`.ConvCnstrMOD_Consensus`
+      Use the implementation defined in :class:`.ConvCnstrMOD_Consensus`.
+      This method is the best choice for large training sets.
+
+    The default value is ``'cns'``.
     """
 
     # Extract method selection argument or set default
@@ -896,7 +903,7 @@ def ConvCnstrMOD(*args, **kwargs):
         method = kwargs['method']
         del kwargs['method']
     else:
-        method = 'ism'
+        method = 'cns'
 
     # Assign base class depending on method selection argument
     if method == 'ism':
@@ -919,7 +926,7 @@ def ConvCnstrMOD(*args, **kwargs):
 
 
 
-def ConvCnstrMODOptions(opt=None, method='ism'):
+def ConvCnstrMODOptions(opt=None, method='cns'):
     """A wrapper function that dynamically defines a class derived from
     the Options class associated with one of the implementations of
     the Convolutional Constrained MOD problem, and returns an object

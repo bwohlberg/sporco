@@ -1036,13 +1036,19 @@ def ConvCnstrMODMaskDcpl(*args, **kwargs):
     argument 'method'. Valid values are:
 
     - ``'ism'`` :
-      Use the implementation defined in
-      :class:`.ConvCnstrMODMaskDcpl_IterSM`
+      Use the implementation defined in :class:`.ConvCnstrMODMaskDcpl_IterSM`.
+      This method works well for a small number of training images, but is
+      very slow for larger training sets.
     - ``'cg'`` :
-      Use the implementation defined in :class:`.ConvCnstrMODMaskDcpl_CG`
+      Use the implementation defined in :class:`.ConvCnstrMODMaskDcpl_CG`.
+      This method is slower than ``'ism'`` for small training sets, but has
+      better run time scaling as the training set grows.
     - ``'cns'`` :
       Use the implementation defined in
-      :class:`.ConvCnstrMODMaskDcpl_Consensus`
+      :class:`.ConvCnstrMODMaskDcpl_Consensus`. This method is the best choice
+      for large training sets.
+
+    The default value is ``'cns'``.
     """
 
     # Extract method selection argument or set default
@@ -1050,7 +1056,7 @@ def ConvCnstrMODMaskDcpl(*args, **kwargs):
         method = kwargs['method']
         del kwargs['method']
     else:
-        method = 'ism'
+        method = 'cns'
 
     # Assign base class depending on method selection argument
     if method == 'ism':
@@ -1074,7 +1080,7 @@ def ConvCnstrMODMaskDcpl(*args, **kwargs):
 
 
 
-def ConvCnstrMODMaskDcplOptions(opt=None, method='ism'):
+def ConvCnstrMODMaskDcplOptions(opt=None, method='cns'):
     """A wrapper function that dynamically defines a class derived from
     the Options class associated with one of the implementations of
     the Convolutional Constrained MOD with Mask Decoupling  problem,
