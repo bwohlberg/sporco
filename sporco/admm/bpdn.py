@@ -723,8 +723,12 @@ class BPDNProjL1(GenericBPDN):
     |
 
 
-    ADMM algorithm for the a BPDN variant with projection onto the
-    :math:`\ell_1` ball instead of an :math:`\ell_1` penalty.
+    ADMM algorithm for a BPDN variant with projection onto the
+    :math:`\ell_1` ball instead of an :math:`\ell_1` penalty. This variant
+    of the BPDN problem was originally referred to as the lasso
+    :cite:`tibshirani-1996-regression`, but that name is now also frequently
+    applied to the penalised form that is referred to here as the BPDN
+    problem.
 
     Solve the problem
 
@@ -737,13 +741,13 @@ class BPDNProjL1(GenericBPDN):
 
     .. math::
        \mathrm{argmin}_\mathbf{x} \;
-       (1/2) \| D \mathbf{x} - \mathbf{s} \|_2^2 + \iota_{C(\mathbf{y}, \gamma)}
-       \quad \text{such that} \quad \mathbf{x} = \mathbf{y} \;\;,
+       (1/2) \| D \mathbf{x} - \mathbf{s} \|_2^2 + \iota_{C(\mathbf{y},
+       \gamma)} \quad \text{such that} \quad \mathbf{x} = \mathbf{y} \;\;,
 
-    where :math:`\iota_{C(\mathbf{x}, \gamma)}` is the indicator
-    function of the :math:`\ell_1` ball of radius :math:`\gamma` about
-    the origin. The algorithm is very similar to that for the BPDN problem
-    (see :class:`BPDN`), the only difference being in the replacement in the
+    where :math:`\iota_{C(\mathbf{x}, \gamma)}` is the indicator function
+    of the :math:`\ell_1` ball of radius :math:`\gamma` about the origin.
+    The algorithm is very similar to that for the BPDN problem (see
+    :class:`BPDN`), the only difference being in the replacement in the
     :math:`\mathbf{y}` step of the proximal operator of the :math:`\ell_1`
     norm with the projection operator of the :math:`\ell_1` norm.
 
