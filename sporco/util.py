@@ -626,7 +626,7 @@ class ExampleImages(object):
             self.bpth = pth
         self.imglst = []
         self.grpimg = {}
-        for dirpath, dirnames, filenames in  os.walk(self.bpth):
+        for dirpath, dirnames, filenames in os.walk(self.bpth):
             # It would be more robust and portable to use
             # pathlib.PurePath.relative_to
             prnpth = dirpath[len(self.bpth)+1:]
