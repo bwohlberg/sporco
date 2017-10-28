@@ -93,6 +93,7 @@ class _ADMM_Meta(type):
 
 
 
+
 class ADMM(with_metaclass(_ADMM_Meta, object)):
     r"""Base class for Alternating Direction Method of Multipliers (ADMM)
     algorithms :cite:`boyd-2010-distributed`.
@@ -312,6 +313,10 @@ class ADMM(with_metaclass(_ADMM_Meta, object)):
                       dtype=self.dtype)
         self.set_attr('rlx', opt['RelaxParam'], dval=1.0, dtype=self.dtype)
 
+
+        # Initialise working variable X
+        if not hasattr(self, 'X'):
+            self.X = None
 
         # Initialise working variable Y
         if self.opt['Y0'] is None:
