@@ -16,6 +16,13 @@ Notes
   <invprob>`, it has not been feasible to optimise the algorithm
   options in all cases. While these examples should contain reasonable
   choices, they should not be assumed to be optimal.
+* The calculation of functional values and ADMM residuals can represent
+  a significant contribution to the total computation time for the ADMM
+  solvers. A considerable improvement in the solve time can often be
+  obtained by setting the following solver options::
+
+      'Verbose': False, 'FastSolve': True, 'AutoRho': {'Enabled': False}
+
 * There is a `bug <https://github.com/pyFFTW/pyFFTW/issues/135>`_ in
   :mod:`pyfftw` that can lead to programs hanging if used within
   processes created by :mod:`multiprocessing`. A work-around is to
