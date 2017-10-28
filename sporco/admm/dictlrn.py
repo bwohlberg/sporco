@@ -19,6 +19,8 @@ import collections
 from sporco import cdict
 from sporco import util
 from sporco.util import u
+from sporco.util import _fix_nested_class_lookup
+
 
 __author__ = """Brendt Wohlberg <brendt@ieee.org>"""
 
@@ -158,6 +160,13 @@ class _DictLearn_Meta(type):
     object initialisation timer and stopping this timer at the end of
     initialisation.
     """
+
+    def __init__(cls, *args):
+
+        # Apply _fix_nested_class_lookup function to class after creation
+        _fix_nested_class_lookup(cls, nstnm='Options')
+
+
 
     def __call__(cls, *args, **kwargs):
 
