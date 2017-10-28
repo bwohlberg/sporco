@@ -193,8 +193,8 @@ class ConvBPDNDictLearn(dictlrn.DictLearn):
         cri = cr.CDU_ConvRepIndexing(dsz, S, dimK, dimN)
 
         # Normalise dictionary
-        D0 = ccmod.getPcn0(opt['CCMOD', 'ZeroMean'], dsz, dimN,
-                           dimC=cri.dimCd)(D0)
+        D0 = cr.Pcn(D0, dsz, cri.Nv, dimN, cri.dimCd, crp=True,
+                    zm=opt['CCMOD', 'ZeroMean'])
 
         # Modify D update options to include initial values for Y and U
         opt['CCMOD'].update({'Y0' : cr.zpad(
@@ -458,8 +458,8 @@ class ConvBPDNMaskDcplDictLearn(dictlrn.DictLearn):
         cri = cr.CDU_ConvRepIndexing(dsz, S, dimK, dimN)
 
         # Normalise dictionary
-        D0 = ccmod.getPcn0(opt['CCMOD', 'ZeroMean'], dsz, dimN=dimN,
-                           dimC=cri.dimCd)(D0)
+        D0 = cr.Pcn(D0, dsz, cri.Nv, dimN, cri.dimCd, crp=True,
+                    zm=opt['CCMOD', 'ZeroMean'])
 
         # Modify D update options to include initial values for Y and U
         if cri.C == cri.Cd:

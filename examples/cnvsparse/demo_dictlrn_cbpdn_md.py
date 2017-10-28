@@ -67,11 +67,12 @@ optx = cbpdn.ConvBPDNMaskDcpl.Options({'Verbose': False, 'MaxMainIter': 1,
                     'rho': 20.0*lmbda, 'AutoRho': {'Enabled': False}})
 optd = ccmodmd.ConvCnstrMODMaskDcplOptions({'Verbose': False,
                     'MaxMainIter': 1, 'rho': 2*cri.K,
-                    'AutoRho': {'Enabled': False}})
+                    'AutoRho': {'Enabled': False}}, method='ism')
 
 
 # Normalise dictionary according to Y update options
-D0n = ccmod.getPcn0(optd['ZeroMean'], D0.shape, dimN=2, dimC=0)(D0)
+D0n = cnvrep.Pcn(D0, D0.shape, cri.Nv, dimN=2, dimC=0, crp=True,
+                 zm=optd['ZeroMean'])
 
 
 # Modify D update options to include initial value for Y (this procedure
@@ -86,7 +87,8 @@ xstep = cbpdn.ConvBPDNMaskDcpl(D0n, shp, lmbda, W, optx)
 
 
 # Create D update object
-dstep = ccmodmd.ConvCnstrMODMaskDcpl(None, shp, W, D0.shape, optd)
+dstep = ccmodmd.ConvCnstrMODMaskDcpl(None, shp, W, D0.shape, optd,
+                                     method='ism')
 
 
 # Create DictLearn object

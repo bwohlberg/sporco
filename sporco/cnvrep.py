@@ -14,6 +14,7 @@ from __future__ import print_function
 from builtins import range
 
 import pprint
+import functools
 import numpy as np
 
 
@@ -770,3 +771,201 @@ def bcrop(v, dsz, dimN=2):
         # Single scale dictionary specification
         axnslc = tuple([slice(0, x) for x in dsz[0:dimN]])
         return v[axnslc]
+
+
+
+def Pcn(x, dsz, Nv, dimN=2, dimC=1, crp=False, zm=False):
+    """Constraint set projection for convolutional dictionary update
+    problem.
+
+    Parameters
+    ----------
+    x  : array_like
+      Input array
+    dsz : tuple
+      Filter support size(s), specified using the same format as the `dsz`
+      parameter of :func:`bcrop`
+    Nv : tuple
+      Sizes of problem spatial indices
+    dimN : int, optional (default 2)
+      Number of problem spatial indices
+    dimC : int, optional (default 1)
+      Number of problem channel indices
+    crp : bool, optional (default False)
+      Flag indicating whether the result should be cropped to the support
+      of the largest filter in the dictionary.
+    zm : bool, optional (default False)
+      Flag indicating whether the projection function should include
+      filter mean subtraction
+
+    Returns
+    -------
+    y : ndarray
+      Projection of input onto constraint set
+    """
+
+    if crp:
+        zpadfn = lambda x: x
+    else:
+        zpadfn = lambda x: zpad(x, Nv)
+
+    if zm:
+        zmeanfn = lambda x: zeromean(x, dsz, dimN)
+    else:
+        zmeanfn = lambda x: x
+
+    return normalise(zmeanfn(zpadfn(bcrop(x, dsz, dimN))), dimN+dimC)
+
+
+
+def getPcn(dsz, Nv, dimN=2, dimC=1, crp=False, zm=False):
+    """Construct the constraint set projection function for convolutional
+    dictionary update problem.
+
+    Parameters
+    ----------
+    dsz : tuple
+      Filter support size(s), specified using the same format as the `dsz`
+      parameter of :func:`bcrop`
+    Nv : tuple
+      Sizes of problem spatial indices
+    dimN : int, optional (default 2)
+      Number of problem spatial indices
+    dimC : int, optional (default 1)
+      Number of problem channel indices
+    crp : bool, optional (default False)
+      Flag indicating whether the result should be cropped to the support
+      of the largest filter in the dictionary.
+    zm : bool, optional (default False)
+      Flag indicating whether the projection function should include
+      filter mean subtraction
+
+    Returns
+    -------
+    fn : function
+      Constraint set projection function
+    """
+
+    fncdict = {(False, False): _Pcn,     (False, True): _Pcn_zm,
+               (True, False):  _Pcn_crp, (True, True):  _Pcn_zm_crp}
+    fnc = fncdict[(crp,zm)]
+    return functools.partial(fnc, dsz=dsz, Nv=Nv, dimN=dimN, dimC=dimC)
+
+
+
+def _Pcn(x, dsz, Nv, dimN=2, dimC=1):
+    """
+    Projection onto dictionary update constraint set: support projection and
+    normalisation. The result has the full spatial dimensions of the input.
+
+    Parameters
+    ----------
+    x  : array_like
+       Input array
+    dsz : tuple
+      Filter support size(s), specified using the same format as the `dsz`
+      parameter of :func:`bcrop`
+    Nv : tuple
+      Sizes of problem spatial indices
+    dimN : int, optional (default 2)
+      Number of problem spatial indices
+    dimC : int, optional (default 1)
+      Number of problem channel indices
+
+    Returns
+    -------
+    y : ndarray
+      Projection of input onto constraint set
+    """
+
+    return normalise(zpad(bcrop(x, dsz, dimN), Nv), dimN+dimC)
+
+
+
+def _Pcn_zm(x, dsz, Nv, dimN=2, dimC=1):
+    """
+    Projection onto dictionary update constraint set: support projection,
+    mean subtraction, and normalisation. The result has the full spatial
+    dimensions of the input.
+
+    Parameters
+    ----------
+    x  : array_like
+       Input array
+    dsz : tuple
+      Filter support size(s), specified using the same format as the `dsz`
+      parameter of :func:`bcrop`
+    Nv : tuple
+      Sizes of problem spatial indices
+    dimN : int, optional (default 2)
+      Number of problem spatial indices
+    dimC : int, optional (default 1)
+      Number of problem channel indices
+
+    Returns
+    -------
+    y : ndarray
+      Projection of input onto constraint set
+    """
+
+    return normalise(zeromean(zpad(bcrop(x, dsz, dimN), Nv), dsz), dimN+dimC)
+
+
+
+def _Pcn_crp(x, dsz, Nv, dimN=2, dimC=1):
+    """
+    Projection onto dictionary update constraint set: support projection and
+    normalisation. The result is cropped to the support of the largest filter
+    in the dictionary.
+
+    Parameters
+    ----------
+    x  : array_like
+       Input array
+    dsz : tuple
+      Filter support size(s), specified using the same format as the `dsz`
+      parameter of :func:`bcrop`
+    Nv : tuple
+      Sizes of problem spatial indices
+    dimN : int, optional (default 2)
+      Number of problem spatial indices
+    dimC : int, optional (default 1)
+      Number of problem channel indices
+
+    Returns
+    -------
+    y : ndarray
+      Projection of input onto constraint set
+    """
+
+    return normalise(zeromean(bcrop(x, dsz, dimN), dsz, dimN), dimN+dimC)
+
+
+
+def _Pcn_zm_crp(x, dsz, Nv, dimN=2, dimC=1):
+    """
+    Projection onto dictionary update constraint set: support projection,
+    mean subtraction, and normalisation. The result is cropped to the support
+    of the largest filter in the dictionary.
+
+    Parameters
+    ----------
+    x  : array_like
+       Input array
+    dsz : tuple
+      Filter support size(s), specified using the same format as the `dsz`
+      parameter of :func:`bcrop`.
+    Nv : tuple
+      Sizes of problem spatial indices
+    dimN : int, optional (default 2)
+      Number of problem spatial indices
+    dimC : int, optional (default 1)
+      Number of problem channel indices
+
+    Returns
+    -------
+    y : ndarray
+      Projection of input onto constraint set
+    """
+
+    return normalise(bcrop(x, dsz, dimN), dimN+dimC)

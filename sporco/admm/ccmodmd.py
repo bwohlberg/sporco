@@ -289,8 +289,8 @@ class ConvCnstrMODMaskDcplBase(admm.ADMMTwoBlockCnstrnt):
         self.S = np.asarray(self.S, dtype=self.dtype)
 
         # Create constraint set projection function
-        self.Pcn = ccmod.getPcn(opt['ZeroMean'], dsz, self.cri.Nv,
-                                self.cri.dimN)
+        self.Pcn = cr.getPcn(dsz, self.cri.Nv, self.cri.dimN, self.cri.dimCd,
+                             zm=opt['ZeroMean'])
 
         # Initialise byte-aligned arrays for pyfftw
         self.YU = sl.pyfftw_empty_aligned(self.Y.shape, dtype=self.dtype)

@@ -62,10 +62,12 @@ optx = cbpdn.ConvBPDNJoint.Options({'Verbose': False, 'MaxMainIter': 1,
 optd = ccmod.ConvCnstrMODOptions({'Verbose': False, 'MaxMainIter': 1,
                                    'rho': cri.K,
                     'AutoRho': {'Period': 10, 'AutoScaling': False,
-                    'RsdlRatio': 10.0, 'Scaling': 2.0, 'RsdlTarget': 1.0}})
+                    'RsdlRatio': 10.0, 'Scaling': 2.0, 'RsdlTarget': 1.0}},
+                    method='ism')
 
 # Normalise dictionary according to Y update options
-D0n = ccmod.getPcn0(optd['ZeroMean'], D0.shape, dimN=2, dimC=0)(D0)
+D0n = cnvrep.Pcn(D0, D0.shape, cri.Nv, dimN=2, dimC=0, crp=True,
+                 zm=optd['ZeroMean'])
 
 # Update D update options to include initial values for Y and U
 optd.update({'Y0': cnvrep.zpad(cnvrep.stdformD(D0n, cri.Cd, cri.M), cri.Nv),
@@ -75,7 +77,7 @@ optd.update({'Y0': cnvrep.zpad(cnvrep.stdformD(D0n, cri.Cd, cri.M), cri.Nv),
 xstep = cbpdn.ConvBPDNJoint(D0n, sh, lmbda, mu, optx)
 
 # Create D update object
-dstep = ccmod.ConvCnstrMOD(None, sh, D0.shape, optd)
+dstep = ccmod.ConvCnstrMOD(None, sh, D0.shape, optd, method='ism')
 
 # Create DictLearn object
 opt = dictlrn.DictLearn.Options({'Verbose': True, 'MaxMainIter': 100})

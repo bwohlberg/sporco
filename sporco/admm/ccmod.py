@@ -270,7 +270,8 @@ class ConvCnstrMODBase(admm.ADMMEqual):
         self.Sf = sl.rfftn(self.S, None, self.cri.axisN)
 
         # Create constraint set projection function
-        self.Pcn = getPcn(opt['ZeroMean'], dsz, self.cri.Nv, self.cri.dimN)
+        self.Pcn = cr.getPcn(dsz, self.cri.Nv, self.cri.dimN, self.cri.dimCd,
+                             zm=opt['ZeroMean'])
 
         # Create byte aligned arrays for FFT calls
         self.YU = sl.pyfftw_empty_aligned(self.Y.shape, dtype=self.dtype)
@@ -683,7 +684,8 @@ class ConvCnstrMOD_Consensus(admm.ADMMConsensus):
         self.Sf = sl.rfftn(self.S, None, self.cri.axisN)
 
         # Create constraint set projection function
-        self.Pcn = getPcn(opt['ZeroMean'], dsz, self.cri.Nv, self.cri.dimN)
+        self.Pcn = cr.getPcn(dsz, self.cri.Nv, self.cri.dimN, self.cri.dimCd,
+                             zm=opt['ZeroMean'])
 
         if Z is not None:
             self.setcoef(Z)
@@ -962,71 +964,3 @@ def ConvCnstrMODOptions(opt=None, method='cns'):
 
     # Return object of the nested class type
     return ConvCnstrMODOptions(opt)
-
-
-
-
-def getPcn0(zm, dsz, dimN=2, dimC=1):
-    """Construct constraint set projection function without support
-    projection. The `dsz` parameter specifies the support sizes of each
-    filter using the same format as the `dsz` parameter of
-    :func:`.cnvrep.bcrop`.
-
-    Parameters
-    ----------
-    zm : bool
-      Flag indicating whether the projection function should include
-      filter mean subtraction
-    dsz : tuple
-      Filter support size(s)
-    dimN : int, optional (default 2)
-      Number of problem spatial indices
-    dimC : int, optional (default 1)
-      Number of problem channel indices
-
-    Returns
-    -------
-    fn : function
-      Constraint set projection function
-    """
-
-    if zm:
-        return lambda x: cr.normalise(cr.zeromean(cr.bcrop(x, dsz, dimN),
-                                                  dsz, dimN), dimN+dimC)
-    else:
-        return lambda x: cr.normalise(cr.bcrop(x, dsz, dimN), dimN+dimC)
-
-
-
-def getPcn(zm, dsz, Nv, dimN=2, dimC=1):
-    """Construct the constraint set projection function utilised by
-    ``ystep``. The `dsz` parameter specifies the support sizes of each
-    filter using the same format as the `dsz` parameter of
-    :func:`.cnvrep.bcrop`.
-
-    Parameters
-    ----------
-    zm : bool
-      Flag indicating whether the projection function should include
-      filter mean subtraction
-    dsz : tuple
-      Filter support size(s)
-    Nv : tuple
-      Sizes of problem spatial indices
-    dimN : int, optional (default 2)
-      Number of problem spatial indices
-    dimC : int, optional (default 1)
-      Number of problem channel indices
-
-    Returns
-    -------
-    fn : function
-      Constraint set projection function
-    """
-
-    if zm:
-        return lambda x: cr.normalise(cr.zeromean(cr.zpad(
-            cr.bcrop(x, dsz, dimN), Nv), dsz), dimN+dimC)
-    else:
-        return lambda x: cr.normalise(cr.zpad(cr.bcrop(x, dsz, dimN), Nv),
-                                      dimN+dimC)
