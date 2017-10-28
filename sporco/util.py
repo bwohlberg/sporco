@@ -105,6 +105,33 @@ def _fix_nested_class_lookup(cls, nstnm):
 
 
 
+def _fix_dynamic_class_lookup(cls, pstfx):
+    """Fix name lookup problem that prevents pickling of dynamically defined
+    classes.
+
+    Parameters
+    ----------
+    cls : class
+      Dynamically generated class to which fix is to be applied
+    pstfx : string
+      Postfix that can be used to identify dynamically generated classes
+      that are equivalent by construction
+    """
+
+    # Extended name for the class that will be added to the module namespace
+    extnm = '_' + cls.__name__ + '_' + pstfx
+    # Get the module in which the dynamic class is defined
+    mdl = sys.modules[cls.__module__]
+    # Allow lookup of the dynamically generated class within the module via
+    # its extended name
+    setattr(mdl, extnm, cls)
+    # Change the dynamically generated class name to the extended name
+    if hasattr(cls, '__qualname__'):
+        cls.__qualname__ = extnm
+    else:
+        cls.__name__ = extnm
+
+
 
 def ntpl2array(ntpl):
     """

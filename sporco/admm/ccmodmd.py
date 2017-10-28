@@ -20,6 +20,7 @@ from sporco.admm import admm
 from sporco.admm import ccmod
 import sporco.cnvrep as cr
 import sporco.linalg as sl
+from sporco.util import _fix_dynamic_class_lookup
 
 __author__ = """Brendt Wohlberg <brendt@ieee.org>"""
 
@@ -1074,6 +1075,9 @@ def ConvCnstrMODMaskDcpl(*args, **kwargs):
         def __init__(self, *args, **kwargs):
             super(ConvCnstrMODMaskDcpl, self).__init__(*args, **kwargs)
 
+    # Allow pickling of objects of type ConvCnstrMODMaskDcpl
+    _fix_dynamic_class_lookup(ConvCnstrMODMaskDcpl, method)
+
     # Return object of the nested class type
     return ConvCnstrMODMaskDcpl(*args, **kwargs)
 
@@ -1107,6 +1111,9 @@ def ConvCnstrMODMaskDcplOptions(opt=None, method='cns'):
     class ConvCnstrMODMaskDcplOptions(base):
         def __init__(self, opt):
             super(ConvCnstrMODMaskDcplOptions, self).__init__(opt)
+
+    # Allow pickling of objects of type ConvCnstrMODMaskDcplOptions
+    _fix_dynamic_class_lookup(ConvCnstrMODMaskDcplOptions, method)
 
     # Return object of the nested class type
     return ConvCnstrMODMaskDcplOptions(opt)

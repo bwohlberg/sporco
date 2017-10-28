@@ -19,6 +19,7 @@ from scipy import linalg
 from sporco.admm import admm
 import sporco.cnvrep as cr
 import sporco.linalg as sl
+from sporco.util import _fix_dynamic_class_lookup
 
 __author__ = """Brendt Wohlberg <brendt@ieee.org>"""
 
@@ -920,6 +921,9 @@ def ConvCnstrMOD(*args, **kwargs):
         def __init__(self, *args, **kwargs):
             super(ConvCnstrMOD, self).__init__(*args, **kwargs)
 
+    # Allow pickling of objects of type ConvCnstrMOD
+    _fix_dynamic_class_lookup(ConvCnstrMOD, method)
+
     # Return object of the nested class type
     return ConvCnstrMOD(*args, **kwargs)
 
@@ -952,6 +956,9 @@ def ConvCnstrMODOptions(opt=None, method='cns'):
     class ConvCnstrMODOptions(base):
         def __init__(self, opt):
             super(ConvCnstrMODOptions, self).__init__(opt)
+
+    # Allow pickling of objects of type ConvCnstrMODOptions
+    _fix_dynamic_class_lookup(ConvCnstrMODOptions, method)
 
     # Return object of the nested class type
     return ConvCnstrMODOptions(opt)
