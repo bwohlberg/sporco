@@ -16,6 +16,7 @@ from builtins import object
 
 from timeit import default_timer as timer
 import os
+import sys
 import imghdr
 import io
 import platform
@@ -68,6 +69,39 @@ else:
     def u(x):
         """Python 2/3 compatible definition of utf8 literals"""
         return x
+
+
+
+def _fix_nested_class_lookup(cls, nstnm):
+    """Fix name lookup problem that prevents pickling of classes with nested
+    class definitions. The approach is loosely based on that implemented at
+    https://git.io/viGqU , simplified and modified to work in both Python 2.7
+    and Python 3.x.
+
+    Parameters
+    ----------
+    cls : class
+      Outer class to which fix is to be applied
+    nstnm : string
+      Name of nested (inner) class to be renamed
+    """
+
+    # Check that nstmm is an attribute of cls
+    if nstnm in cls.__dict__:
+        # Get the attribute of cls by its name
+        nst = cls.__dict__[nstnm]
+        # Check that the attribute is a class
+        if isinstance(nst, type):
+            # Get the module in which the outer class is defined
+            mdl = sys.modules[cls.__module__]
+            # Construct an extended name by concatenating inner and outer names
+            extnm = cls.__name__ + nst.__name__
+            # Allow lookup of the nested class within the module via
+            # its extended name
+            setattr(mdl, extnm, nst)
+            # Change the nested class name to the extended name
+            nst.__name__ = extnm
+    return cls
 
 
 

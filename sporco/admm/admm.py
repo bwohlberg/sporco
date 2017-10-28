@@ -15,7 +15,6 @@ from builtins import object
 
 import copy
 import collections
-import sys
 import warnings
 import numpy as np
 import scipy
@@ -24,48 +23,16 @@ from scipy import linalg
 from sporco import cdict
 from sporco import util
 from sporco.util import u
+from sporco.util import _fix_nested_class_lookup
 
 
 __author__ = """Brendt Wohlberg <brendt@ieee.org>"""
 
 
 
-def _module_name_nested(cls, nstnm='Options'):
-    """Fix name lookup problem that prevents pickling of classes with nested
-    class definitions. The approach is loosely based on that implemented at
-    https://git.io/viGqU , simplified and modified to work
-    in both Python 2.7 and Python 3.x.
-
-    Parameters
-    ----------
-    cls : class
-      Class to which fix is to be applied
-    nstnm : str, optional (default 'Options')
-      Name of nested class to be renamed
-    """
-
-    # Check that nstmm is an attribute of cls
-    if nstnm in cls.__dict__:
-        # Get the attribute of cls by its name
-        nst = cls.__dict__[nstnm]
-        # Check that the attribute is a class
-        if isinstance(nst, type):
-            # Get the module in which the outer class is defined
-            mdl = sys.modules[cls.__module__]
-            # Construct an extended name by concatenating inner and outer names
-            extnm = cls.__name__ + nst.__name__
-            # Allow lookup of the nested class within the module via
-            # its extended name
-            setattr(mdl, extnm, nst)
-            # Change the nested class name to the extended name
-            nst.__name__ = extnm
-    return cls
-
-
-
 class _ADMM_Meta(type):
     """Metaclass for ADMM class that handles intialisation of
-    IterationStats namedtuple and applies module_name_nested to class
+    IterationStats namedtuple and applies _fix_nested_class_lookup to class
     definitions to fix problems with lookup of nested class
     definitions when using pickle. It is also responsible for stopping
     the object initialisation timer at the end of initialisation.
@@ -76,8 +43,8 @@ class _ADMM_Meta(type):
         # Initialise named tuple type for recording ADMM iteration statistics
         cls.IterationStats = collections.namedtuple('IterationStats',
                                                     cls.itstat_fields())
-        # Apply _module_name_nested function to class after creation
-        _module_name_nested(cls)
+        # Apply _fix_nested_class_lookup function to class after creation
+        _fix_nested_class_lookup(cls, nstnm='Options')
 
 
 
