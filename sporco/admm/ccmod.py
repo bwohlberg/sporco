@@ -136,13 +136,13 @@ class ConvCnstrMODBase(admm.ADMMEqual):
         # if 'AuxVarObj' is initialised first, the other two keys are
         # correctly set, but this setting is overwritten when 'fEvalX'
         # and 'gEvalY' are themselves initialised
-        defaults.update({'AuxVarObj' : False, 'fEvalX' : True,
-                         'gEvalY' : False, 'ReturnX' : False,
-                         'RelaxParam' : 1.8, 'ZeroMean' : False,
-                         'LinSolveCheck' : False})
-        defaults['AutoRho'].update({'Enabled' : True, 'Period' : 1,
-                                    'AutoScaling' : True, 'Scaling' : 1000,
-                                    'RsdlRatio' : 1.2})
+        defaults.update({'AuxVarObj': False, 'fEvalX': True,
+                         'gEvalY': False, 'ReturnX': False,
+                         'RelaxParam': 1.8, 'ZeroMean': False,
+                         'LinSolveCheck': False})
+        defaults['AutoRho'].update({'Enabled': True, 'Period': 1,
+                                    'AutoScaling': True, 'Scaling': 1000,
+                                    'RsdlRatio': 1.2})
 
 
         def __init__(self, opt=None):
@@ -177,7 +177,7 @@ class ConvCnstrMODBase(admm.ADMMEqual):
     itstat_fields_objfn = ('DFid', 'Cnstr')
     itstat_fields_extra = ('XSlvRelRes',)
     hdrtxt_objfn = ('DFid', 'Cnstr')
-    hdrval_objfun = {'DFid' : 'DFid', 'Cnstr' : 'Cnstr'}
+    hdrval_objfun = {'DFid': 'DFid', 'Cnstr': 'Cnstr'}
 
 
 
@@ -525,7 +525,7 @@ class ConvCnstrMOD_CG(ConvCnstrMODBase):
         """
 
         defaults = copy.deepcopy(ConvCnstrMODBase.Options.defaults)
-        defaults.update({'CG' : {'MaxIter' : 1000, 'StopTol' : 1e-3}})
+        defaults.update({'CG': {'MaxIter': 1000, 'StopTol': 1e-3}})
 
 
         def __init__(self, opt=None):
@@ -631,7 +631,7 @@ class ConvCnstrMOD_Consensus(admm.ADMMConsensus):
     itstat_fields_objfn = ('DFid', 'Cnstr')
     itstat_fields_extra = ('XSlvRelRes',)
     hdrtxt_objfn = ('DFid', 'Cnstr')
-    hdrval_objfun = {'DFid' : 'DFid', 'Cnstr' : 'Cnstr'}
+    hdrval_objfun = {'DFid': 'DFid', 'Cnstr': 'Cnstr'}
 
 
 

@@ -91,7 +91,7 @@ class BPDNDictLearn(dictlrn.DictLearn):
         """
 
         defaults = copy.deepcopy(dictlrn.DictLearn.Options.defaults)
-        defaults.update({'AccurateDFid' : False,
+        defaults.update({'AccurateDFid': False,
             'BPDN' : copy.deepcopy(bpdn.BPDN.Options.defaults),
             'CMOD' : copy.deepcopy(cmod.CnstrMOD.Options.defaults)})
 
@@ -100,11 +100,11 @@ class BPDNDictLearn(dictlrn.DictLearn):
             """Initialise BPDN dictionary learning algorithm options."""
 
             dictlrn.DictLearn.Options.__init__(self, {
-                'BPDN' : bpdn.BPDN.Options({'MaxMainIter' : 1,
-                    'AutoRho' : {'Period' : 10, 'AutoScaling' : False,
-                    'RsdlRatio' : 10.0, 'Scaling': 2.0, 'RsdlTarget' : 1.0}}),
-                'CMOD' : cmod.CnstrMOD.Options({'MaxMainIter' : 1,
-                    'AutoRho' : {'Period' : 10}, 'AuxVarObj' : False})
+                'BPDN': bpdn.BPDN.Options({'MaxMainIter': 1,
+                    'AutoRho': {'Period': 10, 'AutoScaling': False,
+                    'RsdlRatio': 10.0, 'Scaling': 2.0, 'RsdlTarget': 1.0}}),
+                'CMOD': cmod.CnstrMOD.Options({'MaxMainIter': 1,
+                    'AutoRho': {'Period': 10}, 'AuxVarObj': False})
                 })
 
             if opt is None:
@@ -149,7 +149,7 @@ class BPDNDictLearn(dictlrn.DictLearn):
 
         # Modify D update options to include initial values for Y and U
         Nc = D0.shape[1]
-        opt['CMOD'].update({'Y0' : D0, 'U0' : np.zeros((S.shape[0], Nc))})
+        opt['CMOD'].update({'Y0': D0, 'U0': np.zeros((S.shape[0], Nc))})
 
         # Create X update object
         xstep = bpdn.BPDN(D0, S, lmbda, opt['BPDN'])
@@ -160,27 +160,27 @@ class BPDNDictLearn(dictlrn.DictLearn):
 
         # Configure iteration statistics reporting
         if self.opt['AccurateDFid']:
-            isxmap = {'XPrRsdl' : 'PrimalRsdl', 'XDlRsdl' : 'DualRsdl',
-                      'XRho' : 'Rho'}
-            evlmap = {'ObjFun' : 'ObjFun', 'DFid' : 'DFid', 'RegL1' : 'RegL1'}
+            isxmap = {'XPrRsdl': 'PrimalRsdl', 'XDlRsdl': 'DualRsdl',
+                      'XRho': 'Rho'}
+            evlmap = {'ObjFun': 'ObjFun', 'DFid': 'DFid', 'RegL1': 'RegL1'}
         else:
-            isxmap = {'ObjFun' : 'ObjFun', 'DFid' : 'DFid', 'RegL1' : 'RegL1',
-                      'XPrRsdl' : 'PrimalRsdl', 'XDlRsdl' : 'DualRsdl',
-                      'XRho' : 'Rho'}
+            isxmap = {'ObjFun': 'ObjFun', 'DFid': 'DFid', 'RegL1': 'RegL1',
+                      'XPrRsdl': 'PrimalRsdl', 'XDlRsdl': 'DualRsdl',
+                      'XRho': 'Rho'}
             evlmap = {}
         isc = dictlrn.IterStatsConfig(
             isfld=['Iter', 'ObjFun', 'DFid', 'RegL1', 'Cnstr', 'XPrRsdl',
                    'XDlRsdl', 'XRho', 'DPrRsdl', 'DDlRsdl', 'DRho', 'Time'],
             isxmap=isxmap,
-            isdmap={'Cnstr' :  'Cnstr', 'DPrRsdl' : 'PrimalRsdl',
-                    'DDlRsdl' : 'DualRsdl', 'DRho' : 'Rho'},
+            isdmap={'Cnstr':  'Cnstr', 'DPrRsdl': 'PrimalRsdl',
+                    'DDlRsdl': 'DualRsdl', 'DRho': 'Rho'},
             evlmap=evlmap,
             hdrtxt=['Itn', 'Fnc', 'DFid', u('ℓ1'), 'Cnstr', 'r_X', 's_X',
                     u('ρ_X'), 'r_D', 's_D', u('ρ_D')],
-            hdrmap={'Itn' : 'Iter', 'Fnc' : 'ObjFun', 'DFid' : 'DFid',
-                    u('ℓ1') : 'RegL1', 'Cnstr' : 'Cnstr', 'r_X' : 'XPrRsdl',
-                    's_X' : 'XDlRsdl', u('ρ_X') : 'XRho', 'r_D' : 'DPrRsdl',
-                    's_D' : 'DDlRsdl', u('ρ_D') : 'DRho'}
+            hdrmap={'Itn': 'Iter', 'Fnc': 'ObjFun', 'DFid': 'DFid',
+                    u('ℓ1'): 'RegL1', 'Cnstr': 'Cnstr', 'r_X': 'XPrRsdl',
+                    's_X': 'XDlRsdl', u('ρ_X'): 'XRho', 'r_D': 'DPrRsdl',
+                    's_D': 'DDlRsdl', u('ρ_D'): 'DRho'}
             )
 
         # Call parent constructor

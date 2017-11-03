@@ -205,9 +205,9 @@ class DictLearn(with_metaclass(_DictLearn_Meta, object)):
           every iteration.
         """
 
-        defaults = {'Verbose' : False, 'StatusHeader' : True,
-                    'IterTimer' : 'solve', 'MaxMainIter' : 1000,
-                    'Callback' : None}
+        defaults = {'Verbose': False, 'StatusHeader': True,
+                    'IterTimer': 'solve', 'MaxMainIter': 1000,
+                    'Callback': None}
 
 
         def __init__(self, opt=None):
@@ -253,18 +253,18 @@ class DictLearn(with_metaclass(_DictLearn_Meta, object)):
             isc = IterStatsConfig(
                 isfld=['Iter', 'ObjFunX', 'XPrRsdl', 'XDlRsdl', 'XRho',
                        'ObjFunD', 'DPrRsdl', 'DDlRsdl', 'DRho', 'Time'],
-                isxmap={'ObjFunX' : 'ObjFun', 'XPrRsdl' : 'PrimalRsdl',
-                        'XDlRsdl' : 'DualRsdl', 'XRho' : 'Rho'},
-                isdmap={'ObjFunD' : 'DFid', 'DPrRsdl' : 'PrimalRsdl',
-                        'DDlRsdl' : 'DualRsdl', 'DRho' : 'Rho'},
+                isxmap={'ObjFunX': 'ObjFun', 'XPrRsdl': 'PrimalRsdl',
+                        'XDlRsdl': 'DualRsdl', 'XRho': 'Rho'},
+                isdmap={'ObjFunD': 'DFid', 'DPrRsdl': 'PrimalRsdl',
+                        'DDlRsdl': 'DualRsdl', 'DRho': 'Rho'},
                 evlmap={},
                 hdrtxt=['Itn', 'FncX', 'r_X', 's_X', u('ρ_X'),
                         'FncD', 'r_D', 's_D', u('ρ_D')],
-                hdrmap={'Itn' : 'Iter', 'FncX' : 'ObjFunX',
-                        'r_X' : 'XPrRsdl', 's_X' : 'XDlRsdl',
-                        u('ρ_X') : 'XRho', 'FncD' : 'ObjFunD',
-                        'r_D' : 'DPrRsdl', 's_D' : 'DDlRsdl',
-                        u('ρ_D') : 'DRho'}
+                hdrmap={'Itn': 'Iter', 'FncX': 'ObjFunX',
+                        'r_X': 'XPrRsdl', 's_X': 'XDlRsdl',
+                        u('ρ_X'): 'XRho', 'FncD': 'ObjFunD',
+                        'r_D': 'DPrRsdl', 's_D': 'DDlRsdl',
+                        u('ρ_D'): 'DRho'}
             )
         self.isc = isc
 

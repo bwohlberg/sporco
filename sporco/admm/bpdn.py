@@ -102,12 +102,12 @@ class GenericBPDN(admm.ADMMEqual):
         # if 'AuxVarObj' is initialised first, the other two keys are
         # correctly set, but this setting is overwritten when 'fEvalX'
         # and 'gEvalY' are themselves initialised
-        defaults.update({'AuxVarObj' : True, 'fEvalX' : False,
-                         'gEvalY' : True, 'ReturnX' : False,
-                        'RelaxParam' : 1.8, 'NonNegCoef' : False})
-        defaults['AutoRho'].update({'Enabled' : True, 'Period' : 10,
-                                    'AutoScaling' : True, 'Scaling' : 1000.0,
-                                    'RsdlRatio' : 1.2})
+        defaults.update({'AuxVarObj': True, 'fEvalX': False,
+                         'gEvalY': True, 'ReturnX': False,
+                        'RelaxParam': 1.8, 'NonNegCoef': False})
+        defaults['AutoRho'].update({'Enabled': True, 'Period': 10,
+                                    'AutoScaling': True, 'Scaling': 1000.0,
+                                    'RsdlRatio': 1.2})
 
         def __init__(self, opt=None):
             """Initialise GenericBPDN algorithm options object."""
@@ -137,7 +137,7 @@ class GenericBPDN(admm.ADMMEqual):
 
     itstat_fields_objfn = ('ObjFun', 'DFid', 'Reg')
     hdrtxt_objfn = ('Fnc', 'DFid', 'Reg')
-    hdrval_objfun = {'Fnc' : 'ObjFun', 'DFid' : 'DFid', 'Reg' : 'Reg'}
+    hdrval_objfun = {'Fnc': 'ObjFun', 'DFid': 'DFid', 'Reg': 'Reg'}
 
 
 
@@ -327,7 +327,7 @@ class BPDN(GenericBPDN):
         """
 
         defaults = copy.deepcopy(GenericBPDN.Options.defaults)
-        defaults.update({'L1Weight' : 1.0})
+        defaults.update({'L1Weight': 1.0})
 
 
         def __init__(self, opt=None):
@@ -341,7 +341,7 @@ class BPDN(GenericBPDN):
 
     itstat_fields_objfn = ('ObjFun', 'DFid', 'RegL1')
     hdrtxt_objfn = ('Fnc', 'DFid', u('Regℓ1'))
-    hdrval_objfun = {'Fnc' : 'ObjFun', 'DFid' : 'DFid', u('Regℓ1') : 'RegL1'}
+    hdrval_objfun = {'Fnc': 'ObjFun', 'DFid': 'DFid', u('Regℓ1'): 'RegL1'}
 
 
 
@@ -498,8 +498,8 @@ class BPDNJoint(BPDN):
 
     itstat_fields_objfn = ('ObjFun', 'DFid', 'RegL1', 'RegL21')
     hdrtxt_objfn = ('Fnc', 'DFid', u('Regℓ1'), u('Regℓ2,1'))
-    hdrval_objfun = {'Fnc' : 'ObjFun', 'DFid' : 'DFid',
-                     u('Regℓ1') : 'RegL1', u('Regℓ2,1') : 'RegL21'}
+    hdrval_objfun = {'Fnc': 'ObjFun', 'DFid': 'DFid',
+                     u('Regℓ1'): 'RegL1', u('Regℓ2,1'): 'RegL21'}
 
 
 
@@ -625,8 +625,8 @@ class ElasticNet(BPDN):
 
     itstat_fields_objfn = ('ObjFun', 'DFid', 'RegL1', 'RegL2')
     hdrtxt_objfn = ('Fnc', 'DFid', u('Regℓ1'), u('Regℓ2'))
-    hdrval_objfun = {'Fnc' : 'ObjFun', 'DFid' : 'DFid',
-                     u('Regℓ1') : 'RegL1', u('Regℓ2') : 'RegL2'}
+    hdrval_objfun = {'Fnc': 'ObjFun', 'DFid': 'DFid',
+                     u('Regℓ1'): 'RegL1', u('Regℓ2'): 'RegL2'}
 
 
 
@@ -786,7 +786,7 @@ class BPDNProjL1(GenericBPDN):
         """
 
         defaults = copy.deepcopy(GenericBPDN.Options.defaults)
-        defaults['AutoRho'].update({'RsdlTarget' : 1.0})
+        defaults['AutoRho'].update({'RsdlTarget': 1.0})
 
 
         def __init__(self, opt=None):
@@ -800,7 +800,7 @@ class BPDNProjL1(GenericBPDN):
 
     itstat_fields_objfn = ('ObjFun', 'Cnstr')
     hdrtxt_objfn = ('Fnc', 'Cnstr')
-    hdrval_objfun = {'Fnc' : 'ObjFun', 'Cnstr' : 'Cnstr'}
+    hdrval_objfun = {'Fnc': 'ObjFun', 'Cnstr': 'Cnstr'}
 
 
 
@@ -965,13 +965,13 @@ class MinL1InL2Ball(admm.ADMMTwoBlockCnstrnt):
         """
 
         defaults = copy.deepcopy(admm.ADMMTwoBlockCnstrnt.Options.defaults)
-        defaults.update({'AuxVarObj' : False, 'fEvalX' : True,
-                         'gEvalY' : False, 'RelaxParam' : 1.8,
-                         'L1Weight' : 1.0, 'NonNegCoef' : False,
-                         'ReturnVar' : 'X'})
-        defaults['AutoRho'].update({'Enabled' : True, 'Period' : 10,
-                                    'AutoScaling' : True, 'Scaling' : 1000.0,
-                                    'RsdlRatio' : 1.2, 'RsdlTarget' : 1.0})
+        defaults.update({'AuxVarObj': False, 'fEvalX': True,
+                         'gEvalY': False, 'RelaxParam': 1.8,
+                         'L1Weight': 1.0, 'NonNegCoef': False,
+                         'ReturnVar': 'X'})
+        defaults['AutoRho'].update({'Enabled': True, 'Period': 10,
+                                    'AutoScaling': True, 'Scaling': 1000.0,
+                                    'RsdlRatio': 1.2, 'RsdlTarget': 1.0})
 
         def __init__(self, opt=None):
             """Initialise MinL1InL2Ball algorithm options object."""
@@ -984,7 +984,7 @@ class MinL1InL2Ball(admm.ADMMTwoBlockCnstrnt):
 
     itstat_fields_objfn = ('ObjFun', 'Cnstr')
     hdrtxt_objfn = ('Fnc', 'Cnstr')
-    hdrval_objfun = {'Fnc' : 'ObjFun', 'Cnstr' : 'Cnstr'}
+    hdrval_objfun = {'Fnc': 'ObjFun', 'Cnstr': 'Cnstr'}
 
 
 

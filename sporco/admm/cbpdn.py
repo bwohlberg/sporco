@@ -124,14 +124,14 @@ class GenericConvBPDN(admm.ADMMEqual):
         # if 'AuxVarObj' is initialised first, the other two keys are
         # correctly set, but this setting is overwritten when 'fEvalX'
         # and 'gEvalY' are themselves initialised
-        defaults.update({'AuxVarObj' : False, 'fEvalX' : True,
-                         'gEvalY' : False, 'ReturnX' : False,
-                         'HighMemSolve' : False, 'LinSolveCheck' : False,
-                         'RelaxParam' : 1.8, 'NonNegCoef' : False,
-                         'NoBndryCross' : False})
-        defaults['AutoRho'].update({'Enabled' : True, 'Period' : 1,
-                                    'AutoScaling' : True, 'Scaling' : 1000.0,
-                                    'RsdlRatio' : 1.2})
+        defaults.update({'AuxVarObj': False, 'fEvalX': True,
+                         'gEvalY': False, 'ReturnX': False,
+                         'HighMemSolve': False, 'LinSolveCheck': False,
+                         'RelaxParam': 1.8, 'NonNegCoef': False,
+                         'NoBndryCross': False})
+        defaults['AutoRho'].update({'Enabled': True, 'Period': 1,
+                                    'AutoScaling': True, 'Scaling': 1000.0,
+                                    'RsdlRatio': 1.2})
 
 
         def __init__(self, opt=None):
@@ -163,7 +163,7 @@ class GenericConvBPDN(admm.ADMMEqual):
     itstat_fields_objfn = ('ObjFun', 'DFid', 'Reg')
     itstat_fields_extra = ('XSlvRelRes',)
     hdrtxt_objfn = ('Fnc', 'DFid', 'Reg')
-    hdrval_objfun = {'Fnc' : 'ObjFun', 'DFid' : 'DFid', 'Reg' : 'Reg'}
+    hdrval_objfun = {'Fnc': 'ObjFun', 'DFid': 'DFid', 'Reg': 'Reg'}
 
 
 
@@ -491,7 +491,7 @@ class ConvBPDN(GenericConvBPDN):
         """
 
         defaults = copy.deepcopy(GenericConvBPDN.Options.defaults)
-        defaults.update({'L1Weight' : 1.0})
+        defaults.update({'L1Weight': 1.0})
 
 
         def __init__(self, opt=None):
@@ -505,7 +505,7 @@ class ConvBPDN(GenericConvBPDN):
 
     itstat_fields_objfn = ('ObjFun', 'DFid', 'RegL1')
     hdrtxt_objfn = ('Fnc', 'DFid', u('Regℓ1'))
-    hdrval_objfun = {'Fnc' : 'ObjFun', 'DFid' : 'DFid', u('Regℓ1') : 'RegL1'}
+    hdrval_objfun = {'Fnc': 'ObjFun', 'DFid': 'DFid', u('Regℓ1'): 'RegL1'}
 
 
 
@@ -709,7 +709,7 @@ class ConvBPDNJoint(ConvBPDN):
         """
 
         defaults = copy.deepcopy(ConvBPDN.Options.defaults)
-        defaults.update({'L21Weight' : 1.0})
+        defaults.update({'L21Weight': 1.0})
 
 
         def __init__(self, opt=None):
@@ -723,8 +723,8 @@ class ConvBPDNJoint(ConvBPDN):
 
     itstat_fields_objfn = ('ObjFun', 'DFid', 'RegL1', 'RegL21')
     hdrtxt_objfn = ('Fnc', 'DFid', u('Regℓ1'), u('Regℓ2,1'))
-    hdrval_objfun = {'Fnc' : 'ObjFun', 'DFid' : 'DFid',
-                     u('Regℓ1') : 'RegL1', u('Regℓ2,1') : 'RegL21'}
+    hdrval_objfun = {'Fnc': 'ObjFun', 'DFid': 'DFid',
+                     u('Regℓ1'): 'RegL1', u('Regℓ2,1'): 'RegL21'}
 
 
 
@@ -863,8 +863,8 @@ class ConvElasticNet(ConvBPDN):
 
     itstat_fields_objfn = ('ObjFun', 'DFid', 'RegL1', 'RegL2')
     hdrtxt_objfn = ('Fnc', 'DFid', u('Regℓ1'), u('Regℓ2'))
-    hdrval_objfun = {'Fnc' : 'ObjFun', 'DFid' : 'DFid',
-                     u('Regℓ1') : 'RegL1', u('Regℓ2') : 'RegL2'}
+    hdrval_objfun = {'Fnc': 'ObjFun', 'DFid': 'DFid',
+                     u('Regℓ1'): 'RegL1', u('Regℓ2'): 'RegL2'}
 
 
 
@@ -1058,7 +1058,7 @@ class ConvBPDNGradReg(ConvBPDN):
         """
 
         defaults = copy.deepcopy(ConvBPDN.Options.defaults)
-        defaults.update({'GradWeight' : 1.0})
+        defaults.update({'GradWeight': 1.0})
 
 
         def __init__(self, opt=None):
@@ -1072,8 +1072,8 @@ class ConvBPDNGradReg(ConvBPDN):
 
     itstat_fields_objfn = ('ObjFun', 'DFid', 'RegL1', 'RegGrad')
     hdrtxt_objfn = ('Fnc', 'DFid', u('Regℓ1'), u('Regℓ2∇'))
-    hdrval_objfun = {'Fnc' : 'ObjFun', 'DFid' : 'DFid',
-                     u('Regℓ1') : 'RegL1', u('Regℓ2∇') : 'RegGrad'}
+    hdrval_objfun = {'Fnc': 'ObjFun', 'DFid': 'DFid',
+                     u('Regℓ1'): 'RegL1', u('Regℓ2∇'): 'RegGrad'}
 
 
 
@@ -1274,7 +1274,7 @@ class ConvBPDNProjL1(GenericConvBPDN):
         """
 
         defaults = copy.deepcopy(GenericConvBPDN.Options.defaults)
-        defaults['AutoRho'].update({'RsdlTarget' : 1.0})
+        defaults['AutoRho'].update({'RsdlTarget': 1.0})
 
 
         def __init__(self, opt=None):
@@ -1288,7 +1288,7 @@ class ConvBPDNProjL1(GenericConvBPDN):
 
     itstat_fields_objfn = ('ObjFun', 'Cnstr')
     hdrtxt_objfn = ('Fnc', 'Cnstr')
-    hdrval_objfun = {'Fnc' : 'ObjFun', 'Cnstr' : 'Cnstr'}
+    hdrval_objfun = {'Fnc': 'ObjFun', 'Cnstr': 'Cnstr'}
 
 
 
@@ -1477,11 +1477,11 @@ class ConvTwoBlockCnstrnt(admm.ADMMTwoBlockCnstrnt):
         """
 
         defaults = copy.deepcopy(admm.ADMMEqual.Options.defaults)
-        defaults.update({'AuxVarObj' : False, 'fEvalX' : True,
-                         'gEvalY' : False, 'HighMemSolve' : False,
-                         'LinSolveCheck' : False, 'NonNegCoef' : False,
-                         'NoBndryCross' : False, 'RelaxParam' : 1.8,
-                         'rho' : 1.0, 'ReturnVar' : 'Y1'})
+        defaults.update({'AuxVarObj': False, 'fEvalX': True,
+                         'gEvalY': False, 'HighMemSolve': False,
+                         'LinSolveCheck': False, 'NonNegCoef': False,
+                         'NoBndryCross': False, 'RelaxParam': 1.8,
+                         'rho': 1.0, 'ReturnVar': 'Y1'})
 
 
         def __init__(self, opt=None):
@@ -1496,7 +1496,7 @@ class ConvTwoBlockCnstrnt(admm.ADMMTwoBlockCnstrnt):
     itstat_fields_objfn = ('ObjFun', 'G0Val', 'G1Val')
     itstat_fields_extra = ('XSlvRelRes',)
     hdrtxt_objfn = ('Fnc', 'g0', 'g1')
-    hdrval_objfun = {'Fnc' : 'ObjFun', 'g0' : 'G0Val', 'g1' : 'G1Val'}
+    hdrval_objfun = {'Fnc': 'ObjFun', 'g0': 'G0Val', 'g1': 'G1Val'}
 
 
 
@@ -1881,13 +1881,13 @@ class ConvMinL1InL2Ball(ConvTwoBlockCnstrnt):
         """
 
         defaults = copy.deepcopy(ConvTwoBlockCnstrnt.Options.defaults)
-        defaults.update({'AuxVarObj' : False, 'fEvalX' : True,
-                         'gEvalY' : False, 'RelaxParam' : 1.8,
-                         'L1Weight' : 1.0, 'NonNegCoef' : False,
-                         'ReturnVar' : 'Y1'})
-        defaults['AutoRho'].update({'Enabled' : True, 'Period' : 10,
-                                    'AutoScaling' : True, 'Scaling' : 1000.0,
-                                    'RsdlRatio' : 1.2, 'RsdlTarget' : 1.0})
+        defaults.update({'AuxVarObj': False, 'fEvalX': True,
+                         'gEvalY': False, 'RelaxParam': 1.8,
+                         'L1Weight': 1.0, 'NonNegCoef': False,
+                         'ReturnVar': 'Y1'})
+        defaults['AutoRho'].update({'Enabled': True, 'Period': 10,
+                                    'AutoScaling': True, 'Scaling': 1000.0,
+                                    'RsdlRatio': 1.2, 'RsdlTarget': 1.0})
 
         def __init__(self, opt=None):
             """Initialise ConvMinL1InL2Ball algorithm options object."""
@@ -1900,7 +1900,7 @@ class ConvMinL1InL2Ball(ConvTwoBlockCnstrnt):
 
     itstat_fields_objfn = ('ObjFun', 'Cnstr')
     hdrtxt_objfn = ('Fnc', 'Cnstr')
-    hdrval_objfun = {'Fnc' : 'ObjFun', 'Cnstr' : 'Cnstr'}
+    hdrval_objfun = {'Fnc': 'ObjFun', 'Cnstr': 'Cnstr'}
 
 
 
@@ -2092,7 +2092,7 @@ class ConvBPDNMaskDcpl(ConvTwoBlockCnstrnt):
         """
 
         defaults = copy.deepcopy(ConvTwoBlockCnstrnt.Options.defaults)
-        defaults.update({'L1Weight' : 1.0})
+        defaults.update({'L1Weight': 1.0})
 
 
         def __init__(self, opt=None):
@@ -2106,7 +2106,7 @@ class ConvBPDNMaskDcpl(ConvTwoBlockCnstrnt):
 
     itstat_fields_objfn = ('ObjFun', 'DFid', 'RegL1')
     hdrtxt_objfn = ('Fnc', 'DFid', u('Regℓ1'))
-    hdrval_objfun = {'Fnc' : 'ObjFun', 'DFid' : 'DFid', u('Regℓ1') : 'RegL1'}
+    hdrval_objfun = {'Fnc': 'ObjFun', 'DFid': 'DFid', u('Regℓ1'): 'RegL1'}
 
 
 

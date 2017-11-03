@@ -99,10 +99,10 @@ class CnstrMOD(admm.ADMMEqual):
         # if 'AuxVarObj' is initialised first, the other two keys are
         # correctly set, but this setting is overwritten when 'fEvalX'
         # and 'gEvalY' are themselves initialised
-        defaults.update({'AuxVarObj' : True, 'fEvalX' : False,
-                         'gEvalY' : True, 'ReturnX' : False,
-                         'RelaxParam' : 1.8, 'ZeroMean' : False})
-        defaults['AutoRho'].update({'Enabled' : True})
+        defaults.update({'AuxVarObj': True, 'fEvalX': False,
+                         'gEvalY': True, 'ReturnX': False,
+                         'RelaxParam': 1.8, 'ZeroMean': False})
+        defaults['AutoRho'].update({'Enabled': True})
 
 
         def __init__(self, opt=None):
@@ -136,7 +136,7 @@ class CnstrMOD(admm.ADMMEqual):
 
     itstat_fields_objfn = ('DFid', 'Cnstr')
     hdrtxt_objfn = ('DFid', 'Cnstr')
-    hdrval_objfun = {'DFid' : 'DFid', 'Cnstr' : 'Cnstr'}
+    hdrval_objfun = {'DFid': 'DFid', 'Cnstr': 'Cnstr'}
 
 
 

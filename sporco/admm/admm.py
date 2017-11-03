@@ -181,19 +181,19 @@ class ADMM(with_metaclass(_ADMM_Meta, object)):
             Sec. IV.B in :cite:`wohlberg-2015-adaptive`).
         """
 
-        defaults = {'FastSolve' : False, 'Verbose' : False,
-                    'StatusHeader' : True, 'DataType' : None,
-                    'MaxMainIter' : 1000, 'IterTimer' : 'solve',
-                    'AbsStopTol' : 0.0, 'RelStopTol' : 1e-3,
-                    'RelaxParam' : 1.0, 'rho' : None,
+        defaults = {'FastSolve': False, 'Verbose': False,
+                    'StatusHeader': True, 'DataType': None,
+                    'MaxMainIter': 1000, 'IterTimer': 'solve',
+                    'AbsStopTol': 0.0, 'RelStopTol': 1e-3,
+                    'RelaxParam': 1.0, 'rho': None,
                     'AutoRho' :
                     {
-                        'Enabled' : False, 'Period' : 10,
-                        'Scaling' : 2.0, 'RsdlRatio' : 10.0,
-                        'RsdlTarget' : None, 'AutoScaling' : False,
-                        'StdResiduals' : False
+                        'Enabled': False, 'Period': 10,
+                        'Scaling': 2.0, 'RsdlRatio': 10.0,
+                        'RsdlTarget': None, 'AutoScaling': False,
+                        'StdResiduals': False
                     },
-                    'Y0' : None, 'U0' : None, 'Callback' : None
+                    'Y0': None, 'U0': None, 'Callback': None
                    }
 
         def __init__(self, opt=None):
@@ -219,7 +219,7 @@ class ADMM(with_metaclass(_ADMM_Meta, object)):
     hdrtxt_objfn = ('Fnc', 'f', 'g')
     """Display column headers associated with the objective function;
     see :meth:`eval_objfn`"""
-    hdrval_objfun = {'Fnc' : 'ObjFun', 'f' : 'FVal', 'g' : 'GVal'}
+    hdrval_objfun = {'Fnc': 'ObjFun', 'f': 'FVal', 'g': 'GVal'}
     """Dictionary mapping display column headers in :attr:`hdrtxt_objfn`
     to IterationStats entries"""
 
@@ -1166,8 +1166,8 @@ class ADMMTwoBlockCnstrnt(ADMM):
     hdrtxt_objfn = ('Fnc', 'f', 'g0', 'g1')
     """Display column headers associated with the objective function;
     see :meth:`eval_objfn`"""
-    hdrval_objfun = {'Fnc' : 'ObjFun', 'f' : 'FVal',
-                     'g0' : 'G0Val', 'g1' : 'G1Val'}
+    hdrval_objfun = {'Fnc': 'ObjFun', 'f': 'FVal',
+                     'g0': 'G0Val', 'g1': 'G1Val'}
     """Dictionary mapping display column headers in :attr:`hdrtxt_objfn`
     to IterationStats entries"""
 

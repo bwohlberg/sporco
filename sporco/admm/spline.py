@@ -94,12 +94,12 @@ class SplineL1(admm.ADMM):
         """
 
         defaults = copy.deepcopy(admm.ADMM.Options.defaults)
-        defaults.update({'gEvalY' : True, 'RelaxParam' : 1.8,
-                         'DFidWeight' : 1.0, 'LinSolveCheck' : False
+        defaults.update({'gEvalY': True, 'RelaxParam': 1.8,
+                         'DFidWeight': 1.0, 'LinSolveCheck': False
                         })
-        defaults['AutoRho'].update({'Enabled' : True, 'Period' : 1,
-                                    'AutoScaling' : True, 'Scaling' : 1000.0,
-                                    'RsdlRatio' : 1.2})
+        defaults['AutoRho'].update({'Enabled': True, 'Period': 1,
+                                    'AutoScaling': True, 'Scaling': 1000.0,
+                                    'RsdlRatio': 1.2})
 
 
         def __init__(self, opt=None):
@@ -117,7 +117,7 @@ class SplineL1(admm.ADMM):
     itstat_fields_objfn = ('ObjFun', 'DFid', 'Reg')
     itstat_fields_extra = ('XSlvRelRes',)
     hdrtxt_objfn = ('Fnc', 'DFid', 'Reg')
-    hdrval_objfun = {'Fnc' : 'ObjFun', 'DFid' : 'DFid', 'Reg' : 'Reg'}
+    hdrval_objfun = {'Fnc': 'ObjFun', 'DFid': 'DFid', 'Reg': 'Reg'}
 
 
 

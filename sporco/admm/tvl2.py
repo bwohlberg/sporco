@@ -104,13 +104,13 @@ class TVL2Denoise(admm.ADMM):
         """
 
         defaults = copy.deepcopy(admm.ADMM.Options.defaults)
-        defaults.update({'gEvalY' : True, 'RelaxParam' : 1.8,
-                         'DFidWeight' : 1.0, 'TVWeight' : 1.0,
-                         'GSTol' : 0.0, 'MaxGSIter' : 2
+        defaults.update({'gEvalY': True, 'RelaxParam': 1.8,
+                         'DFidWeight': 1.0, 'TVWeight': 1.0,
+                         'GSTol': 0.0, 'MaxGSIter': 2
                         })
-        defaults['AutoRho'].update({'Enabled' : False, 'Period' : 1,
-                                    'AutoScaling' : True, 'Scaling' : 1000.0,
-                                    'RsdlRatio' : 1.2})
+        defaults['AutoRho'].update({'Enabled': False, 'Period': 1,
+                                    'AutoScaling': True, 'Scaling': 1000.0,
+                                    'RsdlRatio': 1.2})
 
 
         def __init__(self, opt=None):
@@ -128,7 +128,7 @@ class TVL2Denoise(admm.ADMM):
     itstat_fields_objfn = ('ObjFun', 'DFid', 'RegTV')
     itstat_fields_extra = ('GSIter', 'GSRelRes')
     hdrtxt_objfn = ('Fnc', 'DFid', 'RegTV')
-    hdrval_objfun = {'Fnc' : 'ObjFun', 'DFid' : 'DFid', 'RegTV' : 'RegTV'}
+    hdrval_objfun = {'Fnc': 'ObjFun', 'DFid': 'DFid', 'RegTV': 'RegTV'}
 
 
 
@@ -414,11 +414,11 @@ class TVL2Deconv(admm.ADMM):
         """
 
         defaults = copy.deepcopy(admm.ADMM.Options.defaults)
-        defaults.update({'gEvalY' : True, 'RelaxParam' : 1.8,
-                         'LinSolveCheck' : False, 'TVWeight' : 1.0})
-        defaults['AutoRho'].update({'Enabled' : True, 'Period' : 1,
-                                    'AutoScaling' : True, 'Scaling' : 1000.0,
-                                    'RsdlRatio' : 1.2})
+        defaults.update({'gEvalY': True, 'RelaxParam': 1.8,
+                         'LinSolveCheck': False, 'TVWeight': 1.0})
+        defaults['AutoRho'].update({'Enabled': True, 'Period': 1,
+                                    'AutoScaling': True, 'Scaling': 1000.0,
+                                    'RsdlRatio': 1.2})
 
 
         def __init__(self, opt=None):
@@ -436,7 +436,7 @@ class TVL2Deconv(admm.ADMM):
     itstat_fields_objfn = ('ObjFun', 'DFid', 'RegTV')
     itstat_fields_extra = ('XSlvRelRes',)
     hdrtxt_objfn = ('Fnc', 'DFid', 'RegTV')
-    hdrval_objfun = {'Fnc' : 'ObjFun', 'DFid' : 'DFid', 'RegTV' : 'RegTV'}
+    hdrval_objfun = {'Fnc': 'ObjFun', 'DFid': 'DFid', 'RegTV': 'RegTV'}
 
 
 

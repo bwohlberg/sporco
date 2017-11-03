@@ -147,8 +147,8 @@ class ConvBPDNScalarTV(admm.ADMM):
     itstat_fields_objfn = ('ObjFun', 'DFid', 'RegL1', 'RegTV')
     itstat_fields_extra = ('XSlvRelRes',)
     hdrtxt_objfn = ('Fnc', 'DFid', u('Regℓ1'), u('RegTV'))
-    hdrval_objfun = {'Fnc' : 'ObjFun', 'DFid' : 'DFid',
-                     u('Regℓ1') : 'RegL1', u('RegTV') : 'RegTV'}
+    hdrval_objfun = {'Fnc': 'ObjFun', 'DFid': 'DFid',
+                     u('Regℓ1'): 'RegL1', u('RegTV'): 'RegTV'}
 
 
     def __init__(self, D, S, lmbda, mu=0.0, opt=None, dimK=None, dimN=2):
@@ -844,8 +844,8 @@ class ConvBPDNRecTV(admm.ADMM):
     itstat_fields_objfn = ('ObjFun', 'DFid', 'RegL1', 'RegTV')
     itstat_fields_extra = ('XSlvRelRes',)
     hdrtxt_objfn = ('Fnc', 'DFid', u('Regℓ1'), u('RegTV'))
-    hdrval_objfun = {'Fnc' : 'ObjFun', 'DFid' : 'DFid',
-                     u('Regℓ1') : 'RegL1', u('RegTV') : 'RegTV'}
+    hdrval_objfun = {'Fnc': 'ObjFun', 'DFid': 'DFid',
+                     u('Regℓ1'): 'RegL1', u('RegTV'): 'RegTV'}
 
 
     def __init__(self, D, S, lmbda, mu=0.0, opt=None, dimK=None, dimN=2):

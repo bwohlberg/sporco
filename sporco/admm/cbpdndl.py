@@ -112,8 +112,8 @@ class ConvBPDNDictLearn(dictlrn.DictLearn):
         """
 
         defaults = copy.deepcopy(dictlrn.DictLearn.Options.defaults)
-        defaults.update({'DictSize' : None, 'AccurateDFid' : False,
-            'CBPDN' : copy.deepcopy(cbpdn.ConvBPDN.Options.defaults)})
+        defaults.update({'DictSize': None, 'AccurateDFid': False,
+            'CBPDN': copy.deepcopy(cbpdn.ConvBPDN.Options.defaults)})
 
 
         def __init__(self, opt=None, method='cns'):
@@ -123,16 +123,16 @@ class ConvBPDNDictLearn(dictlrn.DictLearn):
             :func:`.ConvCnstrMOD`.
             """
 
-            self.defaults.update({'CCMOD' : copy.deepcopy(
+            self.defaults.update({'CCMOD': copy.deepcopy(
                 ccmod.ConvCnstrMODOptions(method=method).defaults)})
 
             dictlrn.DictLearn.Options.__init__(self, {
-                'CBPDN' : cbpdn.ConvBPDN.Options({'MaxMainIter' : 1,
-                    'AutoRho' : {'Period' : 10, 'AutoScaling' : False,
-                    'RsdlRatio' : 10.0, 'Scaling': 2.0, 'RsdlTarget' : 1.0}}),
-                'CCMOD' : ccmod.ConvCnstrMODOptions({'MaxMainIter' : 1,
-                    'AutoRho' : {'Period' : 10, 'AutoScaling' : False,
-                    'RsdlRatio' : 10.0, 'Scaling': 2.0, 'RsdlTarget' : 1.0}},
+                'CBPDN': cbpdn.ConvBPDN.Options({'MaxMainIter': 1,
+                    'AutoRho': {'Period': 10, 'AutoScaling': False,
+                    'RsdlRatio': 10.0, 'Scaling': 2.0, 'RsdlTarget': 1.0}}),
+                'CCMOD': ccmod.ConvCnstrMODOptions({'MaxMainIter': 1,
+                    'AutoRho': {'Period': 10, 'AutoScaling': False,
+                    'RsdlRatio': 10.0, 'Scaling': 2.0, 'RsdlTarget': 1.0}},
                     method=method)
                 })
 
@@ -210,27 +210,27 @@ class ConvBPDNDictLearn(dictlrn.DictLearn):
 
         # Configure iteration statistics reporting
         if self.opt['AccurateDFid']:
-            isxmap = {'XPrRsdl' : 'PrimalRsdl', 'XDlRsdl' : 'DualRsdl',
-                      'XRho' : 'Rho'}
-            evlmap = {'ObjFun' : 'ObjFun', 'DFid' : 'DFid', 'RegL1' : 'RegL1'}
+            isxmap = {'XPrRsdl': 'PrimalRsdl', 'XDlRsdl': 'DualRsdl',
+                      'XRho': 'Rho'}
+            evlmap = {'ObjFun': 'ObjFun', 'DFid': 'DFid', 'RegL1': 'RegL1'}
         else:
-            isxmap = {'ObjFun' : 'ObjFun', 'DFid' : 'DFid', 'RegL1' : 'RegL1',
-                      'XPrRsdl' : 'PrimalRsdl', 'XDlRsdl' : 'DualRsdl',
-                      'XRho' : 'Rho'}
+            isxmap = {'ObjFun': 'ObjFun', 'DFid': 'DFid', 'RegL1': 'RegL1',
+                      'XPrRsdl': 'PrimalRsdl', 'XDlRsdl': 'DualRsdl',
+                      'XRho': 'Rho'}
             evlmap = {}
         isc = dictlrn.IterStatsConfig(
             isfld=['Iter', 'ObjFun', 'DFid', 'RegL1', 'Cnstr', 'XPrRsdl',
                    'XDlRsdl', 'XRho', 'DPrRsdl', 'DDlRsdl', 'DRho', 'Time'],
             isxmap=isxmap,
-            isdmap={'Cnstr' :  'Cnstr', 'DPrRsdl' : 'PrimalRsdl',
-                    'DDlRsdl' : 'DualRsdl', 'DRho' : 'Rho'},
+            isdmap={'Cnstr':  'Cnstr', 'DPrRsdl': 'PrimalRsdl',
+                    'DDlRsdl': 'DualRsdl', 'DRho': 'Rho'},
             evlmap=evlmap,
             hdrtxt=['Itn', 'Fnc', 'DFid', u('ℓ1'), 'Cnstr', 'r_X', 's_X',
                     u('ρ_X'), 'r_D', 's_D', u('ρ_D')],
-            hdrmap={'Itn' : 'Iter', 'Fnc' : 'ObjFun', 'DFid' : 'DFid',
-                    u('ℓ1') : 'RegL1', 'Cnstr' : 'Cnstr', 'r_X' : 'XPrRsdl',
-                    's_X' : 'XDlRsdl', u('ρ_X') : 'XRho', 'r_D' : 'DPrRsdl',
-                    's_D' : 'DDlRsdl', u('ρ_D') : 'DRho'}
+            hdrmap={'Itn': 'Iter', 'Fnc': 'ObjFun', 'DFid': 'DFid',
+                    u('ℓ1'): 'RegL1', 'Cnstr': 'Cnstr', 'r_X': 'XPrRsdl',
+                    's_X': 'XDlRsdl', u('ρ_X'): 'XRho', 'r_D': 'DPrRsdl',
+                    's_D': 'DDlRsdl', u('ρ_D'): 'DRho'}
             )
 
         # Call parent constructor
@@ -369,8 +369,8 @@ class ConvBPDNMaskDcplDictLearn(dictlrn.DictLearn):
         """
 
         defaults = copy.deepcopy(dictlrn.DictLearn.Options.defaults)
-        defaults.update({'DictSize' : None, 'AccurateDFid' : False,
-            'CBPDN' : copy.deepcopy(cbpdn.ConvBPDNMaskDcpl.Options.defaults)})
+        defaults.update({'DictSize': None, 'AccurateDFid': False,
+            'CBPDN': copy.deepcopy(cbpdn.ConvBPDNMaskDcpl.Options.defaults)})
 
 
         def __init__(self, opt=None, method='cns'):
@@ -381,17 +381,17 @@ class ConvBPDNMaskDcplDictLearn(dictlrn.DictLearn):
             :func:`.ConvCnstrMODMaskDcpl`.
             """
 
-            self.defaults.update({'CCMOD' : copy.deepcopy(
+            self.defaults.update({'CCMOD': copy.deepcopy(
                 ccmodmd.ConvCnstrMODMaskDcplOptions(method=method).defaults)})
 
             dictlrn.DictLearn.Options.__init__(self, {
-                'CBPDN' : cbpdn.ConvBPDNMaskDcpl.Options({'MaxMainIter' : 1,
-                    'AutoRho' : {'Period' : 10, 'AutoScaling' : False,
-                    'RsdlRatio' : 10.0, 'Scaling': 2.0, 'RsdlTarget' : 1.0}}),
-                'CCMOD' : ccmodmd.ConvCnstrMODMaskDcplOptions(
-                    {'MaxMainIter' : 1, 'AutoRho' : {'Period' : 10,
-                    'AutoScaling' : False, 'RsdlRatio' : 10.0,
-                    'Scaling': 2.0, 'RsdlTarget' : 1.0}}, method=method)
+                'CBPDN': cbpdn.ConvBPDNMaskDcpl.Options({'MaxMainIter': 1,
+                    'AutoRho': {'Period': 10, 'AutoScaling': False,
+                    'RsdlRatio': 10.0, 'Scaling': 2.0, 'RsdlTarget': 1.0}}),
+                'CCMOD': ccmodmd.ConvCnstrMODMaskDcplOptions(
+                    {'MaxMainIter': 1, 'AutoRho': {'Period': 10,
+                    'AutoScaling': False, 'RsdlRatio': 10.0,
+                    'Scaling': 2.0, 'RsdlTarget': 1.0}}, method=method)
                 })
 
             if opt is None:
@@ -483,27 +483,27 @@ class ConvBPDNMaskDcplDictLearn(dictlrn.DictLearn):
 
         # Configure iteration statistics reporting
         if self.opt['AccurateDFid']:
-            isxmap = {'XPrRsdl' : 'PrimalRsdl', 'XDlRsdl' : 'DualRsdl',
-                      'XRho' : 'Rho'}
-            evlmap = {'ObjFun' : 'ObjFun', 'DFid' : 'DFid', 'RegL1' : 'RegL1'}
+            isxmap = {'XPrRsdl': 'PrimalRsdl', 'XDlRsdl': 'DualRsdl',
+                      'XRho': 'Rho'}
+            evlmap = {'ObjFun': 'ObjFun', 'DFid': 'DFid', 'RegL1': 'RegL1'}
         else:
-            isxmap = {'ObjFun' : 'ObjFun', 'DFid' : 'DFid', 'RegL1' : 'RegL1',
-                      'XPrRsdl' : 'PrimalRsdl', 'XDlRsdl' : 'DualRsdl',
-                      'XRho' : 'Rho'}
+            isxmap = {'ObjFun': 'ObjFun', 'DFid': 'DFid', 'RegL1': 'RegL1',
+                      'XPrRsdl': 'PrimalRsdl', 'XDlRsdl': 'DualRsdl',
+                      'XRho': 'Rho'}
             evlmap = {}
         isc = dictlrn.IterStatsConfig(
             isfld=['Iter', 'ObjFun', 'DFid', 'RegL1', 'Cnstr', 'XPrRsdl',
                    'XDlRsdl', 'XRho', 'DPrRsdl', 'DDlRsdl', 'DRho', 'Time'],
             isxmap=isxmap,
-            isdmap={'Cnstr' :  'Cnstr', 'DPrRsdl' : 'PrimalRsdl',
-                    'DDlRsdl' : 'DualRsdl', 'DRho' : 'Rho'},
+            isdmap={'Cnstr':  'Cnstr', 'DPrRsdl': 'PrimalRsdl',
+                    'DDlRsdl': 'DualRsdl', 'DRho': 'Rho'},
             evlmap=evlmap,
             hdrtxt=['Itn', 'Fnc', 'DFid', u('ℓ1'), 'Cnstr', 'r_X', 's_X',
                     u('ρ_X'), 'r_D', 's_D', u('ρ_D')],
-            hdrmap={'Itn' : 'Iter', 'Fnc' : 'ObjFun', 'DFid' : 'DFid',
-                    u('ℓ1') : 'RegL1', 'Cnstr' : 'Cnstr', 'r_X' : 'XPrRsdl',
-                    's_X' : 'XDlRsdl', u('ρ_X') : 'XRho', 'r_D' : 'DPrRsdl',
-                    's_D' : 'DDlRsdl', u('ρ_D') : 'DRho'}
+            hdrmap={'Itn': 'Iter', 'Fnc': 'ObjFun', 'DFid': 'DFid',
+                    u('ℓ1'): 'RegL1', 'Cnstr': 'Cnstr', 'r_X': 'XPrRsdl',
+                    's_X': 'XDlRsdl', u('ρ_X'): 'XRho', 'r_D': 'DPrRsdl',
+                    's_D': 'DDlRsdl', u('ρ_D'): 'DRho'}
             )
 
         # Call parent constructor

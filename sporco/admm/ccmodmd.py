@@ -164,10 +164,10 @@ class ConvCnstrMODMaskDcplBase(admm.ADMMTwoBlockCnstrnt):
         """
 
         defaults = copy.deepcopy(admm.ADMMEqual.Options.defaults)
-        defaults.update({'AuxVarObj' : False, 'fEvalX' : True,
-                         'gEvalY' : False, 'LinSolveCheck' : False,
-                         'ZeroMean' : False, 'RelaxParam' : 1.8,
-                         'rho' : 1.0, 'ReturnVar' : 'Y1'})
+        defaults.update({'AuxVarObj': False, 'fEvalX': True,
+                         'gEvalY': False, 'LinSolveCheck': False,
+                         'ZeroMean': False, 'RelaxParam': 1.8,
+                         'rho': 1.0, 'ReturnVar': 'Y1'})
 
 
         def __init__(self, opt=None):
@@ -199,7 +199,7 @@ class ConvCnstrMODMaskDcplBase(admm.ADMMTwoBlockCnstrnt):
     itstat_fields_objfn = ('DFid', 'Cnstr')
     itstat_fields_extra = ('XSlvRelRes',)
     hdrtxt_objfn = ('DFid', 'Cnstr')
-    hdrval_objfun = {'DFid' : 'DFid', 'Cnstr' : 'Cnstr'}
+    hdrval_objfun = {'DFid': 'DFid', 'Cnstr': 'Cnstr'}
 
 
 
@@ -676,7 +676,7 @@ class ConvCnstrMODMaskDcpl_CG(ConvCnstrMODMaskDcplBase):
         """
 
         defaults = copy.deepcopy(ConvCnstrMODMaskDcplBase.Options.defaults)
-        defaults.update({'CG' : {'MaxIter' : 1000, 'StopTol' : 1e-3}})
+        defaults.update({'CG': {'MaxIter': 1000, 'StopTol': 1e-3}})
 
 
         def __init__(self, opt=None):

@@ -84,10 +84,10 @@ class RobustPCA(admm.ADMM):
         """
 
         defaults = copy.deepcopy(admm.ADMM.Options.defaults)
-        defaults.update({'gEvalY' : True, 'fEvalX' : True, 'RelaxParam' : 1.8})
-        defaults['AutoRho'].update({'Enabled' : True, 'Period' : 1,
-                                    'AutoScaling' : True, 'Scaling' : 1000.0,
-                                    'RsdlRatio' : 1.2})
+        defaults.update({'gEvalY': True, 'fEvalX': True, 'RelaxParam': 1.8})
+        defaults['AutoRho'].update({'Enabled': True, 'Period': 1,
+                                    'AutoScaling': True, 'Scaling': 1000.0,
+                                    'RsdlRatio': 1.2})
 
 
         def __init__(self, opt=None):
@@ -104,8 +104,8 @@ class RobustPCA(admm.ADMM):
 
     itstat_fields_objfn = ('ObjFun', 'NrmNuc', 'NrmL1', 'Cnstr')
     hdrtxt_objfn = ('Fnc', 'NrmNuc', u('Nrmℓ1'), 'Cnstr')
-    hdrval_objfun = {'Fnc' : 'ObjFun', 'NrmNuc' : 'NrmNuc',
-                     u('Nrmℓ1') : 'NrmL1', 'Cnstr' : 'Cnstr'}
+    hdrval_objfun = {'Fnc': 'ObjFun', 'NrmNuc': 'NrmNuc',
+                     u('Nrmℓ1'): 'NrmL1', 'Cnstr': 'Cnstr'}
 
 
 
