@@ -416,8 +416,8 @@ class ConvBPDNScalarTV(admm.ADMM):
         \mathbf{x}_m - \mathbf{s} \|_2^2`.
         """
 
-        Ef = np.sum(self.Df * self.obfn_fvarf(), axis=self.cri.axisM,
-                    keepdims=True) - self.Sf
+        Ef = sl.inner(self.Df, self.obfn_fvarf(), axis=self.cri.axisM) \
+             - self.Sf
         return sl.rfl2norm2(Ef, self.S.shape, axis=self.cri.axisN)/2.0
 
 
@@ -1191,8 +1191,8 @@ class ConvBPDNRecTV(admm.ADMM):
         \mathbf{x}_m - \mathbf{s} \|_2^2`.
         """
 
-        Ef = np.sum(self.Df * self.obfn_fvarf(), axis=self.cri.axisM,
-                    keepdims=True) - self.Sf
+        Ef = sl.inner(self.Df, self.obfn_fvarf(), axis=self.cri.axisM) \
+             - self.Sf
         return sl.rfl2norm2(Ef, self.S.shape, axis=self.cri.axisN)/2.0
 
 
@@ -1242,9 +1242,8 @@ class ConvBPDNRecTV(admm.ADMM):
 
         if Xf is None:
             Xf = sl.rfftn(X, axes=self.cri.axisN)
-        return sl.irfftn(np.sum(self.GDf * Xf[..., np.newaxis],
-                    axis=self.cri.axisM, keepdims=True),
-                         self.cri.Nv, self.cri.axisN)
+        return sl.irfftn(sl.inner(self.GDf, Xf[..., np.newaxis],
+                    axis=self.cri.axisM), self.cri.Nv, self.cri.axisN)
 
 
 
