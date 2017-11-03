@@ -328,7 +328,16 @@ class ADMM(with_metaclass(_ADMM_Meta, object)):
 
 
     def set_attr(self, name, val, dval=None, dtype=None, reset=False):
-        """Set an object attribute.
+        """Set an object attribute by its name. The attribute value can be
+        specified as a primary value `val`, and as default value 'dval` that
+        will be used if the primary value is None. This arrangement allows
+        an attribute to be set from an entry in an options object, passed
+        as `val`, while specifying a default value to use, passed as `dval`
+        in the event that the options entry is None. Unless `reset` is True,
+        the attribute is only set if it doesn't exist, or if it exists with
+        value None. This arrangement allows for attributes to be set in
+        both base and derived class initialisers, with the derived class
+        value taking preference.
 
         Parameters
         ----------
@@ -340,21 +349,22 @@ class ADMM(with_metaclass(_ADMM_Meta, object)):
           Default attribute value in case `val` is None
         dtype : data-type, optional (default None)
           If the `dtype` parameter is not None, the attribute `name` is
-          set to `val` after conversion to the specified type.
-          self.dtype
+          set to `val` (which is assumed to be of numeric type) after
+          conversion to the specified type.
         reset : bool, optional (default False)
           Flag indicating whether attribute assignment should be conditional
           on the attribute not existing or having value None. If False,
-          an attribute value other than None will not be not overwritten.
+          an attribute value other than None will not be overwritten.
         """
 
-        # If `val` is None and `dval` is not, replace it with dval
+        # If `val` is None and `dval` is not None, replace it with dval
         if dval is not None and val is None:
             val = dval
 
-        # If val is flagged as numeric, convert it to type self.dtype
+        # If dtype is not None, assume val is numeric and convert it to
+        # type dtype
         if dtype is not None and val is not None:
-            val = self.dtype.type(val)
+            val = dtype.type(val)
 
         # Set attribute value depending on reset flag and whether the
         # attribute exists and is None
