@@ -374,8 +374,10 @@ class ConvBPDNScalarTV(admm.ADMM):
         term, depending on the ``gEvalY`` option value.
         """
 
+        # Use of self.AXnr[..., 0:-1] instead of self.cnst_A0(None, self.Xf)
+        # reduces number of calls to self.cnst_A0
         return self.var_y0() if self.opt['gEvalY'] else \
-            self.cnst_A0(None, self.Xf)
+            self.AXnr[..., 0:-1]
 
 
 
@@ -384,8 +386,10 @@ class ConvBPDNScalarTV(admm.ADMM):
         regularisation term, depending on the ``gEvalY`` option value.
         """
 
+        # Use of self.AXnr[...,-1:] instead of self.cnst_A1(self.X)
+        # reduces number of calls to self.cnst_A1
         return self.var_y1() if self.opt['gEvalY'] else \
-            self.cnst_A1(self.X)
+            self.AXnr[..., -1:]
 
 
 
@@ -1149,8 +1153,10 @@ class ConvBPDNRecTV(admm.ADMM):
         term, depending on the ``gEvalY`` option value.
         """
 
+        # Use of self.block_sep0(self.AXnr) instead of self.cnst_A0(self.X)
+        # reduces number of calls to self.cnst_A0
         return self.var_y0() if self.opt['gEvalY'] else \
-            self.cnst_A0(self.X)
+            self.block_sep0(self.AXnr)
 
 
 
@@ -1159,8 +1165,10 @@ class ConvBPDNRecTV(admm.ADMM):
         regularisation term, depending on the ``gEvalY`` option value.
         """
 
+        # Use of self.block_sep1(self.AXnr) instead of self.cnst_A1(self.X)
+        # reduces number of calls to self.cnst_A0
         return self.var_y1() if self.opt['gEvalY'] else \
-            self.cnst_A1(None, self.Xf)
+            self.block_sep1(self.AXnr)
 
 
 
