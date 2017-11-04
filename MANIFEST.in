@@ -12,6 +12,7 @@ recursive-include docs Makefile *.py *.rst *.bib *.css
 
 include sporco/data/*.npz
 include sporco/data/*.png
+include sporco/data/README.rst
 include sporco/tests/*.py
 include sporco/admm/tests/*.py
 
