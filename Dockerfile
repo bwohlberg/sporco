@@ -14,3 +14,8 @@ USER main
 
 # Install requirements
 RUN /home/main/anaconda/envs/python3/bin/pip install future numpy scipy pillow matplotlib pyfftw
+
+# The notebooks should be run from the current version of sporco in the
+# GitHub repo, but since the correct configuration for mybinder.org is
+# not documented, for now we just install the latest release using pip
+RUN /home/main/anaconda/envs/python3/bin/pip install sporco
