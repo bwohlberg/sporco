@@ -11,6 +11,7 @@ recursive-include examples *.py *.ipynb
 recursive-include docs Makefile *.py *.rst *.bib *.css
 
 include sporco/data/*.npz
+include sporco/data/*.png
 include sporco/tests/*.py
 include sporco/admm/tests/*.py
 
