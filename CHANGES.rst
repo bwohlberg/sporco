@@ -3,8 +3,8 @@ SPORCO Release Notes
 ====================
 
 
-Version 0.1.8   (not yet released)
-----------------------------------
+Version 0.1.8   (2017-11-04)
+----------------------------
 
 - Added parallel processing implementation of convolutional dictionary
   learning algorithm based on the hybrid Mask Decoupling/Consensus
