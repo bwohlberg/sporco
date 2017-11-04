@@ -45,7 +45,7 @@ If SPORCO has been installed via ``pip``, the examples can be found in the direc
 Jupyter Notebooks
 ^^^^^^^^^^^^^^^^^
 
-`Jupyter Notebook <http://jupyter.org/>`_ versions of some of the demos in ``examples`` are also available in the same directories as the corresponding demo scripts. The scripts can also be viewed online via `nbviewer <https://nbviewer.jupyter.org/github/bwohlberg/sporco/blob/master/index.ipynb>`_, or run interactively at `binder <http://mybinder.org/repo/bwohlberg/sporco>`_ (but note that this `service <http://mybinder.org/status>`_ seems to be only intermittently functional).
+`Jupyter Notebook <http://jupyter.org/>`_ versions of some of the demos in ``examples`` are also available in the same directories as the corresponding demo scripts. The notebooks can also be viewed online via `nbviewer <https://nbviewer.jupyter.org/github/bwohlberg/sporco/blob/master/index.ipynb>`_, or run interactively at `binder <https://mybinder.org/v2/gh/bwohlberg/sporco/master?filepath=index.ipynb>`_.
 
 
 
