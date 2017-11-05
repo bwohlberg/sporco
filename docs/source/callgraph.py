@@ -81,10 +81,11 @@ class CallGraph(jonga.ContextCallTracer):
 
 
 
-def gengraphs(pth):
+def gengraphs(pth, nopyfftw):
     """
     Generate call graph images when necessary. Parameter pth is the path
-    to the directory in which images are to be created.
+    to the directory in which images are to be created. Parameter nopyfftw
+    is a flag indicating whether it is necessary to avoid using pyfftw.
     """
 
     srcmodflt = '^sporco.admm'
@@ -93,7 +94,8 @@ def gengraphs(pth):
 
     fnmsub = ('^sporco.admm.', '')
     grpflt = r'^[^\.]*.[^\.]*'
-    lnksub = (r'^([^\.]*).(.*)', r'../../sporco.admm.\1.html#sporco.admm.\1.\2')
+    lnksub = (r'^([^\.]*).(.*)',
+              r'../../sporco.admm.\1.html#sporco.admm.\1.\2')
 
     fntsz = 9
     fntfm = 'Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans'
@@ -108,6 +110,20 @@ def gengraphs(pth):
     # Make destination directory if it doesn't exist
     if not os.path.exists(pth):
         os.makedirs(pth, exist_ok=True)
+
+
+    # Handle environment in which pyfftw is unavailable
+    if nopyfftw:
+        import numpy.fft as npfft
+        import sporco.linalg as spl
+
+        def empty(shape, dtype, order='C', n=None):
+            return np.zeros(shape, dtype=dtype)
+        spl.pyfftw_empty_aligned = empty
+        spl.fftn = npfft.fftn
+        spl.ifftn = npfft.ifftn
+        spl.rfftn = npfft.rfftn
+        spl.irfftn = npfft.irfftn
 
 
     import numpy as np
