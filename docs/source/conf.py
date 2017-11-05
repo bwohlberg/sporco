@@ -456,4 +456,5 @@ def setup(app):
     app.connect('builder-inited', run_apidoc)
     #app.connect('autodoc-process-docstring', process_docstring)
     #app.connect('autodoc-process-signature', process_signature)
-    callgraph.gengraphs('docs/source/_static/jonga')
+    if not on_rtd:
+        callgraph.gengraphs('docs/source/_static/jonga')
