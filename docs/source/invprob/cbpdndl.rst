@@ -151,3 +151,17 @@ Usage Examples
     .. literalinclude:: ../../../examples/cnvsparse/demo_cbpdndl_md_clr.py
        :language: python
        :lines: 11-
+
+
+
+.. container:: toggle
+
+    .. container:: header
+
+	:class:`.parcnsdl.ConvBPDNMaskDcplDictLearn_Consensus` usage (parallel
+	hybrid consensus dict. update, greyscale images,
+	see :cite:`garcia-2017-convolutional`)
+
+    .. literalinclude:: ../../../examples/cnvsparse/demo_cbpdndl_md_parcns_gry.py
+       :language: python
+       :lines: 13-
