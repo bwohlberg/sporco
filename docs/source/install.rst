@@ -89,18 +89,16 @@ Installation of these requirements is system dependent.
 
       ::
 
-	sudo apt-get install python-numpy python-scipy python-numexpr
-	sudo apt-get install python-matplotlib python-pip python-future
-	sudo apt-get install libfftw3-dev python-pytest
+	sudo apt-get -y install python-numpy python-scipy python-numexpr python-matplotlib \
+				python-pip python-future libfftw3-dev python-pytest
 	sudo -H pip install pyfftw pytest-runner
 
       or Python 3
 
       ::
 
-	sudo apt-get install python3-numpy python3-scipy python3-numexpr
-	sudo apt-get install python3-matplotlib python3-pip python3-future
-	sudo apt-get install libfftw3-dev python3-pytest
+	sudo apt-get -y install python3-numpy python3-scipy python3-numexpr python3-matplotlib \
+				python3-pip python3-future libfftw3-dev python3-pytest
 	sudo -H pip3 install pyfftw pytest-runner
 
       For some versions of SciPy it might also be necessary to install `Pillow <https://python-pillow.org/>`_
@@ -111,20 +109,14 @@ Installation of these requirements is system dependent.
 
 
       Some additional dependencies are required for building the
-      documentation from the package source. For example, under Ubuntu
-      Linux 16.04, the following commands should be sufficient for Python 2
+      documentation from the package source, for which Python 3.3 or
+      later is required. For example, under Ubuntu Linux 16.04, the
+      following commands should be sufficient
 
       ::
 
-	sudo apt-get install python-sphinx python-numpydoc
-	sudo -H pip install sphinxcontrib-bibtex sphinx_tabs sphinx_fontawesome
-
-      or Python 3
-
-      ::
-
-	sudo apt-get install python3-sphinx python3-numpydoc
-	sudo -H pip3 install sphinxcontrib-bibtex sphinx_tabs sphinx_fontawesome
+	sudo apt-get -y install python3-sphinx python3-numpydoc python3-pygraphviz
+	sudo -H pip3 install sphinxcontrib-bibtex sphinx_tabs sphinx_fontawesome jonga
 
 
    .. group-tab:: :fa:`apple` Mac OS
