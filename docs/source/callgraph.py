@@ -148,11 +148,9 @@ def gengraphs(pth, nopyfftw):
         b.solve()
 
 
-
-    mu = 0.01
-
     ## BPDNJoint class
     opt = bpdn.BPDNJoint.Options({'Verbose': False, 'MaxMainIter': 1})
+    mu = 0.01
 
     with CallGraph(ct, mdnm, pth, 'bpdnjnt_init.svg', **kwargs):
         b = bpdn.BPDNJoint(D, s, lmbda, mu, opt)
@@ -213,10 +211,9 @@ def gengraphs(pth, nopyfftw):
         b.solve()
 
 
-    mu = 0.01
-
     ## ConvBPDNJoint class
     opt = cbpdn.ConvBPDNJoint.Options({'Verbose': False, 'MaxMainIter': 1})
+    mu = 0.01
 
     with CallGraph(ct, mdnm, pth, 'cbpdnjnt_init.svg', **kwargs):
         b = cbpdn.ConvBPDNJoint(D, s, lmbda, mu, opt)
@@ -267,17 +264,16 @@ def gengraphs(pth, nopyfftw):
         b.solve()
 
 
-
-    W = np.ones(s.shape)
-
     ## ConvBPDNMaskDcpl class
     opt = cbpdn.ConvBPDNMaskDcpl.Options({'Verbose': False, 'MaxMainIter': 1})
+    W = np.ones(s.shape)
 
     with CallGraph(ct, mdnm, pth, 'cbpdnmd_init.svg', **kwargs):
         b = cbpdn.ConvBPDNMaskDcpl(D, s, lmbda, W, opt)
 
     with CallGraph(ct, mdnm, pth, 'cbpdnmd_solve.svg', **kwargs):
         b.solve()
+
 
 
 
@@ -405,7 +401,6 @@ def gengraphs(pth, nopyfftw):
         b.solve()
 
 
-
     ## ConvCnstrMOD_CG class
     opt = ccmodmd.ConvCnstrMODMaskDcpl_CG.Options({'Verbose': False,
                                          'MaxMainIter': 1,
@@ -485,6 +480,67 @@ def gengraphs(pth, nopyfftw):
 
 
 
+    #### tvl1 module
+    from sporco.admm import tvl1
+    mdnm = 'sporco.admm.tvl1'
+
+    s = np.random.randn(16, 16)
+    lmbda = 0.1
+
+    ## TVL1Denoise class
+    opt = tvl1.TVL1Denoise.Options({'Verbose': False, 'MaxMainIter': 1})
+
+    with CallGraph(ct, mdnm, pth, 'tvl1den_init.svg', **kwargs):
+        b = tvl1.TVL1Denoise(s, lmbda, opt)
+
+    with CallGraph(ct, mdnm, pth, 'tvl1den_solve.svg', **kwargs):
+        b.solve()
+
+
+    ## TVL1Deconv class
+    opt = tvl1.TVL1Deconv.Options({'Verbose': False, 'MaxMainIter': 1})
+    h = np.random.randn(3, 3)
+
+    with CallGraph(ct, mdnm, pth, 'tvl1dcn_init.svg', **kwargs):
+        b = tvl1.TVL1Deconv(h, s, lmbda, opt)
+
+    with CallGraph(ct, mdnm, pth, 'tvl1dcn_solve.svg', **kwargs):
+        b.solve()
+
+
+
+
+    #### tvl2 module
+    from sporco.admm import tvl2
+    mdnm = 'sporco.admm.tvl2'
+
+    s = np.random.randn(16, 16)
+    lmbda = 0.1
+
+    ## TVL2Denoise class
+    opt = tvl2.TVL2Denoise.Options({'Verbose': False, 'MaxMainIter': 1})
+
+    with CallGraph(ct, mdnm, pth, 'tvl2den_init.svg', **kwargs):
+        b = tvl2.TVL2Denoise(s, lmbda, opt)
+
+    with CallGraph(ct, mdnm, pth, 'tvl2den_solve.svg', **kwargs):
+        b.solve()
+
+
+    ## TVL2Deconv class
+    opt = tvl2.TVL2Deconv.Options({'Verbose': False, 'MaxMainIter': 1})
+    h = np.random.randn(3, 3)
+
+    with CallGraph(ct, mdnm, pth, 'tvl2dcn_init.svg', **kwargs):
+        b = tvl2.TVL2Deconv(h, s, lmbda, opt)
+
+    with CallGraph(ct, mdnm, pth, 'tvl2dcn_solve.svg', **kwargs):
+        b.solve()
+
+
+
+
+
 
 def make_doc_func(fnm):
     """
@@ -518,6 +574,8 @@ def insert_solve_docs():
     import sporco.admm.ccmodmd
     import sporco.admm.bpdndl
     import sporco.admm.cbpdndl
+    import sporco.admm.tvl1
+    import sporco.admm.tvl2
 
 
     # Classes that require a call graph for their solve method, and
@@ -551,6 +609,10 @@ def insert_solve_docs():
         'sporco.admm.cbpdndl.ConvBPDNDictLearn': 'cbpdndl_solve.svg',
         'sporco.admm.cbpdndl.ConvBPDNMaskDcplDictLearn':
             'cbpdnmddl_solve.svg',
+        'sporco.admm.tvl1.TVL1Denoise': 'tvl1den_solve.svg',
+        'sporco.admm.tvl1.TVL1Deconv': 'tvl1dcn_solve.svg',
+        'sporco.admm.tvl2.TVL2Denoise': 'tvl2den_solve.svg',
+        'sporco.admm.tvl2.TVL2Deconv': 'tvl2dcn_solve.svg',
         }
 
     # Iterate over fully qualified class names in class/call graph image dict

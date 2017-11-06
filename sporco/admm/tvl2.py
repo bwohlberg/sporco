@@ -136,6 +136,18 @@ class TVL2Denoise(admm.ADMM):
         """
         Initialise a TVL2Denoise object with problem parameters.
 
+
+        |
+
+        **Call graph**
+
+        .. image:: _static/jonga/tvl2den_init.svg
+           :width: 20%
+           :target: _static/jonga/tvl2den_init.svg
+
+        |
+
+
         Parameters
         ----------
         S : array_like
@@ -443,6 +455,18 @@ class TVL2Deconv(admm.ADMM):
     def __init__(self, A, S, lmbda, opt=None, axes=(0, 1), caxis=None):
         """
         Initialise a TVL2Deconv object with problem parameters.
+
+
+        |
+
+        **Call graph**
+
+        .. image:: _static/jonga/tvl2dcn_init.svg
+           :width: 20%
+           :target: _static/jonga/tvl2dcn_init.svg
+
+        |
+
 
         Parameters
         ----------
