@@ -75,6 +75,7 @@ docs/source/sporco.prox.rst
 docs/source/sporco.util.rst
 docs/source/sporco.plot.rst
 docs/source/sporco.*.*.rst
+docs/source/_static/jonga
 docs/Makefile
 
 # PyBuilder
