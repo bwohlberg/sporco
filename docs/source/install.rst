@@ -145,21 +145,21 @@ Installation of these requirements is system dependent.
       ::
 
 	pip install numpy scipy pillow matplotlib pyfftw
-	pip install six future subprocess functools python-dateutil
-	pip install pyparsing cycler pytz pytest pytest-runner
+	pip install six future python-dateutil pyparsing cycler
+	pip install pytz pytest pytest-runner
 
       (For Python 3, replace `pip` above with `pip3`.)
 
 
       Some additional dependencies are required for building the
-      documentation from the package source
+      documentation from the package source, for which Python 3 is required
 
       ::
 
-	pip install sphinx numpydoc sphinxcontrib-bibtex sphinx_tabs
-	pip install sphinx_fontawesome
+	brew install graphviz
+	pip3 install sphinx numpydoc sphinxcontrib-bibtex sphinx_tabs
+	pip3 install sphinx_fontawesome jonga
 
-      (For Python 3, replace `pip` above with `pip3`.)
 
 
    .. group-tab:: :fa:`windows` Windows
