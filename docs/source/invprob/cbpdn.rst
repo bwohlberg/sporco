@@ -3,7 +3,7 @@ Modules cbpdn and cbpdntv
 
 Module :mod:`.admm.cbpdn` includes the following classes:
 
-* :class:`.ConvBPDN`
+* :class:`.admm.cbpdn.ConvBPDN`
 
   Solve the basic Convolutional BPDN problem (see
   :cite:`wohlberg-2016-efficient`)
@@ -169,7 +169,7 @@ input images.
 
     .. container:: header
 
-        :class:`.ConvBPDN` usage
+        :class:`.admm.cbpdn.ConvBPDN` usage
 
     .. literalinclude:: ../../../examples/cnvsparse/demo_cbpdn_gry.py
        :language: python
@@ -257,9 +257,9 @@ images: a single-channel dictionary together with a separate set of
 coefficient maps for each channel, or a multi-channel dictionary with
 a single set of coefficient maps shared across all channels. In the
 former case the coefficient maps can be independent across the
-different channels (see the first :class:`.ConvBPDN` example below),
-or expected correlations between the channels can be modelled via a
-joint sparsity penalty (see the :class:`.ConvBPDNJoint` example
+different channels (see the first :class:`.admm.cbpdn.ConvBPDN` example
+below), or expected correlations between the channels can be modelled
+via a joint sparsity penalty (see the :class:`.ConvBPDNJoint` example
 below). A more detailed discussion of these issues can be found in
 :cite:`wohlberg-2016-convolutional`.
 
@@ -268,7 +268,7 @@ below). A more detailed discussion of these issues can be found in
 
     .. container:: header
 
-        :class:`.ConvBPDN` usage (greyscale dictionary, independent channels)
+        :class:`.admm.cbpdn.ConvBPDN` usage (greyscale dictionary, independent channels)
 
     .. literalinclude:: ../../../examples/cnvsparse/demo_cbpdn_clr_gd.py
        :language: python
@@ -290,7 +290,7 @@ below). A more detailed discussion of these issues can be found in
 
     .. container:: header
 
-        :class:`.ConvBPDN` usage (colour dictionary)
+        :class:`admm.cbpdn.ConvBPDN` usage (colour dictionary)
 
     .. literalinclude:: ../../../examples/cnvsparse/demo_cbpdn_clr_cd.py
        :language: python

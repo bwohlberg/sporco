@@ -1,8 +1,7 @@
 Overview
 ========
 
-SParse Optimization Research COde (SPORCO) is a Python package for solving optimisation problems with sparsity-inducing regularisation :cite:`mairal-2014-sparse`. These consist primarily of sparse coding :cite:`chen-1998-atomic` and dictionary learning :cite:`engan-1999-method` problems, including convolutional sparse coding and dictionary learning :cite:`wohlberg-2016-efficient`, but there is also support for other problems such as Total Variation regularisation :cite:`rudin-1992-nonlinear` :cite:`alliney-1992-digital` and Robust PCA :cite:`cai-2010-singular`. In the current version all of the optimisation algorithms are based on the Alternating Direction Method of Multipliers (ADMM) :cite:`boyd-2010-distributed`.
-
+SParse Optimization Research COde (SPORCO) is a Python package for solving optimisation problems with sparsity-inducing regularisation :cite:`mairal-2014-sparse`. These consist primarily of sparse coding :cite:`chen-1998-atomic` and dictionary learning :cite:`engan-1999-method` problems, including convolutional sparse coding and dictionary learning :cite:`wohlberg-2016-efficient`, but there is also support for other problems such as Total Variation regularisation :cite:`rudin-1992-nonlinear` :cite:`alliney-1992-digital` and Robust PCA :cite:`cai-2010-singular`. The optimisation algorithms in the current version are based on the Alternating Direction Method of Multipliers (ADMM) :cite:`boyd-2010-distributed` or on the Fast Iterative Shrinkage-Thresholding Algorithm (FISTA) :cite:`beck-2009-fast`.
 
 In addition to this documentation, an overview of the design and functionality of SPORCO is also available in :cite:`wohlberg-2017-sporco`.
 

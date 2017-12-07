@@ -22,7 +22,7 @@ with open(os.path.join(name, '__init__.py')) as f:
         lambda line: line.startswith('__version__'),
         f))).body[0].value.s
 
-packages = ['sporco', 'sporco.admm']
+packages = ['sporco', 'sporco.admm', 'sporco.fista']
 
 docdirbase  = 'share/doc/%s-%s' % (name, version)
 
@@ -40,8 +40,9 @@ sparsity-inducing regularisation. These consist primarily of sparse
 coding and dictionary learning problems, including convolutional
 sparse coding and dictionary learning, but there is also support for
 other problems such as Total Variation regularisation and Robust
-PCA. In the current version all of the optimisation algorithms are
-based on the Alternating Direction Method of Multipliers (ADMM).
+PCA. The optimisation algorithms in the current version are based
+on the Alternating Direction Method of Multipliers (ADMM) or on
+the Fast Iterative Shrinkage-Thresholding Algorithm (FISTA).
 """
 
 on_rtd = os.environ.get('READTHEDOCS') == 'True'
@@ -61,7 +62,8 @@ setup(
     keywords         = ['Sparse Representations', 'Sparse Coding',
                         'Dictionary Learning',
                         'Convolutional Sparse Representations',
-                        'Convolutional Sparse Coding', 'Optimization', 'ADMM'],
+                        'Convolutional Sparse Coding', 'Optimization',
+                        'ADMM', 'FISTA'],
     platforms        = 'Any',
     license          = 'BSD',
     url              = 'http://bwohlberg.github.io/sporco',

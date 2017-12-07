@@ -35,7 +35,7 @@ class ConvBPDNDictLearn(dictlrn.DictLearn):
     |
 
     Dictionary learning by alternating between sparse coding and
-    dictionary update stages, using :class:`.ConvBPDN` and
+    dictionary update stages, using :class:`.admm.cbpdn.ConvBPDN` and
     :func:`.ConvCnstrMOD` respectively, with the coupling between
     stages as in :cite:`garcia-2017-subproblem`
     :cite:`garcia-2017-convolutional`. The sparse coding algorithm is
@@ -55,10 +55,11 @@ class ConvBPDNDictLearn(dictlrn.DictLearn):
 
     where :math:`C` is the feasible set consisting of filters with
     unit norm and constrained support, via interleaved alternation
-    between the ADMM steps of the :class:`.ConvBPDN` and
+    between the ADMM steps of the :class:`.admm.cbpdn.ConvBPDN` and
     :func:`.ConvCnstrMOD` problems. The multi-channel variants
-    :cite:`wohlberg-2016-convolutional` supported by :class:`.ConvBPDN`
-    and :func:`.ConvCnstrMOD` are also supported.
+    :cite:`wohlberg-2016-convolutional` supported by
+    :class:`.admm.cbpdn.ConvBPDN` and :func:`.ConvCnstrMOD` are also
+    supported.
 
     After termination of the :meth:`solve` method, attribute :attr:`itstat`
     is a list of tuples representing statistics of each iteration. The
@@ -106,9 +107,9 @@ class ConvBPDNDictLearn(dictlrn.DictLearn):
 
           ``DictSize`` : Dictionary size vector.
 
-          ``CBPDN`` : Options :class:`.cbpdn.ConvBPDN.Options`
+          ``CBPDN`` : Options :class:`.admm.cbpdn.ConvBPDN.Options`
 
-          ``CCMOD`` : Options :func:`.ccmod.ConvCnstrMODOptions`
+          ``CCMOD`` : Options :func:`.admm.ccmod.ConvCnstrMODOptions`
         """
 
         defaults = copy.deepcopy(dictlrn.DictLearn.Options.defaults)
@@ -197,7 +198,7 @@ class ConvBPDNDictLearn(dictlrn.DictLearn):
                     zm=opt['CCMOD', 'ZeroMean'])
 
         # Modify D update options to include initial values for Y and U
-        opt['CCMOD'].update({'Y0' : cr.zpad(
+        opt['CCMOD'].update({'Y0': cr.zpad(
             cr.stdformD(D0, cri.C, cri.M, dimN), cri.Nv)})
 
         # Create X update object
@@ -471,7 +472,7 @@ class ConvBPDNMaskDcplDictLearn(dictlrn.DictLearn):
             Y0 = Y0b1
         else:
             Y0 = np.concatenate((Y0b0, Y0b1), axis=cri.axisM)
-        opt['CCMOD'].update({'Y0' : Y0})
+        opt['CCMOD'].update({'Y0': Y0})
 
         # Create X update object
         xstep = cbpdn.ConvBPDNMaskDcpl(D0, S, lmbda, W, opt['CBPDN'],

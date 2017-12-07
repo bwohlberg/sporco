@@ -407,12 +407,22 @@ def rmsection(filename, pattern):
 # See https://github.com/rtfd/readthedocs.org/issues/1139
 def run_apidoc(_):
 
-    # Import the sporco.admm modules and undo the effect of
-    # sporco.util._module_name_nested so that docs for Options
-    # classes appear in the correct locations
+    # Import the sporco.admm and sporco.fista modules and undo the
+    # effect of sporco.util._module_name_nested so that docs for
+    # Options classes appear in the correct locations
     import inspect
-    import sporco
+    import sporco.admm
     for mnm, mod in inspect.getmembers(sporco.admm, inspect.ismodule):
+        for cnm, cls in inspect.getmembers(mod, inspect.isclass):
+            if hasattr(cls, 'Options') and inspect.isclass(getattr(cls,
+                                                'Options')):
+                optcls = getattr(cls, 'Options')
+                if optcls.__name__ != 'Options':
+                    delattr(mod, optcls.__name__)
+                    optcls.__name__ = 'Options'
+
+    import sporco.fista
+    for mnm, mod in inspect.getmembers(sporco.fista, inspect.ismodule):
         for cnm, cls in inspect.getmembers(mod, inspect.isclass):
             if hasattr(cls, 'Options') and inspect.isclass(getattr(cls,
                                                 'Options')):
@@ -429,25 +439,38 @@ def run_apidoc(_):
     # Insert documentation for inherited solve methods
     callgraph.insert_solve_docs()
 
-    # Remove auto-generated sporco.rst and sporco.admm.rst
+    # Remove auto-generated sporco.rst, sporco.admm.rst, and sporco.fista.rst
     rst = os.path.join(cpath, 'sporco.rst')
     if os.path.exists(rst):
         os.remove(rst)
     rst = os.path.join(cpath, 'sporco.admm.rst')
     if os.path.exists(rst):
         os.remove(rst)
+    rst = os.path.join(cpath, 'sporco.fista.rst')
+    if os.path.exists(rst):
+        os.remove(rst)
 
     # Run sphinx-apidoc
     print("Running sphinx-apidoc with output path " + opath)
     sys.stdout.flush()
-    sphinx.apidoc.main(['sphinx-apidoc', '-e', '-d', '2', '-o', opath, module])
+    sphinx.apidoc.main(['sphinx-apidoc', '-e', '-d', '2', '-o', opath,
+                        module, os.path.join(module, 'admm/tests'),
+                        os.path.join(module, 'fista/tests')])
 
     # Remove "Module contents" sections from specified autodoc generated files
-    rmmodlst = ['sporco.rst', 'sporco.admm.rst']
+    rmmodlst = ['sporco.rst', 'sporco.admm.rst', 'sporco.fista.rst']
     for fnm in rmmodlst:
         rst = os.path.join(cpath, fnm)
         if os.path.exists(rst):
             rmsection(rst, r'^Module contents')
+
+
+
+def gencallgraph(_):
+
+    print('Constructing call graph images')
+    cgpth = '_static/jonga' if on_rtd else 'docs/source/_static/jonga'
+    callgraph.gengraphs(cgpth, on_rtd)
 
 
 
@@ -457,5 +480,4 @@ def setup(app):
     #app.connect('autodoc-process-docstring', process_docstring)
     #app.connect('autodoc-process-signature', process_signature)
 
-    cgpth = '_static/jonga' if on_rtd else 'docs/source/_static/jonga'
-    callgraph.gengraphs(cgpth, on_rtd)
+    gencallgraph(None)

@@ -28,7 +28,7 @@ SParse Optimization Research COde (SPORCO)
     :alt: Binder
 
 
-SPORCO is a Python package for solving optimisation problems with sparsity-inducing regularisation. These consist primarily of sparse coding and dictionary learning problems, including convolutional sparse coding and dictionary learning, but there is also support for other problems such as Total Variation regularisation and Robust PCA. In the current version all of the optimisation algorithms are based on the Alternating Direction Method of Multipliers (ADMM).
+SPORCO is a Python package for solving optimisation problems with sparsity-inducing regularisation. These consist primarily of sparse coding and dictionary learning problems, including convolutional sparse coding and dictionary learning, but there is also support for other problems such as Total Variation regularisation and Robust PCA. The optimisation algorithms in the current version are based on the Alternating Direction Method of Multipliers (ADMM) or on the Fast Iterative Shrinkage-Thresholding Algorithm (FISTA).
 
 
 Documentation
@@ -77,7 +77,7 @@ Requirements
 
 The primary requirements are Python itself, and modules  `future <http://python-future.org>`_, `numpy <http://www.numpy.org>`_, `scipy <https://www.scipy.org>`_, `pyfftw <https://hgomersall.github.io/pyFFTW>`_, and `matplotlib <http://matplotlib.org>`_. Module `numexpr <https://github.com/pydata/numexpr>`_ is not required, but some functions will be faster if it is installed. If module `mpldatacursor <https://github.com/joferkington/mpldatacursor>`_ is installed, functions ``plot.plot`` and ``plot.imview`` will support the data cursor that it provides.
 
-Instructions for installing these requirements are provided in the `Requirements <http://sporco.readthedocs.io/en/latest/install.html#requirements>`_ section of the package documentation.
+Instructions for installing these requirements are provided in the `Requirements <http://sporco.rtfd.io/en/latest/install.html#requirements>`_ section of the package documentation.
 
 
 Installation
@@ -90,7 +90,13 @@ To install the most recent release of SPORCO from `PyPI <https://pypi.python.org
     pip install sporco
 
 
-To install the development version from `GitHub <https://github.com/bwohlberg/sporco>`_ do
+The development version from `GitHub <https://github.com/bwohlberg/sporco>`_ can be installed by doing
+
+::
+
+    pip install git+https://github.com/bwohlberg/sporco
+
+or by doing
 
 ::
 

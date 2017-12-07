@@ -240,8 +240,9 @@ class ConvBPDNDictLearn_Consensus(cbpdndl.ConvBPDNDictLearn):
     :cite:`garcia-2017-convolutional`. The sparse coding of each training
     image and the individual consensus problem components are computed in
     parallel, giving a substantial computational advantage, on a multi-core
-    host, over :class:`.cbpdndl.ConvBPDNDictLearn` with the consensus solver
-    (``method`` = ``'cns'``) for the constrained dictionary update problem.
+    host, over :class:`.admm.cbpdndl.ConvBPDNDictLearn` with the consensus
+    solver (``method`` = ``'cns'``) for the constrained dictionary update
+    problem.
 
     Solve the optimisation problem
 
@@ -257,8 +258,8 @@ class ConvBPDNDictLearn_Consensus(cbpdndl.ConvBPDNDictLearn):
     between the ADMM steps of the sparse coding and dictionary update
     algorithms. Multi-channel signals are supported.
 
-    This class is derived from :class:`.cbpdndl.ConvBPDNDictLearn` so that
-    the variable initialisation of its parent can be re-used. The entire
+    This class is derived from :class:`.admm.cbpdndl.ConvBPDNDictLearn` so
+    that the variable initialisation of its parent can be re-used. The entire
     :meth:`.solve` infrastructure is overidden in this class, without any
     use of inherited functionality. Variables initialised by the parent
     class that are non-singleton on axis ``axisK`` have this axis swapped
@@ -307,7 +308,7 @@ class ConvBPDNDictLearn_Consensus(cbpdndl.ConvBPDNDictLearn):
           Signal array
         lmbda : float
           Regularisation parameter
-        opt : :class:`.ConvBPDNDictLearn.Options` object
+        opt : :class:`.admm.cbpdndl.ConvBPDNDictLearn.Options` object
           Algorithm options
         nproc : int
           Number of parallel processes to use
@@ -717,7 +718,7 @@ class ConvBPDNMaskDcplDictLearn_Consensus(cbpdndl.ConvBPDNMaskDcplDictLearn):
     coding of each training image and the individual consensus problem
     components are computed in parallel, giving a substantial computational
     advantage, on a multi-core host, over
-    :class:`.cbpdndl.ConvBPDNMaskDcplDictLearn` with the consensus solver
+    :class:`.admm.cbpdndl.ConvBPDNMaskDcplDictLearn` with the consensus solver
     (``method`` = ``'cns'``) for the constrained dictionary update problem.
 
     Solve the optimisation problem
@@ -734,7 +735,7 @@ class ConvBPDNMaskDcplDictLearn_Consensus(cbpdndl.ConvBPDNMaskDcplDictLearn):
     interleaved alternation between the ADMM steps of the sparse coding and
     dictionary update algorithms. Multi-channel signals are supported.
 
-    This class is derived from :class:`.cbpdndl.ConvBPDNMaskDcplDictLearn`
+    This class is derived from :class:`.admm.cbpdndl.ConvBPDNMaskDcplDictLearn`
     so that the variable initialisation of its parent can be re-used. The
     entire :meth:`.solve` infrastructure is overidden in this class, without
     any use of inherited functionality. Variables initialised by the parent
@@ -788,7 +789,7 @@ class ConvBPDNMaskDcplDictLearn_Consensus(cbpdndl.ConvBPDNMaskDcplDictLearn):
           Mask array. The array shape must be such that the array is
           compatible for multiplication with input array S (see
           :func:`.cnvrep.mskWshape` for more details).
-        opt : :class:`.ConvBPDNMaskDcplDictLearn.Options` object
+        opt : :class:`.admm.cbpdndl.ConvBPDNMaskDcplDictLearn.Options` object
           Algorithm options
         nproc : int
           Number of parallel processes to use

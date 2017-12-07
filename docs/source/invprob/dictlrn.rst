@@ -35,7 +35,7 @@ Usage Examples
 
     .. container:: header
 
-        :class:`.DictLearn` usage (:class:`.cbpdn.ConvBPDN` sparse
+        :class:`.DictLearn` usage (:class:`.admm.cbpdn.ConvBPDN` sparse
         coding, greyscale images, as in :cite:`wohlberg-2016-efficient`)
 
     .. literalinclude:: ../../../examples/cnvsparse/demo_dictlrn_cbpdn_gry.py
@@ -47,7 +47,7 @@ Usage Examples
 
     .. container:: header
 
-        :class:`.DictLearn` usage (:class:`.cbpdn.ConvBPDN` sparse
+        :class:`.DictLearn` usage (:class:`.admm.cbpdn.ConvBPDN` sparse
 	coding, colour images, colour dictionary, as in
 	:cite:`wohlberg-2016-convolutional`)
 

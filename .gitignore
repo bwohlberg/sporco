@@ -66,7 +66,7 @@ coverage.xml
 # Sphinx documentation
 docs/_build/
 docs/source/sporco.admm.rst
-docs/source/sporco.rst
+docs/source/sporco.fista.rst
 docs/source/sporco.cdict.rst
 docs/source/sporco.linalg.rst
 docs/source/sporco.cnvrep.rst

@@ -8,6 +8,7 @@ SPORCO Documentation
    install
    invprob
    admm
+   fista
    util
    notes
    modules
@@ -37,6 +38,9 @@ SPORCO Documentation
    admm/admmcnsns
    admm/admmtwoblk
    admm/convtwoblk
+   fista
+   fista/fista
+   fista/fistadft
    util
    notes
    modules

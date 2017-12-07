@@ -1,11 +1,7 @@
 Inverse Problems
 ================
 
-SPORCO provides a :doc:`set of classes <admm>` supporting the
-construction of new optimisation algorithms within the ADMM framework
-:cite:`boyd-2010-distributed`, as well as a set of complete
-algorithms, based on this framework, for solving optimisation problems
-within the following categories:
+SPORCO provides a :doc:`set of classes <admm>` supporting the construction of new optimisation algorithms within the ADMM :cite:`boyd-2010-distributed` and FISTA :cite:`beck-2009-fast` frameworks, as well as a set of complete algorithms, based on this framework, for solving optimisation problems within the following categories:
 
 
 Standard Sparse Representations
@@ -45,9 +41,4 @@ Miscellaneous
 Extensions
 ----------
 
-The :doc:`ADMM classes <admm>` are designed to for ease of
-implementation of new problems and simplicity of extension of existing
-problems. See :class:`.BPDN` as an example of the methods that need to
-be defined to implement a complete ADMM algorithm, and
-:class:`.BPDNJoint` as an example of the minor additional code
-required to extend an existing problem.
+The :doc:`ADMM <admm>` and :doc:`FISTA <fista>` classes are designed to for ease of implementation of new problems and simplicity of extension of existing problems. See :class:`.BPDN` as an example of the methods that need to be defined to implement a complete ADMM algorithm, and :class:`.BPDNJoint` as an example of the minor additional code required to extend an existing problem.

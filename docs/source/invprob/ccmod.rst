@@ -1,7 +1,7 @@
 Modules ccmod and ccmodmd
 =========================
 
-Module :mod:`.admm.ccmod` includes classes for solving the problem
+Modules :mod:`.admm.ccmod` and :mod:`.fista.ccmod` include classes for solving the problem
 
 .. math::
    \mathrm{argmin}_\mathbf{d} \;
@@ -17,7 +17,7 @@ a mechanism for choosing one of these classes via the ``method`` parameter speci
 
 |
 
-Module :mod:`.admm.ccmodmd` includes classes for solving the problem
+Modules :mod:`.admm.ccmodmd` and :mod:`.fista.ccmod` include classes for solving the problem
 
 .. math::
    \mathrm{argmin}_\mathbf{d} \;

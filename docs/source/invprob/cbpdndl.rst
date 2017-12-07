@@ -38,8 +38,8 @@ Usage Examples
 
     .. container:: header
 
-	:class:`.cbpdndl.ConvBPDNDictLearn` usage (IterSM dictionary update,
-	greyscale images, single-scale dictionary, see
+	:class:`.admm.cbpdndl.ConvBPDNDictLearn` usage (IterSM dictionary
+	update, greyscale images, single-scale dictionary, see
 	:cite:`wohlberg-2016-efficient`)
 
     .. literalinclude:: ../../../examples/cnvsparse/demo_cbpdndl_ism_gry_ssd.py
@@ -51,7 +51,7 @@ Usage Examples
 
     .. container:: header
 
-	:class:`.cbpdndl.ConvBPDNDictLearn` usage (consensus dictionary
+	:class:`.admm.cbpdndl.ConvBPDNDictLearn` usage (consensus dictionary
 	update, greyscale images, single-scale dictionary, see
 	:cite:`garcia-2017-subproblem` :cite:`garcia-2017-convolutional`)
 
@@ -79,7 +79,7 @@ Usage Examples
 
     .. container:: header
 
-	:class:`.cbpdndl.ConvBPDNDictLearn` usage (greyscale images,
+	:class:`.admm.cbpdndl.ConvBPDNDictLearn` usage (greyscale images,
 	multi-scale dictionary, see :cite:`wohlberg-2016-efficient`)
 
     .. literalinclude:: ../../../examples/cnvsparse/demo_cbpdndl_gry_msd.py
@@ -92,8 +92,9 @@ Usage Examples
 
     .. container:: header
 
-	:class:`.cbpdndl.ConvBPDNDictLearn` usage (colour images, single-scale
-	colour dictionary, see :cite:`wohlberg-2016-convolutional`)
+	:class:`.admm.cbpdndl.ConvBPDNDictLearn` usage (colour images,
+	single-scale colour dictionary, see
+	:cite:`wohlberg-2016-convolutional`)
 
     .. literalinclude:: ../../../examples/cnvsparse/demo_cbpdndl_clr_ssd.py
        :language: python
@@ -104,8 +105,9 @@ Usage Examples
 
     .. container:: header
 
-	:class:`.cbpdndl.ConvBPDNDictLearn` usage (colour images, multi-scale
-	colour dictionary, see :cite:`wohlberg-2016-convolutional`)
+	:class:`.admm..cbpdndl.ConvBPDNDictLearn` usage (colour images,
+	multi-scale colour dictionary, see
+	:cite:`wohlberg-2016-convolutional`)
 
     .. literalinclude:: ../../../examples/cnvsparse/demo_cbpdndl_clr_msd.py
        :language: python
@@ -131,8 +133,8 @@ Usage Examples
 
     .. container:: header
 
-	:class:`.cbpdndl.ConvBPDNMaskDcplDictLearn` usage (greyscale images,
-	single-scale dictionary, see :cite:`wohlberg-2016-boundary`)
+	:class:`.admm.cbpdndl.ConvBPDNMaskDcplDictLearn` usage (greyscale
+	images, single-scale dictionary, see :cite:`wohlberg-2016-boundary`)
 
     .. literalinclude:: ../../../examples/cnvsparse/demo_cbpdndl_md_gry.py
        :language: python
@@ -144,7 +146,7 @@ Usage Examples
 
     .. container:: header
 
-	:class:`.cbpdndl.ConvBPDNMaskDcplDictLearn` usage (colour images,
+	:class:`.admm.cbpdndl.ConvBPDNMaskDcplDictLearn` usage (colour images,
 	single-scale colour dictionary, see :cite:`wohlberg-2016-boundary`
 	:cite:`wohlberg-2016-convolutional`)
 

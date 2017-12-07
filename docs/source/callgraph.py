@@ -50,6 +50,8 @@ class CallGraph(jonga.ContextCallTracer):
 
         img = os.path.join(pth, fnm)
         self.need_update = is_newer_than(module_path(mdnm), img)
+        if self.need_update:
+            print('constructing %s\t\t\t\t' % fnm, end='\r')
         super(CallGraph, self).__init__(ct, img, **kwargs)
 
 
@@ -390,7 +392,7 @@ def gengraphs(pth, nopyfftw):
     W = np.array([1.0])
     dsz = (4, 4, 1)
 
-    ## ConvCnstrMOD_IterSM class
+    ## ConvCnstrMODMaskDcpl_IterSM class
     opt = ccmodmd.ConvCnstrMODMaskDcpl_IterSM.Options({'Verbose': False,
                                              'MaxMainIter': 1})
 
@@ -401,7 +403,7 @@ def gengraphs(pth, nopyfftw):
         b.solve()
 
 
-    ## ConvCnstrMOD_CG class
+    ## ConvCnstrMODMaskDcpl_CG class
     opt = ccmodmd.ConvCnstrMODMaskDcpl_CG.Options({'Verbose': False,
                                          'MaxMainIter': 1,
                                          'CG': {'MaxIter': 1}})
@@ -413,7 +415,7 @@ def gengraphs(pth, nopyfftw):
         b.solve()
 
 
-    ## ConvCnstrMOD_Consensus class
+    ## ConvCnstrMODMaskDcpl_Consensus class
     opt = ccmodmd.ConvCnstrMODMaskDcpl_Consensus.Options({'Verbose': False,
                                                 'MaxMainIter': 1})
 
@@ -539,6 +541,63 @@ def gengraphs(pth, nopyfftw):
 
 
 
+    srcmodflt = '^sporco.fista'
+    fnmsub = ('^sporco.fista.', '')
+    lnksub = (r'^([^\.]*).(.*)',
+              r'../../sporco.fista.\1.html#sporco.fista.\1.\2')
+    ct = jonga.CallTracer(srcmodflt=srcmodflt, srcqnmflt=srcqnmflt,
+                          dstqnmflt=dstqnmflt, fnmsub=fnmsub,
+                          grpflt=grpflt, lnksub=lnksub)
+
+
+    #### fista.cbpdn module
+    from sporco.fista import cbpdn
+    mdnm = 'sporco.fista.cbpdn'
+
+    D = np.random.randn(4, 4, 16)
+    s = np.random.randn(8, 8)
+    lmbda = 0.1
+
+    ## ConvBPDN class
+    opt = cbpdn.ConvBPDN.Options({'Verbose': False, 'MaxMainIter': 1})
+
+    with CallGraph(ct, mdnm, pth, 'fista_cbpdn_init.svg', **kwargs):
+        b = cbpdn.ConvBPDN(D, s, lmbda, opt)
+
+    with CallGraph(ct, mdnm, pth, 'fista_cbpdn_solve.svg', **kwargs):
+        b.solve()
+
+
+
+
+    #### fista.ccmod module
+    from sporco.fista import ccmod
+    mdnm = 'sporco.fista.ccmod'
+
+    X = np.random.randn(8, 8, 1, 2, 1)
+    S = np.random.randn(8, 8, 2)
+    dsz = (4, 4, 1)
+
+    ## ConvCnstrMOD class
+    opt = ccmod.ConvCnstrMOD.Options({'Verbose': False, 'MaxMainIter': 1})
+
+    with CallGraph(ct, mdnm, pth, 'ccmodfista_init.svg', **kwargs):
+        b = ccmod.ConvCnstrMOD(X, S, dsz=dsz, opt=opt)
+
+    with CallGraph(ct, mdnm, pth, 'ccmodfista_solve.svg', **kwargs):
+        b.solve()
+
+
+    ## ConvCnstrMODMaskDcpl class
+    opt = ccmod.ConvCnstrMODMaskDcpl.Options({'Verbose': False,
+                                            'MaxMainIter': 1})
+
+    with CallGraph(ct, mdnm, pth, 'ccmodmdfista_init.svg', **kwargs):
+        b = ccmod.ConvCnstrMODMaskDcpl(X, S, W, dsz=dsz, opt=opt)
+
+    with CallGraph(ct, mdnm, pth, 'ccmodmdfista_solve.svg', **kwargs):
+        b.solve()
+
 
 
 
@@ -548,7 +607,7 @@ def make_doc_func(fnm):
     specified call graph image
     """
 
-    def doc_fun():
+    def doc_fun(*args):
         pass
 
     doc_fun.__doc__ = """
@@ -613,6 +672,9 @@ def insert_solve_docs():
         'sporco.admm.tvl1.TVL1Deconv': 'tvl1dcn_solve.svg',
         'sporco.admm.tvl2.TVL2Denoise': 'tvl2den_solve.svg',
         'sporco.admm.tvl2.TVL2Deconv': 'tvl2dcn_solve.svg',
+        'sporco.fista.cbpdn.ConvBPDN': 'fista_cbpdn_solve.svg',
+        'sporco.fista.ccmod.ConvCnstrMOD': 'ccmodfista_solve.svg',
+        'sporco.fista.ccmod.ConvCnstrMODMaskDcpl': 'ccmodmdfista_solve.svg'
         }
 
     # Iterate over fully qualified class names in class/call graph image dict
