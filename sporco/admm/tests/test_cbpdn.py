@@ -122,11 +122,12 @@ class TestSet01(object):
 
 
     def test_08(self):
-        N = 16
+        Nr = 16
+        Nc = 17
         Nd = 5
         M = 4
         D = np.random.randn(Nd, Nd, M)
-        s = np.random.randn(N, N)
+        s = np.random.randn(Nr, Nc)
         lmbda = 1e-1
         try:
             opt = cbpdn.ConvBPDN.Options({'LinSolveCheck': True})
@@ -275,11 +276,12 @@ class TestSet01(object):
 
 
     def test_16(self):
-        N = 16
+        Nr = 16
+        Nc = 17
         Nd = 5
         M = 4
         D = np.random.randn(Nd, Nd, M)
-        s = np.random.randn(N, N)
+        s = np.random.randn(Nr, Nc)
         lmbda = 1e-1
         mu = 1e-2
         try:
@@ -311,11 +313,12 @@ class TestSet01(object):
 
 
     def test_18(self):
-        N = 16
+        Nr = 16
+        Nc = 17
         Nd = 5
         M = 4
         D = np.random.randn(Nd, Nd, M)
-        s = np.random.randn(N, N)
+        s = np.random.randn(Nr, Nc)
         lmbda = 1e-1
         mu = 1e-2
         try:

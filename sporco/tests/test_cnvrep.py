@@ -25,6 +25,12 @@ class TestSet01(object):
         assert(cri.K == 1)
         assert(cri.Nv == (N, N))
         assert(str(cri) != '')
+        W = np.random.randn(N, N)
+        assert(cnvrep.l1Wshape(W, cri) == (N, N, 1, 1, 1))
+        W = np.random.randn(N, N, M)
+        assert(cnvrep.l1Wshape(W, cri) == (N, N, 1, 1, M))
+        W = np.random.randn(N, N, 1, 1, M)
+        assert(cnvrep.l1Wshape(W, cri) == (N, N, 1, 1, M))
 
 
 
@@ -46,11 +52,13 @@ class TestSet01(object):
         N = 32
         M = 16
         L = 8
+        C = 3
         D = np.random.randn(L, L, M)
-        S = np.random.randn(N, N)
+        S = np.random.randn(N, N, C)
         cri = cnvrep.CSC_ConvRepIndexing(D, S, dimK=0)
         assert(cri.M == M)
         assert(cri.K == 1)
+        assert(cri.C == 3)
         assert(cri.Nv == (N, N))
 
 
@@ -92,6 +100,22 @@ class TestSet01(object):
 
 
     def test_08(self):
+        N = 32
+        M = 16
+        L = 8
+        dsz = (L, L, M)
+        S = np.random.randn(N, N)
+        cri = cnvrep.CDU_ConvRepIndexing(dsz, S, dimK=0)
+        assert(cri.M == M)
+        assert(cri.K == 1)
+        assert(cri.Nv == (N, N))
+        assert(str(cri) != '')
+        W = np.random.randn(N, N)
+        assert(cnvrep.mskWshape(W, cri) == (N, N, 1, 1, 1))
+
+
+
+    def test_09(self):
         dsz = (8, 8, 32)
         u = np.zeros((16, 16, 32))
         u[0:8, 0:8, 0:16] = 1.0
@@ -100,7 +124,7 @@ class TestSet01(object):
 
 
 
-    def test_09(self):
+    def test_10(self):
         dsz = ((8, 8, 16), (12, 12, 32))
         u = np.zeros((24, 24, 48))
         u[0:8, 0:8, 0:16] = 1.0
@@ -110,7 +134,7 @@ class TestSet01(object):
 
 
 
-    def test_10(self):
+    def test_11(self):
         dsz = (
             ((5, 5, 2, 8), (7, 7, 1, 8)),
             ((9, 9, 2, 16), (10, 10, 1, 16))
@@ -125,7 +149,7 @@ class TestSet01(object):
 
 
 
-    def test_11(self):
+    def test_12(self):
         dsz = (8, 8, 32)
         u = np.zeros((16, 16, 32))
         u[0:8, 0:8, 0:16] = 1.0
@@ -134,7 +158,7 @@ class TestSet01(object):
 
 
 
-    def test_12(self):
+    def test_13(self):
         dsz = ((8, 8, 16), (12, 12, 32))
         u = np.zeros((24, 24, 48))
         u[0:8, 0:8, 0:16] = 1.0
@@ -144,7 +168,7 @@ class TestSet01(object):
 
 
 
-    def test_13(self):
+    def test_14(self):
         dsz = (
             ((5, 5, 2, 8), (7, 7, 1, 8)),
             ((9, 9, 2, 16), (10, 10, 1, 16))

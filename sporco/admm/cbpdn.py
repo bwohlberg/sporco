@@ -483,7 +483,8 @@ class ConvBPDN(GenericConvBPDN):
 
           ``L1Weight`` : An array of weights for the :math:`\ell_1`
           norm. The array shape must be such that the array is
-          compatible for multiplication with the X/Y variables. If this
+          compatible for multiplication with the `X`/`Y` variables (see
+          :func:`.cnvrep.l1Wshape` for more details). If this
           option is defined, the regularization term is :math:`\lambda
           \sum_m \| \mathbf{w}_m \odot \mathbf{x}_m \|_1` where
           :math:`\mathbf{w}_m` denotes slices of the weighting array on
@@ -570,9 +571,8 @@ class ConvBPDN(GenericConvBPDN):
             b = np.conj(Df) * Sf
             lmbda = 0.1*abs(b).max()
 
-        # Set l1 term scaling and weight array
+        # Set l1 term scaling
         self.lmbda = self.dtype.type(lmbda)
-        self.wl1 = np.asarray(opt['L1Weight'], dtype=self.dtype)
 
         # Set penalty parameter
         self.set_attr('rho', opt['rho'], dval=(50.0*self.lmbda + 1.0),
@@ -588,6 +588,10 @@ class ConvBPDN(GenericConvBPDN):
 
         # Call parent class __init__
         super(ConvBPDN, self).__init__(D, S, opt, dimK, dimN)
+
+        # Set l1 term weight array
+        self.wl1 = np.asarray(opt['L1Weight'], dtype=self.dtype)
+        self.wl1 = self.wl1.reshape(cr.l1Wshape(self.wl1, self.cri))
 
 
 
@@ -948,7 +952,7 @@ class ConvElasticNet(ConvBPDN):
             self.Xf[:] = sl.solvemdbi_ism(self.Df, self.mu + self.rho, b,
                                           self.cri.axisM, self.cri.axisC)
 
-        self.X = sl.irfftn(self.Xf, None, self.cri.axisN)
+        self.X = sl.irfftn(self.Xf, self.cri.Nv, self.cri.axisN)
 
         if self.opt['LinSolveCheck']:
             Dop = lambda x: sl.inner(self.Df, x, axis=self.cri.axisM)
@@ -1050,11 +1054,11 @@ class ConvBPDNGradReg(ConvBPDN):
 
           ``GradWeight`` : An array of weights :math:`w_m` for the term
           penalising the gradient of the coefficient maps. If this
-          option is defined, the regularization term is :math:`\sum_i
-          \sum_m w_m \| G_i \mathbf{x}_m \|_2^2` where :math:`w_m` is
-          the weight for filter index :math:`m`. The array should be an
-          :math:`M`-vector where :math:`M` is the number of filters in
-          the dictionary.
+          option is defined, the gradient regularization term is
+          :math:`\sum_i \sum_m w_m \| G_i \mathbf{x}_m \|_2^2` where
+          :math:`w_m` is the weight for filter index :math:`m`. The array
+          should be an :math:`M`-vector where :math:`M` is the number of
+          filters in the dictionary.
         """
 
         defaults = copy.deepcopy(ConvBPDN.Options.defaults)
@@ -1169,7 +1173,7 @@ class ConvBPDNGradReg(ConvBPDN):
                                           self.rho, b, self.cri.axisM,
                                           self.cri.axisC)
 
-        self.X = sl.irfftn(self.Xf, None, self.cri.axisN)
+        self.X = sl.irfftn(self.Xf, self.cri.Nv, self.cri.axisN)
 
         if self.opt['LinSolveCheck']:
             Dop = lambda x: sl.inner(self.Df, x, axis=self.cri.axisM)
@@ -1872,7 +1876,8 @@ class ConvMinL1InL2Ball(ConvTwoBlockCnstrnt):
 
           ``L1Weight`` : An array of weights for the :math:`\ell_1`
           norm. The array shape must be such that the array is
-          compatible for multiplication with the X/Y variables. If this
+          compatible for multiplication with the `X`/`Y` variables (see
+          :func:`.cnvrep.l1Wshape` for more details). If this
           option is defined, the objective function is :math:`\lambda \|
           \mathbf{w} \odot \mathbf{x} \|_1` where :math:`\mathbf{w}`
           denotes the weighting array.
@@ -1943,7 +1948,9 @@ class ConvMinL1InL2Ball(ConvTwoBlockCnstrnt):
         super(ConvMinL1InL2Ball, self).__init__(D, S, opt, dimK=dimK,
                                                 dimN=dimN)
 
+        # Set l1 term weight array
         self.wl1 = np.asarray(opt['L1Weight'], dtype=self.dtype)
+        self.wl1 = self.wl1.reshape(cr.l1Wshape(self.wl1, self.cri))
 
         # Record epsilon value
         self.epsilon = self.dtype.type(epsilon)
@@ -2084,7 +2091,8 @@ class ConvBPDNMaskDcpl(ConvTwoBlockCnstrnt):
 
           ``L1Weight`` : An array of weights for the :math:`\ell_1`
           norm. The array shape must be such that the array is
-          compatible for multiplication with the X/Y variables. If this
+          compatible for multiplication with the `X` variable (see
+          :func:`.cnvrep.l1Wshape` for more details). If this
           option is defined, the regularization term is :math:`\lambda
           \sum_m \| \mathbf{w}_m \odot \mathbf{x}_m \|_1` where
           :math:`\mathbf{w}_m` denotes slices of the weighting array on
@@ -2156,7 +2164,7 @@ class ConvBPDNMaskDcpl(ConvTwoBlockCnstrnt):
         self.W = np.asarray(W.reshape(cr.mskWshape(W, self.cri)),
                             dtype=self.dtype)
         self.wl1 = np.asarray(opt['L1Weight'], dtype=self.dtype)
-
+        self.wl1 = self.wl1.reshape(cr.l1Wshape(self.wl1, self.cri))
 
 
     def uinit(self, ushape):

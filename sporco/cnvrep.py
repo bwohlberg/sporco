@@ -25,8 +25,8 @@ __author__ = """Brendt Wohlberg <brendt@ieee.org>"""
 class CSC_ConvRepIndexing(object):
     """Manage the inference of problem dimensions and the roles of
     :class:`numpy.ndarray` indices for convolutional representations in
-    convolutional sparse coding problems (e.g. :class:`.ConvBPDN` and
-    related classes).
+    convolutional sparse coding problems (e.g. :class:`.admm.cbpdn.ConvBPDN`
+    and related classes).
     """
 
     def __init__(self, D, S, dimK=None, dimN=2):
@@ -35,8 +35,8 @@ class CSC_ConvRepIndexing(object):
         convolutional representation. These dimensions are inferred
         from the input `D` and `S` as well as from parameters `dimN` and
         `dimK`. Management and inferrence of these problem dimensions
-        is not entirely straightforward because :class:`.ConvBPDN` and
-        related classes make use *internally* of S, D, and X arrays
+        is not entirely straightforward because :class:`.admm.cbpdn.ConvBPDN`
+        and related classes make use *internally* of S, D, and X arrays
         with a standard layout (described below), but *input* `S` and `D`
         are allowed to deviate from this layout for the convenience of
         the user.
@@ -286,8 +286,9 @@ class CDU_ConvRepIndexing(object):
         (described below), but *input* `S` and `dsz` are allowed to
         deviate from this layout for the convenience of the user. Note
         that S, D, and X refers to the names of signal, dictionary, and
-        coefficient map arrays in :class:`.ConvBPDN`; the corresponding
-        variable names in :class:`.ConvCnstrMODBase` are S, X, and Z.
+        coefficient map arrays in :class:`.admm.cbpdn.ConvBPDN`; the
+        corresponding variable names in :class:`.ConvCnstrMODBase` are
+        S, X, and Z.
 
         The most fundamental parameter is `dimN`, which specifies the
         dimensionality of the spatial/temporal samples being represented
@@ -474,6 +475,63 @@ def stdformD(D, Cd, M, dimN=2):
 
 
 
+def l1Wshape(W, cri):
+    """Get appropriate internal shape (see :class:`CSC_ConvRepIndexing`) for
+    an :math:`\ell_1` norm weight array `W`, as in option ``L1Weight`` in
+    :class:`.admm.cbpdn.ConvBPDN.Options` and related options classes. The
+    external shape of `W` depends on the external shape of input data array
+    `S` and the size of the final axis (i.e. the number of filters) in
+    dictionary array `D`. The internal shape of the weight array `W` is
+    required to be compatible for multiplication with the internal sparse
+    representation array `X`. The simplest criterion for ensuring that the
+    external `W` is compatible with `S` is to ensure that `W` has shape
+    ``S.shape + D.shape[-1:]``, except that non-singleton dimensions may
+    be replaced with singleton dimensions. If `W` has a single additional
+    axis that is neither a spatial axis nor a filter axis, it is assigned
+    as a channel or multi-signal axis depending on the corresponding
+    assignement in `S`.
+
+    Parameters
+    ----------
+    W : array_like
+      Weight array
+    cri : :class:`CSC_ConvRepIndexing` object
+      Object specifying convolutional representation dimensions
+
+    Returns
+    -------
+    shp : tuple
+      Appropriate internal weight array shape
+    """
+
+    # Number of dimensions in input array `S`
+    sdim = cri.dimN + cri.dimC + cri.dimK
+
+    if W.ndim < sdim:
+        if W.size == 1:
+            # Weight array is a scalar
+            shpW = (1,) * (cri.dimN+3)
+        else:
+            # Invalid weight array shape
+            raise ValueError('weight array must be scalar or have at least '
+                             'the same number of dimensions as input array')
+    elif W.ndim == sdim:
+        # Weight array has the same number of dimensions as the input array
+        shpW = W.shape + (1,) * (3-cri.dimC-cri.dimK)
+    else:
+        # Weight array has more dimensions than the input array
+        if W.ndim == cri.dimN + 3:
+            # Weight array is already of the appropriate shape
+            shpW = W.shape
+        else:
+            # Assume that the final axis in the input array is the filter
+            # index
+            shpW = W.shape[0:-1] + (1,) * (2-cri.dimC-cri.dimK) + W.shape[-1:]
+
+    return shpW
+
+
+
 def mskWshape(W, cri):
     """Get appropriate internal shape (see :class:`CSC_ConvRepIndexing` and
     :class:`CDU_ConvRepIndexing`) for data fidelity term mask array `W`. The
@@ -494,8 +552,8 @@ def mskWshape(W, cri):
 
     Returns
     -------
-    W : ndarray
-      Reshaped mask array
+    shp : tuple
+      Appropriate internal mask array shape
     """
 
     ckdim = W.ndim - cri.dimN
@@ -511,8 +569,8 @@ def mskWshape(W, cri):
             # Input S has multiple channels and a single signal
             shpW = W.shape[0:cri.dimN] + (W.shape[cri.dimN], 1)
         else:
-            # Input S has multiple channels and signals: resolve abiguity by
-            # taking extra axis in W as a channel axis
+            # Input S has multiple channels and signals: resolve ambiguity
+            # by taking extra axis in W as a channel axis
             shpW = W.shape[0:cri.dimN] + (W.shape[cri.dimN], 1)
     else:
         # Neither C nor K axis is present in W

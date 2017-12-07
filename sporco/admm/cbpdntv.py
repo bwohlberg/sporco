@@ -119,8 +119,9 @@ class ConvBPDNScalarTV(admm.ADMM):
     class Options(cbpdn.ConvBPDN.Options):
         r"""ConvBPDNScalarTV algorithm options
 
-        Options include all of those defined in :class:`.ConvBPDN.Options`,
-        together with additional options:
+        Options include all of those defined in
+        :class:`.admm.cbpdn.ConvBPDN.Options`, together with additional
+        options:
 
         ``TVWeight`` : An array of weights :math:`w_m` for the term
         penalising the gradient of the coefficient maps. If this
@@ -201,6 +202,8 @@ class ConvBPDNScalarTV(admm.ADMM):
         # Set l1 term scaling and weight array
         self.lmbda = self.dtype.type(lmbda)
         self.Wl1 = np.asarray(opt['L1Weight'], dtype=self.dtype)
+        self.Wl1 = self.Wl1.reshape(cr.l1Wshape(self.Wl1, self.cri))
+
         self.mu = self.dtype.type(mu)
         if hasattr(opt['TVWeight'], 'ndim') and opt['TVWeight'].ndim > 0:
             self.Wtv = np.asarray(opt['TVWeight'].reshape((1,)*(dimN+2) +
@@ -358,7 +361,7 @@ class ConvBPDNScalarTV(admm.ADMM):
     def getmin(self):
         """Get minimiser after optimisation."""
 
-        return self.X if self.opt['ReturnX'] else self.var_y1()
+        return self.X if self.opt['ReturnX'] else self.var_y1()[..., 0]
 
 
 
@@ -395,8 +398,8 @@ class ConvBPDNScalarTV(admm.ADMM):
 
     def obfn_gvar(self):
         """Method providing compatibility with the interface of
-        :class:`.ConvBPDN` and derived classes in order to make this
-        class compatible with classes such as :class:`.AddMaskSim`.
+        :class:`.admm.cbpdn.ConvBPDN` and derived classes in order to make
+        this class compatible with classes such as :class:`.AddMaskSim`.
         """
 
         return self.obfn_g1var()
@@ -819,8 +822,9 @@ class ConvBPDNRecTV(admm.ADMM):
     class Options(cbpdn.ConvBPDN.Options):
         r"""ConvBPDNScalarTV algorithm options
 
-        Options include all of those defined in :class:`.ConvBPDN.Options`,
-        together with additional options:
+        Options include all of those defined in
+        :class:`.admm.cbpdn.ConvBPDN.Options`, together with additional
+        options:
 
         ``TVWeight`` : An array of weights :math:`w_m` for the term
         penalising the gradient of the coefficient maps. If this
@@ -903,6 +907,8 @@ class ConvBPDNRecTV(admm.ADMM):
         # Set l1 term scaling and weight array
         self.lmbda = self.dtype.type(lmbda)
         self.Wl1 = np.asarray(opt['L1Weight'], dtype=self.dtype)
+        self.Wl1 = self.Wl1.reshape(cr.l1Wshape(self.Wl1, self.cri))
+
         self.mu = self.dtype.type(mu)
         if hasattr(opt['TVWeight'], 'ndim') and opt['TVWeight'].ndim > 0:
             self.Wtv = np.asarray(opt['TVWeight'].reshape((1,)*(dimN+2) +
@@ -1174,8 +1180,8 @@ class ConvBPDNRecTV(admm.ADMM):
 
     def obfn_gvar(self):
         """Method providing compatibility with the interface of
-        :class:`.ConvBPDN` and derived classes in order to make this
-        class compatible with classes such as :class:`.AddMaskSim`.
+        :class:`.admm.cbpdn.ConvBPDN` and derived classes in order to make
+        this class compatible with classes such as :class:`.AddMaskSim`.
         """
 
         return self.obfn_g1var()
