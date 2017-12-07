@@ -68,9 +68,9 @@ class ConvCnstrMODBase(admm.ADMMEqual):
 
     .. math::
        \mathrm{argmin}_\mathbf{d} \;
-       (1/2) \sum_c \sum_k \left\| \sum_m \mathbf{d}_{c,m} * \mathbf{x}_{k,m} -
-       \mathbf{s}_{c,k} \right\|_2^2 \quad \text{such that} \quad
-       \mathbf{d}_{c,m} \in C \;\; \forall c, m
+       (1/2) \sum_c \sum_k \left\| \sum_m \mathbf{d}_{c,m} *
+       \mathbf{x}_{k,m} - \mathbf{s}_{c,k} \right\|_2^2 \quad
+       \text{such that} \quad \mathbf{d}_{c,m} \in C \;\; \forall c, m
 
     with multi-channel dictionary filters :math:`\mathbf{d}_{c,m}` and
     single-channel coefficient maps :math:`\mathbf{x}_{k,m}`. In this
@@ -111,8 +111,7 @@ class ConvCnstrMODBase(admm.ADMMEqual):
         r"""ConvCnstrMODBase algorithm options
 
         Options include all of those defined in
-        :class:`sporco.admm.admm.ADMMEqual.Options`, together with
-        additional options:
+        :class:`.admm.ADMMEqual.Options`, together with additional options:
 
           ``AuxVarObj`` : Flag indicating whether the objective
           function should be evaluated using variable X (``False``) or
@@ -738,7 +737,7 @@ class ConvCnstrMOD_Consensus(admm.ADMMConsensus):
 
 
     def swapaxes(self, x):
-        """Class :class:`admm.ADMMConsensus`, from which this class is
+        """Class :class:`.admm.ADMMConsensus`, from which this class is
         derived, expects the multiple blocks of a consensus problem to
         be stacked on the final axis. For compatibility with this
         requirement, ``axisK`` of the variables used in this algorithm is
