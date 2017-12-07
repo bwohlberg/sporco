@@ -15,7 +15,13 @@ a release source package downloaded from `PyPI
 <https://pypi.python.org/pypi/sporco/>`_.
 
 To install the development version from `GitHub
-<https://github.com/bwohlberg/sporco>`_ do
+<https://github.com/bwohlberg/sporco>`_, either do
+
+::
+
+    pip install git+https://github.com/bwohlberg/sporco
+
+or
 
 ::
 
@@ -31,6 +37,12 @@ followed by
    python setup.py install
 
 Please report any test failures. The install command will usually have to be performed with root permissions, e.g. on Ubuntu Linux
+
+::
+
+   sudo -H pip install sporco
+
+or
 
 ::
 
