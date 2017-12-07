@@ -476,7 +476,7 @@ def stdformD(D, Cd, M, dimN=2):
 
 
 def l1Wshape(W, cri):
-    """Get appropriate internal shape (see :class:`CSC_ConvRepIndexing`) for
+    r"""Get appropriate internal shape (see :class:`CSC_ConvRepIndexing`) for
     an :math:`\ell_1` norm weight array `W`, as in option ``L1Weight`` in
     :class:`.admm.cbpdn.ConvBPDN.Options` and related options classes. The
     external shape of `W` depends on the external shape of input data array
