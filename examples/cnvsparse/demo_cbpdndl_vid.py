@@ -12,10 +12,10 @@ from __future__ import print_function
 from builtins import input
 from builtins import range
 
-import numpy as np
 import os.path
 import tempfile
 import sys
+import numpy as np
 try:
     import cv2
 except ImportError:
