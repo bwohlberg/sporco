@@ -6,7 +6,11 @@ SPORCO Release Notes
 Version 0.1.9   (not yet released)
 ----------------------------------
 
-
+- Added new sub-package for FISTA algorithms, including algorithms for
+  the CBPDN and CCMOD problems
+- Simplified array shape requirements for option L1Weight in modules
+  admm.cbpdn and admm.cbpdntv
+- Minimum required Numpy version is now 1.11
 
 
 Version 0.1.8   (2017-11-04)
