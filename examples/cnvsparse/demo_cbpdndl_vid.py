@@ -17,9 +17,10 @@ import tempfile
 import sys
 import numpy as np
 try:
-    import cv2
+    import skvideo.datasets
+    import skvideo.io
 except ImportError:
-    print('Module cv2 is required by this demo script', file=sys.stderr)
+    print('Package sk-video is required by this demo script', file=sys.stderr)
     raise
 
 from sporco.admm import cbpdndl
@@ -27,50 +28,29 @@ from sporco import util
 from sporco import plot
 
 
-# Get test video
-pth = os.path.join(tempfile.gettempdir(), 'foreman_qcif_mono.y4m')
-if not os.path.isfile(pth):
-    url = 'https://media.xiph.org/video/derf/y4m/foreman_qcif_mono.y4m'
-    vid = util.netgetdata(url)
-    f = open(pth, 'wb')
-    f.write(vid.read())
-    f.close()
-
-
-# Extract video as 3d array
-vid = np.zeros((144,176,300))
-cap = cv2.VideoCapture(pth)
-k = 0
-while(cap.isOpened()):
-    ret, frame = cap.read()
-    if ret is False:
-        break
-    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-    vid[...,k] = gray
-    k += 1
-cap.release()
-vid = vid[50:114,50:114,0:32] / 255.0
+# Get test video as 3d array
+vid = skvideo.io.vread(skvideo.datasets.fullreferencepair()[0],
+                outputdict={"-pix_fmt": "gray"})[..., 0]
+vid = np.moveaxis(vid, 0, -1)
+vid = vid[0:106,40:136, 10:42].astype(np.float32)/255.0
 
 
 # Highpass filter frames
 npd = 16
-fltlmbd = 5
+fltlmbd = 10
 vl, vh = util.tikhonov_filter(vid, fltlmbd, npd)
 
 
 # Initial dictionary
 np.random.seed(12345)
-D0 = np.random.randn(5, 5, 3, 75)
+D0 = np.random.randn(5, 5, 3, 25)
 
 
 # Set ConvBPDNDictLearn parameters
 lmbda = 0.1
 opt = cbpdndl.ConvBPDNDictLearn.Options({'Verbose': True, 'MaxMainIter': 200,
-                                         'CBPDN': {'rho': 1e3*lmbda,
-                                            'AutoRho': {'Enabled': True}},
-                                         'CCMOD': {'rho': 5, 
-                                           'AutoRho': {'Enabled': True},
-                                                    'ZeroMean': True}})
+                'CBPDN': {'rho': 5e1*lmbda, 'AutoRho': {'Enabled': True}},
+                'CCMOD': {'rho': 1e2, 'AutoRho': {'Enabled': True}}})
 
 
 # Run optimisation
