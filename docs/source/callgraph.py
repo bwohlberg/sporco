@@ -51,7 +51,7 @@ class CallGraph(jonga.ContextCallTracer):
         img = os.path.join(pth, fnm)
         self.need_update = is_newer_than(module_path(mdnm), img)
         if self.need_update:
-            print('constructing %s\t\t\t\t' % fnm, end='\r')
+            print('constructing %s\t\t\t\t\t\t\t\t' % fnm, end='\r')
         super(CallGraph, self).__init__(ct, img, **kwargs)
 
 
