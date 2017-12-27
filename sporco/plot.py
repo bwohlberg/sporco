@@ -16,7 +16,8 @@ from builtins import object
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
-from matplotlib.pyplot import figure, subplot, savefig
+from matplotlib.pyplot import figure, subplot, subplots, gcf, gca, savefig
+from mpl_toolkits.axes_grid1 import make_axes_locatable
 from mpl_toolkits.mplot3d import Axes3D
 try:
     import mpldatacursor as mpldc
@@ -30,31 +31,65 @@ __author__ = """Brendt Wohlberg <brendt@ieee.org>"""
 
 
 
-def plot(dat, x=None, title=None, xlbl=None, ylbl=None, lgnd=None, lglc=None,
-         ptyp='plot', lwidth=1.5, lstyle='solid', msize=6.0, mstyle='None',
-         block=False, fgrf=None, fgnm=None, fgsz=None):
+def attach_keypress(fig):
     """
-    Plot columns of array.
+    Attach a key press event handler that configures keys for closing a
+    figure and changing the figure size. Keys 'e' and 'c' respectively
+    expand and contract the figure, and key 'q' closes it.
+
+    **Note:** Resizing may not function correctly with all matplotlib
+    backends (a
+    `bug <https://github.com/matplotlib/matplotlib/issues/10083>`__
+    has been reported).
 
     Parameters
     ----------
-    dat : array_like
-        Data to plot. Each column is plotted as a separate curve.
+    fig : :class:`matplotlib.figure.Figure` object
+        Figure to which event handling is to be attached
+    """
+
+    def press(event):
+        a = 1.1
+        if event.key == 'q':
+            plt.close(fig)
+        elif event.key == 'e':
+            fig.set_size_inches(a*fig.get_size_inches(), forward=True)
+        elif event.key == 'c':
+            fig.set_size_inches(fig.get_size_inches()/a, forward=True)
+
+    # Avoid multiple even handlers attached to the same figure
+    if not hasattr(fig, '_sporco_keypress_cid'):
+        cid = fig.canvas.mpl_connect('key_press_event', press)
+        fig._sporco_keypress_cid = cid
+
+
+
+def plot(y, x=None, ptyp='plot', xlbl=None, ylbl=None, title=None,
+         lgnd=None, lglc=None, lwidth=1.5, lstyle='solid', msize=6.0,
+         mstyle='None', fgsz=None, fgrf=None, axrf=None, fgnm=None):
+    """
+    Plot points or lines in 2D.
+
+    Parameters
+    ----------
+    y : array_like
+        1d or 2d array of data to plot. If a 2d array, each column is
+        plotted as a separate curve.
     x : array_like, optional (default None)
         Values for x-axis of the plot
-    title : string, optional (default None)
-        Figure title
+    ptyp : string, optional (default 'plot')
+        Plot type specification (options are 'plot', 'semilogx',
+        'semilogy', and 'loglog')
     xlbl : string, optional (default None)
         Label for x-axis
     ylbl : string, optional (default None)
         Label for y-axis
+    title : string, optional (default None)
+        Figure title
     lgnd : list of strings, optional (default None)
         List of legend string
     lglc : string, optional (default None)
         Legend location string
-    ptyp : string, optional (default 'plot')
-        Plot type specification (options are 'plot', 'semilogx',
-        'semilogy', and 'loglog')
     lwidth : float, optional (default 1.5)
         Line width
     lstyle : string, optional (default 'solid')
@@ -63,71 +98,70 @@ def plot(dat, x=None, title=None, xlbl=None, ylbl=None, lgnd=None, lglc=None,
         Marker size
     mstyle : string, optional (default 'None')
         Marker style (see :mod:`matplotlib.markers`)
-    block : boolean, optional (default False)
-        If True, the function only returns when the figure is closed
+    fgsz : tuple (width,height), optional (default None)
+        Specify figure dimensions in inches.
     fgrf : :class:`matplotlib.figure.Figure` object, optional (default None)
         Draw in specified figure instead of creating one
+    axrf : :class:`matplotlib.axes.Axes` object, optional (default None)
+        Plot in specified axes instead of current axes of figure
     fgnm : integer, optional (default None)
         Figure number of figure
-    fgsz : tuple (width,height), optional (default (12,12))
-        Specify figure dimensions in inches.
-    cbar : boolean, optional (default False)
-        Flag indicating whether to display colorbar
 
     Returns
     -------
     fig : :class:`matplotlib.figure.Figure`
       Figure object for this figure
+    ax : :class:`matplotlib.axes.Axes`
+      Axes for this plot
     """
 
     if fgrf is None:
         fig = plt.figure(num=fgnm, figsize=fgsz)
         fig.clf()
+        ax = fig.gca()
     else:
         fig = fgrf
-
-    plttyp = {'plot' : plt.plot, 'semilogx' : plt.semilogx,
-              'semilogy' : plt.semilogy, 'loglog' : plt.loglog}
-    if ptyp in plttyp:
-        if x is None:
-            pltln = plttyp[ptyp](dat, linewidth=lwidth, linestyle=lstyle,
-                                 marker=mstyle, markersize=msize)
+        if axrf is None:
+            ax = fig.gca()
         else:
-            pltln = plttyp[ptyp](x, dat, linewidth=lwidth, linestyle=lstyle,
-                                 marker=mstyle, markersize=msize)
-    else:
+            ax = axrf
+
+    if not ptyp in ('plot', 'semilogx', 'semilogy', 'loglog'):
         raise ValueError("Invalid plot type '%s'" % ptyp)
+    pltmth = getattr(ax, ptyp)
+    if x is None:
+        pltln = pltmth(y, linewidth=lwidth, linestyle=lstyle,
+                        marker=mstyle, markersize=msize)
+    else:
+        pltln = pltmth(x, y, linewidth=lwidth, linestyle=lstyle,
+                        marker=mstyle, markersize=msize)
 
     if title is not None:
-        plt.title(title)
+        ax.set_title(title)
     if xlbl is not None:
-        plt.xlabel(xlbl)
+        ax.set_xlabel(xlbl)
     if ylbl is not None:
-        plt.ylabel(ylbl)
+        ax.set_ylabel(ylbl)
     if lgnd is not None:
-        plt.legend(lgnd, loc=lglc)
+        ax.legend(lgnd, loc=lglc)
 
-    def press(event):
-        if event.key == 'q':
-            plt.close(fig)
-
-    fig.canvas.mpl_connect('key_press_event', press)
+    attach_keypress(fig)
 
     if have_mpldc:
         mpldc.datacursor(pltln)
 
     if fgrf is None:
-        plt.show(block=block)
+        fig.show()
 
-    return fig
+    return fig, ax
 
 
 
-def surf(z, x=None, y=None, title=None, xlbl=None, ylbl=None, zlbl=None,
-         lblpad=8.0, block=False, cmap=None, fgrf=None, axrf=None,
-         fgnm=None, fgsz=None):
+def surf(z, x=None, y=None,  elev=None, azim=None, xlbl=None, ylbl=None,
+        zlbl=None, title=None, lblpad=8.0, cntr=None, cmap=None,
+        fgsz=None, fgrf=None, axrf=None, fgnm=None):
     """
-    Plot columns of array.
+    Plot a 2D surface in 3D.
 
     Parameters
     ----------
@@ -137,61 +171,81 @@ def surf(z, x=None, y=None, title=None, xlbl=None, ylbl=None, zlbl=None,
         Values for x-axis of the plot
     y : array_like, optional (default None)
         Values for y-axis of the plot
-    title : string, optional (default None)
-        Figure title
+    elev : float
+        Elevation angle (in degrees) in the z plane
+    azim : foat
+        Azimuth angle  (in degrees) in the x,y plane
     xlbl : string, optional (default None)
         Label for x-axis
     ylbl : string, optional (default None)
         Label for y-axis
     zlbl : string, optional (default None)
         Label for z-axis
+    title : string, optional (default None)
+        Figure title
     lblpad : float, optional (default 8.0)
         Label padding
-    block : boolean, optional (default False)
-        If True, the function only returns when the figure is closed
+    cntr : int or sequence of ints, optional (default None)
+        If not None, plot contours of the surface on the lower end of
+        the z-axis. An int specifies the number of contours to plot, and
+        a sequence specifies the specific contour levels to plot.
     cmap : :class:`matplotlib.colors.Colormap`, optional (default None)
         Colour map for surface. If none specifed, defaults to cm.coolwarm
+    fgsz : tuple (width,height), optional (default None)
+        Specify figure dimensions in inches
     fgrf : :class:`matplotlib.figure.Figure` object, optional (default None)
         Draw in specified figure instead of creating one
     axrf : :class:`matplotlib.axes.Axes` object, optional (default None)
         Plot in specified axes instead of creating one
     fgnm : integer, optional (default None)
         Figure number of figure
-    fgsz : tuple (width,height), optional (default None)
-        Specify figure dimensions in inches
 
     Returns
     -------
     fig : :class:`matplotlib.figure.Figure`
       Figure object for this figure
     ax : :class:`matplotlib.axes.Axes`
-      Axes for this figure
+      Axes for this plot
     """
 
     if fgrf is None:
         fig = plt.figure(num=fgnm, figsize=fgsz)
         fig.clf()
-    else:
-        fig = fgrf
-
-    if axrf is None:
         ax = plt.axes(projection='3d')
     else:
-        ax = axrf
+        fig = fgrf
+        if axrf is None:
+            ax = plt.axes(projection='3d')
+        else:
+            ax = axrf
+            # See https://stackoverflow.com/a/43563804
+            #     https://stackoverflow.com/a/35221116
+            if ax.name != '3d':
+                ax.remove()
+                ax = fig.add_subplot(*ax.get_geometry(), projection='3d')
+
+    if elev is not None or azim is not None:
+        ax.view_init(elev=elev, azim=azim)
+
+    if cmap is None:
+        cmap = cm.coolwarm
 
     if x is None:
         x = range(z.shape[1])
     if y is None:
         y = range(z.shape[0])
 
-    if cmap is None:
-        cmap = cm.coolwarm
-
     xg, yg = np.meshgrid(x, y)
     ax.plot_surface(xg, yg, z, rstride=1, cstride=1, cmap=cmap)
 
+    if cntr is not None:
+        offset = np.around(z.min() - 0.2 * (z.max() - z.min()), 3)
+        cs = ax.contour(xg, yg, z, cntr, lw=4, cmap=cmap, linestyles="solid",
+                        offset=offset)
+        ax.set_zlim(offset, ax.get_zlim()[1])
+
     if title is not None:
-        plt.title(title)
+        ax.set_title(title)
     if xlbl is not None:
         ax.set_xlabel(xlbl, labelpad=lblpad)
     if ylbl is not None:
@@ -199,22 +253,118 @@ def surf(z, x=None, y=None, title=None, xlbl=None, ylbl=None, zlbl=None,
     if zlbl is not None:
         ax.set_zlabel(zlbl, labelpad=lblpad)
 
-    def press(event):
-        if event.key == 'q':
-            plt.close(fig)
-
-    fig.canvas.mpl_connect('key_press_event', press)
+    attach_keypress(fig)
 
     if fgrf is None:
-        plt.show(block=block)
+        fig.show()
 
     return fig, ax
 
 
 
-def imview(img, title=None, block=False, copy=True, fltscl=False, fgrf=None,
-           fgnm=None, fgsz=(12, 12), norm=None, cmap=None, intrp='nearest',
-           cbar=False, axes=None):
+def contour(z, x=None, y=None, v=5, xlbl=None, ylbl=None, title=None,
+            cfntsz=10, alpha=0.5, cmap=None, fgsz=None, fgrf=None,
+            axrf=None, fgnm=None):
+    """
+    Contour plot of a 2D surface.
+
+    Parameters
+    ----------
+    z : array_like
+        2d array of data to plot
+    x : array_like, optional (default None)
+        Values for x-axis of the plot
+    y : array_like, optional (default None)
+        Values for y-axis of the plot
+    v : int or sequence of ints, optional (default 5)
+        An int specifies the number of contours to plot, and a sequence
+        specifies the specific contour levels to plot.
+    xlbl : string, optional (default None)
+        Label for x-axis
+    ylbl : string, optional (default None)
+        Label for y-axis
+    title : string, optional (default None)
+        Figure title
+    cfntsz : int or None, optional (default 10)
+        Contour label font size. No contour labels are displayed if
+        set to 0 or None.
+    alpha : float, optional (default 0.5)
+        Underlying image display alpha value
+    cmap : :class:`matplotlib.colors.Colormap`, optional (default None)
+        Colour map for surface. If none specifed, defaults to cm.coolwarm
+    fgsz : tuple (width,height), optional (default None)
+        Specify figure dimensions in inches
+    fgrf : :class:`matplotlib.figure.Figure` object, optional (default None)
+        Draw in specified figure instead of creating one
+    axrf : :class:`matplotlib.axes.Axes` object, optional (default None)
+        Plot in specified axes instead of current axes of figure
+    fgnm : integer, optional (default None)
+        Figure number of figure
+
+    Returns
+    -------
+    fig : :class:`matplotlib.figure.Figure`
+      Figure object for this figure
+    ax : :class:`matplotlib.axes.Axes`
+      Axes for this plot
+    """
+
+    if fgrf is None:
+        fig = plt.figure(num=fgnm, figsize=fgsz)
+        fig.clf()
+        ax = fig.gca()
+    else:
+        fig = fgrf
+        if axrf is None:
+            ax = fig.gca()
+        else:
+            ax = axrf
+
+    if cmap is None:
+        cmap = cm.coolwarm
+
+    if x is None:
+        x = np.arange(z.shape[1])
+    else:
+        x = np.array(x)
+    if y is None:
+        y = np.arange(z.shape[0])
+    else:
+        y = np.array(y)
+    xg, yg = np.meshgrid(x, y)
+
+    cntr = ax.contour(xg, yg, z, v, colors='black')
+    if cfntsz is not None and cfntsz > 0:
+        plt.clabel(cntr, inline=True, fontsize=cfntsz)
+    im = ax.imshow(z, origin='lower', extent=[x.min(), x.max(),
+                y.min(), y.max()], cmap=cmap, alpha=alpha)
+
+    if title is not None:
+        ax.set_title(title)
+    if xlbl is not None:
+        ax.set_xlabel(xlbl)
+    if ylbl is not None:
+        ax.set_ylabel(ylbl)
+
+    divider = make_axes_locatable(ax)
+    cax = divider.append_axes("right", size="5%", pad=0.2)
+    plt.colorbar(im, ax=ax, cax=cax)
+
+    attach_keypress(fig)
+
+    if have_mpldc:
+        mpldc.datacursor()
+
+    if fgrf is None:
+        fig.show()
+
+    return fig, ax
+
+
+
+def imview(img, title=None, copy=True, fltscl=False, intrp='nearest',
+           norm=None, cbar=False, axshr=None, cmap=None,
+           fgsz=(12, 12), fgrf=None, axrf=None, fgnm=None):
     """
     Display an image.
 
@@ -229,8 +379,6 @@ def imview(img, title=None, block=False, copy=True, fltscl=False, fgrf=None,
         Image to display
     title : string, optional (default None)
         Figure title
-    block : boolean, optional (default False)
-        If True, the function only returns when the figure is closed
     copy : boolean, optional (default True)
         If True, create a copy of input `img` as a reference for displayed
         pixel values, ensuring that displayed values do not change when the
@@ -238,39 +386,53 @@ def imview(img, title=None, block=False, copy=True, fltscl=False, fgrf=None,
         overhead of an additional copy of the input image is not acceptable.
     fltscl : boolean, optional (default False)
         If True, rescale and shift floating point arrays to [0,1]
-    fgrf : :class:`matplotlib.figure.Figure` object, optional (default None)
-        Draw in specified figure instead of creating one
-    fgnm : integer, optional (default None)
-        Figure number of figure
-    fgsz : tuple (width,height), optional (default (12,12))
-        Specify figure dimensions in inches
-    norm : :class:`matplotlib.colors.Normalize` object, optional (default None)
-        Specify the :class:`matplotlib.colors.Normalize` instance used to
-        scale pixel values for input to the colour map
-    cmap : :class:`matplotlib.colors.Colormap`, optional (default None)
-        Colour map for image. If none specifed, defaults to cm.Greys_r
-        for monochrome image
     intrp : string, optional (default 'nearest')
         Specify type of interpolation used to display image (see
         ``interpolation`` parameter of :meth:`matplotlib.axes.Axes.imshow`)
+    norm : :class:`matplotlib.colors.Normalize` object, optional (default None)
+        Specify the :class:`matplotlib.colors.Normalize` instance used to
+        scale pixel values for input to the colour map
     cbar : boolean, optional (default False)
         Flag indicating whether to display colorbar
-    axes : :class:`matplotlib.axes.Axes` object, optional (default None)
+    axshr : :class:`matplotlib.axes.Axes` object, optional (default None)
         If specified the new figure shares axes with the specified axes of
         an existing figure so that a zoom is shared across both figures
+    cmap : :class:`matplotlib.colors.Colormap`, optional (default None)
+        Colour map for image. If none specifed, defaults to cm.Greys_r
+        for monochrome image
+    fgsz : tuple (width,height), optional (default (12,12))
+        Specify figure dimensions in inches
+    fgrf : :class:`matplotlib.figure.Figure` object, optional (default None)
+        Draw in specified figure instead of creating one
+    axrf : :class:`matplotlib.axes.Axes` object, optional (default None)
+        Plot in specified axes instead of current axes of figure
+    fgnm : integer, optional (default None)
+        Figure number of figure
 
     Returns
     -------
     fig : :class:`matplotlib.figure.Figure`
       Figure object for this figure
     ax : :class:`matplotlib.axes.Axes`
-      Axes for this figure suitable for passing as ``axes`` parameter of
-      another imview call
+      Axes for this plot
     """
 
     if img.ndim > 2 and img.shape[2] != 3:
         raise ValueError('Argument img must be an Nr x Nc array or an '
                          'Nr x Nc x 3 array')
+
+    if fgrf is None:
+        fig = plt.figure(num=fgnm, figsize=fgsz)
+        fig.clf()
+        ax = fig.gca()
+    else:
+        fig = fgrf
+        if axrf is None:
+            ax = fig.gca()
+        else:
+            ax = axrf
+
+    ax.set_adjustable('box-forced')
 
     imgd = img.copy()
     if copy:
@@ -294,28 +456,32 @@ def imview(img, title=None, block=False, copy=True, fltscl=False, fgrf=None,
         imgd = np.float16(imgd) - imgd.min()
         imgd /= imgd.max()
 
-    if fgrf is None:
-        fig = plt.figure(num=fgnm, figsize=fgsz)
-        fig.clf()
-    else:
-        fig = fgrf
-
-    if axes is not None:
-        ax = plt.subplot(sharex=axes, sharey=axes)
-        axes.set_adjustable('box-forced')
-        ax.set_adjustable('box-forced')
-
     if norm is None:
-        plt.imshow(imgd, cmap=cmap, interpolation=intrp, vmin=imgd.min(),
-                   vmax=imgd.max())
+        im = ax.imshow(imgd, cmap=cmap, interpolation=intrp, vmin=imgd.min(),
+                    vmax=imgd.max())
     else:
-        plt.imshow(imgd, cmap=cmap, interpolation=intrp, norm=norm)
+        im = ax.imshow(imgd, cmap=cmap, interpolation=intrp, norm=norm)
+
+    ax.set_yticklabels([])
+    ax.set_xticklabels([])
 
     if title is not None:
-        plt.title(title)
-    if cbar:
+        ax.set_title(title)
+
+    if cbar or cbar is None:
         orient = 'vertical' if img.shape[0] >= img.shape[1] else 'horizontal'
-        plt.colorbar(orientation=orient, shrink=0.8)
+        pos = 'right' if orient == 'vertical' else 'bottom'
+        divider = make_axes_locatable(ax)
+        cax = divider.append_axes(pos, size="5%", pad=0.2)
+        if cbar is None:
+            # See http://chris35wills.github.io/matplotlib_axis
+            cax.set_axis_bgcolor('none')
+            for axis in ['top','bottom','left','right']:
+                cax.spines[axis].set_linewidth(0)
+            cax.set_xticks([])
+            cax.set_yticks([])
+        else:
+            plt.colorbar(im, ax=ax, cax=cax, orientation=orient)
 
     def format_coord(x, y):
         nr, nc = imgd.shape[0:2]
@@ -331,21 +497,15 @@ def imview(img, title=None, block=False, copy=True, fltscl=False, fgrf=None,
         else:
             return 'x=%.2f, y=%.2f' % (x, y)
 
-    def press(event):
-        if event.key == 'q':
-            plt.close(fig)
-
-    fig.canvas.mpl_connect('key_press_event', press)
-
-    plt.axis('off')
-    ax = plt.gca()
     ax.format_coord = format_coord
+
+    attach_keypress(fig)
 
     if have_mpldc:
         mpldc.datacursor(display='single')
 
     if fgrf is None:
-        plt.show(block=block)
+        fig.show()
 
     return fig, ax
 
@@ -367,3 +527,110 @@ def close(fgrf=None):
         plt.close("all")
     else:
         plt.close(fgrf)
+
+
+
+def set_ipython_plot_backend(backend='qt'):
+    """
+    Set matplotlib backend within an ipython shell. Ths function has the
+    same effect as the line magic ``%matplotlib [backend]`` but is called
+    as a function and includes a check to determine whether the code is
+    running in an ipython shell, so that it can safely be used within a
+    normal python script since it has no effect when not running in an
+    ipython shell.
+
+    Parameters
+    ----------
+    backend : string, optional (default 'qt')
+      Name of backend to be passed to the ``%matplotlib`` line magic
+      command
+    """
+
+    from sporco.util import in_ipython
+    if in_ipython():
+        # See https://stackoverflow.com/questions/35595766
+        get_ipython().run_line_magic('matplotlib', backend)
+
+
+
+def set_notebook_plot_backend(backend='inline'):
+    """
+    Set matplotlib backend within a Jupyter Notebook shell. Ths function
+    has the same effect as the line magic ``%matplotlib [backend]`` but is
+    called as a function and includes a check to determine whether the code
+    is running in a notebook shell, so that it can safely be used within a
+    normal python script since it has no effect when not running in a
+    notebook shell.
+
+    Parameters
+    ----------
+    backend : string, optional (default 'inline')
+      Name of backend to be passed to the ``%matplotlib`` line magic
+      command
+    """
+
+    from sporco.util import in_notebook
+    if in_notebook():
+        # See https://stackoverflow.com/questions/35595766
+        get_ipython().run_line_magic('matplotlib', backend)
+
+
+
+def config_notebook_plotting():
+    """
+    Configure plotting functions for inline plotting within a Jupyter
+    Notebook shell. This function has no effect when not within a
+    notebook shell, and may therefore be used within a normal python
+    script.
+    """
+
+    # The name plot here refers to the module plot function
+    global plot
+
+    # Check whether running within a notebook shell and have
+    # not already monkey patched the plot function
+    from sporco.util import in_notebook
+    if in_notebook() and plot.__name__ == 'plot':
+
+        # Set inline backend (i.e. %matplotlib inline) if in
+        set_notebook_plot_backend()
+
+        # Replace plot function with a wrapper function that discards
+        # its return value (within a notebook with inline plotting, plots
+        # are duplicated if the return value from the original function is
+        # not assigned to a variable)
+        plot_original = plot
+        def plot_wrap(*args, **kwargs):
+            plot_original(*args, **kwargs)
+        plot = plot_wrap
+
+        # Replace surf function with a wrapper function that discards
+        # its return value (see comment for plot function)
+        global surf
+        surf_original = surf
+        def surf_wrap(*args, **kwargs):
+            surf_original(*args, **kwargs)
+        surf = surf_wrap
+
+        # Replace contour function with a wrapper function that discards
+        # its return value (see comment for plot function)
+        global contour
+        contour_original = contour
+        def contour_wrap(*args, **kwargs):
+            contour_original(*args, **kwargs)
+        contour = contour_wrap
+
+        # Replace imview function with a wrapper function that discards
+        # its return value (see comment for plot function)
+        global imview
+        imview_original = imview
+        def imview_wrap(*args, **kwargs):
+            imview_original(*args, **kwargs)
+        imview = imview_wrap
+
+        # Disable figure show method (results in a warning if used within
+        # a notebook with inline plotting)
+        import matplotlib.figure
+        def show_disable(self):
+            pass
+        matplotlib.figure.Figure.show = show_disable

@@ -41,41 +41,48 @@ class TestSet01(object):
     def test_04(self):
         fig = plot.figure()
         plot.surf(self.z, x=self.x, y=self.y, title='Surf Test', xlbl='x',
-                  ylbl='y', zlbl='z', fgrf=fig)
+                  ylbl='y', zlbl='z', cntr=5, fgrf=fig)
         plot.close()
 
 
     def test_05(self):
-        plot.imview(self.z.astype(np.float16), title='Imview Test', cbar=True)
+        fig = plot.figure()
+        plot.contour(self.z, title='Contour Test', xlbl='x', ylbl='y',
+        fgrf=fig)
         plot.close()
 
 
     def test_06(self):
+        plot.imview(self.z.astype(np.float16), title='Imview Test', cbar=True)
+        plot.close()
+
+
+    def test_07(self):
         fig = plot.figure()
         plot.imview(self.z, title='Imview Test', fltscl=True, fgrf=fig)
         plot.close()
 
 
-    def test_07(self):
-        fg, ax = plot.imview(self.z, title='Imview Test', fltscl=True)
-        plot.imview(self.z, title='Imview Test', fltscl=True, axes=ax)
-
-
     def test_08(self):
+        fg, ax = plot.imview(self.z, title='Imview Test', fltscl=True)
+        plot.imview(self.z, title='Imview Test', fltscl=True, axshr=ax)
+
+
+    def test_09(self):
         fig = plot.figure()
         plot.imview((100.0*self.z).astype(np.int16), title='Imview Test',
                     fltscl=True, fgrf=fig)
         plot.close()
 
 
-    def test_09(self):
+    def test_10(self):
         fig = plot.figure()
         plot.imview((100.0*self.z).astype(np.uint16), title='Imview Test',
                     fltscl=True, fgrf=fig)
         plot.close()
 
 
-    def test_10(self):
+    def test_11(self):
         z3 = np.dstack((self.z, 2*self.z, 3*self.z))
         fig = plot.figure()
         plot.imview(z3, title='Imview Test', fgrf=fig)
