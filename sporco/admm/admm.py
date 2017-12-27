@@ -1695,7 +1695,7 @@ class ADMMConsensus(ADMM):
 
 
     def prox_g(self, X, rho):
-        """Proximal operator of :math:`g`.
+        r"""Proximal operator of :math:`\rho^{-1} g(\cdot)`.
 
         Overriding this method is required.
         """
