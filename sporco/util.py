@@ -159,7 +159,7 @@ def array2ntpl(arr):
     Convert a :class:`numpy.ndarray` object constructed by :func:`ntpl2array`
     back to the original :func:`collections.namedtuple` representation.
 
-   Parameters
+    Parameters
     ----------
     arr : ndarray
       Array representation of named tuple constructed by :func:`ntpl2array`
@@ -648,6 +648,50 @@ def netgetdata(url, maxtry=3, timeout=10):
         raise err
 
     return io.BytesIO(cntnt)
+
+
+
+def in_ipython():
+    """
+    Determine whether code is running in an ipython shell.
+
+    Returns
+    -------
+    ip : bool
+      True if running in an ipython shell, False otherwise
+    """
+
+    try:
+        # See https://stackoverflow.com/questions/15411967
+        shell = get_ipython().__class__.__name__
+        if shell == 'TerminalInteractiveShell':
+            return True
+        else:
+            return False
+    except NameError:
+        return False
+
+
+
+def in_notebook():
+    """
+    Determine whether code is running in a Jupyter Notebook shell.
+
+    Returns
+    -------
+    ip : bool
+      True if running in a notebook shell, False otherwise
+    """
+
+    try:
+        # See https://stackoverflow.com/questions/15411967
+        shell = get_ipython().__class__.__name__
+        if shell == 'ZMQInteractiveShell':
+            return True
+        else:
+            return False
+    except NameError:
+        return False
 
 
 
