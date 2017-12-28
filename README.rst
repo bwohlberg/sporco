@@ -24,7 +24,7 @@ SParse Optimization Research COde (SPORCO)
     :target: https://github.com/bwohlberg/sporco
     :alt: Package License
 .. image:: http://mybinder.org/badge.svg
-    :target: https://mybinder.org/v2/gh/bwohlberg/sporco/master?filepath=index.ipynb
+    :target: https://mybinder.org/v2/gh/bwohlberg/sporco-notebooks/master?filepath=index.ipynb
     :alt: Binder
 
 
@@ -68,7 +68,7 @@ To run these scripts prior to installing the package it will be necessary to fir
 from the root directory of the package.
 
 
-`Jupyter Notebook <http://jupyter.org/>`_ versions of some of the demos in ``examples`` are also available in the same directories as the corresponding demo scripts. The scripts can also be viewed online via `nbviewer <https://nbviewer.jupyter.org/github/bwohlberg/sporco/blob/master/index.ipynb>`_, or run interactively at `binder <https://mybinder.org/v2/gh/bwohlberg/sporco/master?filepath=index.ipynb>`_.
+`Jupyter Notebook <http://jupyter.org/>`_ examples are also `available <https://github.com/bwohlberg/sporco-notebooks>`_. These examples can be viewed online via `nbviewer <https://nbviewer.jupyter.org/github/bwohlberg/sporco-notebooks/blob/master/index.ipynb>`_, or run interactively at `binder <https://mybinder.org/v2/gh/bwohlberg/sporco-notebooks/master?filepath=index.ipynb>`_.
 
 
 
