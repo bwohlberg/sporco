@@ -362,6 +362,16 @@ autodoc_member_order = 'bysource'
 #exclude_patterns = ['_build', '**tests**', '**spi**']
 
 
+# Avoid errors when extension module sporco_cuda is not installed
+if sys.version[0] == '3':
+    import unittest.mock as mock
+elif sys.version[0] == '2':
+    import mock
+else:
+    raise ImportError("Can't determine how to import mock.")
+sys.modules['sporco.cuda'] = mock.Mock()
+
+
 # Ensure that the __init__ method gets documented.
 def skip_member(app, what, name, obj, skip, options):
     if name == "__init__":

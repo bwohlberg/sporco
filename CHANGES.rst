@@ -11,6 +11,7 @@ Version 0.1.9   (not yet released)
 - Simplified array shape requirements for option L1Weight in modules
   admm.cbpdn and admm.cbpdntv
 - Minimum required Numpy version is now 1.11
+- Added sporco.cuda interface to CUDA extension
 
 
 Version 0.1.8   (2017-11-04)
