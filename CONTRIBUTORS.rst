@@ -4,7 +4,7 @@
 
 * Cristina Garcia-Cardona
 
-  - fista sub-package
+  - FISTA sub-package
   - MacOS installation instructions
   - Comments, suggestions, and bug reports
 
