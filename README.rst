@@ -55,7 +55,7 @@ Scripts illustrating usage of the package can be found in the ``examples`` direc
 
 ::
 
-   python examples/stdsparse/demo_bpdn.py
+   python examples/scripts/sc/bpdn.py
 
 
 To run these scripts prior to installing the package it will be necessary to first set the ``PYTHONPATH`` environment variable to include the root directory of the package. For example, in a ``bash`` shell
