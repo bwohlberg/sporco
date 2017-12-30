@@ -169,13 +169,10 @@ class FISTA(with_metaclass(_FISTA_Meta, object)):
                     'StatusHeader': True, 'DataType': None,
                     'X0': None, 'Callback': None,
                     'MaxMainIter': 1000, 'IterTimer': 'solve',
-                    'RelStopTol': 1e-3,
-                    'L': None,
-                    'BackTrack' :
+                    'RelStopTol': 1e-3, 'L': None,
+                    'BackTrack':
                     {'Enabled': False, 'Eta': 1.2, 'MaxIter': 100},
-                    'AutoStop' :
-                    {'Enabled': False, 'Tau0': 1e-2}
-                   }
+                    'AutoStop': {'Enabled': False, 'Tau0': 1e-2}}
 
         def __init__(self, opt=None):
             """Initialise FISTA algorithm options object."""
@@ -200,7 +197,7 @@ class FISTA(with_metaclass(_FISTA_Meta, object)):
     hdrtxt_objfn = ('Fnc', 'f', 'g')
     """Display column headers associated with the objective function;
     see :meth:`eval_objfun`"""
-    hdrval_objfun = {'Fnc' : 'ObjFun', 'f' : 'FVal', 'g' : 'GVal'}
+    hdrval_objfun = {'Fnc': 'ObjFun', 'f': 'FVal', 'g': 'GVal'}
     """Dictionary mapping display column headers in :attr:`hdrtxt_objfn`
     to IterationStats entries"""
 
