@@ -132,10 +132,10 @@ def plot(y, x=None, ptyp='plot', xlbl=None, ylbl=None, title=None,
     pltmth = getattr(ax, ptyp)
     if x is None:
         pltln = pltmth(y, linewidth=lwidth, linestyle=lstyle,
-                    marker=mstyle, markersize=msize)
+                       marker=mstyle, markersize=msize)
     else:
         pltln = pltmth(x, y, linewidth=lwidth, linestyle=lstyle,
-                    marker=mstyle, markersize=msize)
+                       marker=mstyle, markersize=msize)
 
     if title is not None:
         ax.set_title(title)
@@ -242,7 +242,7 @@ def surf(z, x=None, y=None, elev=None, azim=None, xlbl=None, ylbl=None,
     if cntr is not None:
         offset = np.around(z.min() - 0.2 * (z.max() - z.min()), 3)
         ax.contour(xg, yg, z, cntr, lw=4, cmap=cmap, linestyles="solid",
-                    offset=offset)
+                   offset=offset)
         ax.set_zlim(offset, ax.get_zlim()[1])
 
     if title is not None:
