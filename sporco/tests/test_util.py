@@ -184,7 +184,17 @@ class TestSet01(object):
             dat = util.netgetdata('http://devnull')
 
 
+    def test_23(self):
+        val = util.in_ipython()
+        assert(val is True or val is False)
+
+
+    def test_24(self):
+        val = util.in_notebook()
+        assert(val is True or val is False)
+
+
     @pytest.mark.skipif(platform.system() == 'Windows',
                         reason='Feature not supported under Windows')
-    def test_23(self):
+    def test_25(self):
         assert(util.idle_cpu_count() >= 1)

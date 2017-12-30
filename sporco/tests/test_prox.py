@@ -101,3 +101,8 @@ class TestSet01(object):
         prox_test_axes(self.V1, nrm, prx, self.alpha)
         prox_test_axes(self.V2, nrm, prx, self.alpha)
 
+
+    def test_12(self):
+        assert(np.sum(np.abs(prox.prox_l1l2(self.V1, 1e-2, 1e-2))) > 0)
+        assert(prox.norm_nuclear(self.V1) > 0)
+
