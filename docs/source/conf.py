@@ -21,6 +21,7 @@ import re, shutil, tempfile
 
 sys.path.append(os.path.dirname(__file__))
 import callgraph
+import docntbk
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -484,9 +485,35 @@ def gencallgraph(_):
 
 
 
+def genexamples(_):
+
+    import zipfile
+    from sporco.util import netgetdata
+
+    url = 'https://codeload.github.com/bwohlberg/sporco-notebooks/zip/master'
+    print('Constructing docs from example scripts')
+    epth = '../../examples' if on_rtd else 'examples'
+    spth = os.path.join(epth, 'scripts')
+    npth = os.path.join(epth, 'notebooks')
+    rpth = 'examples' if on_rtd else 'docs/source/examples'
+
+    if not os.path.exists(npth):
+        print('Notebooks required for examples section not found: '
+            'downloading from sporco-notebooks repo on GitHub')
+        zipdat = netgetdata(url)
+        zipobj = zipfile.ZipFile(zipdat)
+        zipobj.extractall(path=epth)
+        os.rename(os.path.join(epth, 'sporco-notebooks-master'),
+                  os.path.join(epth, 'notebooks'))
+
+    docntbk.make_example_scripts_docs(spth, npth, rpth)
+
+
+
 def setup(app):
     app.connect("autodoc-skip-member", skip_member)
     app.connect('builder-inited', run_apidoc)
+    app.connect('builder-inited', genexamples)
     #app.connect('autodoc-process-docstring', process_docstring)
     #app.connect('autodoc-process-signature', process_signature)
 

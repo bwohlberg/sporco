@@ -19,20 +19,7 @@ via an ADMM problem of the form
    I \\ I \\ \vdots \end{array} \right) \mathbf{y} \;\;.
 
 See :class:`.ConvCnstrMOD_Consensus` as an example of a class derived
-from :class:`.ADMMConsensus`, or see the simple example in
-``examples/misc/demo_admmcnsns.py``, included below.
-
-.. container:: toggle
-
-    .. container:: header
-
-       :class:`.ADMMConsensus` usage example
-
-    .. literalinclude:: ../../../examples/misc/demo_admmcnsns.py
-       :language: python
-       :lines: 9-
-
-
+from :class:`.ADMMConsensus`, or see the simple :ref:`usage example <example_misc_admmcnsns>`.
 
 Classes derived from :class:`.ADMMConsensus` should override/define
 the methods and attributes in the following sections.

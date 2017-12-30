@@ -9,17 +9,4 @@ problem
    \| X \|_* + \lambda \| Y \|_1 \quad \text{ such that }
    \quad X + Y = S
 
-
-
-Usage Examples
---------------
-
-.. container:: toggle
-
-    .. container:: header
-
-        :class:`.RobustPCA` usage
-
-    .. literalinclude:: ../../../examples/misc/demo_rpca.py
-       :language: python
-       :lines: 9-
+A :ref:`usage example <example_misc_rpca>` is available.

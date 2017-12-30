@@ -79,6 +79,10 @@ docs/source/sporco.*.*.rst
 docs/source/_static/jonga
 docs/Makefile
 
+# Example notebooks and derived docs
+examples/notebooks
+docs/source/examples
+
 # PyBuilder
 target/
 

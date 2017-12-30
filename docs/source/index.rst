@@ -10,6 +10,7 @@ SPORCO Documentation
    admm
    fista
    util
+   examples/index
    notes
    modules
    zreferences
@@ -42,6 +43,7 @@ SPORCO Documentation
    fista/fista
    fista/fistadft
    util
+   examples/index
    notes
    modules
    zreferences

@@ -100,6 +100,7 @@ Module :mod:`.admm.cbpdn` includes the following classes:
 
 |
 
+
 Module :mod:`.admm.cbpdntv` includes the following classes:
 
 * :class:`.ConvBPDNScalarTV`
@@ -152,179 +153,14 @@ Module :mod:`.admm.cbpdntv` includes the following classes:
   :math:`i`.
 
 
+|
 
+:ref:`Usage examples <example_convolutional_sparse_coding_index>` are available.
 
-Usage Examples
---------------
 
-Single-Channel (Greyscale) Input
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The following example scripts demonstrate usage for each of the
-classes in the :mod:`.admm.cbpdn` module with single-channel (greyscale)
-input images.
 
+Multi-channel Data
+------------------
 
-.. container:: toggle
-
-    .. container:: header
-
-        :class:`.admm.cbpdn.ConvBPDN` usage
-
-    .. literalinclude:: ../../../examples/cnvsparse/demo_cbpdn_gry.py
-       :language: python
-       :lines: 9-
-
-
-.. container:: toggle
-
-    .. container:: header
-
-        :class:`.ConvElasticNet` usage
-
-    .. literalinclude:: ../../../examples/cnvsparse/demo_celnet.py
-       :language: python
-       :lines: 9-
-
-
-.. container:: toggle
-
-    .. container:: header
-
-        :class:`.ConvBPDNGradReg` usage
-
-    .. literalinclude:: ../../../examples/cnvsparse/demo_cbpdn_grd_gry.py
-       :language: python
-       :lines: 9-
-
-
-.. container:: toggle
-
-    .. container:: header
-
-        :class:`.ConvBPDNProjL1` usage
-
-    .. literalinclude:: ../../../examples/cnvsparse/demo_cbpdnl1prj.py
-       :language: python
-       :lines: 9-
-
-
-.. container:: toggle
-
-    .. container:: header
-
-        :class:`.ConvMinL1InL2Ball` usage
-
-    .. literalinclude:: ../../../examples/cnvsparse/demo_cnvminl1.py
-       :language: python
-       :lines: 9-
-
-
-.. container:: toggle
-
-    .. container:: header
-
-        :class:`.ConvBPDNMaskDcpl` usage
-
-    .. literalinclude:: ../../../examples/cnvsparse/demo_cbpdn_md_gry.py
-       :language: python
-       :lines: 9-
-
-
-.. container:: toggle
-
-    .. container:: header
-
-        :class:`.AddMaskSim` usage
-
-    .. literalinclude:: ../../../examples/cnvsparse/demo_cbpdn_ams_gry.py
-       :language: python
-       :lines: 9-
-
-
-
-Multi-Channel (Colour) Input
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-The following example scripts demonstrate usage of the classes in the
-:mod:`.admm.cbpdn` module with multi-channel (all of these examples are for
-RGB colour images, but an arbitrary number of channels is supported)
-input images. Multi-channel input examples are not provided for all
-classes since the usage differences for single- and multi-channel
-inputs are the same across most of the classes. There are two
-fundamentally different ways of representing multi-channel input
-images: a single-channel dictionary together with a separate set of
-coefficient maps for each channel, or a multi-channel dictionary with
-a single set of coefficient maps shared across all channels. In the
-former case the coefficient maps can be independent across the
-different channels (see the first :class:`.admm.cbpdn.ConvBPDN` example
-below), or expected correlations between the channels can be modelled
-via a joint sparsity penalty (see the :class:`.ConvBPDNJoint` example
-below). A more detailed discussion of these issues can be found in
-:cite:`wohlberg-2016-convolutional`.
-
-
-.. container:: toggle
-
-    .. container:: header
-
-        :class:`.admm.cbpdn.ConvBPDN` usage (greyscale dictionary, independent channels)
-
-    .. literalinclude:: ../../../examples/cnvsparse/demo_cbpdn_clr_gd.py
-       :language: python
-       :lines: 9-
-
-
-.. container:: toggle
-
-    .. container:: header
-
-        :class:`.ConvBPDNJoint` usage (greyscale dictionary, channels coupled via joint sparsity penalty)
-
-    .. literalinclude:: ../../../examples/cnvsparse/demo_cbpdnjnt_clr.py
-       :language: python
-       :lines: 9-
-
-
-.. container:: toggle
-
-    .. container:: header
-
-        :class:`admm.cbpdn.ConvBPDN` usage (colour dictionary)
-
-    .. literalinclude:: ../../../examples/cnvsparse/demo_cbpdn_clr_cd.py
-       :language: python
-       :lines: 9-
-
-
-.. container:: toggle
-
-    .. container:: header
-
-        :class:`.ConvBPDNGradReg` usage (colour dictionary)
-
-    .. literalinclude:: ../../../examples/cnvsparse/demo_cbpdn_grd_clr.py
-       :language: python
-       :lines: 9-
-
-
-.. container:: toggle
-
-    .. container:: header
-
-        :class:`.ConvBPDNMaskDcpl` usage (colour dictionary)
-
-    .. literalinclude:: ../../../examples/cnvsparse/demo_cbpdn_md_clr.py
-       :language: python
-       :lines: 9-
-
-
-.. container:: toggle
-
-    .. container:: header
-
-        :class:`.AddMaskSim` usage (colour dictionary)
-
-    .. literalinclude:: ../../../examples/cnvsparse/demo_cbpdn_ams_clr.py
-       :language: python
-       :lines: 9-
+Some of the example scripts demonstrate usage of the classes in the :mod:`.admm.cbpdn` module with multi-channel (all of these examples are for RGB colour images, but an arbitrary number of channels is supported) input images. Multi-channel input examples are not provided for all classes since the usage differences for single- and multi-channel inputs are the same across most of the classes. There are two fundamentally different ways of representing multi-channel input images: a single-channel dictionary together with a separate set of coefficient maps for each channel, or a multi-channel dictionary with a single set of coefficient maps shared across all channels. In the former case the coefficient maps can be independent across the different channels, or expected correlations between the channels can be modelled via a joint sparsity penalty. A more detailed discussion of these issues can be found in :cite:`wohlberg-2016-convolutional`.

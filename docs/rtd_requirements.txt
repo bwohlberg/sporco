@@ -1,9 +1,12 @@
 future
 scipy
-sphinx
+sphinx>=1.2.2
 numpydoc
 sphinxcontrib-bibtex
 sphinx_tabs
 sphinx_fontawesome
 pygraphviz
 jonga
+jupyter
+# The version of py2nb available from PyPI is apparently no longer maintained
+git+https://github.com/leonardt/py2nb#egg=py2nb

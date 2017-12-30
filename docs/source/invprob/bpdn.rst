@@ -56,66 +56,10 @@ This module includes the following classes:
      :label: minl1inl2
 
 
+:ref:`Usage examples <example_sparse_coding_index>` are available.
+
 
 A Note on Problem Naming
 ------------------------
 
 Unfortunately there is no consistent use of names for problems :eq:`bpdn`, :eq:`lasso`, and :eq:`minl1inl2` in the literature. Problem :eq:`bpdn` is referred to here as Basis Pursuit DeNoising (BPDN) since this is the form of the problem to which this name was first applied :cite:`chen-1998-atomic`, but one can also find problem :eq:`minl1inl2` referred to as BPDN, and problem :eq:`bpdn` referred to as the lasso, which is the name that was originally applied to problem :eq:`lasso` :cite:`tibshirani-1996-regression`.
-
-
-Usage Examples
---------------
-
-.. container:: toggle
-
-    .. container:: header
-
-        :class:`.BPDN` usage
-
-    .. literalinclude:: ../../../examples/stdsparse/demo_bpdn.py
-       :language: python
-       :lines: 9-
-
-
-.. container:: toggle
-
-    .. container:: header
-
-        :class:`.BPDNJoint` usage
-
-    .. literalinclude:: ../../../examples/stdsparse/demo_bpdnjnt.py
-       :language: python
-       :lines: 9-
-
-
-.. container:: toggle
-
-    .. container:: header
-
-        :class:`.ElasticNet` usage
-
-    .. literalinclude:: ../../../examples/stdsparse/demo_elnet.py
-       :language: python
-       :lines: 9-
-
-
-.. container:: toggle
-
-    .. container:: header
-
-        :class:`.BPDNProjL1` usage
-
-    .. literalinclude:: ../../../examples/stdsparse/demo_bpdnl1prj.py
-       :language: python
-       :lines: 9-
-
-
-.. container:: toggle
-
-    .. container:: header
-
-        :class:`.MinL1InL2Ball` usage
-
-    .. literalinclude:: ../../../examples/stdsparse/demo_minl1.py
-       :language: python
-       :lines: 9-

@@ -9,17 +9,4 @@ problem
    \| W(\mathbf{x} - \mathbf{s}) \|_1 + \frac{\lambda}{2} \;
    \| D \mathbf{x} \|_2^2
 
-
-
-Usage Examples
---------------
-
-.. container:: toggle
-
-    .. container:: header
-
-        :class:`.SplineL1` usage
-
-    .. literalinclude:: ../../../examples/misc/demo_spline.py
-       :language: python
-       :lines: 9-
+A :ref:`usage example <example_misc_spline>` is available.

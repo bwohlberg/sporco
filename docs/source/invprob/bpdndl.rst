@@ -10,16 +10,4 @@ problem
    \quad \|\mathbf{d}_m\|_2 = 1
 
 
-
-Usage Examples
---------------
-
-.. container:: toggle
-
-    .. container:: header
-
-        :class:`.BPDNDictLearn` usage
-
-    .. literalinclude:: ../../../examples/stdsparse/demo_bpdndl.py
-       :language: python
-       :lines: 9-
+A :ref:`usage example <example_dl_bpdndl>` is available.

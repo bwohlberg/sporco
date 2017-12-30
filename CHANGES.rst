@@ -12,6 +12,9 @@ Version 0.1.9   (not yet released)
   admm.cbpdn and admm.cbpdntv
 - Minimum required Numpy version is now 1.11
 - Added sporco.cuda interface to CUDA extension
+- Completely restructured example scripts from which example Jupyter
+  notebooks and corresponding docs pages are generated
+
 
 
 Version 0.1.8   (2017-11-04)
