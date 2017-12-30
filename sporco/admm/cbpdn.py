@@ -2356,7 +2356,7 @@ class AddMaskSim(object):
 
 
     def solve(self):
-        """Call the solve method if the inner cbpdn object and strip
+        """Call the solve method of the inner cbpdn object and strip
         the AMS component from the returned result.
         """
 

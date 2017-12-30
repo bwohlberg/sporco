@@ -127,15 +127,15 @@ def plot(y, x=None, ptyp='plot', xlbl=None, ylbl=None, title=None,
         else:
             ax = axrf
 
-    if not ptyp in ('plot', 'semilogx', 'semilogy', 'loglog'):
+    if ptyp not in ('plot', 'semilogx', 'semilogy', 'loglog'):
         raise ValueError("Invalid plot type '%s'" % ptyp)
     pltmth = getattr(ax, ptyp)
     if x is None:
         pltln = pltmth(y, linewidth=lwidth, linestyle=lstyle,
-                        marker=mstyle, markersize=msize)
+                    marker=mstyle, markersize=msize)
     else:
         pltln = pltmth(x, y, linewidth=lwidth, linestyle=lstyle,
-                        marker=mstyle, markersize=msize)
+                    marker=mstyle, markersize=msize)
 
     if title is not None:
         ax.set_title(title)
@@ -158,9 +158,9 @@ def plot(y, x=None, ptyp='plot', xlbl=None, ylbl=None, title=None,
 
 
 
-def surf(z, x=None, y=None,  elev=None, azim=None, xlbl=None, ylbl=None,
-        zlbl=None, title=None, lblpad=8.0, cntr=None, cmap=None,
-        fgsz=None, fgrf=None, axrf=None, fgnm=None):
+def surf(z, x=None, y=None, elev=None, azim=None, xlbl=None, ylbl=None,
+         zlbl=None, title=None, lblpad=8.0, cntr=None, cmap=None,
+         fgsz=None, fgrf=None, axrf=None, fgnm=None):
     """
     Plot a 2D surface in 3D.
 
@@ -241,8 +241,8 @@ def surf(z, x=None, y=None,  elev=None, azim=None, xlbl=None, ylbl=None,
 
     if cntr is not None:
         offset = np.around(z.min() - 0.2 * (z.max() - z.min()), 3)
-        cs = ax.contour(xg, yg, z, cntr, lw=4, cmap=cmap, linestyles="solid",
-                        offset=offset)
+        ax.contour(xg, yg, z, cntr, lw=4, cmap=cmap, linestyles="solid",
+                    offset=offset)
         ax.set_zlim(offset, ax.get_zlim()[1])
 
     if title is not None:
@@ -371,7 +371,7 @@ def imview(img, title=None, copy=True, fltscl=False, intrp='nearest',
 
     Pixel values are displayed when the pointer is over valid image
     data.  If a figure object is specified then the image is drawn in
-    that figure, and plt.show() is not called.  The figure is closed
+    that figure, and fig.show() is not called.  The figure is closed
     on key entry 'q'.
 
     Parameters
@@ -477,7 +477,7 @@ def imview(img, title=None, copy=True, fltscl=False, intrp='nearest',
         if cbar is None:
             # See http://chris35wills.github.io/matplotlib_axis
             cax.set_axis_bgcolor('none')
-            for axis in ['top','bottom','left','right']:
+            for axis in ['top', 'bottom', 'left', 'right']:
                 cax.spines[axis].set_linewidth(0)
             cax.set_xticks([])
             cax.set_yticks([])

@@ -149,7 +149,7 @@ class ConvCnstrMODMaskDcplBase(admm.ADMMTwoBlockCnstrnt):
 
 
     class Options(admm.ADMMTwoBlockCnstrnt.Options):
-        """ConvCnstrMODMaskDcplBase algorithm options
+        r"""ConvCnstrMODMaskDcplBase algorithm options
 
         Options include all of those defined in
         :class:`.ADMMTwoBlockCnstrnt.Options`, together with
@@ -564,7 +564,7 @@ class ConvCnstrMODMaskDcplBase(admm.ADMMTwoBlockCnstrnt):
 
 
 class ConvCnstrMODMaskDcpl_IterSM(ConvCnstrMODMaskDcplBase):
-    """
+    r"""
     **Class inheritance structure**
 
     .. inheritance-diagram:: ConvCnstrMODMaskDcpl_IterSM
@@ -645,7 +645,7 @@ class ConvCnstrMODMaskDcpl_IterSM(ConvCnstrMODMaskDcplBase):
 
 
 class ConvCnstrMODMaskDcpl_CG(ConvCnstrMODMaskDcplBase):
-    """
+    r"""
     **Class inheritance structure**
 
     .. inheritance-diagram:: ConvCnstrMODMaskDcpl_CG

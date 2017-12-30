@@ -1729,7 +1729,7 @@ class ADMMConsensus(ADMM):
 
 
     def obfn_fvar(self, i):
-        """Variable to be evaluated in computing :math:`f_i(\cdot)`,
+        r"""Variable to be evaluated in computing :math:`f_i(\cdot)`,
         depending on the ``fEvalX`` option value.
         """
 
@@ -1738,7 +1738,7 @@ class ADMMConsensus(ADMM):
 
 
     def obfn_gvar(self):
-        """Variable to be evaluated in computing :math:`g(\cdot)`,
+        r"""Variable to be evaluated in computing :math:`g(\cdot)`,
         depending on the ``gEvalY`` option value.
         """
 

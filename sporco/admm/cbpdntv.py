@@ -270,7 +270,7 @@ class ConvBPDNScalarTV(admm.ADMM):
 
 
     def xstep(self):
-        """Minimise Augmented Lagrangian with respect to
+        r"""Minimise Augmented Lagrangian with respect to
         :math:`\mathbf{x}`."""
 
         self.YU[:] = self.Y - self.U
@@ -305,7 +305,7 @@ class ConvBPDNScalarTV(admm.ADMM):
 
 
     def ystep(self):
-        """Minimise Augmented Lagrangian with respect to
+        r"""Minimise Augmented Lagrangian with respect to
         :math:`\mathbf{y}`."""
 
         AXU = self.AX + self.U
@@ -483,7 +483,7 @@ class ConvBPDNScalarTV(admm.ADMM):
 
 
     def cnst_A1T(self, X):
-        """Compute :math:`A_1^T \mathbf{x}` where :math:`A_1 \mathbf{x}`
+        r"""Compute :math:`A_1^T \mathbf{x}` where :math:`A_1 \mathbf{x}`
         is a component of the ADMM problem constraint. In this case
         :math:`A_1^T \mathbf{x} = \mathbf{x}`.
         """
@@ -699,7 +699,7 @@ class ConvBPDNVectorTV(ConvBPDNScalarTV):
 
 
     def ystep(self):
-        """Minimise Augmented Lagrangian with respect to
+        r"""Minimise Augmented Lagrangian with respect to
         :math:`\mathbf{y}`."""
 
         AXU = self.AX + self.U
@@ -1014,7 +1014,7 @@ class ConvBPDNRecTV(admm.ADMM):
 
 
     def xstep(self):
-        """Minimise Augmented Lagrangian with respect to
+        r"""Minimise Augmented Lagrangian with respect to
         :math:`\mathbf{x}`."""
 
         self.YU[:] = self.Y - self.U
@@ -1086,7 +1086,7 @@ class ConvBPDNRecTV(admm.ADMM):
 
 
     def ystep(self):
-        """Minimise Augmented Lagrangian with respect to
+        r"""Minimise Augmented Lagrangian with respect to
         :math:`\mathbf{y}`."""
 
         AXU = self.AX + self.U

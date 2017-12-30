@@ -420,7 +420,7 @@ class ConvCnstrMODBase(admm.ADMMEqual):
 
 
 class ConvCnstrMOD_IterSM(ConvCnstrMODBase):
-    """
+    r"""
     **Class inheritance structure**
 
     .. inheritance-diagram:: ConvCnstrMOD_IterSM
@@ -493,7 +493,7 @@ class ConvCnstrMOD_IterSM(ConvCnstrMODBase):
 
 
 class ConvCnstrMOD_CG(ConvCnstrMODBase):
-    """
+    r"""
     **Class inheritance structure**
 
     .. inheritance-diagram:: ConvCnstrMOD_CG
@@ -589,7 +589,7 @@ class ConvCnstrMOD_CG(ConvCnstrMODBase):
 
 
 class ConvCnstrMOD_Consensus(admm.ADMMConsensus):
-    """
+    r"""
     **Class inheritance structure**
 
     .. inheritance-diagram:: ConvCnstrMOD_Consensus
