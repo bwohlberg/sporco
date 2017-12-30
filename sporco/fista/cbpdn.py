@@ -92,7 +92,7 @@ class ConvBPDN(fista.FISTADFT):
 
 
     class Options(fista.FISTADFT.Options):
-        """ConvBPDN algorithm options
+        r"""ConvBPDN algorithm options
 
         Options include all of those defined in
         :class:`.fista.FISTADFT.Options`, together with
