@@ -15,6 +15,7 @@ coverage:
 ignore:
   - "sporco/tests"
   - "sporco/admm/tests"
+  - "sporco/fista/tests"
   - "test_*.py"
 
 parsers:
