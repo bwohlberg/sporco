@@ -1,3 +1,8 @@
+# -*- coding: utf-8 -*-
+
+"""Interface to the sporco-cuda extension package"""
+
+
 try:
     # Import functions in sporco_cuda.util and sporco_cuda.cbpdn into
     # namespace of sporco.cuda module
