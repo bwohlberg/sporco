@@ -13,6 +13,7 @@ from __future__ import print_function
 from builtins import range
 from builtins import object
 
+import sys
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
@@ -363,8 +364,8 @@ def contour(z, x=None, y=None, v=5, xlbl=None, ylbl=None, title=None,
 
 
 def imview(img, title=None, copy=True, fltscl=False, intrp='nearest',
-           norm=None, cbar=False, axshr=None, cmap=None,
-           fgsz=(12, 12), fgrf=None, axrf=None, fgnm=None):
+           norm=None, cbar=False, cmap=None, fgsz=(12, 12), fgrf=None,
+           axrf=None, fgnm=None):
     """
     Display an image.
 
@@ -584,13 +585,11 @@ def config_notebook_plotting():
     script.
     """
 
-    # The name plot here refers to the module plot function
-    global plot
-
     # Check whether running within a notebook shell and have
     # not already monkey patched the plot function
     from sporco.util import in_notebook
-    if in_notebook() and plot.__name__ == 'plot':
+    module = sys.modules[__name__]
+    if in_notebook() and module.plot.__name__ == 'plot':
 
         # Set inline backend (i.e. %matplotlib inline) if in
         set_notebook_plot_backend()
@@ -599,34 +598,31 @@ def config_notebook_plotting():
         # its return value (within a notebook with inline plotting, plots
         # are duplicated if the return value from the original function is
         # not assigned to a variable)
-        plot_original = plot
+        plot_original = module.plot
         def plot_wrap(*args, **kwargs):
             plot_original(*args, **kwargs)
-        plot = plot_wrap
+        module.plot = plot_wrap
 
         # Replace surf function with a wrapper function that discards
         # its return value (see comment for plot function)
-        global surf
-        surf_original = surf
+        surf_original = module.surf
         def surf_wrap(*args, **kwargs):
             surf_original(*args, **kwargs)
-        surf = surf_wrap
+        module.surf = surf_wrap
 
         # Replace contour function with a wrapper function that discards
         # its return value (see comment for plot function)
-        global contour
-        contour_original = contour
+        contour_original = module.contour
         def contour_wrap(*args, **kwargs):
             contour_original(*args, **kwargs)
-        contour = contour_wrap
+        module.contour = contour_wrap
 
         # Replace imview function with a wrapper function that discards
         # its return value (see comment for plot function)
-        global imview
-        imview_original = imview
+        imview_original = module.imview
         def imview_wrap(*args, **kwargs):
             imview_original(*args, **kwargs)
-        imview = imview_wrap
+        module.imview = imview_wrap
 
         # Disable figure show method (results in a warning if used within
         # a notebook with inline plotting)

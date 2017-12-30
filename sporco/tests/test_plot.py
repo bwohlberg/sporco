@@ -7,6 +7,26 @@ matplotlib.use('Agg')
 
 import numpy as np
 from sporco import plot
+from sporco import util
+
+
+# Monkey patch in_ipython and in_notebook functions to allow testing of
+# functions that depend on these tests
+def in_ipython():
+    return True
+util.in_ipython = in_ipython
+def in_notebook():
+    return True
+util.in_notebook = in_notebook
+
+# Dummy get_ipython function to allow testing of code segments that
+# are only intended to be run within ipython or a notebook
+def get_ipython():
+    class ipython_dummy(object):
+        def run_line_magic(*args):
+            pass
+    return ipython_dummy()
+plot.get_ipython = get_ipython
 
 
 class TestSet01(object):
@@ -33,8 +53,9 @@ class TestSet01(object):
 
 
     def test_03(self):
-        fig = plot.figure()
-        plot.surf(self.z, title='Surf Test', xlbl='x', ylbl='y', zlbl='z')
+        fig, ax = plot.subplots(nrows=1, ncols=1)
+        plot.surf(self.z, title='Surf Test', xlbl='x', ylbl='y', zlbl='z',
+                  elev=0.0, fgrf=fig, axrf=ax)
         plot.close()
 
 
@@ -46,44 +67,65 @@ class TestSet01(object):
 
 
     def test_05(self):
-        fig = plot.figure()
-        plot.contour(self.z, title='Contour Test', xlbl='x', ylbl='y',
-        fgrf=fig)
+        plot.contour(self.z, x=self.x, y=self.y, title='Contour Test',
+                    xlbl='x', ylbl='y')
         plot.close()
 
 
     def test_06(self):
-        plot.imview(self.z.astype(np.float16), title='Imview Test', cbar=True)
+        fig = plot.figure()
+        plot.contour(self.z, title='Contour Test', xlbl='x', ylbl='y',
+                    fgrf=fig)
         plot.close()
 
 
     def test_07(self):
+        plot.imview(self.z.astype(np.float16), title='Imview Test', cbar=True)
+        plot.close()
+
+
+    def test_08(self):
         fig = plot.figure()
         plot.imview(self.z, title='Imview Test', fltscl=True, fgrf=fig)
         plot.close()
 
 
-    def test_08(self):
-        fg, ax = plot.imview(self.z, title='Imview Test', fltscl=True)
-        plot.imview(self.z, title='Imview Test', fltscl=True, axshr=ax)
-
-
     def test_09(self):
+        fg, ax = plot.imview(self.z, title='Imview Test', fltscl=True,
+                            cbar=None)
+        ax.format_coord(0, 0)
+        plot.close(fg)
+
+
+    def test_10(self):
         fig = plot.figure()
         plot.imview((100.0*self.z).astype(np.int16), title='Imview Test',
                     fltscl=True, fgrf=fig)
         plot.close()
 
 
-    def test_10(self):
+    def test_11(self):
         fig = plot.figure()
         plot.imview((100.0*self.z).astype(np.uint16), title='Imview Test',
                     fltscl=True, fgrf=fig)
         plot.close()
 
 
-    def test_11(self):
+    def test_12(self):
         z3 = np.dstack((self.z, 2*self.z, 3*self.z))
         fig = plot.figure()
         plot.imview(z3, title='Imview Test', fgrf=fig)
         plot.close()
+
+
+    def test_13(self):
+        plot.set_ipython_plot_backend()
+
+
+    def test_14(self):
+        plot.set_notebook_plot_backend()
+
+
+    def test_15(self):
+        plot.config_notebook_plotting()
+        assert(plot.plot.__name__ == 'plot_wrap')
