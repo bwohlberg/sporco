@@ -7,7 +7,7 @@ include LICENSE
 include CHANGES.rst
 include requirements.txt
 
-recursive-include examples *.py *.ipynb
+recursive-include examples *.rst *.py
 recursive-include docs Makefile *.py *.rst *.bib *.css
 
 include sporco/data/*.npz

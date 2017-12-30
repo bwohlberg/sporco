@@ -25,12 +25,13 @@ with open(os.path.join(name, '__init__.py')) as f:
 packages = ['sporco', 'sporco.admm', 'sporco.fista']
 
 docdirbase  = 'share/doc/%s-%s' % (name, version)
-
-data = [(docdirbase, glob("*.txt"))]
-dd = os.path.join(docdirbase,'examples')
-pp = os.path.join('examples')
-data.append((dd, glob(os.path.join(pp ,"*/*.py")) +
-                 glob(os.path.join(pp ,"*/*.ipynb"))))
+data = [(os.path.join(docdirbase, 'examples/scripts'),
+        ['examples/scripts/index.rst'])]
+for d in glob('examples/scripts/*'):
+    if os.path.isdir(d):
+        data.append((os.path.join(docdirbase, d),
+                    [os.path.join(d, 'index.rst')] +
+                    glob(os.path.join(d, '*.py'))))
 
 
 longdesc = \
