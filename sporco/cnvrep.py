@@ -906,7 +906,7 @@ def getPcn(dsz, Nv, dimN=2, dimC=1, crp=False, zm=False):
 
     fncdict = {(False, False): _Pcn,     (False, True): _Pcn_zm,
                (True, False):  _Pcn_crp, (True, True):  _Pcn_zm_crp}
-    fnc = fncdict[(crp,zm)]
+    fnc = fncdict[(crp, zm)]
     return functools.partial(fnc, dsz=dsz, Nv=Nv, dimN=dimN, dimC=dimC)
 
 

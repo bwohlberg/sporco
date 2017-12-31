@@ -923,7 +923,7 @@ class ConvCnstrMODMaskDcpl_Consensus(ccmod.ConvCnstrMOD_Consensus):
 
         self.YU1[:] = self.Y1 - self.U1
         self.ZSf = np.conj(self.Zf) * (self.Sf + sl.rfftn(
-                self.YU1, None, self.cri.axisN))
+            self.YU1, None, self.cri.axisN))
         rho = self.rho
         self.rho = 1.0
         super(ConvCnstrMODMaskDcpl_Consensus, self).xstep()
@@ -992,7 +992,7 @@ class ConvCnstrMODMaskDcpl_Consensus(ccmod.ConvCnstrMOD_Consensus):
         nAX = np.sqrt(np.linalg.norm(self.AXnr)**2 +
                       np.linalg.norm(self.AX1nr)**2)
         nY = np.sqrt(np.linalg.norm(self.Y)**2 +
-                      np.linalg.norm(self.Y1)**2)
+                     np.linalg.norm(self.Y1)**2)
         rn = max(nAX, nY, np.linalg.norm(self.S))
 
         # The normalisation factor for the full dual residual is

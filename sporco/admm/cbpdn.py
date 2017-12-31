@@ -14,7 +14,6 @@ from builtins import range
 
 import copy
 from types import MethodType
-import pprint
 import numpy as np
 from scipy import linalg
 
@@ -781,7 +780,7 @@ class ConvBPDNJoint(ConvBPDN):
         """
 
         self.Y = sl.shrink12(self.AX + self.U, (self.lmbda/self.rho)*self.wl1,
-                        (self.mu/self.rho)*self.wl21, axis=self.cri.axisC)
+                             (self.mu/self.rho)*self.wl21, axis=self.cri.axisC)
         GenericConvBPDN.ystep(self)
 
 
@@ -1181,7 +1180,7 @@ class ConvBPDNGradReg(ConvBPDN):
                 DHop = lambda x: np.conj(self.Df) * x
             else:
                 DHop = lambda x: sl.inner(np.conj(self.Df), x,
-                                       axis=self.cri.axisC)
+                                          axis=self.cri.axisC)
             ax = DHop(Dop(self.Xf)) + (self.mu*self.GHGf + self.rho)*self.Xf
             self.xrrs = sl.rrs(ax, b)
         else:
@@ -1527,10 +1526,7 @@ class ConvTwoBlockCnstrnt(admm.ADMMTwoBlockCnstrnt):
         self.cri = cr.CSC_ConvRepIndexing(D, S, dimK=dimK, dimN=dimN)
 
         # Determine whether axis swapping on Y block 0 is necessary
-        if self.cri.C > 1 and self.cri.Cd > 1:
-            self.y0swapaxes = True
-        else:
-            self.y0swapaxes = False
+        self.y0swapaxes = bool(self.cri.C > 1 and self.cri.Cd > 1)
 
         # Call parent class __init__
         Nx = self.cri.M * self.cri.N * self.cri.K
@@ -1731,7 +1727,7 @@ class ConvTwoBlockCnstrnt(admm.ADMMTwoBlockCnstrnt):
         # (dual residual) to avoid this cost.
         Y0f = sl.rfftn(Y0, None, self.cri.axisN)
         return sl.irfftn(sl.inner(np.conj(self.Df), Y0f, axis=self.cri.axisC),
-                                  self.cri.Nv, self.cri.axisN)
+                         self.cri.Nv, self.cri.axisN)
 
 
 

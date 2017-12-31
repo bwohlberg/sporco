@@ -217,7 +217,7 @@ class ConvBPDNScalarTV(admm.ADMM):
                       dtype=self.dtype)
 
         # Set rho_xi attribute
-        self.set_attr('rho_xi', opt['AutoRho','RsdlTarget'], dval=1.0,
+        self.set_attr('rho_xi', opt['AutoRho', 'RsdlTarget'], dval=1.0,
                       dtype=self.dtype)
 
         # Reshape D and S to standard layout
@@ -278,7 +278,7 @@ class ConvBPDNScalarTV(admm.ADMM):
 
         # The sum is over the extra axis indexing spatial gradient
         # operators G_i, *not* over axisM
-        b = self.DSf + self.rho*(YUf[...,-1] + self.Wtv * np.sum(
+        b = self.DSf + self.rho*(YUf[..., -1] + self.Wtv * np.sum(
                     np.conj(self.Gf) * YUf[...,0:-1], axis=-1))
 
         if self.cri.Cd == 1:
@@ -309,9 +309,9 @@ class ConvBPDNScalarTV(admm.ADMM):
         :math:`\mathbf{y}`."""
 
         AXU = self.AX + self.U
-        self.Y[...,0:-1] = sl.shrink2(AXU[...,0:-1], self.mu/self.rho)
-        self.Y[...,-1] = sl.shrink1(AXU[...,-1],
-                                    (self.lmbda/self.rho) * self.Wl1)
+        self.Y[..., 0:-1] = sl.shrink2(AXU[..., 0:-1], self.mu/self.rho)
+        self.Y[..., -1] = sl.shrink1(AXU[..., -1],
+                                     (self.lmbda/self.rho) * self.Wl1)
 
 
 
@@ -321,7 +321,7 @@ class ConvBPDNScalarTV(admm.ADMM):
         """
 
         return self.Xf if self.opt['fEvalX'] else \
-            sl.rfftn(self.Y[...,-1], None, self.cri.axisN)
+            sl.rfftn(self.Y[..., -1], None, self.cri.axisN)
 
 
 
@@ -337,7 +337,7 @@ class ConvBPDNScalarTV(admm.ADMM):
         r"""Get :math:`\mathbf{y}_1` variable, the block of
         :math:`\mathbf{y}` corresponding to the identity operator."""
 
-        return self.Y[...,-1:]
+        return self.Y[..., -1:]
 
 
 
@@ -354,7 +354,7 @@ class ConvBPDNScalarTV(admm.ADMM):
         that is constrained to be equal to :math:`\mathbf{x}`.
         """
 
-        return np.s_[...,-1]
+        return np.s_[..., -1]
 
 
 
@@ -455,8 +455,8 @@ class ConvBPDNScalarTV(admm.ADMM):
 
         if Xf is None:
             Xf = sl.rfftn(X, axes=self.cri.axisN)
-        return self.Wtv[...,np.newaxis] * sl.irfftn(self.Gf *
-                    Xf[...,np.newaxis], self.cri.Nv, axes=self.cri.axisN)
+        return self.Wtv[..., np.newaxis] * sl.irfftn(self.Gf *
+                    Xf[..., np.newaxis], self.cri.Nv, axes=self.cri.axisN)
 
 
 
@@ -468,8 +468,8 @@ class ConvBPDNScalarTV(admm.ADMM):
         """
 
         Xf = sl.rfftn(X, axes=self.cri.axisN)
-        return self.Wtv[...,np.newaxis] * sl.irfftn(np.conj(self.Gf) *
-                    Xf[...,0:-1], self.cri.Nv, axes=self.cri.axisN)
+        return self.Wtv[..., np.newaxis] * sl.irfftn(np.conj(self.Gf) *
+                    Xf[..., 0:-1], self.cri.Nv, axes=self.cri.axisN)
 
 
 
@@ -703,10 +703,10 @@ class ConvBPDNVectorTV(ConvBPDNScalarTV):
         :math:`\mathbf{y}`."""
 
         AXU = self.AX + self.U
-        self.Y[...,0:-1] = sl.shrink2(AXU[...,0:-1], self.mu/self.rho,
-                                      axis=(self.cri.axisM, -1))
-        self.Y[...,-1] = sl.shrink1(AXU[...,-1],
-                                    (self.lmbda/self.rho) * self.Wl1)
+        self.Y[..., 0:-1] = sl.shrink2(AXU[..., 0:-1], self.mu/self.rho,
+                                       axis=(self.cri.axisM, -1))
+        self.Y[..., -1] = sl.shrink1(AXU[..., -1],
+                                     (self.lmbda/self.rho) * self.Wl1)
 
 
 
@@ -902,7 +902,7 @@ class ConvBPDNRecTV(admm.ADMM):
         yshape = list(self.cri.shpX)
         yshape[self.cri.axisM] += len(self.cri.axisN) * self.cri.Cd
         super(ConvBPDNRecTV, self).__init__(Nx, yshape, yshape,
-                                                 S.dtype, opt)
+                                            S.dtype, opt)
 
         # Set l1 term scaling and weight array
         self.lmbda = self.dtype.type(lmbda)
@@ -922,7 +922,7 @@ class ConvBPDNRecTV(admm.ADMM):
                       dtype=self.dtype)
 
         # Set rho_xi attribute
-        self.set_attr('rho_xi', opt['AutoRho','RsdlTarget'], dval=1.0,
+        self.set_attr('rho_xi', opt['AutoRho', 'RsdlTarget'], dval=1.0,
                       dtype=self.dtype)
 
         # Reshape D and S to standard layout
@@ -984,7 +984,7 @@ class ConvBPDNRecTV(admm.ADMM):
 
         # Axes are swapped here for similar reasons to those
         # motivating swapping in cbpdn.ConvTwoBlockCnstrnt.block_sep0
-        Y1 =  np.swapaxes(Y1[..., np.newaxis], self.cri.axisM, -1)
+        Y1 = np.swapaxes(Y1[..., np.newaxis], self.cri.axisM, -1)
 
         return Y1
 
@@ -1050,7 +1050,7 @@ class ConvBPDNRecTV(admm.ADMM):
             # (corresponding to the dictionary and a gradient operator per
             # spatial dimension)
             DfGDf = np.concatenate([self.Df[..., np.newaxis],] +
-                    [np.sqrt(self.rho)*self.GDf[...,k, np.newaxis] for k
+                    [np.sqrt(self.rho)*self.GDf[..., k, np.newaxis] for k
                      in range(self.GDf.shape[-1])], axis=-1)
             self.Xf[:] = sl.solvemdbi_ism(DfGDf, self.rho, b[..., np.newaxis],
                                           self.cri.axisM, -1)[..., 0]
@@ -1218,7 +1218,7 @@ class ConvBPDNRecTV(admm.ADMM):
 
         rl1 = linalg.norm((self.Wl1 * self.obfn_g0var()).ravel(), 1)
         rtv = np.sum(np.sqrt(np.sum(self.obfn_g1var()**2,
-                                    axis=(self.cri.axisC,-1))))
+                                    axis=(self.cri.axisC, -1))))
         return (self.lmbda*rl1 + self.mu*rtv, rl1, rtv)
 
 

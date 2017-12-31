@@ -597,7 +597,7 @@ class TVL1Deconv(admm.ADMM):
         self.Y[..., 0:-1] = sl.shrink2(self.AX[..., 0:-1] + self.U[..., 0:-1],
                         (self.lmbda/self.rho)*self.Wtvna, axis=self.saxes)
         self.Y[..., -1] = sl.shrink1(self.AX[..., -1] + self.U[..., -1] -
-                                    self.S, (1.0/self.rho)*self.Wdf)
+                                     self.S, (1.0/self.rho)*self.Wdf)
 
 
 

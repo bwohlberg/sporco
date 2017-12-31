@@ -230,7 +230,7 @@ class ADMM(with_metaclass(_ADMM_Meta, object)):
 
         instance = super(ADMM, cls).__new__(cls)
         instance.timer = util.Timer(['init', 'solve', 'solve_wo_func',
-                                    'solve_wo_rsdl'])
+                                     'solve_wo_rsdl'])
         instance.timer.start('init')
         return instance
 
@@ -610,9 +610,9 @@ class ADMM(with_metaclass(_ADMM_Meta, object)):
         IterationStats entries.
         """
 
-        dict = {'Itn' : 'Iter'}
+        dict = {'Itn': 'Iter'}
         dict.update(cls.hdrval_objfun)
-        dict.update({'r' : 'PrimalRsdl', 's' : 'DualRsdl', u('ρ') : 'Rho'})
+        dict.update({'r': 'PrimalRsdl', 's': 'DualRsdl', u('ρ'): 'Rho'})
         return dict
 
 

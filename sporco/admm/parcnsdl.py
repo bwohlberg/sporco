@@ -5,6 +5,8 @@
 # and user license can be found in the 'LICENSE.txt' file distributed
 # with the package.
 
+"""Parallel consensus convolutional dictionary learning"""
+
 from __future__ import print_function
 from builtins import range
 
@@ -864,7 +866,7 @@ class ConvBPDNMaskDcplDictLearn_Consensus(cbpdndl.ConvBPDNMaskDcplDictLearn):
             init_mpraw('mp_W', self.dstep.W)
         global mp_Zf
         shp = np.insert(np.roll(self.xstep.Xf.shape, 1), -1, 1)
-        shp[[0,-1]] = shp[[-1,0]]
+        shp[[0, -1]] = shp[[-1, 0]]
         mp_Zf = mpraw_as_np(shp, self.xstep.Xf.dtype)
         global mp_Z_Y0
         init_mpraw_swap('mp_Z_Y0', self.xstep.block_sep0(self.xstep.Y))
