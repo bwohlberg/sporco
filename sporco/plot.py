@@ -67,9 +67,11 @@ def attach_keypress(fig):
 
 def plot(y, x=None, ptyp='plot', xlbl=None, ylbl=None, title=None,
          lgnd=None, lglc=None, lwidth=1.5, lstyle='solid', msize=6.0,
-         mstyle='None', fgsz=None, fgrf=None, axrf=None, fgnm=None):
+         mstyle='None', fgrf=None, axrf=None, fgsz=None, fgnm=None):
     """
-    Plot points or lines in 2D.
+    Plot points or lines in 2D. If a figure object is specified then the
+    plot is drawn in that figure, and fig.show() is not called. The figure
+    is closed on key entry 'q'.
 
     Parameters
     ----------
@@ -99,12 +101,12 @@ def plot(y, x=None, ptyp='plot', xlbl=None, ylbl=None, title=None,
         Marker size
     mstyle : string, optional (default 'None')
         Marker style (see :mod:`matplotlib.markers`)
-    fgsz : tuple (width,height), optional (default None)
-        Specify figure dimensions in inches.
     fgrf : :class:`matplotlib.figure.Figure` object, optional (default None)
         Draw in specified figure instead of creating one
     axrf : :class:`matplotlib.axes.Axes` object, optional (default None)
         Plot in specified axes instead of current axes of figure
+    fgsz : tuple (width,height), optional (default None)
+        Specify figure dimensions in inches
     fgnm : integer, optional (default None)
         Figure number of figure
 
@@ -160,9 +162,11 @@ def plot(y, x=None, ptyp='plot', xlbl=None, ylbl=None, title=None,
 
 def surf(z, x=None, y=None, elev=None, azim=None, xlbl=None, ylbl=None,
          zlbl=None, title=None, lblpad=8.0, cntr=None, cmap=None,
-         fgsz=None, fgrf=None, axrf=None, fgnm=None):
+         fgrf=None, axrf=None, fgsz=None, fgnm=None):
     """
-    Plot a 2D surface in 3D.
+    Plot a 2D surface in 3D. If a figure object is specified then the
+    surface is drawn in that figure, and fig.show() is not called. The
+    figure is closed on key entry 'q'.
 
     Parameters
     ----------
@@ -192,12 +196,12 @@ def surf(z, x=None, y=None, elev=None, azim=None, xlbl=None, ylbl=None,
         a sequence specifies the specific contour levels to plot.
     cmap : :class:`matplotlib.colors.Colormap`, optional (default None)
         Colour map for surface. If none specifed, defaults to cm.coolwarm
-    fgsz : tuple (width,height), optional (default None)
-        Specify figure dimensions in inches
     fgrf : :class:`matplotlib.figure.Figure` object, optional (default None)
         Draw in specified figure instead of creating one
     axrf : :class:`matplotlib.axes.Axes` object, optional (default None)
         Plot in specified axes instead of creating one
+    fgsz : tuple (width,height), optional (default None)
+        Specify figure dimensions in inches
     fgnm : integer, optional (default None)
         Figure number of figure
 
@@ -264,10 +268,12 @@ def surf(z, x=None, y=None, elev=None, azim=None, xlbl=None, ylbl=None,
 
 
 def contour(z, x=None, y=None, v=5, xlbl=None, ylbl=None, title=None,
-            cfntsz=10, alpha=0.5, cmap=None, fgsz=None, fgrf=None,
-            axrf=None, fgnm=None):
+            cfntsz=10, alpha=0.5, cmap=None, fgrf=None, axrf=None,
+            fgsz=None, fgnm=None):
     """
-    Contour plot of a 2D surface.
+    Contour plot of a 2D surface. If a figure object is specified then the
+    plot is drawn in that figure, and fig.show() is not called. The figure
+    is closed on key entry 'q'.
 
     Parameters
     ----------
@@ -293,12 +299,12 @@ def contour(z, x=None, y=None, v=5, xlbl=None, ylbl=None, title=None,
         Underlying image display alpha value
     cmap : :class:`matplotlib.colors.Colormap`, optional (default None)
         Colour map for surface. If none specifed, defaults to cm.coolwarm
-    fgsz : tuple (width,height), optional (default None)
-        Specify figure dimensions in inches
     fgrf : :class:`matplotlib.figure.Figure` object, optional (default None)
         Draw in specified figure instead of creating one
     axrf : :class:`matplotlib.axes.Axes` object, optional (default None)
         Plot in specified axes instead of current axes of figure
+    fgsz : tuple (width,height), optional (default None)
+        Specify figure dimensions in inches
     fgnm : integer, optional (default None)
         Figure number of figure
 
@@ -364,15 +370,13 @@ def contour(z, x=None, y=None, v=5, xlbl=None, ylbl=None, title=None,
 
 
 def imview(img, title=None, copy=True, fltscl=False, intrp='nearest',
-           norm=None, cbar=False, cmap=None, fgsz=(12, 12), fgrf=None,
-           axrf=None, fgnm=None):
+           norm=None, cbar=False, cmap=None, fgrf=None, axrf=None,
+           fgsz=None, fgnm=None):
     """
-    Display an image.
-
-    Pixel values are displayed when the pointer is over valid image
-    data.  If a figure object is specified then the image is drawn in
-    that figure, and fig.show() is not called.  The figure is closed
-    on key entry 'q'.
+    Display an image. Pixel values are displayed when the pointer is over
+    valid image data.  If a figure object is specified then the image is
+    drawn in that figure, and fig.show() is not called. The figure is
+    closed on key entry 'q'.
 
     Parameters
     ----------
@@ -395,18 +399,15 @@ def imview(img, title=None, copy=True, fltscl=False, intrp='nearest',
         scale pixel values for input to the colour map
     cbar : boolean, optional (default False)
         Flag indicating whether to display colorbar
-    axshr : :class:`matplotlib.axes.Axes` object, optional (default None)
-        If specified the new figure shares axes with the specified axes of
-        an existing figure so that a zoom is shared across both figures
     cmap : :class:`matplotlib.colors.Colormap`, optional (default None)
         Colour map for image. If none specifed, defaults to cm.Greys_r
         for monochrome image
-    fgsz : tuple (width,height), optional (default (12,12))
-        Specify figure dimensions in inches
     fgrf : :class:`matplotlib.figure.Figure` object, optional (default None)
         Draw in specified figure instead of creating one
     axrf : :class:`matplotlib.axes.Axes` object, optional (default None)
         Plot in specified axes instead of current axes of figure
+    fgsz : tuple (width,height), optional (default None)
+        Specify figure dimensions in inches
     fgnm : integer, optional (default None)
         Figure number of figure
 
@@ -512,22 +513,22 @@ def imview(img, title=None, copy=True, fltscl=False, intrp='nearest',
 
 
 
-def close(fgrf=None):
+def close(fig=None):
     """
-    Close figure(s).
+    Close figure(s). If a figure object reference or figure number is
+    provided, close the specified figure, otherwise close all figures.
 
     Parameters
     ----------
-    fgrf : :class:`matplotlib.figure.Figure` object or integer or None, \
-           optional (default None)
-        If a figure object reference or figure number is provided, close the
-        specified figure, otherwise close all figures
+    fig : :class:`matplotlib.figure.Figure` object or integer or None,\
+          optional (default None)
+        Figure object or number of figure to close
     """
 
-    if fgrf is None:
+    if fig is None:
         plt.close("all")
     else:
-        plt.close(fgrf)
+        plt.close(fig)
 
 
 
