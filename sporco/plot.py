@@ -245,7 +245,7 @@ def surf(z, x=None, y=None, elev=None, azim=None, xlbl=None, ylbl=None,
 
     if cntr is not None:
         offset = np.around(z.min() - 0.2 * (z.max() - z.min()), 3)
-        ax.contour(xg, yg, z, cntr, lw=4, cmap=cmap, linestyles="solid",
+        ax.contour(xg, yg, z, cntr, linewidths=2, cmap=cmap, linestyles="solid",
                    offset=offset)
         ax.set_zlim(offset, ax.get_zlim()[1])
 
@@ -477,7 +477,8 @@ def imview(img, title=None, copy=True, fltscl=False, intrp='nearest',
         cax = divider.append_axes(pos, size="5%", pad=0.2)
         if cbar is None:
             # See http://chris35wills.github.io/matplotlib_axis
-            cax.set_axis_bgcolor('none')
+            #cax.set_axis_bgcolor('none')
+            cax.set_facecolor('none')
             for axis in ['top', 'bottom', 'left', 'right']:
                 cax.spines[axis].set_linewidth(0)
             cax.set_xticks([])
