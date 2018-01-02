@@ -106,26 +106,26 @@ class TestSet01(object):
 
 
     def test_15(self):
-        bpth = tempfile.mkdtemp()
-        os.mkdir(os.path.join(bpth, 'a'))
-        ipth = os.path.join(bpth, 'a', 'b.png')
-        img = np.ones((32,32))
-        misc.imsave(ipth, img)
-        ei = util.ExampleImages(pth=bpth)
+        ei = util.ExampleImages()
         im = ei.images()
         assert(len(im) > 0)
         gp = ei.groups()
         assert(len(gp) > 0)
-        img = ei.image('b.png', group='a')
-        assert(img.shape == (32,32))
-        im = ei.image('b.png', group='a', scaled=True, dtype=np.float32,
-                      zoom=0.5)
-        os.remove(ipth)
-        os.rmdir(os.path.join(bpth, 'a'))
-        os.rmdir(bpth)
+        gi = ei.groupimages(gp[0])
+        assert(len(gi) > 0)
+        im1 = ei.image('sail.png')
+        im2 = ei.image('sail.png', scaled=True, dtype=np.float32,
+                      idxexp=np.s_[:, 10:-10], zoom=0.5)
 
 
     def test_16(self):
+        pth = os.path.join(os.path.dirname(util.__file__), 'data')
+        ei = util.ExampleImages(pth=pth)
+        im = ei.images()
+        assert(len(im) > 0)
+
+
+    def test_17(self):
         t = util.Timer()
         t.start()
         t0 = t.elapsed()
@@ -137,7 +137,7 @@ class TestSet01(object):
         assert(len(t.labels()) > 0)
 
 
-    def test_17(self):
+    def test_18(self):
         t = util.Timer('a')
         t.start(['a', 'b'])
         t0 = t.elapsed('a')
@@ -149,7 +149,7 @@ class TestSet01(object):
         assert(t.elapsed('a', total=False) == 0.0)
 
 
-    def test_18(self):
+    def test_19(self):
         t = util.Timer('a')
         t.start(['a', 'b'])
         t.reset('a')
@@ -158,14 +158,14 @@ class TestSet01(object):
         assert(t.elapsed('b') == 0.0)
 
 
-    def test_19(self):
+    def test_20(self):
         t = util.Timer()
         with util.ContextTimer(t):
             t0 = t.elapsed()
         assert(t.elapsed() >= 0.0)
 
 
-    def test_20(self):
+    def test_21(self):
         t = util.Timer()
         t.start()
         with util.ContextTimer(t, action='StopStart'):
@@ -174,27 +174,27 @@ class TestSet01(object):
         assert(t.elapsed() >= 0.0)
 
 
-    def test_21(self):
+    def test_22(self):
         with pytest.raises(ValueError):
             dat = util.netgetdata('http://devnull', maxtry=0)
 
 
-    def test_22(self):
+    def test_23(self):
         with pytest.raises(util.urlerror.URLError):
             dat = util.netgetdata('http://devnull')
 
 
-    def test_23(self):
+    def test_24(self):
         val = util.in_ipython()
         assert(val is True or val is False)
 
 
-    def test_24(self):
+    def test_25(self):
         val = util.in_notebook()
         assert(val is True or val is False)
 
 
     @pytest.mark.skipif(platform.system() == 'Windows',
                         reason='Feature not supported under Windows')
-    def test_25(self):
+    def test_26(self):
         assert(util.idle_cpu_count() >= 1)
