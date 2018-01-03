@@ -477,8 +477,10 @@ def imview(img, title=None, copy=True, fltscl=False, intrp='nearest',
         cax = divider.append_axes(pos, size="5%", pad=0.2)
         if cbar is None:
             # See http://chris35wills.github.io/matplotlib_axis
-            #cax.set_axis_bgcolor('none')
-            cax.set_facecolor('none')
+            if hasattr(cax, 'set_facecolor'):
+                cax.set_facecolor('none')
+            else:
+                cax.set_axis_bgcolor('none')
             for axis in ['top', 'bottom', 'left', 'right']:
                 cax.spines[axis].set_linewidth(0)
             cax.set_xticks([])
