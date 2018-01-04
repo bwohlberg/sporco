@@ -13,6 +13,12 @@ Module :mod:`.admm.cbpdn` includes the following classes:
      \frac{1}{2} \left \|  \sum_m \mathbf{d}_m * \mathbf{x}_m - \mathbf{s}
      \right \|_2^2 + \lambda \sum_m \| \mathbf{x}_m \|_1
 
+  The function :ref:`cbpdn <cuda_cbpdn>` in the
+  :ref:`sporco.cuda <cuda_package>` package provides a GPU accelerated
+  solver for this problem if the
+  `sporco-cuda  <https://github.com/bwohlberg/sporco-cuda>`__ extension
+  package is installed.
+
 
 * :class:`.ConvBPDNJoint`
 
@@ -53,6 +59,12 @@ Module :mod:`.admm.cbpdn` includes the following classes:
 
   where :math:`G_i` is an operator computing the derivative along index
   :math:`i`.
+
+  The function :ref:`cbpdngrd <cuda_cbpdngrd>` in the
+  :ref:`sporco.cuda <cuda_package>` package provides a GPU accelerated
+  solver for this problem if the
+  `sporco-cuda  <https://github.com/bwohlberg/sporco-cuda>`__ extension
+  package is installed.
 
 
 * :class:`.ConvBPDNProjL1`

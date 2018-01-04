@@ -1,3 +1,5 @@
+.. _cuda_package:
+
 sporco.cuda package
 ===================
 
@@ -86,6 +88,7 @@ Only available if ``have_cuda`` is `True`
       Total memory in bytes
 
 
+.. _cuda_cbpdn:
 .. py:function:: cbpdn(D, S, lmbda, opt, dev=0)
 
    A GPU-accelerated version of :class:`.admm.cbpdn.ConvBPDN`. Multiple images
@@ -110,6 +113,7 @@ Only available if ``have_cuda`` is `True`
      Coefficient map array (sparse representation)
 
 
+.. _cuda_cbpdngrd:
 .. py:function:: cbpdngrd(D, S, lmbda, mu, opt, dev=0)
 
    A GPU-accelerated version of :class:`.admm.cbpdn.ConvBPDNGradReg`. Multiple
