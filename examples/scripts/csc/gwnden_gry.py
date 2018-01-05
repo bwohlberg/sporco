@@ -83,7 +83,6 @@ W = spl.irfftn(np.conj(spl.rfftn(D, imgnph.shape, (0, 1))) *
                imgnph.shape, (0,1))
 W = W**2
 W = 1.0/(np.maximum(np.abs(W), 1e-8))
-W = W[..., np.newaxis, np.newaxis, :]
 
 lmbda = 4.8e-2
 
