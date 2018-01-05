@@ -279,7 +279,7 @@ class ConvBPDNScalarTV(admm.ADMM):
         # The sum is over the extra axis indexing spatial gradient
         # operators G_i, *not* over axisM
         b = self.DSf + self.rho*(YUf[..., -1] + self.Wtv * np.sum(
-                    np.conj(self.Gf) * YUf[...,0:-1], axis=-1))
+            np.conj(self.Gf) * YUf[..., 0:-1], axis=-1))
 
         if self.cri.Cd == 1:
             self.Xf[:] = sl.solvedbi_sm(self.Df, self.rho*self.GHGf +
@@ -329,7 +329,7 @@ class ConvBPDNScalarTV(admm.ADMM):
         r"""Get :math:`\mathbf{y}_0` variable, consisting of all blocks of
         :math:`\mathbf{y}` corresponding to a gradient operator."""
 
-        return self.Y[...,0:-1]
+        return self.Y[..., 0:-1]
 
 
 
@@ -345,7 +345,7 @@ class ConvBPDNScalarTV(admm.ADMM):
         r"""Get component block of :math:`\mathbf{y}` that is constrained
         to be equal to :math:`\mathbf{x}`."""
 
-        return self.Y[...,-1]
+        return self.Y[..., -1]
 
 
 

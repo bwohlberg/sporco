@@ -110,8 +110,8 @@ class ConvBPDNDictLearn(dictlrn.DictLearn):
 
         defaults = copy.deepcopy(dictlrn.DictLearn.Options.defaults)
         defaults.update({'DictSize' : None, 'AccurateDFid' : False,
-            'CBPDN' : copy.deepcopy(
-                Fcbpdn.ConvBPDN.Options.defaults)})
+                         'CBPDN' : copy.deepcopy(
+                             Fcbpdn.ConvBPDN.Options.defaults)})
 
 
         def __init__(self, opt=None):

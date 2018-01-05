@@ -178,7 +178,7 @@ def transpose_ntpl_list(lst):
         return None
     else:
         return cls(*[[lst[k][l] for k in range(len(lst))]
-                   for l in range(len(lst[0]))])
+                     for l in range(len(lst[0]))])
 
 
 
@@ -645,10 +645,7 @@ def in_ipython():
     try:
         # See https://stackoverflow.com/questions/15411967
         shell = get_ipython().__class__.__name__
-        if shell == 'TerminalInteractiveShell':
-            return True
-        else:
-            return False
+        return bool(shell == 'TerminalInteractiveShell')
     except NameError:
         return False
 
@@ -667,10 +664,7 @@ def in_notebook():
     try:
         # See https://stackoverflow.com/questions/15411967
         shell = get_ipython().__class__.__name__
-        if shell == 'ZMQInteractiveShell':
-            return True
-        else:
-            return False
+        return bool(shell == 'ZMQInteractiveShell')
     except NameError:
         return False
 

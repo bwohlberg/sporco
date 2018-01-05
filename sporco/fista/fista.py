@@ -16,14 +16,11 @@ from builtins import object
 
 import copy
 import collections
-import warnings
 import numpy as np
-import scipy
 from scipy import linalg
 
 from sporco import cdict
 from sporco import util
-from sporco.util import u
 from sporco.util import _fix_nested_class_lookup
 
 import sporco.linalg as sl
@@ -540,7 +537,7 @@ class FISTA(with_metaclass(_FISTA_Meta, object)):
 
     def eval_R(self, V):
         """Evaluate smooth function :math:`f` in V.
-        
+
         Overriding this method is required.
         """
 

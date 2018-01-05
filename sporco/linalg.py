@@ -248,7 +248,7 @@ def idctii(x, axes=None):
 
 
 
-def fftconv(a, b, axes=(0,1)):
+def fftconv(a, b, axes=(0, 1)):
     """
     Compute a multi-dimensional convolution via the Discrete Fourier Transform.
 
@@ -595,7 +595,7 @@ def solvemdbi_rsm(ah, rho, b, axisK, dimN=2):
     for k in range(0, K):
         slck = slcnc + (slice(k, k+1),) + (slice(None), np.newaxis,)
         Aia = inner(Ainv, np.swapaxes(a[slck], dimN+2, dimN+3),
-                     axis=dimN+3)
+                    axis=dimN+3)
         ahAia = 1.0 + inner(ah[slck], Aia, axis=dimN+2)
         ahAi = inner(ah[slck], Ainv, axis=dimN+2)
         AiaahAi = Aia * ahAi
