@@ -182,11 +182,11 @@ class ConvBPDNDictLearn(dictlrn.DictLearn):
 
         # Create X update object
         xstep = Fcbpdn.ConvBPDN(D0, S, lmbda, opt['CBPDN'],
-                                    dimK=dimK, dimN=dimN)
+                                dimK=dimK, dimN=dimN)
 
         # Create D update object
         dstep = ccmod.ConvCnstrMOD(None, S, dsz, opt['CCMOD'],
-                                        dimK=dimK, dimN=dimN)
+                                   dimK=dimK, dimN=dimN)
 
         print("L xstep in cbpdndl: ", xstep.L)
         print("L dstep in cbpdndl: ", dstep.L)
@@ -194,50 +194,52 @@ class ConvBPDNDictLearn(dictlrn.DictLearn):
         # Configure iteration statistics reporting
         isfld = ['Iter', 'ObjFun', 'DFid', 'RegL1', 'Cnstr']
         hdrtxt = ['Itn', 'Fnc', 'DFid', u('ℓ1'), 'Cnstr']
-        hdrmap={'Itn': 'Iter', 'Fnc': 'ObjFun', 'DFid': 'DFid',
-                u('ℓ1'): 'RegL1', 'Cnstr': 'Cnstr'}
+        hdrmap = {'Itn': 'Iter', 'Fnc': 'ObjFun', 'DFid': 'DFid',
+                  u('ℓ1'): 'RegL1', 'Cnstr': 'Cnstr'}
 
         if self.opt['AccurateDFid']:
-            isxmap = {'X_F_Btrack': 'F_Btrack', 'X_Q_Btrack': 'Q_Btrack', 'X_ItBt': 'IterBTrack', 'X_L': 'L',
-            'X_Rsdl' : 'Rsdl'}
+            isxmap = {'X_F_Btrack': 'F_Btrack', 'X_Q_Btrack': 'Q_Btrack',
+                      'X_ItBt': 'IterBTrack', 'X_L': 'L',
+                      'X_Rsdl': 'Rsdl'}
             evlmap = {'ObjFun': 'ObjFun', 'DFid': 'DFid', 'RegL1': 'RegL1'}
         else:
             isxmap = {'ObjFun': 'ObjFun', 'DFid': 'DFid', 'RegL1': 'RegL1',
-            'X_F_Btrack': 'F_Btrack', 'X_Q_Btrack': 'Q_Btrack', 'X_ItBt': 'IterBTrack', 'X_L': 'L',
-            'X_Rsdl' : 'Rsdl'}
+                      'X_F_Btrack': 'F_Btrack', 'X_Q_Btrack': 'Q_Btrack',
+                      'X_ItBt': 'IterBTrack', 'X_L': 'L',
+                      'X_Rsdl': 'Rsdl'}
             evlmap = {}
 
         # If Backtracking enabled in xstep display the BT variables also
         if xstep.opt['BackTrack', 'Enabled']:
-            isfld.extend(['X_F_Btrack', 'X_Q_Btrack', 'X_ItBt', 'X_L', 'X_Rsdl'])
+            isfld.extend(['X_F_Btrack', 'X_Q_Btrack', 'X_ItBt', 'X_L',
+                          'X_Rsdl'])
             hdrtxt.extend(['F_X', 'Q_X', 'It_X', 'L_X'])
-            hdrmap.update({'F_X': 'X_F_Btrack','Q_X': 'X_Q_Btrack', 'It_X': 'X_ItBt', 'L_X': 'X_L'})
+            hdrmap.update({'F_X': 'X_F_Btrack','Q_X': 'X_Q_Btrack',
+                           'It_X': 'X_ItBt', 'L_X': 'X_L'})
         else: # Add just L value to xstep display
             isfld.extend(['X_L', 'X_Rsdl'])
             hdrtxt.append('L_X')
             hdrmap.update({'L_X': 'X_L'})
 
-        isdmap = {'Cnstr':  'Cnstr', 'D_F_Btrack': 'F_Btrack',
-                'D_Q_Btrack': 'Q_Btrack', 'D_ItBt': 'IterBTrack', 'D_L': 'L', 'D_Rsdl' : 'Rsdl'}
+        isdmap = {'Cnstr': 'Cnstr', 'D_F_Btrack': 'F_Btrack',
+                  'D_Q_Btrack': 'Q_Btrack', 'D_ItBt': 'IterBTrack',
+                  'D_L': 'L', 'D_Rsdl': 'Rsdl'}
 
         # If Backtracking enabled in dstep display the BT variables also
         if dstep.opt['BackTrack', 'Enabled']:
-            isfld.extend(['D_F_Btrack', 'D_Q_Btrack', 'D_ItBt', 'D_L', 'D_Rsdl', 'Time'])
+            isfld.extend(['D_F_Btrack', 'D_Q_Btrack', 'D_ItBt', 'D_L',
+                          'D_Rsdl', 'Time'])
             hdrtxt.extend(['F_D', 'Q_D', 'It_D', 'L_D'])
-            hdrmap.update({'F_D': 'D_F_Btrack','Q_D': 'D_Q_Btrack', 'It_D': 'D_ItBt', 'L_D': 'D_L'})
+            hdrmap.update({'F_D': 'D_F_Btrack', 'Q_D': 'D_Q_Btrack',
+                           'It_D': 'D_ItBt', 'L_D': 'D_L'})
         else: # Add just L value to dstep display
             isfld.extend(['D_L', 'D_Rsdl', 'Time'])
             hdrtxt.append('L_D')
             hdrmap.update({'L_D': 'D_L'})
 
-        isc = dictlrn.IterStatsConfig(
-            isfld=isfld,
-            isxmap=isxmap,
-            isdmap=isdmap,
-            evlmap=evlmap,
-            hdrtxt=hdrtxt,
-            hdrmap=hdrmap
-            )
+        isc = dictlrn.IterStatsConfig(isfld=isfld, isxmap=isxmap,
+                                      isdmap=isdmap, evlmap=evlmap,
+                                      hdrtxt=hdrtxt, hdrmap=hdrmap)
 
         # Call parent constructor
         super(ConvBPDNDictLearn, self).__init__(xstep, dstep, opt, isc)
@@ -432,7 +434,7 @@ class MixConvBPDNDictLearn(dictlrn.DictLearn):
 
         # Create D update object
         dstep = ccmod.ConvCnstrMOD(None, S, dsz, opt['CCMOD'],
-                                        dimK=dimK, dimN=dimN)
+                                   dimK=dimK, dimN=dimN)
 
 
         # Configure iteration statistics reporting
@@ -448,12 +450,13 @@ class MixConvBPDNDictLearn(dictlrn.DictLearn):
 
         if dstep.opt['BackTrack', 'Enabled']:
             isfld = ['Iter', 'ObjFun', 'DFid', 'RegL1', 'Cnstr', 'XPrRsdl',
-                   'XDlRsdl', 'XRho', 'D_F_Btrack', 'D_Q_Btrack', 'D_ItBt',
-                   'D_L', 'Time']
+                     'XDlRsdl', 'XRho', 'D_F_Btrack', 'D_Q_Btrack', 'D_ItBt',
+                     'D_L', 'Time']
             isdmap = {'Cnstr':  'Cnstr', 'D_F_Btrack': 'F_Btrack',
-                    'D_Q_Btrack': 'Q_Btrack', 'D_ItBt': 'IterBTrack', 'D_L': 'L'}
+                      'D_Q_Btrack': 'Q_Btrack', 'D_ItBt': 'IterBTrack',
+                      'D_L': 'L'}
             hdrtxt = ['Itn', 'Fnc', 'DFid', u('ℓ1'), 'Cnstr', 'r_X', 's_X',
-                    u('ρ_X'), 'F_D', 'Q_D', 'It_D', 'L_D']
+                      u('ρ_X'), 'F_D', 'Q_D', 'It_D', 'L_D']
             hdrmap={'Itn': 'Iter', 'Fnc': 'ObjFun', 'DFid': 'DFid',
                     u('ℓ1'): 'RegL1', 'Cnstr': 'Cnstr', 'r_X': 'XPrRsdl',
                     's_X': 'XDlRsdl', u('ρ_X'): 'XRho', 'F_D': 'D_F_Btrack',
@@ -461,7 +464,7 @@ class MixConvBPDNDictLearn(dictlrn.DictLearn):
 
         else:
             isfld = ['Iter', 'ObjFun', 'DFid', 'RegL1', 'Cnstr', 'XPrRsdl',
-                   'XDlRsdl', 'XRho', 'D_L', 'Time']
+                     'XDlRsdl', 'XRho', 'D_L', 'Time']
             isdmap={'Cnstr':  'Cnstr', 'D_L': 'L'}
             hdrtxt=['Itn', 'Fnc', 'DFid', u('ℓ1'), 'Cnstr', 'r_X', 's_X',
                     u('ρ_X'), 'L_D']
@@ -469,14 +472,9 @@ class MixConvBPDNDictLearn(dictlrn.DictLearn):
                     u('ℓ1'): 'RegL1', 'Cnstr': 'Cnstr', 'r_X': 'XPrRsdl',
                     's_X': 'XDlRsdl', u('ρ_X'): 'XRho', 'L_D': 'D_L'}
 
-        isc = dictlrn.IterStatsConfig(
-            isfld=isfld,
-            isxmap=isxmap,
-            isdmap=isdmap,
-            evlmap=evlmap,
-            hdrtxt=hdrtxt,
-            hdrmap=hdrmap
-            )
+        isc = dictlrn.IterStatsConfig(isfld=isfld, isxmap=isxmap,
+                                      isdmap=isdmap, evlmap=evlmap,
+                                      hdrtxt=hdrtxt, hdrmap=hdrmap)
 
         # Call parent constructor
         super(MixConvBPDNDictLearn, self).__init__(xstep, dstep, opt,
@@ -616,7 +614,7 @@ class MixConvBPDNMaskDcplDictLearn(dictlrn.DictLearn):
             """
 
             self.defaults.update({'CCMOD' : copy.deepcopy(
-                                    ccmod.ConvCnstrMODMaskDcpl.Options.defaults)})
+                ccmod.ConvCnstrMODMaskDcpl.Options.defaults)})
 
             dictlrn.DictLearn.Options.__init__(self, {
                 'CBPDN': Acbpdn.ConvBPDNMaskDcpl.Options({'MaxMainIter': 1,
@@ -687,59 +685,55 @@ class MixConvBPDNMaskDcplDictLearn(dictlrn.DictLearn):
 
         # Create X update object
         xstep = Acbpdn.ConvBPDNMaskDcpl(D0, S, lmbda, W, opt['CBPDN'],
-                                       dimK=dimK, dimN=dimN)
+                                        dimK=dimK, dimN=dimN)
 
         # Create D update object
         dstep = ccmod.ConvCnstrMODMaskDcpl(None, S, W, dsz, opt['CCMOD'],
-                                                   dimK=dimK, dimN=dimN)
+                                           dimK=dimK, dimN=dimN)
 
         # Configure iteration statistics reporting
         if self.opt['AccurateDFid']:
             isxmap = {'XPrRsdl': 'PrimalRsdl', 'XDlRsdl': 'DualRsdl',
-                                   'XRho': 'Rho'}
+                      'XRho': 'Rho'}
             evlmap = {'ObjFun': 'ObjFun', 'DFid': 'DFid', 'RegL1': 'RegL1'}
         else:
             isxmap = {'ObjFun': 'ObjFun', 'DFid': 'DFid', 'RegL1': 'RegL1',
-                        'XPrRsdl': 'PrimalRsdl', 'XDlRsdl': 'DualRsdl',
-                        'XRho': 'Rho'}
+                      'XPrRsdl': 'PrimalRsdl', 'XDlRsdl': 'DualRsdl',
+                      'XRho': 'Rho'}
             evlmap = {}
 
         if dstep.opt['BackTrack', 'Enabled']:
             isfld = ['Iter', 'ObjFun', 'DFid', 'RegL1', 'Cnstr', 'XPrRsdl',
-                   'XDlRsdl', 'XRho', 'D_F_Btrack', 'D_Q_Btrack', 'D_ItBt',
-                   'D_L', 'Time']
+                     'XDlRsdl', 'XRho', 'D_F_Btrack', 'D_Q_Btrack', 'D_ItBt',
+                     'D_L', 'Time']
             isdmap = {'Cnstr':  'Cnstr', 'D_F_Btrack': 'F_Btrack',
-                    'D_Q_Btrack': 'Q_Btrack', 'D_ItBt': 'IterBTrack', 'D_L': 'L'}
+                      'D_Q_Btrack': 'Q_Btrack', 'D_ItBt': 'IterBTrack',
+                      'D_L': 'L'}
             hdrtxt = ['Itn', 'Fnc', 'DFid', u('ℓ1'), 'Cnstr', 'r_X', 's_X',
-                    u('ρ_X'), 'F_D', 'Q_D', 'It_D', 'L_D']
-            hdrmap={'Itn': 'Iter', 'Fnc': 'ObjFun', 'DFid': 'DFid',
-                    u('ℓ1'): 'RegL1', 'Cnstr': 'Cnstr', 'r_X': 'XPrRsdl',
-                    's_X': 'XDlRsdl', u('ρ_X'): 'XRho', 'F_D': 'D_F_Btrack',
-                    'Q_D': 'D_Q_Btrack', 'It_D': 'D_ItBt', 'L_D': 'D_L'}
+                      u('ρ_X'), 'F_D', 'Q_D', 'It_D', 'L_D']
+            hdrmap = {'Itn': 'Iter', 'Fnc': 'ObjFun', 'DFid': 'DFid',
+                      u('ℓ1'): 'RegL1', 'Cnstr': 'Cnstr', 'r_X': 'XPrRsdl',
+                      's_X': 'XDlRsdl', u('ρ_X'): 'XRho', 'F_D': 'D_F_Btrack',
+                      'Q_D': 'D_Q_Btrack', 'It_D': 'D_ItBt', 'L_D': 'D_L'}
 
         else:
             isfld = ['Iter', 'ObjFun', 'DFid', 'RegL1', 'Cnstr', 'XPrRsdl',
-                   'XDlRsdl', 'XRho', 'D_L', 'Time']
-            isdmap={'Cnstr':  'Cnstr', 'D_L': 'L'}
-            hdrtxt=['Itn', 'Fnc', 'DFid', u('ℓ1'), 'Cnstr', 'r_X', 's_X',
-                    u('ρ_X'), 'L_D']
-            hdrmap={'Itn': 'Iter', 'Fnc': 'ObjFun', 'DFid': 'DFid',
-                    u('ℓ1'): 'RegL1', 'Cnstr': 'Cnstr', 'r_X': 'XPrRsdl',
-                    's_X': 'XDlRsdl', u('ρ_X'): 'XRho', 'L_D': 'D_L'}
+                     'XDlRsdl', 'XRho', 'D_L', 'Time']
+            isdmap = {'Cnstr':  'Cnstr', 'D_L': 'L'}
+            hdrtxt = ['Itn', 'Fnc', 'DFid', u('ℓ1'), 'Cnstr', 'r_X', 's_X',
+                      u('ρ_X'), 'L_D']
+            hdrmap = {'Itn': 'Iter', 'Fnc': 'ObjFun', 'DFid': 'DFid',
+                      u('ℓ1'): 'RegL1', 'Cnstr': 'Cnstr', 'r_X': 'XPrRsdl',
+                      's_X': 'XDlRsdl', u('ρ_X'): 'XRho', 'L_D': 'D_L'}
 
-        isc = dictlrn.IterStatsConfig(
-            isfld=isfld,
-            isxmap=isxmap,
-            isdmap=isdmap,
-            evlmap=evlmap,
-            hdrtxt=hdrtxt,
-            hdrmap=hdrmap
-            )
+        isc = dictlrn.IterStatsConfig(isfld=isfld, isxmap=isxmap,
+                                      isdmap=isdmap, evlmap=evlmap,
+                                      hdrtxt=hdrtxt, hdrmap=hdrmap)
 
 
         # Call parent constructor
-        super(MixConvBPDNMaskDcplDictLearn, self).__init__(xstep,
-                                                        dstep, opt, isc)
+        super(MixConvBPDNMaskDcplDictLearn, self).__init__(xstep, dstep,
+                                                           opt, isc)
 
 
     def getdict(self, crop=True):
