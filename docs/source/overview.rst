@@ -62,7 +62,9 @@ Please submit bug reports, comments, etc. to brendt@ieee.org. Bugs and feature r
 
 
 
-BSD License
------------
+License
+-------
 
-This library was developed at Los Alamos National Laboratory, and has been approved for public release under the approval number LA-CC-14-057. It is made available under the terms of the BSD 3-Clause License; please see the ``LICENSE`` file for further details.
+This package was developed at Los Alamos National Laboratory, and has been approved for public release under the approval number LA-CC-14-057. It is made available under the terms of the BSD 3-Clause License (see the `LICENSE <https://github.com/bwohlberg/sporco/blob/master/LICENSE>`__ file for details).
+
+This material was produced under U.S. Government contract DE-AC52-06NA25396 for Los Alamos National Laboratory (LANL), which is operated by Los Alamos National Security, LLC for the U.S. Department of Energy. The U.S. Government has rights to use, reproduce, and distribute this software. NEITHER THE GOVERNMENT NOR LOS ALAMOS NATIONAL SECURITY, LLC MAKES ANY WARRANTY, EXPRESS OR IMPLIED, OR ASSUMES ANY LIABILITY FOR THE USE OF THIS SOFTWARE. If software is modified to produce derivative works, such modified software should be clearly marked, so as not to confuse it with the version available from LANL.

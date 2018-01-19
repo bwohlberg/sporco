@@ -120,4 +120,4 @@ A summary of the most significant changes between SPORCO releases can be found i
 License
 -------
 
-This package is distributed with a 3-Clause BSD license; see the ``LICENSE`` file for details.
+SPORCO is distributed as open-source software under a BSD 3-Clause License (see the ``LICENSE`` file for details).
