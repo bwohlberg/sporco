@@ -313,8 +313,10 @@ def inner(x, y, axis=-1):
         xr = np.rollaxis(x, axis, 0)
         yr = np.rollaxis(y, axis, 0)
 
-    # Efficient inner product on axis 0
-    ip = np.einsum(xr, [0, Ellipsis], yr, [0, Ellipsis])[np.newaxis, ...]
+    # Efficient inner product on axis 0 (setting of optimize
+    # flag due to https://github.com/numpy/numpy/issues/10343)
+    ip = np.einsum(xr, [0, Ellipsis], yr, [0, Ellipsis],
+                   optimize=False)[np.newaxis, ...]
 
     # Roll axis back to original position if necessary
     if axis != 0:
