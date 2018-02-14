@@ -16,10 +16,13 @@ from __future__ import print_function
 from builtins import input
 from builtins import range
 
-import numpy as np
 import os.path
 import tempfile
 import sys
+
+import pyfftw   # See https://github.com/pyFFTW/pyFFTW/issues/40
+import numpy as np
+
 try:
     import skvideo.datasets
     import skvideo.io
