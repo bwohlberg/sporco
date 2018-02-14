@@ -135,18 +135,18 @@ class FISTA(with_metaclass(_FISTA_Meta, object)):
           ``IterTimer`` : Label of the timer to use for iteration times.
 
           ``RelStopTol`` : Relative convergence tolerance for fixed point
-          residual (see Sec. 3.2.3 of :cite:`liu-2017-online2`).
+          residual (see Sec. 4.3 of :cite:`liu-2018-first`).
 
           ``L`` : Inverse of gradient step parameter :math:`L`.
 
           ``AutoStop`` : Options for adaptive stoping strategy (fixed point
-          residual, see Sec. 3.2.3 of :cite:`liu-2017-online2`).
+          residual, see Sec. 4.3 of :cite:`liu-2018-first`).
 
             ``Enabled`` : Flag determining whether adaptive stopping relative
             parameter strategy is enabled.
 
             ``Tau0`` : numerator in adaptive criterion
-            (:math:`\tau_0` in :cite:`liu-2017-online2`).
+            (:math:`\tau_0` in :cite:`liu-2018-first`).
 
 
           ``BackTrack`` : Options for adaptive L strategy (bactracking, see
