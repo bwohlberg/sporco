@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2017 by Brendt Wohlberg <brendt@ieee.org>
+# Copyright (C) 2017-2018 by Brendt Wohlberg <brendt@ieee.org>
 # All rights reserved. BSD 3-clause License.
 # This file is part of the SPORCO package. Details of the copyright
 # and user license can be found in the 'LICENSE.txt' file distributed
@@ -31,6 +31,8 @@ mp_lmbda = None  # Regularisation parameter lambda
 mp_dprox = None  # Projection operator of the dictionary update
 mp_xrho = None   # Penalty parameter of the X (cbpdn) step
 mp_drho = None   # Penalty parameter of the D (ccmod) step
+mp_xrlx = None   # Relaxation parameter of the X (cbpdn) step
+mp_drlx = None   # Relaxation parameter of the D (ccmod) step
 mp_Sf = None     # Training data array in DFT domain
 mp_Df = None     # Dictionary variable (in DFT domain) used by X step
 mp_Zf = None     # Coefficient map variable (in DFT domain) used by D step
@@ -131,9 +133,9 @@ def cbpdn_setdict():
 
 
 def cbpdn_xstep(k):
-    """Do the X step of the cbpdn stage. There are no parameters
-    or return values because all inputs and outputs are from and to
-    global variables.
+    """Do the X step of the cbpdn stage. The only parameter is the slice
+    index `k` and there are no return values; all inputs and outputs are
+    from and to global variables.
     """
 
     YU = mp_Z_Y[k] - mp_Z_U[k]
@@ -146,10 +148,20 @@ def cbpdn_xstep(k):
 
 
 
+def cbpdn_relax(k):
+    """Do relaxation for the cbpdn stage. The only parameter is the slice
+    index `k` and there are no return values; all inputs and outputs are
+    from and to global variables.
+    """
+
+    mp_Z_X[k] = mp_xrlx * mp_Z_X[k] + (1 - mp_xrlx) * mp_Z_Y[k]
+
+
+
 def cbpdn_ystep(k):
-    """Do the Y step of the cbpdn stage. There are no parameters
-    or return values because all inputs and outputs are from and to
-    global variables.
+    """Do the Y step of the cbpdn stage. The only parameter is the slice
+    index `k` and there are no return values; all inputs and outputs are
+    from and to global variables.
     """
 
     AXU = mp_Z_X[k] + mp_Z_U[k]
@@ -158,9 +170,9 @@ def cbpdn_ystep(k):
 
 
 def cbpdn_ustep(k):
-    """Do the U step of the cbpdn stage. There are no parameters
-    or return values because all inputs and outputs are from and to
-    global variables.
+    """Do the U step of the cbpdn stage. The only parameter is the slice
+    index `k` and there are no return values; all inputs and outputs are
+    from and to global variables.
     """
 
     mp_Z_U[k] += mp_Z_X[k] - mp_Z_Y[k]
@@ -168,9 +180,9 @@ def cbpdn_ustep(k):
 
 
 def ccmod_setcoef(k):
-    """Set the coefficient maps for the ccmod stage. There are no
-    parameters or return values because all inputs and outputs are from
-    and to global variables.
+    """Set the coefficient maps for the ccmod stage. The only parameter is
+    the slice index `k` and there are no return values; all inputs and
+    outputs are from and to global variables.
     """
 
     # Set working coefficient maps for ccmod step and compute DFT of
@@ -181,15 +193,25 @@ def ccmod_setcoef(k):
 
 
 def ccmod_xstep(k):
-    """Do the X step of the ccmod stage. There are no parameters
-    or return values because all inputs and outputs are from and to
-    global variables.
+    """Do the X step of the ccmod stage. The only parameter is the slice
+    index `k` and there are no return values; all inputs and outputs are
+    from and to global variables.
     """
 
     YU = mp_D_Y - mp_D_U[k]
     b = mp_ZSf[k] + mp_drho * spl.rfftn(YU, None, mp_cri.axisN)
     Xf = spl.solvedbi_sm(mp_Zf[k], mp_drho, b, axis=mp_cri.axisM)
     mp_D_X[k] = spl.irfftn(Xf, mp_cri.Nv, mp_cri.axisN)
+
+
+
+def ccmod_relax(k):
+    """Do relaxation for the ccmod stage. The only parameter is the slice
+    index `k` and there are no return values; all inputs and outputs are
+    from and to global variables.
+    """
+
+    mp_D_X[k] = mp_drlx * mp_D_X[k] + (1 - mp_drlx) * mp_D_Y
 
 
 
@@ -216,13 +238,19 @@ def ccmod_ustep():
 
 def step_group(k):
     """Do a single iteration over cbpdn and ccmod steps that can be
-    performed independently for each slice k of the input data set."""
+    performed independently for each slice `k` of the input data set.
+    """
 
     cbpdn_xstep(k)
+    if mp_xrlx != 1.0:
+        cbpdn_relax(k)
     cbpdn_ystep(k)
     cbpdn_ustep(k)
     ccmod_setcoef(k)
     ccmod_xstep(k)
+    if mp_drlx != 1.0:
+        ccmod_relax(k)
+
 
 
 
@@ -266,10 +294,9 @@ class ConvBPDNDictLearn_Consensus(cbpdndl.ConvBPDNDictLearn):
     use of inherited functionality. Variables initialised by the parent
     class that are non-singleton on axis ``axisK`` have this axis swapped
     with axis 0 for simpler and more computationally efficient indexing.
-    Note that relaxation and automatic penalty parameter selection (see
-    options ``RelaxParam`` and ``AutoRho`` respectively in
-    :class:`.admm.ADMM.Options`) are currently not supported, the
-    corresponding options settings being silently ignored.
+    Note that automatic penalty parameter selection (see option ``AutoRho``
+    in :class:`.admm.ADMM.Options`) is not supported, the option settings
+    being silently ignored.
 
     After termination of the :meth:`solve` method, attribute :attr:`itstat`
     is a list of tuples representing statistics of each iteration. The
@@ -372,6 +399,10 @@ class ConvBPDNDictLearn_Consensus(cbpdndl.ConvBPDNDictLearn):
         mp_xrho = self.xstep.rho
         global mp_drho
         mp_drho = self.dstep.rho
+        global mp_xrlx
+        mp_xrlx = self.xstep.rlx
+        global mp_drlx
+        mp_drlx = self.dstep.rlx
         global mp_dprox
         mp_dprox = self.dstep.Pcn
         global mp_Sf
@@ -589,9 +620,9 @@ def cbpdnmd_setdict():
 
 
 def cbpdnmd_xstep(k):
-    """Do the X step of the cbpdn stage. There are no parameters
-    or return values because all inputs and outputs are from and to
-    global variables.
+    """Do the X step of the cbpdn stage. The only parameter is the slice
+    index `k` and there are no return values; all inputs and outputs are
+    from and to global variables.
     """
 
     YU0 = mp_Z_Y0[k] + mp_S[k] - mp_Z_U0[k]
@@ -610,10 +641,21 @@ def cbpdnmd_xstep(k):
 
 
 
+def cbpdnmd_relax(k):
+    """Do relaxation for the cbpdn stage. The only parameter is the slice
+    index `k` and there are no return values; all inputs and outputs are
+    from and to global variables.
+    """
+
+    mp_Z_X[k] = mp_xrlx * mp_Z_X[k] + (1 - mp_xrlx) * mp_Z_Y1[k]
+    mp_DX[k] = mp_xrlx * mp_DX[k] + (1 - mp_xrlx) * (mp_Z_Y0[k] + mp_S[k])
+
+
+
 def cbpdnmd_ystep(k):
-    """Do the Y step of the cbpdn stage. There are no parameters
-    or return values because all inputs and outputs are from and to
-    global variables.
+    """Do the Y step of the cbpdn stage. The only parameter is the slice
+    index `k` and there are no return values; all inputs and outputs are
+    from and to global variables.
     """
 
     if mp_W.shape[0] > 1:
@@ -628,9 +670,9 @@ def cbpdnmd_ystep(k):
 
 
 def cbpdnmd_ustep(k):
-    """Do the U step of the cbpdn stage. There are no parameters
-    or return values because all inputs and outputs are from and to
-    global variables.
+    """Do the U step of the cbpdn stage. The only parameter is the slice
+    index `k` and there are no return values; all inputs and outputs are
+    from and to global variables.
     """
 
     mp_Z_U0[k] += mp_DX[k] - mp_Z_Y0[k] - mp_S[k]
@@ -639,9 +681,9 @@ def cbpdnmd_ustep(k):
 
 
 def ccmodmd_setcoef(k):
-    """Set the coefficient maps for the ccmod stage. There are no
-    parameters or return values because all inputs and outputs are from
-    and to global variables.
+    """Set the coefficient maps for the ccmod stage. The only parameter is
+    the slice index `k` and there are no return values; all inputs and
+    outputs are from and to global variables.
     """
 
     # Set working coefficient maps for ccmod step and compute DFT of
@@ -651,9 +693,9 @@ def ccmodmd_setcoef(k):
 
 
 def ccmodmd_xstep(k):
-    """Do the X step of the ccmod stage. There are no parameters
-    or return values because all inputs and outputs are from and to
-    global variables.
+    """Do the X step of the ccmod stage. The only parameter is the slice
+    index `k` and there are no return values; all inputs and outputs are
+    from and to global variables.
     """
 
     YU0 = mp_D_Y0 - mp_D_U0[k]
@@ -663,6 +705,17 @@ def ccmodmd_xstep(k):
     Xf = spl.solvedbi_sm(mp_Zf[k], 1.0, b, axis=mp_cri.axisM)
     mp_D_X[k] = spl.irfftn(Xf, mp_cri.Nv, mp_cri.axisN)
     mp_DX[k] = spl.irfftn(spl.inner(Xf, mp_Zf[k]), mp_cri.Nv, mp_cri.axisN)
+
+
+
+def ccmodmd_relax(k):
+    """Do relaxation for the ccmod stage. The only parameter is the slice
+    index `k` and there are no return values; all inputs and outputs are
+    from and to global variables.
+    """
+
+    mp_D_X[k] = mp_drlx * mp_D_X[k] + (1 - mp_drlx) * mp_D_Y0
+    mp_DX[k] = mp_drlx * mp_DX[k] + (1 - mp_drlx) * (mp_D_Y1[k] + mp_S[k])
 
 
 
@@ -692,13 +745,18 @@ def ccmodmd_ustep():
 
 def md_step_group(k):
     """Do a single iteration over cbpdn and ccmod steps that can be
-    performed independently for each slice k of the input data set."""
+    performed independently for each slice `k` of the input data set.
+    """
 
     cbpdnmd_xstep(k)
+    if mp_xrlx != 1.0:
+        cbpdnmd_relax(k)
     cbpdnmd_ystep(k)
     cbpdnmd_ustep(k)
     ccmodmd_setcoef(k)
     ccmodmd_xstep(k)
+    if mp_drlx != 1.0:
+        ccmodmd_relax(k)
 
 
 
@@ -743,10 +801,9 @@ class ConvBPDNMaskDcplDictLearn_Consensus(cbpdndl.ConvBPDNMaskDcplDictLearn):
     any use of inherited functionality. Variables initialised by the parent
     class that are non-singleton on axis ``axisK`` have this axis swapped
     with axis 0 for simpler and more computationally efficient indexing.
-    Note that relaxation and automatic penalty parameter selection (see
-    options ``RelaxParam`` and ``AutoRho`` respectively in
-    :class:`.admm.ADMM.Options`) are currently not supported, the
-    corresponding options settings being silently ignored.
+    Note that automatic penalty parameter selection (see option ``AutoRho``
+    in :class:`.admm.ADMM.Options`) is not supported, the option settings
+    being silently ignored.
 
     After termination of the :meth:`solve` method, attribute :attr:`itstat`
     is a list of tuples representing statistics of each iteration. The
@@ -853,6 +910,10 @@ class ConvBPDNMaskDcplDictLearn_Consensus(cbpdndl.ConvBPDNMaskDcplDictLearn):
         mp_xrho = self.xstep.rho
         global mp_drho
         mp_drho = self.dstep.rho
+        global mp_xrlx
+        mp_xrlx = self.xstep.rlx
+        global mp_drlx
+        mp_drlx = self.dstep.rlx
         global mp_dprox
         mp_dprox = self.dstep.Pcn
         global mp_S
