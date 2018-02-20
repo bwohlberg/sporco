@@ -55,8 +55,7 @@ Sw = W * S
 
 
 """
-:math:`\ell_2`-TV denoising with a spatial mask as a non-linear lowpass
-filter.
+$\ell_2$-TV denoising with a spatial mask as a non-linear lowpass filter.
 """
 
 lmbda = 0.1
@@ -75,7 +74,7 @@ lmbda = 0.05
 opt1 = cbpdndl.ConvBPDNDictLearn.Options({'Verbose': True,
             'MaxMainIter': 200, 'AccurateDFid': True,
             'CBPDN': {'rho': 50.0*lmbda + 0.5},
-            'CCMOD': {'ZeroMean': True}})
+            'CCMOD': {'rho': 1e2}})
 d1 = cbpdndl.ConvBPDNDictLearn(D0, sh, lmbda, opt1)
 D1 = d1.solve()
 
@@ -88,13 +87,13 @@ sr1 = d1.reconstruct().squeeze() + sl
 
 
 """
-CDL with a spatial mask using :class:`.cbpdndl.ConvBPDNMaskDcplDictLearn`.
+CDL with a spatial mask using :class:`.cbpdndl.ConvBPDNMaskDcplDictLearn`. (Note that :class:`.parcnsdl.ConvBPDNMaskDcplDictLearn_Consensus` solves the same problem, but is substantially faster on a multi-core architecture.)
 """
 
 opt2 = cbpdndl.ConvBPDNMaskDcplDictLearn.Options({'Verbose': True,
             'MaxMainIter': 200, 'AccurateDFid': True,
-            'CBPDN': {'rho': 50.0*lmbda + 0.5},
-            'CCMOD': {'ZeroMean': True}})
+            'CBPDN': {'rho': 20.0*lmbda + 0.5},
+            'CCMOD': {'rho': 2e-1}})
 d2 = cbpdndl.ConvBPDNMaskDcplDictLearn(D0, sh, lmbda, W, opt2)
 D2 = d2.solve()
 

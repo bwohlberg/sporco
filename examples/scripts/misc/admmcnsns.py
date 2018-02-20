@@ -143,7 +143,7 @@ class ConsensusTest(admm.ADMMConsensus):
 
 
 """
-Construct random sparse vector :math:`\mathbf{x}`, random :math:`A_k` matrices, and vectors :math:`\mathbf{s}_k` such that :math:`A_k \mathbf{x} = \mathbf{s}_k`.
+Construct random sparse vector $\mathbf{x}$, random $A_k$` matrices, and vectors $\mathbf{s}_k$ such that $A_k \mathbf{x} = \mathbf{s}_k$.
 """
 
 np.random.seed(12345)

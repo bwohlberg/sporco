@@ -66,8 +66,7 @@ imgwp = spad(imgw)
 
 
 """
-:math:`\ell_2`-TV denoising with a spatial mask as a non-linear lowpass
-filter.
+$\ell_2$-TV denoising with a spatial mask as a non-linear lowpass filter. The highpass component is the difference between the test image and the lowpass component, multiplied by the mask for faster convergence of the convolutional sparse coding (see :cite:`wohlberg-2017-convolutional3`).
 """
 
 lmbda = 0.05
@@ -76,7 +75,7 @@ opt = tvl2.TVL2Denoise.Options({'Verbose': False, 'MaxMainIter': 200,
                     'AutoRho': {'Enabled': True}})
 b = tvl2.TVL2Denoise(imgwp, lmbda, opt)
 sl = b.solve()
-sh = imgwp - sl
+sh = mskp * (imgwp - sl)
 
 
 """
@@ -91,15 +90,15 @@ Set up :class:`.admm.cbpdn.ConvBPDN` options.
 """
 
 lmbda = 2e-2
-opt = cbpdn.ConvBPDN.Options({'Verbose': True, 'MaxMainIter': 250,
-                    'HighMemSolve': True, 'RelStopTol': 1e-3,
+opt = cbpdn.ConvBPDN.Options({'Verbose': True, 'MaxMainIter': 200,
+                    'HighMemSolve': True, 'RelStopTol': 5e-3,
                     'AuxVarObj': False, 'RelaxParam': 1.8,
                     'rho': 5e1*lmbda + 1e-1, 'AutoRho': {'Enabled': False,
-                    'StdResiduals': True}})
+                    'StdResiduals': False}})
 
 
 """
-Construct :class:`.admm.cbpdn.AddMaskSim` wrapper for :class`.admm.cbpdn.ConvBPDN` and solve via wrapper. This example could also have made use of :class`.admm.cbpdn.ConvBPDNMaskDcpl`, which has very similar performance in this application, but :class:`.admm.cbpdn.AddMaskSim` has the advantage of greater flexibility in that the wrapper can be applied to a variety of CSC solver objects.
+Construct :class:`.admm.cbpdn.AddMaskSim` wrapper for :class:`.admm.cbpdn.ConvBPDN` and solve via wrapper. This example could also have made use of :class:`.admm.cbpdn.ConvBPDNMaskDcpl` (see example `cbpdn_md_gry`), which has similar performance in this application, but :class:`.admm.cbpdn.AddMaskSim` has the advantage of greater flexibility in that the wrapper can be applied to a variety of CSC solver objects.
 """
 
 ams = cbpdn.AddMaskSim(cbpdn.ConvBPDN, D, sh, mskp, lmbda, opt=opt)

@@ -129,7 +129,7 @@ fig.show()
 
 
 """
-The previous method gave good results, but the weight on the filter representing the impulse noise is an additional parameter that has to be tuned. This parameter can be avoided by switching to an :math:`\ell_1` data fidelity term instead of including dictionary filters to represent the impulse noise, as in the problem :cite:`wohlberg-2016-convolutional2`
+The previous method gave good results, but the weight on the filter representing the impulse noise is an additional parameter that has to be tuned. This parameter can be avoided by switching to an $\ell_1$ data fidelity term instead of including dictionary filters to represent the impulse noise, as in the problem :cite:`wohlberg-2016-convolutional2`
 
   $$\mathrm{argmin}_{\{\mathbf{x}_m\}} \;
   \left \|  \sum_m \mathbf{d}_m * \mathbf{x}_m - \mathbf{s}

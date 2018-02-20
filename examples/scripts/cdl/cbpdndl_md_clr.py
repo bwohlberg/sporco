@@ -55,8 +55,7 @@ Sw = W * S
 
 
 """
-:math:`\ell_2`-TV denoising with a spatial mask as a non-linear lowpass
-filter.
+$\ell_2$-TV denoising with a spatial mask as a non-linear lowpass filter.
 """
 
 lmbda = 0.1
@@ -68,14 +67,14 @@ sh = Sw - sl
 
 
 """
-CDL without a spatial mask using :class:`.admm.cbpdndl.ConvBPDNDictLearn`.
+CDL without a spatial mask using :class:`.admm.cbpdndl.ConvBPDNDictLearn`. (Note that :class:`.parcnsdl.ConvBPDNMaskDcplDictLearn_Consensus` solves the same problem, but is substantially faster on a multi-core architecture.)
 """
 
 lmbda = 0.05
 opt1 = cbpdndl.ConvBPDNDictLearn.Options({'Verbose': True,
             'MaxMainIter': 200, 'AccurateDFid': True,
             'CBPDN': {'rho': 50.0*lmbda + 0.5},
-            'CCMOD': {'ZeroMean': True}})
+            'CCMOD': {'rho': 3e2}})
 d1 = cbpdndl.ConvBPDNDictLearn(D0, sh, lmbda, opt1)
 D1 = d1.solve()
 
@@ -94,7 +93,7 @@ CDL with a spatial mask using :class:`.cbpdndl.ConvBPDNMaskDcplDictLearn`.
 opt2 = cbpdndl.ConvBPDNMaskDcplDictLearn.Options({'Verbose': True,
             'MaxMainIter': 200, 'AccurateDFid': True,
             'CBPDN': {'rho': 50.0*lmbda + 0.5},
-            'CCMOD': {'ZeroMean': True}})
+            'CCMOD': {'rho': 1.0}})
 d2 = cbpdndl.ConvBPDNMaskDcplDictLearn(D0, sh, lmbda, W, opt2)
 D2 = d2.solve()
 
@@ -110,7 +109,7 @@ sr2 = d2.reconstruct().squeeze() + sl
 Compare dictionaries.
 """
 
-fig = plot.figure(figsize=(14,7))
+fig = plot.figure(figsize=(14, 7))
 plot.subplot(1, 2, 1)
 plot.imview(util.tiledict(D1.squeeze()), fgrf=fig,
             title='Without Mask Decoupling')
@@ -124,7 +123,7 @@ fig.show()
 Display reference and training images.
 """
 
-fig = plot.figure(figsize=(14,14))
+fig = plot.figure(figsize=(14, 14))
 plot.subplot(2, 2, 1)
 plot.imview(S[...,0], fgrf=fig, title='Reference')
 plot.subplot(2, 2, 2)
@@ -140,7 +139,7 @@ fig.show()
 Compare reconstructed images.
 """
 
-fig = plot.figure(figsize=(14,14))
+fig = plot.figure(figsize=(14, 14))
 plot.subplot(2, 2, 1)
 plot.imview(sr1[...,0], fgrf=fig, title='Without Mask Decoupling')
 plot.subplot(2, 2, 2)
