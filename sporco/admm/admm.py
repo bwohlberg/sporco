@@ -943,7 +943,7 @@ class ADMMEqual(ADMM):
         """
 
         defaults = copy.deepcopy(ADMM.Options.defaults)
-        defaults.update({'fEvalX' : True, 'gEvalY' : True, 'ReturnX' : True})
+        defaults.update({'fEvalX': True, 'gEvalY': True, 'ReturnX': True})
 
         def __init__(self, opt=None):
             """Initialise ADMMEqual algorithm options object."""
@@ -1158,7 +1158,7 @@ class ADMMTwoBlockCnstrnt(ADMM):
         """
 
         defaults = copy.deepcopy(ADMM.Options.defaults)
-        defaults.update({'AuxVarObj' : False, 'ReturnVar' : 'X'})
+        defaults.update({'AuxVarObj': False, 'ReturnVar': 'X'})
 
         def __init__(self, opt=None):
             """Initialise ADMMTwoBlockCnstrnt algorithm options object."""
@@ -1599,8 +1599,8 @@ class ADMMConsensus(ADMM):
         """
 
         defaults = copy.deepcopy(ADMM.Options.defaults)
-        defaults.update({'fEvalX' : False, 'gEvalY' : True,
-                         'AuxVarObj' : True})
+        defaults.update({'fEvalX': False, 'gEvalY': True,
+                         'AuxVarObj': True})
 
 
         def __init__(self, opt=None):
