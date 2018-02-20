@@ -823,6 +823,8 @@ class ConvCnstrMODMaskDcpl_Consensus(ccmod.ConvCnstrMOD_Consensus):
                                         opt=opt, dimK=dimK, dimN=dimN)
 
         # Convert W to internal shape
+        if W is None:
+            W = np.array([1.0], dtype=self.dtype)
         W = np.asarray(W.reshape(cr.mskWshape(W, self.cri)),
                        dtype=S.dtype)
 

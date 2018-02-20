@@ -614,6 +614,7 @@ class ConvCnstrMOD_Consensus(admm.ADMMConsensus):
 
         defaults = copy.deepcopy(ConvCnstrMODBase.Options.defaults)
         defaults.update(admm.ADMMConsensus.Options.defaults)
+        defaults.update({'RelaxParam': 1.8})
 
 
         def __init__(self, opt=None):
