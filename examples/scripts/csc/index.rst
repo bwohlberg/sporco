@@ -13,6 +13,9 @@ implsden_clr.py
 cbpdn_ams_gry.py
   Inpainting of randomly distributed pixel corruption (greyscale image)
 
+cbpdn_md_gry.py
+  Inpainting of randomly distributed pixel corruption (greyscale image)
+
 cbpdn_ams_clr.py
   Inpainting of randomly distributed pixel corruption (colour image)
 
