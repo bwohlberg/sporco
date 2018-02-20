@@ -821,7 +821,7 @@ class CrossReferenceLookup(object):
                     url = self.get_docs_url(role, name)
                     lbl = self.get_docs_label(role, name)
                 except KeyError as ex:
-                    if ex.args[1] != 'role':
+                    if len(ex.args) == 1 or ex.args[1] != 'role':
                         print('Warning: %s' % ex.args[0])
                 else:
                     # If the cross-reference lookup was successful, replace
