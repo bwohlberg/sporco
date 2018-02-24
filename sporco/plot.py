@@ -459,7 +459,7 @@ def imview(img, title=None, copy=True, fltscl=False, intrp='nearest',
     if cmap is None and img.ndim == 2:
         cmap = cm.Greys_r
 
-    if np.issubdtype(img.dtype, np.float):
+    if np.issubdtype(img.dtype, np.floating):
         if fltscl:
             imgd -= imgd.min()
             imgd /= imgd.max()
