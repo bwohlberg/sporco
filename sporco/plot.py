@@ -112,10 +112,10 @@ def plot(y, x=None, ptyp='plot', xlbl=None, ylbl=None, title=None,
 
     Returns
     -------
-    fig : :class:`matplotlib.figure.Figure`
+    fig : :class:`matplotlib.figure.Figure` object
       Figure object for this figure
-    ax : :class:`matplotlib.axes.Axes`
-      Axes for this plot
+    ax : :class:`matplotlib.axes.Axes` object
+      Axes object for this plot
     """
 
     if fgrf is None:
@@ -194,7 +194,7 @@ def surf(z, x=None, y=None, elev=None, azim=None, xlbl=None, ylbl=None,
         If not None, plot contours of the surface on the lower end of
         the z-axis. An int specifies the number of contours to plot, and
         a sequence specifies the specific contour levels to plot.
-    cmap : :class:`matplotlib.colors.Colormap`, optional (default None)
+    cmap : :class:`matplotlib.colors.Colormap` object, optional (default None)
         Colour map for surface. If none specifed, defaults to cm.coolwarm
     fgrf : :class:`matplotlib.figure.Figure` object, optional (default None)
         Draw in specified figure instead of creating one
@@ -207,10 +207,10 @@ def surf(z, x=None, y=None, elev=None, azim=None, xlbl=None, ylbl=None,
 
     Returns
     -------
-    fig : :class:`matplotlib.figure.Figure`
+    fig : :class:`matplotlib.figure.Figure` object
       Figure object for this figure
-    ax : :class:`matplotlib.axes.Axes`
-      Axes for this plot
+    ax : :class:`matplotlib.axes.Axes` object
+      Axes object for this plot
     """
 
     if fgrf is None:
@@ -322,10 +322,10 @@ def contour(z, x=None, y=None, v=5, xlbl=None, ylbl=None, title=None,
 
     Returns
     -------
-    fig : :class:`matplotlib.figure.Figure`
+    fig : :class:`matplotlib.figure.Figure` object
       Figure object for this figure
-    ax : :class:`matplotlib.axes.Axes`
-      Axes for this plot
+    ax : :class:`matplotlib.axes.Axes` object
+      Axes object for this plot
     """
 
     if fgrf is None:
@@ -426,10 +426,10 @@ def imview(img, title=None, copy=True, fltscl=False, intrp='nearest',
 
     Returns
     -------
-    fig : :class:`matplotlib.figure.Figure`
+    fig : :class:`matplotlib.figure.Figure` object
       Figure object for this figure
-    ax : :class:`matplotlib.axes.Axes`
-      Axes for this plot
+    ax : :class:`matplotlib.axes.Axes` object
+      Axes object for this plot
     """
 
     if img.ndim > 2 and img.shape[2] != 3:
@@ -473,7 +473,7 @@ def imview(img, title=None, copy=True, fltscl=False, intrp='nearest',
 
     if norm is None:
         im = ax.imshow(imgd, cmap=cmap, interpolation=intrp, vmin=imgd.min(),
-                    vmax=imgd.max())
+                       vmax=imgd.max())
     else:
         im = ax.imshow(imgd, cmap=cmap, interpolation=intrp, norm=norm)
 
@@ -536,13 +536,13 @@ def close(fig=None):
 
     Parameters
     ----------
-    fig : :class:`matplotlib.figure.Figure` object or integer or None,\
+    fig : :class:`matplotlib.figure.Figure` object or integer,\
           optional (default None)
         Figure object or number of figure to close
     """
 
     if fig is None:
-        plt.close("all")
+        plt.close('all')
     else:
         plt.close(fig)
 
