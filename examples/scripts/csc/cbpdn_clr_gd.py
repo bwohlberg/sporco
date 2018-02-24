@@ -89,10 +89,10 @@ Display low pass component and sum of absolute values of coefficient maps of hig
 gamma = lambda x, g: x**g
 fig = plot.figure(figsize=(14, 7))
 plot.subplot(1, 2, 1)
-plot.imview(sl, title='Lowpass component', fgrf=fig)
+plot.imview(sl, title='Lowpass component', fig=fig)
 plot.subplot(1, 2, 2)
 plot.imview(gamma(np.sum(abs(X), axis=b.cri.axisM).squeeze(), 0.4),
-            title='Sparse representation', fgrf=fig)
+            title='Sparse representation', fig=fig)
 fig.show()
 
 
@@ -102,9 +102,9 @@ Display original and reconstructed images.
 
 fig = plot.figure(figsize=(14, 7))
 plot.subplot(1, 2, 1)
-plot.imview(img, title='Original', fgrf=fig)
+plot.imview(img, title='Original', fig=fig)
 plot.subplot(1, 2, 2)
-plot.imview(imgr, title='Reconstructed', fgrf=fig)
+plot.imview(imgr, title='Reconstructed', fig=fig)
 fig.show()
 
 
@@ -115,13 +115,13 @@ Get iterations statistics from solver object and plot functional value, ADMM pri
 its = b.getitstat()
 fig = plot.figure(figsize=(20, 5))
 plot.subplot(1, 3, 1)
-plot.plot(its.ObjFun, fgrf=fig, xlbl='Iterations', ylbl='Functional')
+plot.plot(its.ObjFun, fig=fig, xlbl='Iterations', ylbl='Functional')
 plot.subplot(1, 3, 2)
-plot.plot(np.vstack((its.PrimalRsdl, its.DualRsdl)).T, fgrf=fig,
+plot.plot(np.vstack((its.PrimalRsdl, its.DualRsdl)).T, fig=fig,
           ptyp='semilogy', xlbl='Iterations', ylbl='Residual',
           lgnd=['Primal', 'Dual'])
 plot.subplot(1, 3, 3)
-plot.plot(its.Rho, fgrf=fig, xlbl='Iterations', ylbl='Penalty Parameter')
+plot.plot(its.Rho, fig=fig, xlbl='Iterations', ylbl='Penalty Parameter')
 fig.show()
 
 

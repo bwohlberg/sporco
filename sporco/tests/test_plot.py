@@ -48,21 +48,21 @@ class TestSet01(object):
         x = np.linspace(-1, 1, 20)
         y = x**2
         fig = plot.figure()
-        plot.plot(y, x=x, title='Plot Test', xlbl='x', ylbl='y', fgrf=fig)
+        plot.plot(y, x=x, title='Plot Test', xlbl='x', ylbl='y', fig=fig)
         plot.close()
 
 
     def test_03(self):
         fig, ax = plot.subplots(nrows=1, ncols=1)
         plot.surf(self.z, title='Surf Test', xlbl='x', ylbl='y', zlbl='z',
-                  elev=0.0, fgrf=fig, axrf=ax)
+                  elev=0.0, fig=fig, ax=ax)
         plot.close()
 
 
     def test_04(self):
         fig = plot.figure()
         plot.surf(self.z, x=self.x, y=self.y, title='Surf Test', xlbl='x',
-                  ylbl='y', zlbl='z', cntr=5, fgrf=fig)
+                  ylbl='y', zlbl='z', cntr=5, fig=fig)
         plot.close()
 
 
@@ -75,7 +75,7 @@ class TestSet01(object):
     def test_06(self):
         fig = plot.figure()
         plot.contour(self.z, title='Contour Test', xlbl='x', ylbl='y',
-                    fgrf=fig)
+                    fig=fig)
         plot.close()
 
 
@@ -86,7 +86,7 @@ class TestSet01(object):
 
     def test_08(self):
         fig = plot.figure()
-        plot.imview(self.z, title='Imview Test', fltscl=True, fgrf=fig)
+        plot.imview(self.z, title='Imview Test', fltscl=True, fig=fig)
         plot.close()
 
 
@@ -100,21 +100,21 @@ class TestSet01(object):
     def test_10(self):
         fig = plot.figure()
         plot.imview((100.0*self.z).astype(np.int16), title='Imview Test',
-                    fltscl=True, fgrf=fig)
+                    fltscl=True, fig=fig)
         plot.close()
 
 
     def test_11(self):
         fig = plot.figure()
         plot.imview((100.0*self.z).astype(np.uint16), title='Imview Test',
-                    fltscl=True, fgrf=fig)
+                    fltscl=True, fig=fig)
         plot.close()
 
 
     def test_12(self):
         z3 = np.dstack((self.z, 2*self.z, 3*self.z))
         fig = plot.figure()
-        plot.imview(z3, title='Imview Test', fgrf=fig)
+        plot.imview(z3, title='Imview Test', fig=fig)
         plot.close()
 
 

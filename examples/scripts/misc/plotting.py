@@ -47,8 +47,8 @@ We can also create a plot and then add to it. In this case we need to create the
 fig = plot.figure()
 plot.plot(np.stack((y1, y2, y3)).T, x, xlbl='x', ylbl='y',
         title='Plot Example', lgnd=('$|x|$', '$|x|^{(3/2)}$', '$x^2$'),
-        lglc='upper center', fgrf=fig)
-plot.plot(y1[::5], x[::5], lwidth=0, msize=8.0, mstyle='o', fgrf=fig)
+        lglc='upper center', fig=fig)
+plot.plot(y1[::5], x[::5], lwidth=0, msize=8.0, mstyle='o', fig=fig)
 fig.show()
 
 
@@ -84,9 +84,9 @@ We can also plot within subplots of the same figure.
 fig, ax = plot.subplots(nrows=1, ncols=2, figsize=(12.1, 5))
 fig.suptitle('Figure Title', fontsize=14)
 plot.surf(z, x, y, xlbl='x', ylbl='y', zlbl='z', title='Surface Plot Example',
-        fgrf=fig, axrf=ax[0])
+        fig=fig, ax=ax[0])
 plot.contour(z, x, y, xlbl='x', ylbl='y', title='Contour Plot Example',
-        fgrf=fig, axrf=ax[1])
+        fig=fig, ax=ax[1])
 fig.show()
 
 
@@ -121,9 +121,9 @@ We can view both images as subplots within the same figure, but the colour bar o
 
 fig, ax = plot.subplots(nrows=1, ncols=2, figsize=(18, 8))
 fig.suptitle('Figure Title', fontsize=14)
-plot.imview(imgc, title='Colour Image', fgrf=fig, axrf=ax[0])
+plot.imview(imgc, title='Colour Image', fig=fig, ax=ax[0])
 plot.imview(imgg, cmap=plot.cm.coolwarm, title='Monochrome Image',
-            cbar=True, fgrf=fig, axrf=ax[1])
+            cbar=True, fig=fig, ax=ax[1])
 fig.show()
 
 
@@ -135,9 +135,9 @@ fig, ax = plot.subplots(nrows=1, ncols=2, sharex=True, sharey=True,
                         gridspec_kw={'width_ratios': [1, 1.07]},
                         figsize=(19.5, 8))
 fig.suptitle('Figure Title', fontsize=14)
-plot.imview(imgc, title='Colour Image', fgrf=fig, axrf=ax[0])
+plot.imview(imgc, title='Colour Image', fig=fig, ax=ax[0])
 plot.imview(imgg, cmap=plot.cm.coolwarm, title='Monochrome Image',
-            cbar=True, fgrf=fig, axrf=ax[1])
+            cbar=True, fig=fig, ax=ax[1])
 fig.show()
 
 
@@ -150,9 +150,9 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 fig, ax = plot.subplots(nrows=1, ncols=2, sharex=True, sharey=True,
                         figsize=(18, 8))
 fig.suptitle('Figure Title', fontsize=14)
-plot.imview(imgc, title='Colour Image', cbar=None, fgrf=fig, axrf=ax[0])
+plot.imview(imgc, title='Colour Image', cbar=None, fig=fig, ax=ax[0])
 plot.imview(imgg, cmap=plot.cm.coolwarm, title='Monochrome Image',
-            cbar=True, fgrf=fig, axrf=ax[1])
+            cbar=True, fig=fig, ax=ax[1])
 fig.show()
 
 

@@ -111,10 +111,10 @@ Compare dictionaries.
 
 fig = plot.figure(figsize=(14, 7))
 plot.subplot(1, 2, 1)
-plot.imview(util.tiledict(D1.squeeze()), fgrf=fig,
+plot.imview(util.tiledict(D1.squeeze()), fig=fig,
             title='Without Mask Decoupling')
 plot.subplot(1, 2, 2)
-plot.imview(util.tiledict(D2.squeeze()), fgrf=fig,
+plot.imview(util.tiledict(D2.squeeze()), fig=fig,
             title='With Mask Decoupling')
 fig.show()
 
@@ -125,13 +125,13 @@ Display reference and training images.
 
 fig = plot.figure(figsize=(14, 14))
 plot.subplot(2, 2, 1)
-plot.imview(S[...,0], fgrf=fig, title='Reference')
+plot.imview(S[...,0], fig=fig, title='Reference')
 plot.subplot(2, 2, 2)
-plot.imview(Sw[...,0], fgrf=fig, title='Test')
+plot.imview(Sw[...,0], fig=fig, title='Test')
 plot.subplot(2, 2, 3)
-plot.imview(S[...,1], fgrf=fig, title='Reference')
+plot.imview(S[...,1], fig=fig, title='Reference')
 plot.subplot(2, 2, 4)
-plot.imview(Sw[...,1], fgrf=fig, title='Test')
+plot.imview(Sw[...,1], fig=fig, title='Test')
 fig.show()
 
 
@@ -141,13 +141,13 @@ Compare reconstructed images.
 
 fig = plot.figure(figsize=(14, 14))
 plot.subplot(2, 2, 1)
-plot.imview(sr1[...,0], fgrf=fig, title='Without Mask Decoupling')
+plot.imview(sr1[...,0], fig=fig, title='Without Mask Decoupling')
 plot.subplot(2, 2, 2)
-plot.imview(sr2[...,0], fgrf=fig, title='With Mask Decoupling')
+plot.imview(sr2[...,0], fig=fig, title='With Mask Decoupling')
 plot.subplot(2, 2, 3)
-plot.imview(sr1[...,1], fgrf=fig, title='Without Mask Decoupling')
+plot.imview(sr1[...,1], fig=fig, title='Without Mask Decoupling')
 plot.subplot(2, 2, 4)
-plot.imview(sr2[...,1], fgrf=fig, title='With Mask Decoupling')
+plot.imview(sr2[...,1], fig=fig, title='With Mask Decoupling')
 fig.show()
 
 

@@ -106,9 +106,9 @@ Plot comparison of reference and recovered representations.
 
 fig = plot.figure(figsize=(6, 8))
 plot.subplot(1, 2, 1)
-plot.imview(x0, fgrf=fig, cmap=plot.cm.Blues, title='Reference')
+plot.imview(x0, fig=fig, cmap=plot.cm.Blues, title='Reference')
 plot.subplot(1, 2, 2)
-plot.imview(x, fgrf=fig, cmap=plot.cm.Blues, title='Reconstruction')
+plot.imview(x, fig=fig, cmap=plot.cm.Blues, title='Reconstruction')
 fig.show()
 
 
@@ -121,15 +121,15 @@ fig = plot.figure(figsize=(15, 10))
 ax = fig.add_subplot(2, 2, 1, projection='3d')
 ax.locator_params(nbins=5, axis='y')
 plot.surf(fvmx, x=np.log10(mrng), y=np.log10(lrng), xlbl='log($\mu$)',
-          ylbl='log($\lambda$)', zlbl='Error', fgrf=fig, axrf=ax)
+          ylbl='log($\lambda$)', zlbl='Error', fig=fig, ax=ax)
 plot.subplot(2, 2, 2)
-plot.plot(its.ObjFun, fgrf=fig, xlbl='Iterations', ylbl='Functional')
+plot.plot(its.ObjFun, fig=fig, xlbl='Iterations', ylbl='Functional')
 plot.subplot(2, 2, 3)
-plot.plot(np.vstack((its.PrimalRsdl, its.DualRsdl)).T, fgrf=fig,
+plot.plot(np.vstack((its.PrimalRsdl, its.DualRsdl)).T, fig=fig,
           ptyp='semilogy', xlbl='Iterations', ylbl='Residual',
           lgnd=['Primal', 'Dual'])
 plot.subplot(2, 2, 4)
-plot.plot(its.Rho, fgrf=fig, xlbl='Iterations', ylbl='Penalty Parameter')
+plot.plot(its.Rho, fig=fig, xlbl='Iterations', ylbl='Penalty Parameter')
 fig.show()
 
 

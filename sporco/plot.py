@@ -67,7 +67,7 @@ def attach_keypress(fig):
 
 def plot(y, x=None, ptyp='plot', xlbl=None, ylbl=None, title=None,
          lgnd=None, lglc=None, lwidth=1.5, lstyle='solid', msize=6.0,
-         mstyle='None', fgrf=None, axrf=None, fgsz=None, fgnm=None):
+         mstyle='None', fgsz=None, fgnm=None, fig=None, ax=None):
     """
     Plot points or lines in 2D. If a figure object is specified then the
     plot is drawn in that figure, and fig.show() is not called. The figure
@@ -101,14 +101,14 @@ def plot(y, x=None, ptyp='plot', xlbl=None, ylbl=None, title=None,
         Marker size
     mstyle : string, optional (default 'None')
         Marker style (see :mod:`matplotlib.markers`)
-    fgrf : :class:`matplotlib.figure.Figure` object, optional (default None)
-        Draw in specified figure instead of creating one
-    axrf : :class:`matplotlib.axes.Axes` object, optional (default None)
-        Plot in specified axes instead of current axes of figure
     fgsz : tuple (width,height), optional (default None)
         Specify figure dimensions in inches
     fgnm : integer, optional (default None)
         Figure number of figure
+    fig : :class:`matplotlib.figure.Figure` object, optional (default None)
+        Draw in specified figure instead of creating one
+    ax : :class:`matplotlib.axes.Axes` object, optional (default None)
+        Plot in specified axes instead of current axes of figure
 
     Returns
     -------
@@ -118,16 +118,13 @@ def plot(y, x=None, ptyp='plot', xlbl=None, ylbl=None, title=None,
       Axes object for this plot
     """
 
-    if fgrf is None:
+    figp = fig
+    if fig is None:
         fig = plt.figure(num=fgnm, figsize=fgsz)
         fig.clf()
         ax = fig.gca()
-    else:
-        fig = fgrf
-        if axrf is None:
-            ax = fig.gca()
-        else:
-            ax = axrf
+    elif ax is None:
+        ax = fig.gca()
 
     if ptyp not in ('plot', 'semilogx', 'semilogy', 'loglog'):
         raise ValueError("Invalid plot type '%s'" % ptyp)
@@ -153,7 +150,7 @@ def plot(y, x=None, ptyp='plot', xlbl=None, ylbl=None, title=None,
     if have_mpldc:
         mpldc.datacursor(pltln)
 
-    if fgrf is None:
+    if figp is None:
         fig.show()
 
     return fig, ax
@@ -162,7 +159,7 @@ def plot(y, x=None, ptyp='plot', xlbl=None, ylbl=None, title=None,
 
 def surf(z, x=None, y=None, elev=None, azim=None, xlbl=None, ylbl=None,
          zlbl=None, title=None, lblpad=8.0, cntr=None, cmap=None,
-         fgrf=None, axrf=None, fgsz=None, fgnm=None):
+         fgsz=None, fgnm=None, fig=None, ax=None):
     """
     Plot a 2D surface in 3D. If a figure object is specified then the
     surface is drawn in that figure, and fig.show() is not called. The
@@ -196,14 +193,14 @@ def surf(z, x=None, y=None, elev=None, azim=None, xlbl=None, ylbl=None,
         a sequence specifies the specific contour levels to plot.
     cmap : :class:`matplotlib.colors.Colormap` object, optional (default None)
         Colour map for surface. If none specifed, defaults to cm.coolwarm
-    fgrf : :class:`matplotlib.figure.Figure` object, optional (default None)
-        Draw in specified figure instead of creating one
-    axrf : :class:`matplotlib.axes.Axes` object, optional (default None)
-        Plot in specified axes instead of creating one
     fgsz : tuple (width,height), optional (default None)
         Specify figure dimensions in inches
     fgnm : integer, optional (default None)
         Figure number of figure
+    fig : :class:`matplotlib.figure.Figure` object, optional (default None)
+        Draw in specified figure instead of creating one
+    ax : :class:`matplotlib.axes.Axes` object, optional (default None)
+        Plot in specified axes instead of creating one
 
     Returns
     -------
@@ -213,16 +210,15 @@ def surf(z, x=None, y=None, elev=None, azim=None, xlbl=None, ylbl=None,
       Axes object for this plot
     """
 
-    if fgrf is None:
+    figp = fig
+    if fig is None:
         fig = plt.figure(num=fgnm, figsize=fgsz)
         fig.clf()
         ax = plt.axes(projection='3d')
     else:
-        fig = fgrf
-        if axrf is None:
+        if ax is None:
             ax = plt.axes(projection='3d')
         else:
-            ax = axrf
             # See https://stackoverflow.com/a/43563804
             #     https://stackoverflow.com/a/35221116
             if ax.name != '3d':
@@ -260,7 +256,7 @@ def surf(z, x=None, y=None, elev=None, azim=None, xlbl=None, ylbl=None,
 
     attach_keypress(fig)
 
-    if fgrf is None:
+    if figp is None:
         fig.show()
 
     return fig, ax
@@ -269,7 +265,7 @@ def surf(z, x=None, y=None, elev=None, azim=None, xlbl=None, ylbl=None,
 
 def contour(z, x=None, y=None, v=5, xlbl=None, ylbl=None, title=None,
             cfntsz=10, lfntsz=None, intrp='bicubic', alpha=0.5, cmap=None,
-            vmin=None, vmax=None, fgrf=None, axrf=None, fgsz=None, fgnm=None):
+            vmin=None, vmax=None, fgsz=None, fgnm=None, fig=None, ax=None):
     """
     Contour plot of a 2D surface. If a figure object is specified then the
     plot is drawn in that figure, and fig.show() is not called. The figure
@@ -308,17 +304,14 @@ def contour(z, x=None, y=None, v=5, xlbl=None, ylbl=None, title=None,
     vmin, vmax : float, optional (default None)
         Set upper and lower bounds for the colour map (see the corresponding
         parameters of :meth:`matplotlib.axes.Axes.imshow`)
-
-
-
-    fgrf : :class:`matplotlib.figure.Figure` object, optional (default None)
-        Draw in specified figure instead of creating one
-    axrf : :class:`matplotlib.axes.Axes` object, optional (default None)
-        Plot in specified axes instead of current axes of figure
     fgsz : tuple (width,height), optional (default None)
         Specify figure dimensions in inches
     fgnm : integer, optional (default None)
         Figure number of figure
+    fig : :class:`matplotlib.figure.Figure` object, optional (default None)
+        Draw in specified figure instead of creating one
+    ax : :class:`matplotlib.axes.Axes` object, optional (default None)
+        Plot in specified axes instead of current axes of figure
 
     Returns
     -------
@@ -328,16 +321,13 @@ def contour(z, x=None, y=None, v=5, xlbl=None, ylbl=None, title=None,
       Axes object for this plot
     """
 
-    if fgrf is None:
+    figp = fig
+    if fig is None:
         fig = plt.figure(num=fgnm, figsize=fgsz)
         fig.clf()
         ax = fig.gca()
-    else:
-        fig = fgrf
-        if axrf is None:
-            ax = fig.gca()
-        else:
-            ax = axrf
+    elif ax is None:
+        ax = fig.gca()
 
     if cmap is None:
         cmap = cm.coolwarm
@@ -375,7 +365,7 @@ def contour(z, x=None, y=None, v=5, xlbl=None, ylbl=None, title=None,
     if have_mpldc:
         mpldc.datacursor()
 
-    if fgrf is None:
+    if figp is None:
         fig.show()
 
     return fig, ax
@@ -383,8 +373,8 @@ def contour(z, x=None, y=None, v=5, xlbl=None, ylbl=None, title=None,
 
 
 def imview(img, title=None, copy=True, fltscl=False, intrp='nearest',
-           norm=None, cbar=False, cmap=None, fgrf=None, axrf=None,
-           fgsz=None, fgnm=None):
+           norm=None, cbar=False, cmap=None, fgsz=None, fgnm=None,
+           fig=None, ax=None):
     """
     Display an image. Pixel values are displayed when the pointer is over
     valid image data.  If a figure object is specified then the image is
@@ -415,14 +405,14 @@ def imview(img, title=None, copy=True, fltscl=False, intrp='nearest',
     cmap : :class:`matplotlib.colors.Colormap`, optional (default None)
         Colour map for image. If none specifed, defaults to cm.Greys_r
         for monochrome image
-    fgrf : :class:`matplotlib.figure.Figure` object, optional (default None)
-        Draw in specified figure instead of creating one
-    axrf : :class:`matplotlib.axes.Axes` object, optional (default None)
-        Plot in specified axes instead of current axes of figure
     fgsz : tuple (width,height), optional (default None)
         Specify figure dimensions in inches
     fgnm : integer, optional (default None)
         Figure number of figure
+    fig : :class:`matplotlib.figure.Figure` object, optional (default None)
+        Draw in specified figure instead of creating one
+    ax : :class:`matplotlib.axes.Axes` object, optional (default None)
+        Plot in specified axes instead of current axes of figure
 
     Returns
     -------
@@ -436,16 +426,13 @@ def imview(img, title=None, copy=True, fltscl=False, intrp='nearest',
         raise ValueError('Argument img must be an Nr x Nc array or an '
                          'Nr x Nc x 3 array')
 
-    if fgrf is None:
+    figp = fig
+    if fig is None:
         fig = plt.figure(num=fgnm, figsize=fgsz)
         fig.clf()
         ax = fig.gca()
-    else:
-        fig = fgrf
-        if axrf is None:
-            ax = fig.gca()
-        else:
-            ax = axrf
+    elif ax is None:
+        ax = fig.gca()
 
     ax.set_adjustable('box-forced')
 
@@ -522,7 +509,7 @@ def imview(img, title=None, copy=True, fltscl=False, intrp='nearest',
     if have_mpldc:
         mpldc.datacursor(display='single')
 
-    if fgrf is None:
+    if figp is None:
         fig.show()
 
     return fig, ax

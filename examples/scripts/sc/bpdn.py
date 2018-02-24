@@ -109,15 +109,15 @@ its = b.getitstat()
 fig = plot.figure(figsize=(15, 10))
 plot.subplot(2, 2, 1)
 plot.plot(fvmx, x=lrng, ptyp='semilogx', xlbl='$\lambda$',
-          ylbl='Error', fgrf=fig)
+          ylbl='Error', fig=fig)
 plot.subplot(2, 2, 2)
-plot.plot(its.ObjFun, fgrf=fig, xlbl='Iterations', ylbl='Functional')
+plot.plot(its.ObjFun, fig=fig, xlbl='Iterations', ylbl='Functional')
 plot.subplot(2, 2, 3)
-plot.plot(np.vstack((its.PrimalRsdl, its.DualRsdl)).T, fgrf=fig,
+plot.plot(np.vstack((its.PrimalRsdl, its.DualRsdl)).T, fig=fig,
           ptyp='semilogy', xlbl='Iterations', ylbl='Residual',
           lgnd=['Primal', 'Dual'])
 plot.subplot(2, 2, 4)
-plot.plot(its.Rho, fgrf=fig, xlbl='Iterations', ylbl='Penalty Parameter')
+plot.plot(its.Rho, fig=fig, xlbl='Iterations', ylbl='Penalty Parameter')
 fig.show()
 
 

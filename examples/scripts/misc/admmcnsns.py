@@ -182,14 +182,14 @@ Plot functional value, residuals, and rho.
 its = b.getitstat()
 fig = plot.figure(figsize=(20, 5))
 plot.subplot(1, 3, 1)
-plot.plot(its.ObjFun, fgrf=fig, ptyp='semilogy', xlbl='Iterations',
+plot.plot(its.ObjFun, fig=fig, ptyp='semilogy', xlbl='Iterations',
         ylbl='Functional')
 plot.subplot(1, 3, 2)
-plot.plot(np.vstack((its.PrimalRsdl, its.DualRsdl)).T, fgrf=fig,
+plot.plot(np.vstack((its.PrimalRsdl, its.DualRsdl)).T, fig=fig,
         ptyp='semilogy', xlbl='Iterations', ylbl='Residual',
         lgnd=['Primal', 'Dual']);
 plot.subplot(1, 3, 3)
-plot.plot(its.Rho, fgrf=fig, xlbl='Iterations', ylbl='Penalty Parameter')
+plot.plot(its.Rho, fig=fig, xlbl='Iterations', ylbl='Penalty Parameter')
 fig.show()
 
 

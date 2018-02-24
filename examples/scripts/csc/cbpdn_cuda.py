@@ -108,14 +108,14 @@ Display representation and reconstructed image.
 
 fig = plot.figure(figsize=(14, 14))
 plot.subplot(2, 2, 1)
-plot.imview(sl, fgrf=fig, title='Lowpass component')
+plot.imview(sl, fig=fig, title='Lowpass component')
 plot.subplot(2, 2, 2)
-plot.imview(np.sum(abs(X), axis=2).squeeze(), fgrf=fig,
+plot.imview(np.sum(abs(X), axis=2).squeeze(), fig=fig,
             cmap=plot.cm.Blues, title='Main representation')
 plot.subplot(2, 2, 3)
-plot.imview(imgr, fgrf=fig, title='Reconstructed image')
+plot.imview(imgr, fig=fig, title='Reconstructed image')
 plot.subplot(2, 2, 4)
-plot.imview(imgr - img, fgrf=fig, fltscl=True,
+plot.imview(imgr - img, fig=fig, fltscl=True,
             title='Reconstruction difference')
 fig.show()
 

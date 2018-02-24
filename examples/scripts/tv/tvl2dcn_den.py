@@ -73,11 +73,11 @@ Display reference, corrupted, and denoised images.
 
 fig = plot.figure(figsize=(20, 5))
 plot.subplot(1, 3, 1)
-plot.imview(img, fgrf=fig, title='Reference')
+plot.imview(img, fig=fig, title='Reference')
 plot.subplot(1, 3, 2)
-plot.imview(imgn, fgrf=fig, title='Corrupted')
+plot.imview(imgn, fig=fig, title='Corrupted')
 plot.subplot(1, 3, 3)
-plot.imview(imgr, fgrf=fig, title=r'Restored ($\ell_2$-TV)')
+plot.imview(imgr, fig=fig, title=r'Restored ($\ell_2$-TV)')
 fig.show()
 
 
@@ -88,13 +88,13 @@ Get iterations statistics from solver object and plot functional value, ADMM pri
 its = b.getitstat()
 fig = plot.figure(figsize=(20, 5))
 plot.subplot(1, 3, 1)
-plot.plot(its.ObjFun, fgrf=fig, xlbl='Iterations', ylbl='Functional')
+plot.plot(its.ObjFun, fig=fig, xlbl='Iterations', ylbl='Functional')
 plot.subplot(1, 3, 2)
-plot.plot(np.vstack((its.PrimalRsdl, its.DualRsdl)).T, fgrf=fig,
+plot.plot(np.vstack((its.PrimalRsdl, its.DualRsdl)).T, fig=fig,
           ptyp='semilogy', xlbl='Iterations', ylbl='Residual',
           lgnd=['Primal', 'Dual'])
 plot.subplot(1, 3, 3)
-plot.plot(its.Rho, fgrf=fig, xlbl='Iterations', ylbl='Penalty Parameter')
+plot.plot(its.Rho, fig=fig, xlbl='Iterations', ylbl='Penalty Parameter')
 fig.show()
 
 

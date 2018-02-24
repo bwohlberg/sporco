@@ -83,9 +83,9 @@ D0 = D0.reshape((8, 8, D0.shape[-1]))
 D1 = D1.reshape((8, 8, D1.shape[-1]))
 fig = plot.figure(figsize=(14, 7))
 plot.subplot(1, 2, 1)
-plot.imview(util.tiledict(D0), fgrf=fig, title='D0')
+plot.imview(util.tiledict(D0), fig=fig, title='D0')
 plot.subplot(1, 2, 2)
-plot.imview(util.tiledict(D1), fgrf=fig, title='D1')
+plot.imview(util.tiledict(D1), fig=fig, title='D1')
 fig.show()
 
 
@@ -96,13 +96,13 @@ Get iterations statistics from CMOD solver object and plot functional value, ADM
 its = c.getitstat()
 fig = plot.figure(figsize=(20, 5))
 plot.subplot(1, 3, 1)
-plot.plot(its.DFid, fgrf=fig, xlbl='Iterations', ylbl='Functional')
+plot.plot(its.DFid, fig=fig, xlbl='Iterations', ylbl='Functional')
 plot.subplot(1, 3, 2)
-plot.plot(np.vstack((its.PrimalRsdl, its.DualRsdl)).T, fgrf=fig,
+plot.plot(np.vstack((its.PrimalRsdl, its.DualRsdl)).T, fig=fig,
           ptyp='semilogy', xlbl='Iterations', ylbl='Residual',
           lgnd=['Primal', 'Dual'])
 plot.subplot(1, 3, 3)
-plot.plot(its.Rho, fgrf=fig, xlbl='Iterations', ylbl='Penalty Parameter')
+plot.plot(its.Rho, fig=fig, xlbl='Iterations', ylbl='Penalty Parameter')
 fig.show()
 
 
