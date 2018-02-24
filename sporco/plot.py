@@ -608,7 +608,7 @@ def config_notebook_plotting():
     module = sys.modules[__name__]
     if in_notebook() and module.plot.__name__ == 'plot':
 
-        # Set inline backend (i.e. %matplotlib inline) if in
+        # Set inline backend (i.e. %matplotlib inline) if in a notebook shell
         set_notebook_plot_backend()
 
         # Replace plot function with a wrapper function that discards
