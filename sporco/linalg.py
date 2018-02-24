@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2015-2017 by Brendt Wohlberg <brendt@ieee.org>
+# Copyright (C) 2015-2018 by Brendt Wohlberg <brendt@ieee.org>
 # All rights reserved. BSD 3-clause License.
 # This file is part of the SPORCO package. Details of the copyright
 # and user license can be found in the 'LICENSE.txt' file distributed
@@ -1251,28 +1251,3 @@ def rrs(ax, b):
         return 1.0
     else:
         return linalg.norm((ax - b).ravel()) / nrm
-
-
-
-import warnings
-import sporco.metric as sm
-
-def mae(*args, **kwargs):
-    warnings.warn("sporco.linalg.mae is deprecated: use sporco.metric.mae",
-                  PendingDeprecationWarning)
-    return sm.mae(*args, **kwargs)
-
-def mse(*args, **kwargs):
-    warnings.warn("sporco.linalg.mse is deprecated: use sporco.metric.mse",
-                  PendingDeprecationWarning)
-    return sm.mse(*args, **kwargs)
-
-def snr(*args, **kwargs):
-    warnings.warn("sporco.linalg.snr is deprecated: use sporco.metric.snr",
-                  PendingDeprecationWarning)
-    return sm.snr(*args, **kwargs)
-
-def psnr(*args, **kwargs):
-    warnings.warn("sporco.linalg.psnr is deprecated: use sporco.metric.psnr",
-                  PendingDeprecationWarning)
-    return sm.psnr(*args, **kwargs)
