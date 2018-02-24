@@ -14,6 +14,8 @@ Version 0.1.9   (not yet released)
 - Added sporco.cuda interface to CUDA extension package sporco-cuda
 - Completely restructured example scripts, which are now used to generate
   example Jupyter notebooks and corresponding docs pages
+- Modifications to the interfaces of the plot module functions that will
+  break existing code that uses the fgrf or axrf parameters
 
 
 
