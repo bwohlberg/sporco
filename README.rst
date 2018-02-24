@@ -118,6 +118,15 @@ The install commands will usually have to be performed with root privileges.
 A summary of the most significant changes between SPORCO releases can be found in the ``CHANGES.rst`` file. It is strongly recommended to consult this summary when updating from a previous version.
 
 
+Extensions
+----------
+
+Some additional components of SPORCO are made available as separate extension packages:
+
+* `SPORCO-CUDA <https://github.com/bwohlberg/sporco-cuda>`__: GPU-accelerated versions of selected convolutional sparse coding algorithms
+
+* `SPORCO Notebooks <https://github.com/bwohlberg/sporco-notebooks>`__: Jupyter Notebook versions of the example scripts distributed with SPORCO
+
 
 License
 -------
