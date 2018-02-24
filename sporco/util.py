@@ -356,7 +356,7 @@ def complex_randn(*args):
 
     Parameters
     ----------
-    d0, d1, ..., dn: int
+    d0, d1, ..., dn : int
       Dimensions of the random array
 
     Returns
