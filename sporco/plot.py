@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2015-2017 by Brendt Wohlberg <brendt@ieee.org>
+# Copyright (C) 2015-2018 by Brendt Wohlberg <brendt@ieee.org>
 # All rights reserved. BSD 3-clause License.
 # This file is part of the SPORCO package. Details of the copyright
 # and user license can be found in the 'LICENSE.txt' file distributed
@@ -268,8 +268,8 @@ def surf(z, x=None, y=None, elev=None, azim=None, xlbl=None, ylbl=None,
 
 
 def contour(z, x=None, y=None, v=5, xlbl=None, ylbl=None, title=None,
-            cfntsz=10, alpha=0.5, cmap=None, fgrf=None, axrf=None,
-            fgsz=None, fgnm=None):
+            cfntsz=10, lfntsz=None, intrp='bicubic', alpha=0.5, cmap=None,
+            vmin=None, vmax=None, fgrf=None, axrf=None, fgsz=None, fgnm=None):
     """
     Contour plot of a 2D surface. If a figure object is specified then the
     plot is drawn in that figure, and fig.show() is not called. The figure
@@ -295,10 +295,22 @@ def contour(z, x=None, y=None, v=5, xlbl=None, ylbl=None, title=None,
     cfntsz : int or None, optional (default 10)
         Contour label font size. No contour labels are displayed if
         set to 0 or None.
+    lfntsz : int, optional (default None)
+        Axis label font size. The default font size is used if set to None.
+    intrp : string, optional (default 'bicubic')
+        Specify type of interpolation used to display image underlying
+        contours (see ``interpolation`` parameter of
+        :meth:`matplotlib.axes.Axes.imshow`)
     alpha : float, optional (default 0.5)
         Underlying image display alpha value
     cmap : :class:`matplotlib.colors.Colormap`, optional (default None)
         Colour map for surface. If none specifed, defaults to cm.coolwarm
+    vmin, vmax : float, optional (default None)
+        Set upper and lower bounds for the colour map (see the corresponding
+        parameters of :meth:`matplotlib.axes.Axes.imshow`)
+
+
+
     fgrf : :class:`matplotlib.figure.Figure` object, optional (default None)
         Draw in specified figure instead of creating one
     axrf : :class:`matplotlib.axes.Axes` object, optional (default None)
@@ -343,15 +355,16 @@ def contour(z, x=None, y=None, v=5, xlbl=None, ylbl=None, title=None,
     cntr = ax.contour(xg, yg, z, v, colors='black')
     if cfntsz is not None and cfntsz > 0:
         plt.clabel(cntr, inline=True, fontsize=cfntsz)
-    im = ax.imshow(z, origin='lower', extent=[x.min(), x.max(),
-                y.min(), y.max()], cmap=cmap, alpha=alpha)
+    im = ax.imshow(z, origin='lower', interpolation=intrp, aspect='auto',
+                extent=[x.min(), x.max(), y.min(), y.max()], cmap=cmap,
+                vmin=vmin, vmax=vmax, alpha=alpha)
 
     if title is not None:
         ax.set_title(title)
     if xlbl is not None:
-        ax.set_xlabel(xlbl)
+        ax.set_xlabel(xlbl, fontsize=lfntsz)
     if ylbl is not None:
-        ax.set_ylabel(ylbl)
+        ax.set_ylabel(ylbl, fontsize=lfntsz)
 
     divider = make_axes_locatable(ax)
     cax = divider.append_axes("right", size="5%", pad=0.2)
