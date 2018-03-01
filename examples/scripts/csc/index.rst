@@ -28,6 +28,9 @@ cbpdn_fista_gry.py
 cbpdn_cuda.py
   Convolutional sparse coding of a greyscale image using the CUDA solver
 
+cbpdn_grd_cuda.py
+  Convolutional sparse coding with gradient penalty of a greyscale image using the CUDA solver
+
 cbpdn_clr_cd.py
   Convolutional sparse coding of a colour image with a colour dictionary
 
