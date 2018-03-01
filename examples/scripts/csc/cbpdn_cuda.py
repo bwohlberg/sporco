@@ -8,7 +8,7 @@
 CUDA Convolutional Sparse Coding
 ================================
 
-This example demonstrates the use of the interface to the CUDA CSC solver extension package, with a test for the availablity of a GPU that runs the Python version of the CSC solver if one is not available, or if the extension package is not installed.
+This example demonstrates the use of the interface to the CUDA CSC solver extension package, with a test for the availablity of a GPU that runs the Python version of the ConvBPDN solver if one is not available, or if the extension package is not installed.
 """
 
 
@@ -54,7 +54,7 @@ Highpass filter example image.
 """
 
 npd = 16
-fltlmbd = 5
+fltlmbd = 20
 sl, sh = util.tikhonov_filter(img, fltlmbd, npd)
 
 
@@ -76,11 +76,11 @@ opt = cbpdn.ConvBPDN.Options({'Verbose': True, 'MaxMainIter': 250,
 
 
 """
-If GPU available, run CUDA CBPDN solver, otherwise run standard Python version.
+If GPU available, run CUDA ConvBPDN solver, otherwise run standard Python version.
 """
 
 if cuda.device_count() > 0:
-    print('GPU found: running CUDA solver')
+    print('%s GPU found: running CUDA solver' % cuda.device_name())
     tm = util.Timer()
     with sys_pipes(), util.ContextTimer(tm):
         X = cuda.cbpdn(D, sh, lmbda, opt)
