@@ -818,9 +818,10 @@ def Gax(x, ax):
       Output array
     """
 
-    slc0 = (slice(None),)*ax
-    return zpad(x[slc0 + (slice(1, None),)] - x[slc0 + (slice(-1),)],
-                (0, 1), ax)
+    slc = (slice(None),)*ax + (slice(-1,None),)
+    xg = np.roll(x, -1, axis=ax) - x
+    xg[slc] = 0.0
+    return xg
 
 
 
@@ -842,8 +843,10 @@ def GTax(x, ax):
     """
 
     slc0 = (slice(None),)*ax
-    return zpad(x[slc0 + (slice(-1),)], (1, 0), ax) - \
-      zpad(x[slc0 + (slice(-1),)], (0, 1), ax)
+    xg = np.roll(x, 1, axis=ax) - x
+    xg[slc0 + (slice(0,1),)] = -x[slc0 + (slice(0,1),)]
+    xg[slc0 + (slice(-1,None),)] = x[slc0 + (slice(-2,-1),)]
+    return xg
 
 
 
