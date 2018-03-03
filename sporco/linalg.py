@@ -258,7 +258,7 @@ def fftconv(a, b, axes=(0, 1)):
       Input array
     b : array_like
       Input array
-    axes : sequence of ints, optional (default (0,1))
+    axes : sequence of ints, optional (default (0, 1))
       Axes on which to perform convolution
 
     Returns
@@ -844,8 +844,8 @@ def GTax(x, ax):
 
     slc0 = (slice(None),)*ax
     xg = np.roll(x, 1, axis=ax) - x
-    xg[slc0 + (slice(0,1),)] = -x[slc0 + (slice(0,1),)]
-    xg[slc0 + (slice(-1,None),)] = x[slc0 + (slice(-2,-1),)]
+    xg[slc0 + (slice(0, 1),)] = -x[slc0 + (slice(0, 1),)]
+    xg[slc0 + (slice(-1, None),)] = x[slc0 + (slice(-2, -1),)]
     return xg
 
 
