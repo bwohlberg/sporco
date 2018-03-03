@@ -228,17 +228,6 @@ class GenericConvBPDN(admm.ADMMEqual):
 
 
 
-    def dualinit(self):
-        """Initial value for dual variable U if initial Y is provided.
-        This base-class method is intended to be overridden, but an
-        implementation is provided so that overriding it is not
-        essential.
-        """
-
-        return np.zeros(self.cri.shpX, self.dtype)
-
-
-
     def setdict(self, D=None):
         """Set dictionary array."""
 
