@@ -58,13 +58,15 @@ class TestSet01(object):
         D = np.random.randn(N, M)
         s = np.random.randn(N, 1)
         try:
-            opt = bpdn.BPDN.Options({'Verbose': True, 'MaxMainIter': 20,
+            opt = bpdn.BPDN.Options({'Verbose': False, 'MaxMainIter': 20,
+                                     'LinSolveCheck': True,
                                      'AutoRho': {'StdResiduals': True}})
             b = bpdn.BPDN(D, s, lmbda=1.0, opt=opt)
             b.solve()
         except Exception as e:
             print(e)
             assert(0)
+        assert(np.array(b.getitstat().XSlvRelRes).max() < 1e-5)
 
 
     def test_04(self):
@@ -203,6 +205,25 @@ class TestSet01(object):
         M = 16
         D = np.random.randn(N, M)
         s = np.random.randn(N, 1)
+        lmbda = 1e-1
+        mu = 1e-2
+        try:
+            opt = bpdn.ElasticNet.Options({'Verbose': False,
+                                'MaxMainIter': 20, 'LinSolveCheck': True,
+                                'AutoRho': {'StdResiduals': True}})
+            b = bpdn.ElasticNet(D, s, lmbda, mu, opt=opt)
+            b.solve()
+        except Exception as e:
+            print(e)
+            assert(0)
+        assert(np.array(b.getitstat().XSlvRelRes).max() < 1e-5)
+
+
+    def test_13(self):
+        N = 8
+        M = 16
+        D = np.random.randn(N, M)
+        s = np.random.randn(N, 1)
         dt = np.float16
         opt = bpdn.ElasticNet.Options({'Verbose': False, 'MaxMainIter': 20,
                                  'AutoRho': {'Enabled': True},
@@ -214,7 +235,7 @@ class TestSet01(object):
         assert(b.U.dtype == dt)
 
 
-    def test_13(self):
+    def test_14(self):
         N = 8
         M = 16
         D = np.random.randn(N, M)
@@ -228,7 +249,7 @@ class TestSet01(object):
             assert(0)
 
 
-    def test_14(self):
+    def test_15(self):
         N = 8
         M = 16
         D = np.random.randn(N, M)
@@ -244,7 +265,7 @@ class TestSet01(object):
         assert(b.U.dtype == dt)
 
 
-    def test_15(self):
+    def test_16(self):
         N = 8
         M = 16
         D = np.random.randn(N, M)
@@ -258,7 +279,7 @@ class TestSet01(object):
             assert(0)
 
 
-    def test_16(self):
+    def test_17(self):
         N = 8
         M = 16
         D = np.random.randn(N, M)
@@ -274,7 +295,7 @@ class TestSet01(object):
         assert(b.U.dtype == dt)
 
 
-    def test_17(self):
+    def test_18(self):
         N = 8
         M = 16
         D = np.random.randn(N, M)
@@ -289,14 +310,14 @@ class TestSet01(object):
         assert(linalg.norm(Xb-Xc)==0.0)
 
 
-    def test_18(self):
+    def test_19(self):
         opt = bpdn.GenericBPDN.Options({'AuxVarObj': False})
         assert(opt['fEvalX'] is True and opt['gEvalY'] is False)
         opt['AuxVarObj'] = True
         assert(opt['fEvalX'] is False and opt['gEvalY'] is True)
 
 
-    def test_19(self):
+    def test_20(self):
         opt = bpdn.GenericBPDN.Options({'AuxVarObj': True})
         assert(opt['fEvalX'] is False and opt['gEvalY'] is True)
         opt['AuxVarObj'] = False
@@ -304,7 +325,7 @@ class TestSet01(object):
 
 
     @pytest.mark.filterwarnings('ignore:admm.ADMM.runtime')
-    def test_20(self):
+    def test_21(self):
         N = 8
         M = 16
         D = np.random.randn(N, M)

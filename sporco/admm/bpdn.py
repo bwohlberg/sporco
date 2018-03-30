@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2015-2017 by Brendt Wohlberg <brendt@ieee.org>
+# Copyright (C) 2015-2018 by Brendt Wohlberg <brendt@ieee.org>
 # All rights reserved. BSD 3-clause License.
 # This file is part of the SPORCO package. Details of the copyright
 # and user license can be found in the 'LICENSE.txt' file distributed
@@ -91,6 +91,9 @@ class GenericBPDN(admm.ADMMEqual):
           Y (``True``) as its argument. Setting this flag to ``True``
           often gives a better estimate of the objective function.
 
+          ``LinSolveCheck`` : Flag indicating whether to compute
+          relative residual of X step solver.
+
           ``NonNegCoef`` : If ``True``, force solution to be non-negative.
         """
 
@@ -104,7 +107,8 @@ class GenericBPDN(admm.ADMMEqual):
         # and 'gEvalY' are themselves initialised
         defaults.update({'AuxVarObj': True, 'fEvalX': False,
                          'gEvalY': True, 'ReturnX': False,
-                        'RelaxParam': 1.8, 'NonNegCoef': False})
+                         'LinSolveCheck': False, 'RelaxParam': 1.8,
+                         'NonNegCoef': False})
         defaults['AutoRho'].update({'Enabled': True, 'Period': 10,
                                     'AutoScaling': True, 'Scaling': 1000.0,
                                     'RsdlRatio': 1.2})
@@ -136,6 +140,7 @@ class GenericBPDN(admm.ADMMEqual):
 
 
     itstat_fields_objfn = ('ObjFun', 'DFid', 'Reg')
+    itstat_fields_extra = ('XSlvRelRes',)
     hdrtxt_objfn = ('Fnc', 'DFid', 'Reg')
     hdrval_objfun = {'Fnc': 'ObjFun', 'DFid': 'DFid', 'Reg': 'Reg'}
 
@@ -191,6 +196,13 @@ class GenericBPDN(admm.ADMMEqual):
                         self.rho*(self.Y - self.U), self.lu, self.piv),
                         dtype=self.dtype)
 
+        if self.opt['LinSolveCheck']:
+            b = self.DTS + self.rho*(self.Y - self.U)
+            ax = self.D.T.dot(self.D.dot(self.X)) + self.rho*self.X
+            self.xrrs = sl.rrs(ax, b)
+        else:
+            self.xrrs = None
+
 
 
     def ystep(self):
@@ -234,6 +246,13 @@ class GenericBPDN(admm.ADMMEqual):
         """
 
         raise NotImplementedError()
+
+
+
+    def itstat_extra(self):
+        """Non-standard entries for the iteration stats record tuple."""
+
+        return (self.xrrs,)
 
 
 
@@ -690,6 +709,13 @@ class ElasticNet(BPDN):
         self.X = np.asarray(sl.lu_solve_ATAI(self.D, self.mu + self.rho,
                     self.DTS + self.rho*(self.Y - self.U), self.lu,
                     self.piv), dtype=self.dtype)
+
+        if self.opt['LinSolveCheck']:
+            b = self.DTS + self.rho*(self.Y - self.U)
+            ax = self.D.T.dot(self.D.dot(self.X)) + (self.mu+self.rho)*self.X
+            self.xrrs = sl.rrs(ax, b)
+        else:
+            self.xrrs = None
 
 
 
