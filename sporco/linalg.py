@@ -90,8 +90,8 @@ def fftn(a, s=None, axes=None):
     a : array_like
       Input array (can be complex)
     s : sequence of ints, optional (default None)
-      Shape of the output along each axis (input is cropped or zero-padded
-      to match).
+      Shape of the output along each transformed axis (input is cropped or
+      zero-padded to match).
     axes : sequence of ints, optional (default None)
       Axes over which to compute the DFT.
 
@@ -118,8 +118,8 @@ def ifftn(a, s=None, axes=None):
     a : array_like
       Input array (can be complex)
     s : sequence of ints, optional (default None)
-      Shape of the output along each axis (input is cropped or zero-padded
-      to match).
+      Shape of the output along each transformed axis (input is cropped or
+      zero-padded to match).
     axes : sequence of ints, optional (default None)
       Axes over which to compute the inverse DFT.
 
@@ -146,8 +146,8 @@ def rfftn(a, s=None, axes=None):
     a : array_like
       Input array (taken to be real)
     s : sequence of ints, optional (default None)
-      Shape of the output along each axis (input is cropped or zero-padded
-      to match).
+      Shape of the output along each transformed axis (input is cropped or
+      zero-padded to match).
     axes : sequence of ints, optional (default None)
       Axes over which to compute the DFT.
 
@@ -163,7 +163,7 @@ def rfftn(a, s=None, axes=None):
 
 
 
-def irfftn(a, s=None, axes=None):
+def irfftn(a, s, axes=None):
     """
     Compute the inverse of the multi-dimensional discrete Fourier transform
     for real input. This function is a wrapper for
@@ -174,9 +174,11 @@ def irfftn(a, s=None, axes=None):
     ----------
     a : array_like
       Input array
-    s : sequence of ints, optional (default None)
-      Shape of the output along each axis (input is cropped or zero-padded
-      to match).
+    s : sequence of ints
+      Shape of the output along each transformed axis (input is cropped or
+      zero-padded to match). This parameter is not optional because, unlike
+      :func:`ifftn`, the output shape cannot be uniquely determined from
+      the input shape.
     axes : sequence of ints, optional (default None)
       Axes over which to compute the inverse DFT.
 
