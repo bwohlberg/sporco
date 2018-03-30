@@ -13,8 +13,7 @@ class TestSet01(object):
 
     def setup_method(self, method):
         np.random.seed(12345)
-        N = 16
-        self.D = np.random.randn(N,N)
+        self.D = np.random.randn(16, 15)
 
 
     def test_01(self):

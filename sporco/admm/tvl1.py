@@ -519,6 +519,7 @@ class TVL1Deconv(admm.ADMM):
         self.set_dtype(opt, S.dtype)
 
         self.axes = axes
+        self.axsz = np.asarray(S.shape)[list(axes)]
         if caxis is None:
             self.saxes = (-1,)
         else:
@@ -579,7 +580,7 @@ class TVL1Deconv(admm.ADMM):
         b = self.AHSf + np.sum(np.conj(self.GAf) *
             sl.rfftn(self.Y-self.U, axes=self.axes), axis=self.Y.ndim-1)
         self.Xf = b / (self.AHAf + self.GHGf)
-        self.X = sl.irfftn(self.Xf, None, axes=self.axes)
+        self.X = sl.irfftn(self.Xf, self.axsz, axes=self.axes)
 
         if self.opt['LinSolveCheck']:
             ax = (self.AHAf + self.GHGf)*self.Xf
@@ -645,7 +646,8 @@ class TVL1Deconv(admm.ADMM):
 
         if Xf is None:
             Xf = sl.rfftn(X, axes=self.axes)
-        return sl.irfftn(self.GAf*Xf[..., np.newaxis], None, axes=self.axes)
+        return sl.irfftn(self.GAf*Xf[..., np.newaxis], self.axsz,
+                         axes=self.axes)
 
 
 
@@ -656,8 +658,8 @@ class TVL1Deconv(admm.ADMM):
         """
 
         Xf = sl.rfftn(X, axes=self.axes)
-        return np.sum(sl.irfftn(np.conj(self.GAf)*Xf, None, axes=self.axes),
-                      axis=self.Y.ndim-1)
+        return np.sum(sl.irfftn(np.conj(self.GAf)*Xf, self.axsz,
+                      axes=self.axes), axis=self.Y.ndim-1)
 
 
 
