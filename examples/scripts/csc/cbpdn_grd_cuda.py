@@ -63,7 +63,7 @@ D = np.concatenate((di, Db), axis=2)
 Set up weights for the $\ell_1$ norm to disable regularization of the coefficient map corresponding to the impulse filter.
 """
 wl1 = np.ones((1,)*2 + (D.shape[2:]), dtype=np.float32)
-wl1[..., 0] = 1e-15  # Not set to zero due to a bug in sporco-cuda
+wl1[..., 0] = 0.0
 
 
 """
