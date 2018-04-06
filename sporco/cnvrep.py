@@ -556,30 +556,28 @@ def mskWshape(W, cri):
       Appropriate internal mask array shape
     """
 
+    # Number of axes in W available for C and/or K axes
     ckdim = W.ndim - cri.dimN
     if ckdim >= 2:
         # Both C and K axes are present in W
-        shpW = W.shape
+        shpW = W.shape + (1,) if ckdim == 2 else W.shape
     elif ckdim == 1:
         # Exactly one of C or K axes is present in W
         if cri.C == 1 and cri.K > 1:
             # Input S has a single channel and multiple signals
-            shpW = W.shape[0:cri.dimN] + (1, W.shape[cri.dimN])
+            shpW = W.shape[0:cri.dimN] + (1, W.shape[cri.dimN]) + (1,)
         elif cri.C > 1 and cri.K == 1:
             # Input S has multiple channels and a single signal
-            shpW = W.shape[0:cri.dimN] + (W.shape[cri.dimN], 1)
+            shpW = W.shape[0:cri.dimN] + (W.shape[cri.dimN], 1) + (1,)
         else:
             # Input S has multiple channels and signals: resolve ambiguity
             # by taking extra axis in W as a channel axis
-            shpW = W.shape[0:cri.dimN] + (W.shape[cri.dimN], 1)
+            shpW = W.shape[0:cri.dimN] + (W.shape[cri.dimN], 1) + (1,)
     else:
         # Neither C nor K axis is present in W
-        shpW = W.shape + (1, 1)
+        shpW = W.shape + (1,) * (3 - ckdim)
 
-    if ckdim > 2:
-        return shpW
-    else:
-        return shpW + (1,)
+    return shpW
 
 
 
