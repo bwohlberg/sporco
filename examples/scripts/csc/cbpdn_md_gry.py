@@ -41,7 +41,7 @@ Create random mask and apply to reference image to obtain test image. (The call 
 
 t = 0.5
 np.random.seed(12345)
-msk = np.random.randn(*(img.shape))
+msk = np.random.randn(*(img.shape)).astype(np.float32)
 msk[np.abs(msk) > t] = 1;
 msk[np.abs(msk) < t] = 0;
 imgw = msk * img
