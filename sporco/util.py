@@ -173,10 +173,11 @@ def transpose_ntpl_list(lst):
       corresponding fields of the named tuple objects in list ``lst``
     """
 
-    cls = collections.namedtuple(lst[0].__class__.__name__, lst[0]._fields)
     if len(lst) == 0:
         return None
     else:
+        cls = collections.namedtuple(lst[0].__class__.__name__,
+                                     lst[0]._fields)
         return cls(*[[lst[k][l] for k in range(len(lst))]
                      for l in range(len(lst[0]))])
 
