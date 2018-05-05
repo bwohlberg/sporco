@@ -82,6 +82,24 @@ td.field-body blockquote {
     padding-left: 30px;
 }
 
+table.kwargs {
+    border: 1px solid black;
+    border-collapse: collapse;
+}
+
+table.kwargs tbody {
+    border: 1px solid black;
+}
+
+table.kwargs th {
+    border: 1px solid black;
+    background-color: #d5d5d5;
+}
+
+table.kwargs td {
+    border: 1px solid black;
+}
+
 .class, .function, .exception {
   margin-bottom: 4em;
   background-color: #f8f8f8;

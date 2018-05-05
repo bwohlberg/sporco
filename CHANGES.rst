@@ -16,6 +16,9 @@ Version 0.1.9   (not yet released)
   example Jupyter notebooks and corresponding docs pages
 - Modifications to the interfaces of the plot module functions that will
   break existing code that uses the fgrf or axrf parameters
+- Modifications to the interface of the plot.plot function that will
+  break existing code that uses the lwidth, lstyle, msize, or mstyle
+  parameters
 
 
 

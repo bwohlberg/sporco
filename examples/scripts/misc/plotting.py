@@ -48,7 +48,7 @@ fig = plot.figure()
 plot.plot(np.stack((y1, y2, y3)).T, x, xlbl='x', ylbl='y',
         title='Plot Example', lgnd=('$|x|$', '$|x|^{(3/2)}$', '$x^2$'),
         lglc='upper center', fig=fig)
-plot.plot(y1[::5], x[::5], lwidth=0, msize=8.0, mstyle='o', fig=fig)
+plot.plot(y1[::5], x[::5], lw=0, ms=8.0, marker='o', fig=fig)
 fig.show()
 
 

@@ -66,12 +66,11 @@ def attach_keypress(fig):
 
 
 def plot(y, x=None, ptyp='plot', xlbl=None, ylbl=None, title=None,
-         lgnd=None, lglc=None, lwidth=1.5, lstyle='solid', msize=6.0,
-         mstyle='None', fgsz=None, fgnm=None, fig=None, ax=None):
+         lgnd=None, lglc=None, **kwargs):
     """
     Plot points or lines in 2D. If a figure object is specified then the
-    plot is drawn in that figure, and fig.show() is not called. The figure
-    is closed on key entry 'q'.
+    plot is drawn in that figure, and ``fig.show()`` is not called. The
+    figure is closed on key entry 'q'.
 
     Parameters
     ----------
@@ -93,22 +92,31 @@ def plot(y, x=None, ptyp='plot', xlbl=None, ylbl=None, title=None,
         List of legend string
     lglc : string, optional (default None)
         Legend location string
-    lwidth : float, optional (default 1.5)
-        Line width
-    lstyle : string, optional (default 'solid')
-        Line style (see :class:`matplotlib.lines.Line2D`)
-    msize : float, optional (default 6.0)
-        Marker size
-    mstyle : string, optional (default 'None')
-        Marker style (see :mod:`matplotlib.markers`)
-    fgsz : tuple (width,height), optional (default None)
-        Specify figure dimensions in inches
-    fgnm : integer, optional (default None)
-        Figure number of figure
-    fig : :class:`matplotlib.figure.Figure` object, optional (default None)
-        Draw in specified figure instead of creating one
-    ax : :class:`matplotlib.axes.Axes` object, optional (default None)
-        Plot in specified axes instead of current axes of figure
+    **kwargs :  :class:`matplotlib.lines.Line2D` properties or figure \
+    properties, optional
+        Keyword arguments specifying :class:`matplotlib.lines.Line2D`
+        properties, e.g. ``lw=2.0`` sets a line width of 2, or properties
+        of the figure and axes. If not specified, the defaults for line
+        width (``lw``) and marker size (``ms``) are 1.5 and 6.0
+        respectively. The valid figure and axes keyword arguments are
+        listed below:
+
+        .. |mplfg| replace:: :class:`matplotlib.figure.Figure` object
+        .. |mplax| replace:: :class:`matplotlib.axes.Axes` object
+
+        .. rst-class:: kwargs
+
+        =====  ==================== ======================================
+        kwarg  Accepts              Description
+        =====  ==================== ======================================
+        fgsz   tuple (width,height) Specify figure dimensions in inches
+        fgnm   integer              Figure number of figure
+        fig    |mplfg|              Draw in specified figure instead of
+                                    creating one
+        ax     |mplax|              Plot in specified axes instead of
+                                    current axes of figure
+        =====  ==================== ======================================
+
 
     Returns
     -------
@@ -118,6 +126,12 @@ def plot(y, x=None, ptyp='plot', xlbl=None, ylbl=None, title=None,
       Axes object for this plot
     """
 
+    # Extract kwargs entries that are not related to line properties
+    fgsz = kwargs.pop('fgsz', None)
+    fgnm = kwargs.pop('fgnm', None)
+    fig = kwargs.pop('fig', None)
+    ax = kwargs.pop('ax', None)
+
     figp = fig
     if fig is None:
         fig = plt.figure(num=fgnm, figsize=fgsz)
@@ -126,15 +140,19 @@ def plot(y, x=None, ptyp='plot', xlbl=None, ylbl=None, title=None,
     elif ax is None:
         ax = fig.gca()
 
+    # Set defaults for line width and marker size
+    if 'lw' not in kwargs and 'linewidth' not in kwargs:
+        kwargs['lw'] = 1.5
+    if 'ms' not in kwargs and 'markersize' not in kwargs:
+        kwargs['ms'] = 6.0
+
     if ptyp not in ('plot', 'semilogx', 'semilogy', 'loglog'):
         raise ValueError("Invalid plot type '%s'" % ptyp)
     pltmth = getattr(ax, ptyp)
     if x is None:
-        pltln = pltmth(y, linewidth=lwidth, linestyle=lstyle,
-                       marker=mstyle, markersize=msize)
+        pltln = pltmth(y, **kwargs)
     else:
-        pltln = pltmth(x, y, linewidth=lwidth, linestyle=lstyle,
-                       marker=mstyle, markersize=msize)
+        pltln = pltmth(x, y, **kwargs)
 
     if title is not None:
         ax.set_title(title)
@@ -162,8 +180,8 @@ def surf(z, x=None, y=None, elev=None, azim=None, xlbl=None, ylbl=None,
          fgsz=None, fgnm=None, fig=None, ax=None):
     """
     Plot a 2D surface in 3D. If a figure object is specified then the
-    surface is drawn in that figure, and fig.show() is not called. The
-    figure is closed on key entry 'q'.
+    surface is drawn in that figure, and ``fig.show()`` is not called.
+    The figure is closed on key entry 'q'.
 
     Parameters
     ----------
@@ -241,8 +259,8 @@ def surf(z, x=None, y=None, elev=None, azim=None, xlbl=None, ylbl=None,
 
     if cntr is not None:
         offset = np.around(z.min() - 0.2 * (z.max() - z.min()), 3)
-        ax.contour(xg, yg, z, cntr, linewidths=2, cmap=cmap, linestyles="solid",
-                   offset=offset)
+        ax.contour(xg, yg, z, cntr, cmap=cmap, linewidths=2,
+                   linestyles="solid", offset=offset)
         ax.set_zlim(offset, ax.get_zlim()[1])
 
     if title is not None:
@@ -268,8 +286,8 @@ def contour(z, x=None, y=None, v=5, xlbl=None, ylbl=None, title=None,
             vmin=None, vmax=None, fgsz=None, fgnm=None, fig=None, ax=None):
     """
     Contour plot of a 2D surface. If a figure object is specified then the
-    plot is drawn in that figure, and fig.show() is not called. The figure
-    is closed on key entry 'q'.
+    plot is drawn in that figure, and ``fig.show()`` is not called. The
+    figure is closed on key entry 'q'.
 
     Parameters
     ----------
@@ -378,7 +396,7 @@ def imview(img, title=None, copy=True, fltscl=False, intrp='nearest',
     """
     Display an image. Pixel values are displayed when the pointer is over
     valid image data.  If a figure object is specified then the image is
-    drawn in that figure, and fig.show() is not called. The figure is
+    drawn in that figure, and ``fig.show()`` is not called. The figure is
     closed on key entry 'q'.
 
     Parameters
@@ -495,14 +513,26 @@ def imview(img, title=None, copy=True, fltscl=False, intrp='nearest',
         if col >= 0 and col < nc and row >= 0 and row < nr:
             z = img[row, col]
             if imgd.ndim == 2:
-                return 'x=%.2f, y=%.2f, z=%.2f' % (x, y, z)
+                return 'x=%6.2f, y=%6.2f, z=%.2f' % (x, y, z)
             else:
-                return 'x=%.2f, y=%.2f, z=(%.2f,%.2f,%.2f)' % \
+                return 'x=%6.2f, y=%6.2f, z=(%.2f,%.2f,%.2f)' % \
                     sum(((x,), (y,), tuple(z)), ())
         else:
             return 'x=%.2f, y=%.2f' % (x, y)
 
     ax.format_coord = format_coord
+
+    if fig.canvas.toolbar is not None:
+        # See https://stackoverflow.com/a/47086132
+        def mouse_move(self, event):
+            if event.inaxes and event.inaxes.get_navigate():
+                s = event.inaxes.format_coord(event.xdata, event.ydata)
+                self.set_message(s)
+
+        mouse_move_patch = lambda arg: mouse_move(fig.canvas.toolbar, arg)
+        fig.canvas.toolbar._idDrag = fig.canvas.mpl_connect(
+            'motion_notify_event', mouse_move_patch)
+
 
     attach_keypress(fig)
 
