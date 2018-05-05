@@ -199,7 +199,7 @@ class ConvBPDNDictLearn(dictlrn.DictLearn):
 
         # Modify D update options to include initial values for Y and U
         opt['CCMOD'].update({'Y0': cr.zpad(
-            cr.stdformD(D0, cri.C, cri.M, dimN), cri.Nv)})
+            cr.stdformD(D0, cri.Cd, cri.M, dimN), cri.Nv)})
 
         # Create X update object
         xstep = cbpdn.ConvBPDN(D0, S, lmbda, opt['CBPDN'], dimK=dimK,
