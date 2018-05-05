@@ -47,10 +47,8 @@ D0 = np.random.randn(8, 8, 32)
 Create random mask and apply to training images.
 """
 
-t = 0.5
-W = np.random.randn(*(S.shape[0:2] + (1,)))
-W[np.abs(W) > t] = 1;
-W[np.abs(W) < t] = 0;
+frc = 0.5
+W = util.rndmask(S.shape[0:2] + (1,), frc, dtype=np.float32)
 Sw = W * S
 
 
