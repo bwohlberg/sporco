@@ -398,6 +398,31 @@ def spnoise(s, frc, smn=0.0, smx=1.0):
 
 
 
+def rndmask(shp, frc, dtype=None):
+    r"""Return random mask image with values in :math:`\{0,1\}`.
+
+    Parameters
+    ----------
+    s : tuple
+      Mask array shape
+    frc : float
+      Desired fraction of zero pixels
+    dtype : data-type or None, optional (default None)
+      Data type of mask array
+
+    Returns
+    -------
+    msk : ndarray
+      Mask image
+    """
+
+    msk = np.asarray(np.random.uniform(-1.0, 1.0, shp), dtype=dtype)
+    msk[np.abs(msk) > frc] = 1.0
+    msk[np.abs(msk) < frc] = 0.0
+    return msk
+
+
+
 def tikhonov_filter(s, lmbda, npd=16):
     r"""Lowpass filter based on Tikhonov regularization.
 
