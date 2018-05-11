@@ -100,7 +100,7 @@ plot.plot(np.vstack((its.XPrRsdl, its.XDlRsdl, its.DPrRsdl,
           ylbl='Residual', lgnd=['X Primal', 'X Dual', 'D Primal', 'D Dual'],
           fig=fig)
 plot.subplot(1, 3, 3)
-plot.plot(np.vstack((its.XRho, its.DRho)).T, fig=fig, xlbl='Iterations',
+plot.plot(np.vstack((its.XRho, its.DRho)).T, xlbl='Iterations',
           ylbl='Penalty Parameter', ptyp='semilogy',
           lgnd=['$\\rho_X$', '$\\rho_D$'], fig=fig)
 fig.show()
