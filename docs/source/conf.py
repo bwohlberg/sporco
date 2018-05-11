@@ -467,7 +467,7 @@ def run_apidoc(_):
     sys.stdout.flush()
     from distutils.version import LooseVersion
     if LooseVersion(sphinx.__version__) < LooseVersion('1.7.0'):
-        sphinx.ext.apidoc.main(['sphinx-apidoc', '-e', '-d', '2', '-o', opath,
+        sphinx.apidoc.main(['sphinx-apidoc', '-e', '-d', '2', '-o', opath,
                                module, os.path.join(module, 'admm/tests'),
                                os.path.join(module, 'fista/tests')])
     else:
