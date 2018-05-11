@@ -696,6 +696,41 @@ def in_notebook():
 
 
 
+def notebook_system_output():
+    """Get a context manager that attempts to use `wurlitzer
+    <https://github.com/minrk/wurlitzer>`_ to capture system-level
+    stdout/stderr within a Jupyter Notebook shell, without affecting normal
+    operation when run as a Python script. For example:
+
+    >>> sys_pipes = sporco.util.notebook_system_output()
+    >>> with sys_pipes():
+    >>>    command_producing_system_level_output()
+
+
+    Returns
+    -------
+    sys_pipes : context manager
+      Context manager that handles output redirection when run within a
+      Jupyter Notebook shell
+    """
+
+    from contextlib import contextmanager
+    @contextmanager
+    def null_context_manager():
+        yield
+
+    if in_notebook():
+        try:
+            from wurlitzer import sys_pipes
+        except:
+            sys_pipes = null_context_manager
+    else:
+        sys_pipes = null_context_manager
+
+    return sys_pipes
+
+
+
 class ExampleImages(object):
     """Access a set of example images."""
 
