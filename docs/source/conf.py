@@ -465,9 +465,15 @@ def run_apidoc(_):
     # Run sphinx-apidoc
     print("Running sphinx-apidoc with output path " + opath)
     sys.stdout.flush()
-    sphinx.apidoc.main(['sphinx-apidoc', '-e', '-d', '2', '-o', opath,
-                        module, os.path.join(module, 'admm/tests'),
-                        os.path.join(module, 'fista/tests')])
+    from distutils.version import LooseVersion
+    if LooseVersion(sphinx.__version__) < LooseVersion('1.7.0'):
+        sphinx.ext.apidoc.main(['sphinx-apidoc', '-e', '-d', '2', '-o', opath,
+                               module, os.path.join(module, 'admm/tests'),
+                               os.path.join(module, 'fista/tests')])
+    else:
+        sphinx.ext.apidoc.main(['-o', opath, '-e', '-d', '2', module,
+                               os.path.join(module, 'admm/tests'),
+                               os.path.join(module, 'fista/tests')])
 
     # Remove "Module contents" sections from specified autodoc generated files
     rmmodlst = ['sporco.rst', 'sporco.admm.rst', 'sporco.fista.rst']
