@@ -81,9 +81,9 @@ Display initial and final dictionaries.
 D1 = D1.squeeze()
 fig = plot.figure(figsize=(14, 7))
 plot.subplot(1, 2, 1)
-plot.imview(util.tiledict(D0), fig=fig, title='D0')
+plot.imview(util.tiledict(D0), title='D0', fig=fig)
 plot.subplot(1, 2, 2)
-plot.imview(util.tiledict(D1), fig=fig, title='D1')
+plot.imview(util.tiledict(D1), title='D1', fig=fig)
 fig.show()
 
 
@@ -94,15 +94,16 @@ Get iterations statistics from solver object and plot functional value, ADMM pri
 its = d.getitstat()
 fig = plot.figure(figsize=(20, 5))
 plot.subplot(1, 3, 1)
-plot.plot(its.ObjFun, fig=fig, xlbl='Iterations', ylbl='Functional')
+plot.plot(its.ObjFun, xlbl='Iterations', ylbl='Functional', fig=fig)
 plot.subplot(1, 3, 2)
 plot.plot(np.vstack((its.XPrRsdl, its.XDlRsdl, its.DPrRsdl,
-          its.DDlRsdl)).T, fig=fig, ptyp='semilogy', xlbl='Iterations',
-          ylbl='Residual', lgnd=['X Primal', 'X Dual', 'D Primal', 'D Dual'])
+          its.DDlRsdl)).T, ptyp='semilogy', xlbl='Iterations',
+          ylbl='Residual', lgnd=['X Primal', 'X Dual', 'D Primal', 'D Dual'],
+          fig=fig)
 plot.subplot(1, 3, 3)
-plot.plot(np.vstack((its.XRho, its.DRho)).T, fig=fig, xlbl='Iterations',
+plot.plot(np.vstack((its.XRho, its.DRho)).T, xlbl='Iterations',
           ylbl='Penalty Parameter', ptyp='semilogy',
-          lgnd=['$\\rho_X$', '$\\rho_D$'])
+          lgnd=['$\\rho_X$', '$\\rho_D$'], fig=fig)
 fig.show()
 
 

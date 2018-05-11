@@ -82,9 +82,9 @@ Display initial and final dictionaries.
 D1 = D1.squeeze()
 fig = plot.figure(figsize=(14, 7))
 plot.subplot(1, 2, 1)
-plot.imview(util.tiledict(D0), fig=fig, title='D0')
+plot.imview(util.tiledict(D0), title='D0', fig=fig)
 plot.subplot(1, 2, 2)
-plot.imview(util.tiledict(D1, dsz), fig=fig, title='D1')
+plot.imview(util.tiledict(D1, dsz), title='D1', fig=fig)
 fig.show()
 
 
@@ -95,15 +95,15 @@ Get iterations statistics from solver object and plot functional value, residual
 its = d.getitstat()
 fig = plot.figure(figsize=(20, 5))
 plot.subplot(1, 3, 1)
-plot.plot(its.ObjFun, fig=fig, xlbl='Iterations', ylbl='Functional')
+plot.plot(its.ObjFun, xlbl='Iterations', ylbl='Functional', fig=fig)
 plot.subplot(1, 3, 2)
 plot.plot(np.vstack((its.X_Rsdl, its.D_Rsdl)).T,
-          fig=fig, ptyp='semilogy', xlbl='Iterations', ylbl='Residual',
-          lgnd=['X', 'D'])
+          ptyp='semilogy', xlbl='Iterations', ylbl='Residual',
+          lgnd=['X', 'D'], fig=fig)
 plot.subplot(1, 3, 3)
-plot.plot(np.vstack((its.X_L, its.D_L)).T, fig=fig, xlbl='Iterations',
+plot.plot(np.vstack((its.X_L, its.D_L)).T, xlbl='Iterations',
           ylbl='Inverse of Gradient Step Parameter', ptyp='semilogy',
-          lgnd=['$\L_X$', '$\L_D$'])
+          lgnd=['$\L_X$', '$\L_D$'], fig=fig)
 fig.show()
 
 

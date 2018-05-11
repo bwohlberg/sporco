@@ -28,17 +28,7 @@ import sporco.metric as spm
 
 # If running in a notebook, try to use wurlitzer so that output from the CUDA
 # code will be properly captured in the notebook.
-from contextlib import contextmanager
-@contextmanager
-def null_context_manager():
-    yield
-if util.in_notebook():
-    try:
-        from wurlitzer import sys_pipes
-    except:
-        sys_pipes = null_context_manager
-else:
-    sys_pipes = null_context_manager
+sys_pipes = util.notebook_system_output()
 
 
 """
@@ -108,15 +98,15 @@ Display representation and reconstructed image.
 
 fig = plot.figure(figsize=(14, 14))
 plot.subplot(2, 2, 1)
-plot.imview(sl, fig=fig, title='Lowpass component')
+plot.imview(sl, title='Lowpass component', fig=fig)
 plot.subplot(2, 2, 2)
-plot.imview(np.sum(abs(X), axis=2).squeeze(), fig=fig,
-            cmap=plot.cm.Blues, title='Main representation')
+plot.imview(np.sum(abs(X), axis=2).squeeze(),
+            cmap=plot.cm.Blues, title='Main representation', fig=fig)
 plot.subplot(2, 2, 3)
-plot.imview(imgr, fig=fig, title='Reconstructed image')
+plot.imview(imgr, title='Reconstructed image', fig=fig)
 plot.subplot(2, 2, 4)
-plot.imview(imgr - img, fig=fig, fltscl=True,
-            title='Reconstruction difference')
+plot.imview(imgr - img, fltscl=True, title='Reconstruction difference',
+            fig=fig)
 fig.show()
 
 

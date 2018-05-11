@@ -115,13 +115,13 @@ Get iterations statistics from solver object and plot functional value, ADMM pri
 its = b.getitstat()
 fig = plot.figure(figsize=(20, 5))
 plot.subplot(1, 3, 1)
-plot.plot(its.ObjFun, fig=fig, xlbl='Iterations', ylbl='Functional')
+plot.plot(its.ObjFun, xlbl='Iterations', ylbl='Functional', fig=fig)
 plot.subplot(1, 3, 2)
-plot.plot(its.Rsdl, fig=fig, ptyp='semilogy', xlbl='Iterations',
-        ylbl='Residual')
+plot.plot(its.Rsdl, ptyp='semilogy', xlbl='Iterations', ylbl='Residual',
+          fig=fig)
 plot.subplot(1, 3, 3)
-plot.plot(its.L, fig=fig, xlbl='Iterations',
-        ylbl='Inverse of Gradient Step Parameter')
+plot.plot(its.L, xlbl='Iterations',
+          ylbl='Inverse of Gradient Step Parameter', fig=fig)
 fig.show()
 
 

@@ -82,9 +82,9 @@ Display initial and final dictionaries.
 D1 = D1.squeeze()
 fig = plot.figure(figsize=(14, 7))
 plot.subplot(1, 2, 1)
-plot.imview(util.tiledict(D0), fig=fig, title='D0')
+plot.imview(util.tiledict(D0), title='D0', fig=fig)
 plot.subplot(1, 2, 2)
-plot.imview(util.tiledict(D1), fig=fig, title='D1')
+plot.imview(util.tiledict(D1), title='D1', fig=fig)
 fig.show()
 
 

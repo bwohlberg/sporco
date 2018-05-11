@@ -70,11 +70,11 @@ Display reference, corrupted, and recovered matrices.
 
 fig = plot.figure(figsize=(21, 7))
 plot.subplot(1, 3, 1)
-plot.imview(S0, fig=fig, cmap=plot.cm.Blues, title='Original matrix')
+plot.imview(S0, cmap=plot.cm.Blues, title='Original matrix', fig=fig)
 plot.subplot(1, 3, 2)
-plot.imview(S1, fig=fig, cmap=plot.cm.Blues, title='Corrupted matrix')
+plot.imview(S1, cmap=plot.cm.Blues, title='Corrupted matrix', fig=fig)
 plot.subplot(1, 3, 3)
-plot.imview(X, fig=fig, cmap=plot.cm.Blues, title='Recovered matrix')
+plot.imview(X, cmap=plot.cm.Blues, title='Recovered matrix', fig=fig)
 fig.show()
 
 
@@ -85,13 +85,13 @@ Get iterations statistics from solver object and plot functional value, ADMM pri
 its = b.getitstat()
 fig = plot.figure(figsize=(20, 5))
 plot.subplot(1, 3, 1)
-plot.plot(its.ObjFun, fig=fig, xlbl='Iterations', ylbl='Functional')
+plot.plot(its.ObjFun, xlbl='Iterations', ylbl='Functional', fig=fig)
 plot.subplot(1, 3, 2)
-plot.plot(np.vstack((its.PrimalRsdl, its.DualRsdl)).T, fig=fig,
+plot.plot(np.vstack((its.PrimalRsdl, its.DualRsdl)).T,
           ptyp='semilogy', xlbl='Iterations', ylbl='Residual',
-          lgnd=['Primal', 'Dual'])
+          lgnd=['Primal', 'Dual'], fig=fig)
 plot.subplot(1, 3, 3)
-plot.plot(its.Rho, fig=fig, xlbl='Iterations', ylbl='Penalty Parameter')
+plot.plot(its.Rho, xlbl='Iterations', ylbl='Penalty Parameter', fig=fig)
 fig.show()
 
 

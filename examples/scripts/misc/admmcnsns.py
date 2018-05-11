@@ -171,7 +171,7 @@ print("ConsensusTest solve time: %.2fs" % b.timer.elapsed('solve'))
 Plot reference and reconstructed sparse representations.
 """
 
-plot.plot(np.hstack((x, yr)), fgnm=1, title='Sparse representation',
+plot.plot(np.hstack((x, yr)), title='Sparse representation',
         lgnd=['Reference', 'Reconstructed'])
 
 
@@ -182,14 +182,14 @@ Plot functional value, residuals, and rho.
 its = b.getitstat()
 fig = plot.figure(figsize=(20, 5))
 plot.subplot(1, 3, 1)
-plot.plot(its.ObjFun, fig=fig, ptyp='semilogy', xlbl='Iterations',
-        ylbl='Functional')
+plot.plot(its.ObjFun, ptyp='semilogy', xlbl='Iterations', ylbl='Functional',
+          fig=fig)
 plot.subplot(1, 3, 2)
-plot.plot(np.vstack((its.PrimalRsdl, its.DualRsdl)).T, fig=fig,
-        ptyp='semilogy', xlbl='Iterations', ylbl='Residual',
-        lgnd=['Primal', 'Dual']);
+plot.plot(np.vstack((its.PrimalRsdl, its.DualRsdl)).T,
+          ptyp='semilogy', xlbl='Iterations', ylbl='Residual',
+          lgnd=['Primal', 'Dual'], fig=fig);
 plot.subplot(1, 3, 3)
-plot.plot(its.Rho, fig=fig, xlbl='Iterations', ylbl='Penalty Parameter')
+plot.plot(its.Rho, xlbl='Iterations', ylbl='Penalty Parameter', fig=fig)
 fig.show()
 
 

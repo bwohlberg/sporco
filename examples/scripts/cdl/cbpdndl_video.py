@@ -40,7 +40,7 @@ Construct 3D training array from video data
 """
 
 vid = skvideo.io.vread(skvideo.datasets.fullreferencepair()[0],
-                outputdict={"-pix_fmt": "gray"})[..., 0]
+                       outputdict={"-pix_fmt": "gray"})[..., 0]
 vid = np.moveaxis(vid, 0, -1)
 vid = vid[0:106,40:136, 10:42].astype(np.float32)/255.0
 
@@ -113,15 +113,15 @@ Get iterations statistics from solver object and plot functional value, ADMM pri
 its = d.getitstat()
 fig = plot.figure(figsize=(20, 5))
 plot.subplot(1, 3, 1)
-plot.plot(its.ObjFun, fig=fig, xlbl='Iterations', ylbl='Functional')
+plot.plot(its.ObjFun, xlbl='Iterations', ylbl='Functional', fig=fig)
 plot.subplot(1, 3, 2)
 plot.plot(np.vstack((its.XPrRsdl, its.XDlRsdl, its.DPrRsdl, its.DDlRsdl)).T,
-          fig=fig, ptyp='semilogy', xlbl='Iterations', ylbl='Residual',
-          lgnd=['X Primal', 'X Dual', 'D Primal', 'D Dual'])
+          ptyp='semilogy', xlbl='Iterations', ylbl='Residual',
+          lgnd=['X Primal', 'X Dual', 'D Primal', 'D Dual'], fig=fig)
 plot.subplot(1, 3, 3)
-plot.plot(np.vstack((its.XRho, its.DRho)).T, fig=fig, xlbl='Iterations',
+plot.plot(np.vstack((its.XRho, its.DRho)).T, xlbl='Iterations',
           ylbl='Penalty Parameter', ptyp='semilogy',
-          lgnd=['$\\rho_X$', '$\\rho_D$'])
+          lgnd=['$\\rho_X$', '$\\rho_D$'], fig=fig)
 fig.show()
 
 

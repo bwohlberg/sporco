@@ -8,7 +8,7 @@
 CSC with a Spatial Mask
 =======================
 
-This example demonstrates the use of :class:`.cbpdn.AddMaskSim` for convolutional sparse coding with a spatial mask :cite:`wohlberg-2016-boundary`. The example problem is inpainting of randomly distributed corruption of a greyscale image.
+This example demonstrates the use of :class:`.cbpdn.AddMaskSim` for convolutional sparse coding with a spatial mask :cite:`wohlberg-2016-boundary`. If the ``sporco-cuda`` extension is installed and a GPU is available, a GPU accelerated version is used. The example problem is inpainting of randomly distributed corruption of a greyscale image.
 """
 
 
@@ -19,11 +19,17 @@ from builtins import range
 import pyfftw   # See https://github.com/pyFFTW/pyFFTW/issues/40
 import numpy as np
 
-from sporco.admm import tvl2
-from sporco.admm import cbpdn
 from sporco import util
 from sporco import metric
+from sporco import linalg
 from sporco import plot
+from sporco.admm import tvl2
+from sporco.admm import cbpdn
+from sporco import cuda
+
+# If running in a notebook, try to use wurlitzer so that output from the CUDA
+# code will be properly captured in the notebook.
+sys_pipes = util.notebook_system_output()
 
 
 """
@@ -96,26 +102,29 @@ opt = cbpdn.ConvBPDN.Options({'Verbose': True, 'MaxMainIter': 200,
 
 
 """
-Construct :class:`.admm.cbpdn.AddMaskSim` wrapper for :class:`.admm.cbpdn.ConvBPDN` and solve via wrapper. This example could also have made use of :class:`.admm.cbpdn.ConvBPDNMaskDcpl` (see example `cbpdn_md_gry`), which has similar performance in this application, but :class:`.admm.cbpdn.AddMaskSim` has the advantage of greater flexibility in that the wrapper can be applied to a variety of CSC solver objects.
+Construct :class:`.admm.cbpdn.AddMaskSim` wrapper for :class:`.admm.cbpdn.ConvBPDN` and solve via wrapper. This example could also have made use of :class:`.admm.cbpdn.ConvBPDNMaskDcpl` (see example `cbpdn_md_gry`), which has similar performance in this application, but :class:`.admm.cbpdn.AddMaskSim` has the advantage of greater flexibility in that the wrapper can be applied to a variety of CSC solver objects. If the ``sporco-cuda`` extension is installed and a GPU is available, use the CUDA implementation of this combination.
 """
 
-ams = cbpdn.AddMaskSim(cbpdn.ConvBPDN, D, sh, mskp, lmbda, opt=opt)
-X = ams.solve()
-
-
-"""
-Reconstruct from representation.
-"""
-
-imgr = crop(sl + ams.reconstruct().squeeze())
+if cuda.device_count() > 0:
+    ams = None
+    print('%s GPU found: running CUDA solver' % cuda.device_name())
+    tm = util.Timer()
+    with sys_pipes(), util.ContextTimer(tm):
+        X = cuda.cbpdnmsk(D, sh, mskp, lmbda, opt)
+    t = tm.elapsed()
+    imgr = crop(sl + np.sum(linalg.fftconv(D, X), axis=-1))
+else:
+    ams = cbpdn.AddMaskSim(cbpdn.ConvBPDN, D, sh, mskp, lmbda, opt=opt)
+    X = ams.solve()
+    t = ams.timer.elapsed('solve')
+    imgr = crop(sl + ams.reconstruct().squeeze())
 
 
 """
 Display solve time and reconstruction performance.
 """
 
-print("AddMaskSim wrapped ConvBPDN solve time: %.2fs" %
-      ams.timer.elapsed('solve'))
+print("AddMaskSim wrapped ConvBPDN solve time: %.2fs" % t)
 print("Corrupted image PSNR: %5.2f dB" % metric.psnr(img, imgw))
 print("Recovered image PSNR: %5.2f dB" % metric.psnr(img, imgr))
 
@@ -126,11 +135,11 @@ Display reference, test, and reconstructed image
 
 fig = plot.figure(figsize=(21, 7))
 plot.subplot(1, 3, 1)
-plot.imview(img, fig=fig, title='Reference image')
+plot.imview(img, title='Reference image', fig=fig)
 plot.subplot(1, 3, 2)
-plot.imview(imgw, fig=fig, title='Corrupted image')
+plot.imview(imgw, title='Corrupted image', fig=fig)
 plot.subplot(1, 3, 3)
-plot.imview(imgr, fig=fig, title='Reconstructed image')
+plot.imview(imgr, title='Reconstructed image', fig=fig)
 fig.show()
 
 
@@ -140,28 +149,29 @@ Display lowpass component and sparse representation
 
 fig = plot.figure(figsize=(14, 7))
 plot.subplot(1, 2, 1)
-plot.imview(sl, fig=fig, cmap=plot.cm.Blues, title='Lowpass component')
+plot.imview(sl, cmap=plot.cm.Blues, title='Lowpass component', fig=fig)
 plot.subplot(1, 2, 2)
-plot.imview(np.squeeze(np.sum(abs(X), axis=ams.cri.axisM)), fig=fig,
-            cmap=plot.cm.Blues, title='Sparse representation')
+plot.imview(np.sum(abs(X).squeeze(), axis=-1), cmap=plot.cm.Blues,
+            title='Sparse representation', fig=fig)
 fig.show()
 
 
 """
-Plot functional value, residuals, and rho
+Plot functional value, residuals, and rho (not available if GPU implementation used).
 """
 
-its = ams.getitstat()
-fig = plot.figure(figsize=(21, 7))
-plot.subplot(1, 3, 1)
-plot.plot(its.ObjFun, fig=fig, xlbl='Iterations', ylbl='Functional')
-plot.subplot(1, 3, 2)
-plot.plot(np.vstack((its.PrimalRsdl, its.DualRsdl)).T, fig=fig,
-          ptyp='semilogy', xlbl='Iterations', ylbl='Residual',
-          lgnd=['Primal', 'Dual'])
-plot.subplot(1, 3, 3)
-plot.plot(its.Rho, fig=fig, xlbl='Iterations', ylbl='Penalty Parameter')
-fig.show()
+if ams is not None:
+    its = ams.getitstat()
+    fig = plot.figure(figsize=(21, 7))
+    plot.subplot(1, 3, 1)
+    plot.plot(its.ObjFun, xlbl='Iterations', ylbl='Functional', fig=fig)
+    plot.subplot(1, 3, 2)
+    plot.plot(np.vstack((its.PrimalRsdl, its.DualRsdl)).T, ptyp='semilogy',
+              xlbl='Iterations', ylbl='Residual', lgnd=['Primal', 'Dual'],
+              fig=fig)
+    plot.subplot(1, 3, 3)
+    plot.plot(its.Rho, xlbl='Iterations', ylbl='Penalty Parameter', fig=fig)
+    fig.show()
 
 
 # Wait for enter on keyboard

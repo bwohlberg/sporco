@@ -199,9 +199,9 @@ Display the reference, noisy, and denoised images.
 
 fig, ax = plot.subplots(nrows=1, ncols=3, figsize=(21, 7))
 fig.suptitle('Method 2 Results')
-plot.imview(img, fig=fig, ax=ax[0], title='Reference')
-plot.imview(imgn, fig=fig, ax=ax[1], title='Noisy')
-plot.imview(imgd, fig=fig, ax=ax[2], title='CSC Result')
+plot.imview(img, ax=ax[0], title='Reference', fig=fig)
+plot.imview(imgn, ax=ax[1], title='Noisy', fig=fig)
+plot.imview(imgd, ax=ax[2], title='CSC Result', fig=fig)
 fig.show()
 
 

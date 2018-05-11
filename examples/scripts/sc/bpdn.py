@@ -111,13 +111,13 @@ plot.subplot(2, 2, 1)
 plot.plot(fvmx, x=lrng, ptyp='semilogx', xlbl='$\lambda$',
           ylbl='Error', fig=fig)
 plot.subplot(2, 2, 2)
-plot.plot(its.ObjFun, fig=fig, xlbl='Iterations', ylbl='Functional')
+plot.plot(its.ObjFun, xlbl='Iterations', ylbl='Functional', fig=fig)
 plot.subplot(2, 2, 3)
-plot.plot(np.vstack((its.PrimalRsdl, its.DualRsdl)).T, fig=fig,
+plot.plot(np.vstack((its.PrimalRsdl, its.DualRsdl)).T,
           ptyp='semilogy', xlbl='Iterations', ylbl='Residual',
-          lgnd=['Primal', 'Dual'])
+          lgnd=['Primal', 'Dual'], fig=fig)
 plot.subplot(2, 2, 4)
-plot.plot(its.Rho, fig=fig, xlbl='Iterations', ylbl='Penalty Parameter')
+plot.plot(its.Rho, xlbl='Iterations', ylbl='Penalty Parameter', fig=fig)
 fig.show()
 
 

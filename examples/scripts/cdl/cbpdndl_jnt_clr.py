@@ -126,9 +126,9 @@ Display dictionaries.
 D1 = D1.squeeze()
 fig = plot.figure(figsize=(14, 7))
 plot.subplot(1, 2, 1)
-plot.imview(util.tiledict(D0), fig=fig, title='D0')
+plot.imview(util.tiledict(D0), title='D0', fig=fig)
 plot.subplot(1, 2, 2)
-plot.imview(util.tiledict(D1), fig=fig, title='D1')
+plot.imview(util.tiledict(D1), title='D1', fig=fig)
 fig.show()
 
 
@@ -140,14 +140,16 @@ itsx = xstep.getitstat()
 itsd = dstep.getitstat()
 fig = plot.figure(figsize=(20, 5))
 plot.subplot(1, 3, 1)
-plot.plot(itsx.ObjFun, fig=fig, xlbl='Iterations', ylbl='Functional')
+plot.plot(itsx.ObjFun, xlbl='Iterations', ylbl='Functional', fig=fig)
 plot.subplot(1, 3, 2)
 plot.plot(np.vstack((itsx.PrimalRsdl, itsx.DualRsdl, itsd.PrimalRsdl,
-        itsd.DualRsdl)).T, fig=fig, ptyp='semilogy', xlbl='Iterations',
-        ylbl='Residual', lgnd=['X Primal', 'X Dual', 'D Primal', 'D Dual'])
+          itsd.DualRsdl)).T, ptyp='semilogy', xlbl='Iterations',
+          ylbl='Residual', lgnd=['X Primal', 'X Dual', 'D Primal', 'D Dual'],
+          fig=fig)
 plot.subplot(1, 3, 3)
-plot.plot(np.vstack((itsx.Rho, itsd.Rho)).T, fig=fig, xlbl='Iterations',
-          ylbl='Penalty Parameter', ptyp='semilogy', lgnd=['Rho', 'Sigma'])
+plot.plot(np.vstack((itsx.Rho, itsd.Rho)).T,  xlbl='Iterations',
+          ylbl='Penalty Parameter', ptyp='semilogy', lgnd=['Rho', 'Sigma'],
+          fig=fig)
 fig.show()
 
 

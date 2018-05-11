@@ -122,11 +122,11 @@ Display the reference, noisy, and denoised images.
 
 fig = plot.figure(figsize=(21, 7))
 plot.subplot(1, 3, 1)
-plot.imview(img, fig=fig, title='Reference')
+plot.imview(img, title='Reference', fig=fig)
 plot.subplot(1, 3, 2)
-plot.imview(imgn, fig=fig, title='Noisy')
+plot.imview(imgn, title='Noisy', fig=fig)
 plot.subplot(1, 3, 3)
-plot.imview(imgd, fig=fig, title='CSC Result')
+plot.imview(imgd, title='CSC Result', fig=fig)
 fig.show()
 
 

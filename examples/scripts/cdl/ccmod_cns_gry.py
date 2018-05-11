@@ -83,9 +83,9 @@ Display initial and final dictionaries.
 
 fig = plot.figure(figsize=(14, 7))
 plot.subplot(1, 2, 1)
-plot.imview(util.tiledict(D0), fig=fig, title='D0')
+plot.imview(util.tiledict(D0), title='D0', fig=fig)
 plot.subplot(1, 2, 2)
-plot.imview(util.tiledict(D1), fig=fig, title='D1')
+plot.imview(util.tiledict(D1), title='D1', fig=fig)
 fig.show()
 
 
@@ -96,13 +96,13 @@ Get iterations statistics from CCMOD solver object and plot functional value, AD
 its = c.getitstat()
 fig = plot.figure(figsize=(20, 5))
 plot.subplot(1, 3, 1)
-plot.plot(its.DFid, fig=fig, xlbl='Iterations', ylbl='Functional')
+plot.plot(its.DFid, xlbl='Iterations', ylbl='Functional', fig=fig)
 plot.subplot(1, 3, 2)
-plot.plot(np.vstack((its.PrimalRsdl, its.DualRsdl)).T, fig=fig,
+plot.plot(np.vstack((its.PrimalRsdl, its.DualRsdl)).T,
           ptyp='semilogy', xlbl='Iterations', ylbl='Residual',
-          lgnd=['Primal', 'Dual'])
+          lgnd=['Primal', 'Dual'], fig=fig)
 plot.subplot(1, 3, 3)
-plot.plot(its.Rho, fig=fig, xlbl='Iterations', ylbl='Penalty Parameter')
+plot.plot(its.Rho, xlbl='Iterations', ylbl='Penalty Parameter', fig=fig)
 fig.show()
 
 

@@ -125,11 +125,11 @@ Display reference, test, and reconstructed image
 
 fig = plot.figure(figsize=(21, 7))
 plot.subplot(1, 3, 1)
-plot.imview(img, fig=fig, title='Reference image')
+plot.imview(img, title='Reference image', fig=fig)
 plot.subplot(1, 3, 2)
-plot.imview(imgw, fig=fig, title='Corrupted image')
+plot.imview(imgw, title='Corrupted image', fig=fig)
 plot.subplot(1, 3, 3)
-plot.imview(imgr, fig=fig, title='Reconstructed image')
+plot.imview(imgr, title='Reconstructed image', fig=fig)
 fig.show()
 
 
@@ -139,10 +139,10 @@ Display lowpass component and sparse representation
 
 fig = plot.figure(figsize=(14, 7))
 plot.subplot(1, 2, 1)
-plot.imview(sl, fig=fig, cmap=plot.cm.Blues, title='Lowpass component')
+plot.imview(sl, cmap=plot.cm.Blues, title='Lowpass component', fig=fig)
 plot.subplot(1, 2, 2)
-plot.imview(np.squeeze(np.sum(abs(X), axis=b.cri.axisM)), fig=fig,
-            cmap=plot.cm.Blues, title='Sparse representation')
+plot.imview(np.squeeze(np.sum(abs(X), axis=b.cri.axisM)),
+            cmap=plot.cm.Blues, title='Sparse representation', fig=fig)
 fig.show()
 
 
@@ -153,13 +153,13 @@ Plot functional value, residuals, and rho
 its = b.getitstat()
 fig = plot.figure(figsize=(21, 7))
 plot.subplot(1, 3, 1)
-plot.plot(its.ObjFun, fig=fig, xlbl='Iterations', ylbl='Functional')
+plot.plot(its.ObjFun, xlbl='Iterations', ylbl='Functional', fig=fig)
 plot.subplot(1, 3, 2)
-plot.plot(np.vstack((its.PrimalRsdl, its.DualRsdl)).T, fig=fig,
+plot.plot(np.vstack((its.PrimalRsdl, its.DualRsdl)).T,
           ptyp='semilogy', xlbl='Iterations', ylbl='Residual',
-          lgnd=['Primal', 'Dual'])
+          lgnd=['Primal', 'Dual'], fig=fig)
 plot.subplot(1, 3, 3)
-plot.plot(its.Rho, fig=fig, xlbl='Iterations', ylbl='Penalty Parameter')
+plot.plot(its.Rho, xlbl='Iterations', ylbl='Penalty Parameter', fig=fig)
 fig.show()
 
 
