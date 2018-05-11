@@ -88,11 +88,27 @@ Only available if ``have_cuda`` is `True`
       Total memory in bytes
 
 
+.. py:function:: device_name(int dev=0)
+
+   Get hardware model name for the specified CUDA GPU device.
+
+   Parameters
+   ----------
+   id : int, optional (default 0)
+     Device number of device
+
+   Returns
+   -------
+   name : string
+     Hardware device name
+
+
 .. _cuda_cbpdn:
 .. py:function:: cbpdn(D, S, lmbda, opt, dev=0)
 
-   A GPU-accelerated version of :class:`.admm.cbpdn.ConvBPDN`. Multiple images
-   and multi-channel images in input signal `S` are currently not supported.
+   A GPU-accelerated version of :class:`.admm.cbpdn.ConvBPDN`. Multiple
+   images and multi-channel images in input signal `S` are currently not
+   supported.
 
    Parameters
    ----------
@@ -116,9 +132,9 @@ Only available if ``have_cuda`` is `True`
 .. _cuda_cbpdngrd:
 .. py:function:: cbpdngrd(D, S, lmbda, mu, opt, dev=0)
 
-   A GPU-accelerated version of :class:`.admm.cbpdn.ConvBPDNGradReg`. Multiple
-   images and multi-channel images in input signal `S` are currently not
-   supported.
+   A GPU-accelerated version of :class:`.admm.cbpdn.ConvBPDNGradReg`.
+   Multiple images and multi-channel images in input signal `S` are
+   currently not supported.
 
    Parameters
    ----------
@@ -127,9 +143,91 @@ Only available if ``have_cuda`` is `True`
    S : array_like(ndim=2)
      Signal array (two dimensional)
    lmbda : float32
-     Regularisation parameter (l1)
+     Regularisation parameter (:math:`\ell_1`)
    mu : float
-     Regularisation parameter (gradient)
+     Regularisation parameter (:math:`\ell_2` of gradient)
+   opt : dict or :class:`.admm.cbpdn.ConvBPDNGradReg.Options` object
+     Algorithm options
+   dev : int
+     Device number of GPU device to use
+
+   Returns
+   -------
+   X : ndarray
+     Coefficient map array (sparse representation)
+
+
+.. _cuda_cbpdnmsk:
+.. py:function:: cbpdnmsk(D, s, w, lmbda, opt, dev=0)
+
+   A GPU-accelerated version of :class:`.admm.cbpdn.AddMaskSim` used
+   together with :class:`.admm.cbpdn.ConvBPDN`, providing a spatial
+   mask in the data fidelity term of the functional minimized by this class.
+   Multiple images and multi-channel images in input signal `S` are
+   currently not supported.
+
+   Since the spatial mask is implemented via the Additive Mask Simulation
+   (AMS) method :cite:`wohlberg-2016-boundary`, the entries must be in
+   :math:`\{0,1\}`. Note that this GPU version differs from the Python code
+   in its handling of the ``L1Weight`` option: this version automatically
+   adjusts this array to account for the AMS impulse filter that is
+   inserted into the dictionary, while the Python version requires this to
+   be handled by the calling function. In addition, this version prepends
+   the AMS impulse filter at the start of the dictionary, while the Python
+   version appends it at the end.
+
+   Parameters
+   ----------
+   D : array_like(float32, ndim=3)
+     Dictionary array (three dimensional)
+   s : array_like(float32, ndim=2)
+     Signal array (two dimensional)
+   w : array_like
+     Mask array (two dimensional)
+   lmbda : float32
+     Regularisation parameter
+   opt : dict or :class:`.admm.cbpdn.ConvBPDN.Options` object
+     Algorithm options
+   dev : int
+     Device number of GPU device to use
+
+   Returns
+   -------
+   X : ndarray
+     Coefficient map array (sparse representation)
+
+
+.. _cuda_cbpdngrdmsk:
+.. py:function:: cbpdngrdmsk(D, s, w, lmbda, mu, opt, dev=0)
+
+   A GPU-accelerated version of of :class:`.admm.cbpdn.AddMaskSim`
+   used together with :class:`.admm.cbpdn.ConvBPDNGradReg`, providing
+   a spatial mask in the data fidelity term of the functional minimized by
+   this class. Multiple images and multi-channel images in input signal `S`
+   are currently not supported.
+
+   Since the spatial mask is implemented via the Additive Mask Simulation
+   (AMS) method :cite:`wohlberg-2016-boundary`, the entries must be in
+   :math:`\{0,1\}`. Note that this GPU version differs from the Python code
+   in its handling of the ``L1Weight`` and ``GradWeight`` options: this
+   version automatically adjusts these arrays to account for the AMS impulse
+   filter that is inserted into the dictionary, while the Python version
+   requires this to be handled by the calling function. In addition, this
+   version prepends the AMS impulse filter at the start of the dictionary,
+   while the Python version appends it at the end.
+
+   Parameters
+   ----------
+   D : array_like(float32, ndim=3)
+     Dictionary array (three dimensional)
+   s : array_like(float32, ndim=2)
+     Signal array (two dimensional)
+   w : array_like
+     Mask array (two dimensional)
+   lmbda : float32
+     Regularisation parameter (:math:`\ell_1`)
+   mu : float
+     Regularisation parameter (:math:`\ell_2` of gradient)
    opt : dict or :class:`.admm.cbpdn.ConvBPDNGradReg.Options` object
      Algorithm options
    dev : int
