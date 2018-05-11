@@ -257,7 +257,8 @@ class ADMM(with_metaclass(_ADMM_Meta, object)):
         if opt is None:
             opt = ADMM.Options()
         if not isinstance(opt, ADMM.Options):
-            raise TypeError("Parameter opt must be an instance of ADMM.Options")
+            raise TypeError('Parameter opt must be an instance of '
+                            'ADMM.Options')
 
         self.opt = opt
         self.Nx = Nx
@@ -390,9 +391,10 @@ class ADMM(with_metaclass(_ADMM_Meta, object)):
 
     def solve(self):
         """Start (or re-start) optimisation. This method implements the
-        framework for the iterations of an ADMM algorithm. There is sufficient
-        flexibility in overriding the component methods that it calls that it
-        is usually not necessary to override this method in derived clases.
+        framework for the iterations of an ADMM algorithm. There is
+        sufficient flexibility in overriding the component methods that
+        it calls that it is usually not necessary to override this method
+        in derived clases.
 
         If option ``Verbose`` is ``True``, the progress of the
         optimisation is displayed at every iteration. At termination
@@ -651,12 +653,7 @@ class ADMM(with_metaclass(_ADMM_Meta, object)):
         named tuples.
         """
 
-        if len(self.itstat) == 0:
-            return None
-        else:
-            return type(self).IterationStats(
-                *[[self.itstat[k][l] for k in range(len(self.itstat))]
-                  for l in range(len(self.itstat[0]))])
+        return util.transpose_ntpl_list(self.itstat)
 
 
 
@@ -690,9 +687,9 @@ class ADMM(with_metaclass(_ADMM_Meta, object)):
 
 
     def display_start(self):
-        """Set up status display if option selected. NB: this method assumes
-        that the first entry is the iteration count and the last is
-        the rho value.
+        """Set up status display if option selected. NB: this method
+        assumes that the first entry is the iteration count and the last
+        is the rho value.
         """
 
         if self.opt['Verbose']:
