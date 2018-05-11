@@ -158,8 +158,8 @@ class FISTA(with_metaclass(_FISTA_Meta, object)):
             ``Eta`` : Multiplier applied to L when updated
             (:math:`L` in :cite:`beck-2009-fast`).
 
-            ``MaxIter`` : Maximum iterations of updating L when backtracking.
-
+            ``MaxIter`` : Maximum iterations of updating L when
+            backtracking.
         """
 
         defaults = {'FastSolve': False, 'Verbose': False,
@@ -343,11 +343,13 @@ class FISTA(with_metaclass(_FISTA_Meta, object)):
         return np.zeros(xshape, dtype=self.dtype)
 
 
+
     def solve(self):
         """Start (or re-start) optimisation. This method implements the
-        framework for the iterations of a FISTA algorithm. There is sufficient
-        flexibility in overriding the component methods that it calls that it
-        is usually not necessary to override this method in derived clases.
+        framework for the iterations of a FISTA algorithm. There is
+        sufficient flexibility in overriding the component methods that it
+        calls that it is usually not necessary to override this method in
+        derived clases.
 
         If option ``Verbose`` is ``True``, the progress of the
         optimisation is displayed at every iteration. At termination
@@ -447,10 +449,12 @@ class FISTA(with_metaclass(_FISTA_Meta, object)):
         return self.getmin()
 
 
+
     def getmin(self):
         """Get minimiser after optimisation."""
 
         return self.X
+
 
 
     def proximal_step(self, grad=None):
@@ -463,6 +467,7 @@ class FISTA(with_metaclass(_FISTA_Meta, object)):
         V = self.Y - (1. / self.L) * grad
 
         self.X = self.eval_proxop(V)
+
 
 
     def combination_step(self):
@@ -526,6 +531,7 @@ class FISTA(with_metaclass(_FISTA_Meta, object)):
         raise NotImplementedError()
 
 
+
     def eval_proxop(self, V):
         """ Compute proximal operator of :math:`g`
 
@@ -535,6 +541,7 @@ class FISTA(with_metaclass(_FISTA_Meta, object)):
         raise NotImplementedError()
 
 
+
     def eval_R(self, V):
         """Evaluate smooth function :math:`f` in V.
 
@@ -542,6 +549,7 @@ class FISTA(with_metaclass(_FISTA_Meta, object)):
         """
 
         raise NotImplementedError()
+
 
 
     def eval_Rx(self):
@@ -645,7 +653,7 @@ class FISTA(with_metaclass(_FISTA_Meta, object)):
     def itstat_extra(self):
         """Non-standard entries for the iteration stats record tuple."""
 
-        return ()#self.F, self.Q, self.iterBTrack)
+        return ()
 
 
 
@@ -654,12 +662,7 @@ class FISTA(with_metaclass(_FISTA_Meta, object)):
         named tuples.
         """
 
-        if len(self.itstat) == 0:
-            return None
-        else:
-            return type(self).IterationStats(
-                *[[self.itstat[k][l] for k in range(len(self.itstat))]
-                  for l in range(len(self.itstat[0]))])
+        return util.transpose_ntpl_list(self.itstat)
 
 
 
@@ -670,7 +673,8 @@ class FISTA(with_metaclass(_FISTA_Meta, object)):
         """
 
         if self.opt['Verbose']:
-            # If Backtracking option enabled F, Q, itBT, L are included in iteration status
+            # If Backtracking option enabled F, Q, itBT, L are included in
+            # iteration status
             if self.opt['BackTrack', 'Enabled']:
                 hdrtxt = type(self).hdrtxt()
             else:
@@ -743,6 +747,7 @@ class FISTA(with_metaclass(_FISTA_Meta, object)):
         raise NotImplementedError()
 
 
+
     def rsdl(self):
         """Compute fixed point residual.
 
@@ -750,6 +755,7 @@ class FISTA(with_metaclass(_FISTA_Meta, object)):
         """
 
         raise NotImplementedError()
+
 
 
     def Lchange(self):
@@ -828,7 +834,6 @@ class FISTADFT(FISTA):
 
 
 
-
     def proximal_step(self, gradf=None):
         """ Compute proximal update (gradient descent + constraint)
 
@@ -859,6 +864,7 @@ class FISTADFT(FISTA):
         if not self.opt['FastSolve']:
             self.Yfprv = self.Yf.copy()
         self.Yf = self.Xf + ((tprv - 1.) / self.t) * (self.Xf - self.Xfprv)
+
 
 
     def compute_backtracking(self):
@@ -896,6 +902,7 @@ class FISTADFT(FISTA):
         self.iterBTrack = iterBTrack
 
 
+
     def store_prev(self):
 
         self.Xfprv = self.Xf.copy()
@@ -907,10 +914,12 @@ class FISTADFT(FISTA):
         return self.Xf - self.Yf
 
 
+
     def eval_Rxf(self):
         """Evaluate smooth term in X."""
 
         return self.eval_Rf(self.Xf)
+
 
 
     def eval_gradf(self):
@@ -921,6 +930,7 @@ class FISTADFT(FISTA):
         """
 
         raise NotImplementedError()
+
 
 
     def eval_proxop(self, V):
