@@ -105,9 +105,15 @@ Module :mod:`.admm.cbpdn` includes the following classes:
 
 * :class:`.AddMaskSim`
 
-  A wrapper class for applying the Additive Mask Simulation boundary
+  A wrapper class for applying the Additive Mask Simulation (AMS) boundary
   handling technique (see :cite:`wohlberg-2016-boundary`) to any of the
   other :mod:`.admm.cbpdn` classes.
+
+  If the `sporco-cuda <https://github.com/bwohlberg/sporco-cuda>`__
+  extension package is installed, functions :ref:`cbpdnmsk <cuda_cbpdnmsk>`
+  and :ref:`cbpdngrdmsk <cuda_cbpdngrdmsk>` in the :ref:`sporco.cuda
+  <cuda_package>` package provide GPU accelerated solvers for AMS variants
+  of the ``ConvBPDN`` and ``ConvBPDNGradReg`` problems.
 
 
 |
@@ -163,7 +169,6 @@ Module :mod:`.admm.cbpdntv` includes the following classes:
 
   where :math:`G_i` is an operator computing the derivative along index
   :math:`i`.
-
 
 |
 

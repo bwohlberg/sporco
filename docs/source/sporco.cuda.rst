@@ -41,12 +41,12 @@ The content of the ``sporco.cuda`` namespace is summarised below. For full detai
 Always available
 ~~~~~~~~~~~~~~~~
 
-.. py:attribute:: have_cuda
+.. np:attribute:: have_cuda
 
    A boolean value indicating whether the import of ``sporco_cuda`` succeeded.
 
 
-.. py:function:: device_count()
+.. np:function:: device_count()
 
    Get the number of CUDA GPU devices installed on the host system. Returns 0
    if no devices are installed or if the import of ``sporco_cuda`` failed.
@@ -60,10 +60,10 @@ Always available
 Only available if ``have_cuda`` is `True`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. py:function:: current_device(id=None)
+.. np:function:: current_device(id=None)
 
    Get or set the current CUDA GPU device. The current device is not set
-   if `id` is None
+   if `id` is None.
 
    Parameters
    ----------
@@ -76,7 +76,8 @@ Only available if ``have_cuda`` is `True`
      Device number of current device
 
 
-.. py:function:: memory_info()
+
+.. np:function:: memory_info()
 
    Get memory information for the current CUDA GPU device.
 
@@ -88,7 +89,8 @@ Only available if ``have_cuda`` is `True`
       Total memory in bytes
 
 
-.. py:function:: device_name(int dev=0)
+
+.. np:function:: device_name(int dev=0)
 
    Get hardware model name for the specified CUDA GPU device.
 
@@ -103,12 +105,15 @@ Only available if ``have_cuda`` is `True`
      Hardware device name
 
 
+
 .. _cuda_cbpdn:
-.. py:function:: cbpdn(D, S, lmbda, opt, dev=0)
+.. np:function:: cbpdn(D, S, lmbda, opt, dev=0)
 
    A GPU-accelerated version of :class:`.admm.cbpdn.ConvBPDN`. Multiple
-   images and multi-channel images in input signal `S` are currently not
+   images and multi-channel images in input signal ``S`` are currently not
    supported.
+
+   A :ref:`usage example <example_csc_cbpdn_cuda>` is available.
 
    Parameters
    ----------
@@ -129,12 +134,15 @@ Only available if ``have_cuda`` is `True`
      Coefficient map array (sparse representation)
 
 
+
 .. _cuda_cbpdngrd:
-.. py:function:: cbpdngrd(D, S, lmbda, mu, opt, dev=0)
+.. np:function:: cbpdngrd(D, S, lmbda, mu, opt, dev=0)
 
    A GPU-accelerated version of :class:`.admm.cbpdn.ConvBPDNGradReg`.
-   Multiple images and multi-channel images in input signal `S` are
+   Multiple images and multi-channel images in input signal ``S`` are
    currently not supported.
+
+   A :ref:`usage example <example_csc_cbpdn_grd_cuda>` is available.
 
    Parameters
    ----------
@@ -157,13 +165,14 @@ Only available if ``have_cuda`` is `True`
      Coefficient map array (sparse representation)
 
 
+
 .. _cuda_cbpdnmsk:
-.. py:function:: cbpdnmsk(D, s, w, lmbda, opt, dev=0)
+.. np:function:: cbpdnmsk(D, s, w, lmbda, opt, dev=0)
 
    A GPU-accelerated version of :class:`.admm.cbpdn.AddMaskSim` used
    together with :class:`.admm.cbpdn.ConvBPDN`, providing a spatial
    mask in the data fidelity term of the functional minimized by this class.
-   Multiple images and multi-channel images in input signal `S` are
+   Multiple images and multi-channel images in input signal ``S`` are
    currently not supported.
 
    Since the spatial mask is implemented via the Additive Mask Simulation
@@ -175,6 +184,8 @@ Only available if ``have_cuda`` is `True`
    be handled by the calling function. In addition, this version prepends
    the AMS impulse filter at the start of the dictionary, while the Python
    version appends it at the end.
+
+   A :ref:`usage example <example_csc_cbpdn_ams_gry>` is available.
 
    Parameters
    ----------
@@ -197,13 +208,14 @@ Only available if ``have_cuda`` is `True`
      Coefficient map array (sparse representation)
 
 
+
 .. _cuda_cbpdngrdmsk:
-.. py:function:: cbpdngrdmsk(D, s, w, lmbda, mu, opt, dev=0)
+.. np:function:: cbpdngrdmsk(D, s, w, lmbda, mu, opt, dev=0)
 
    A GPU-accelerated version of of :class:`.admm.cbpdn.AddMaskSim`
    used together with :class:`.admm.cbpdn.ConvBPDNGradReg`, providing
    a spatial mask in the data fidelity term of the functional minimized by
-   this class. Multiple images and multi-channel images in input signal `S`
+   this class. Multiple images and multi-channel images in input signal ``S``
    are currently not supported.
 
    Since the spatial mask is implemented via the Additive Mask Simulation
@@ -215,6 +227,8 @@ Only available if ``have_cuda`` is `True`
    requires this to be handled by the calling function. In addition, this
    version prepends the AMS impulse filter at the start of the dictionary,
    while the Python version appends it at the end.
+
+   A :ref:`usage example <example_csc_cbpdn_ams_grd_gry>` is available.
 
    Parameters
    ----------
