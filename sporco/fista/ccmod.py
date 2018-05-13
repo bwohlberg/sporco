@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2016-2017 by Brendt Wohlberg <brendt@ieee.org>
+# Copyright (C) 2016-2018 by Brendt Wohlberg <brendt@ieee.org>
 #                            Cristina Garcia-Cardona <cgarciac@lanl.gov>
 # All rights reserved. BSD 3-clause License.
 # This file is part of the SPORCO package. Details of the copyright
@@ -240,14 +240,12 @@ class ConvCnstrMOD(fista.FISTADFT):
                              zm=opt['ZeroMean'])
 
         # Create byte aligned arrays for FFT calls
-        xfshp = list(self.X.shape)
-        xfshp[dimN-1] = xfshp[dimN-1]//2 + 1
-        self.Xf = sl.pyfftw_empty_aligned(xfshp,
-                            dtype=sl.complex_dtype(self.dtype))
+        self.Xf = sl.pyfftw_rfftn_empty_aligned(self.X.shape, self.cri.axisN,
+                                                self.dtype)
 
         # Initialise auxiliary variable Yf
-        self.Yf = sl.pyfftw_empty_aligned(xfshp,
-                            dtype=sl.complex_dtype(self.dtype))
+        self.Yf = sl.pyfftw_rfftn_empty_aligned(self.X.shape, self.cri.axisN,
+                                                self.dtype)
 
 
         self.Ryf = -self.Sf

@@ -233,10 +233,8 @@ class ConvBPDNScalarTV(admm.ADMM):
 
         # Initialise byte-aligned arrays for pyfftw
         self.YU = sl.pyfftw_empty_aligned(self.Y.shape, dtype=self.dtype)
-        xfshp = list(self.cri.shpX)
-        xfshp[dimN-1] = xfshp[dimN-1]//2 + 1
-        self.Xf = sl.pyfftw_empty_aligned(xfshp,
-                            dtype=sl.complex_dtype(self.dtype))
+        self.Xf = sl.pyfftw_rfftn_empty_aligned(self.cri.shpX, self.cri.axisN,
+                                             self.dtype)
 
         self.setdict()
 
@@ -937,10 +935,8 @@ class ConvBPDNRecTV(admm.ADMM):
 
         # Initialise byte-aligned arrays for pyfftw
         self.YU = sl.pyfftw_empty_aligned(self.Y.shape, dtype=self.dtype)
-        xfshp = list(self.cri.shpX)
-        xfshp[dimN-1] = xfshp[dimN-1]//2 + 1
-        self.Xf = sl.pyfftw_empty_aligned(xfshp,
-                            dtype=sl.complex_dtype(self.dtype))
+        self.Xf = sl.pyfftw_rfftn_empty_aligned(self.cri.shpX, self.cri.axisN,
+                                             self.dtype)
 
         self.setdict()
 

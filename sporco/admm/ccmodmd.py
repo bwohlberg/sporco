@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2015-2017 by Brendt Wohlberg <brendt@ieee.org>
+# Copyright (C) 2015-2018 by Brendt Wohlberg <brendt@ieee.org>
 # All rights reserved. BSD 3-clause License.
 # This file is part of the SPORCO package. Details of the copyright
 # and user license can be found in the 'LICENSE.txt' file distributed
@@ -295,9 +295,8 @@ class ConvCnstrMODMaskDcplBase(admm.ADMMTwoBlockCnstrnt):
         # Initialise byte-aligned arrays for pyfftw
         self.YU = sl.pyfftw_empty_aligned(self.Y.shape, dtype=self.dtype)
         xfshp = list(self.cri.Nv + (self.cri.Cd, 1, self.cri.M))
-        xfshp[dimN-1] = xfshp[dimN-1]//2 + 1
-        self.Xf = sl.pyfftw_empty_aligned(xfshp,
-                                          dtype=sl.complex_dtype(self.dtype))
+        self.Xf = sl.pyfftw_rfftn_empty_aligned(xfshp, self.cri.axisN,
+                                                self.dtype)
 
         if Z is not None:
             self.setcoef(Z)
