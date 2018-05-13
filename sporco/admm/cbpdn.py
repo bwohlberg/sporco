@@ -1711,8 +1711,12 @@ class ConvTwoBlockCnstrnt(admm.ADMMTwoBlockCnstrnt):
         # should be possible to disable relevant diagnostic information
         # (dual residual) to avoid this cost.
         Y0f = sl.rfftn(Y0, None, self.cri.axisN)
-        return sl.irfftn(sl.inner(np.conj(self.Df), Y0f, axis=self.cri.axisC),
-                         self.cri.Nv, self.cri.axisN)
+        if self.cri.Cd == 1:
+            return sl.irfftn(np.conj(self.Df) * Y0f, self.cri.Nv,
+                             self.cri.axisN)
+        else:
+            return sl.irfftn(sl.inner(np.conj(self.Df), Y0f,
+                    axis=self.cri.axisC), self.cri.Nv, self.cri.axisN)
 
 
 
