@@ -66,6 +66,9 @@ def pyfftw_empty_aligned(shape, dtype, order='C', n=None):
       Output array shape
     dtype : dtype
       Output array dtype
+    order : {'C', 'F'}, optional (default 'C')
+      Specify whether arrays should be stored in row-major (C-style) or
+      column-major (Fortran-style) order
     n : int, optional (default None)
       Output array should be aligned to n-byte boundary
 
@@ -76,6 +79,43 @@ def pyfftw_empty_aligned(shape, dtype, order='C', n=None):
     """
 
     return pyfftw.empty_aligned(shape, dtype, order, n)
+
+
+
+def pyfftw_rfftn_empty_aligned(shape, axes, dtype, order='C', n=None):
+    """
+    Construct an empty byte-aligned array for efficient use by :mod:`pyfftw`
+    functions :mod:`pyfftw.rfftn` and :mod:`pyfftw.irfftn`. The shape of the
+    empty array is appropriate for the output of :mod:`pyfftw.rfftn` applied
+    to an array of the shape specified by parameter ``shape``, and for the
+    input of the corresponding :mod:`pyfftw.irfftn` call that reverses this
+    operation.
+
+    Parameters
+    ----------
+    shape : sequence of ints
+      Output array shape
+    axes : sequence of ints
+      Axes on which the FFT will be computed
+    dtype : dtype
+      Real dtype from which the complex dtype of the output array is derived
+    order : {'C', 'F'}, optional (default 'C')
+      Specify whether arrays should be stored in row-major (C-style) or
+      column-major (Fortran-style) order
+    n : int, optional (default None)
+      Output array should be aligned to n-byte boundary
+
+    Returns
+    -------
+    a :  ndarray
+      Empty array with required byte-alignment
+    """
+
+    ashp = list(shape)
+    raxis = axes[-1]
+    ashp[raxis] = ashp[raxis]//2 + 1
+    cdtype = complex_dtype(dtype)
+    return pyfftw.empty_aligned(ashp, cdtype, order, n)
 
 
 
