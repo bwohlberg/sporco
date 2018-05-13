@@ -1015,7 +1015,7 @@ def shrink2(x, alpha, axis=-1):
     a = np.sqrt(np.sum(x**2, axis=axis, keepdims=True))
     b = np.maximum(0, a - alpha)
     b = zdivide(b, a)
-    return b*x
+    return np.asarray(b*x, dtype=x.dtype)
 
 
 
