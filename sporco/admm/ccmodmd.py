@@ -849,8 +849,6 @@ class ConvCnstrMODMaskDcpl_Consensus(ccmod.ConvCnstrMOD_Consensus):
                 W = np.broadcast_to(W, shpw)
             self.W = W.reshape(W.shape[0:self.cri.dimN] +
                 (1, W.shape[self.cri.axisC] * W.shape[self.cri.axisK], 1))
-            self.W = W.reshape(W.shape[0:self.cri.dimN] +
-                (1, W.shape[self.cri.axisC] * W.shape[self.cri.axisK], 1))
         else:
             self.W = W
 
