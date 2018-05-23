@@ -67,8 +67,7 @@ class FISTA(with_metaclass(_FISTA_Meta, object)):
     Solve optimisation problems of the form
 
     .. math::
-       \mathrm{argmin}_{\mathbf{x}} \;
-       f(\mathbf{x}) + g(\mathbf{x}) \;\;,
+       \mathrm{argmin}_{\mathbf{x}} \; f(\mathbf{x}) + g(\mathbf{x}) \;\;,
 
     where :math:`f, g` are convex functions and :math:`f` is smooth.
 
