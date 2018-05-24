@@ -31,8 +31,9 @@ dirlst, diridx = docntbk.parse_rst_index(pfn)
 # Update notebooks index if it doesn't exist, or is older than scripts index
 if docntbk.update_required(pfn, nfn):
     print('Writing %s' % nfn)
-    ptxt = docntbk.construct_notebook_index('Jupyter Notebook Examples',
-                                            dirlst, diridx)
+    ptxt = docntbk.construct_notebook_index(
+        '[SPORCO](https://github.com/bwohlberg/sporco) Usage Examples',
+        dirlst, diridx)
     docntbk.script_string_to_notebook(ptxt, nfn)
 
 # Work through example script subdirectories
