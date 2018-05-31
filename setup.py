@@ -67,7 +67,7 @@ setup(
                         'ADMM', 'FISTA'],
     platforms        = 'Any',
     license          = 'BSD',
-    url              = 'http://bwohlberg.github.io/sporco',
+    url              = 'https://github.com/bwohlberg/sporco',
     author           = 'Brendt Wohlberg',
     author_email     = 'brendt@ieee.org',
     packages         = packages,
