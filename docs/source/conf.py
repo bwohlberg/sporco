@@ -18,6 +18,7 @@ from builtins import next
 from builtins import filter
 from ast import parse
 import re, shutil, tempfile
+import inspect
 
 sys.path.append(os.path.dirname(__file__))
 import callgraph
@@ -416,32 +417,27 @@ def rmsection(filename, pattern):
 
 
 
+def options_name_fix(modname):
+    for mnm, mod in inspect.getmembers(modname, inspect.ismodule):
+        for cnm, cls in inspect.getmembers(mod, inspect.isclass):
+            if hasattr(cls, 'Options') and inspect.isclass(getattr(cls,
+                                                'Options')):
+                optcls = getattr(cls, 'Options')
+                if optcls.__name__ != 'Options':
+                    delattr(mod, optcls.__name__)
+                    optcls.__name__ = 'Options'
+
+
 # See https://github.com/rtfd/readthedocs.org/issues/1139
 def run_apidoc(_):
 
-    # Import the sporco.admm and sporco.fista modules and undo the
-    # effect of sporco.util._module_name_nested so that docs for
+    # Import the sporco.admm, sporco.fista, and sporco.dictlrn modules and
+    # undo the effect of common._fix_nested_class_lookup so that docs for
     # Options classes appear in the correct locations
-    import inspect
     import sporco.admm
-    for mnm, mod in inspect.getmembers(sporco.admm, inspect.ismodule):
-        for cnm, cls in inspect.getmembers(mod, inspect.isclass):
-            if hasattr(cls, 'Options') and inspect.isclass(getattr(cls,
-                                                'Options')):
-                optcls = getattr(cls, 'Options')
-                if optcls.__name__ != 'Options':
-                    delattr(mod, optcls.__name__)
-                    optcls.__name__ = 'Options'
-
+    options_name_fix(sporco.admm)
     import sporco.fista
-    for mnm, mod in inspect.getmembers(sporco.fista, inspect.ismodule):
-        for cnm, cls in inspect.getmembers(mod, inspect.isclass):
-            if hasattr(cls, 'Options') and inspect.isclass(getattr(cls,
-                                                'Options')):
-                optcls = getattr(cls, 'Options')
-                if optcls.__name__ != 'Options':
-                    delattr(mod, optcls.__name__)
-                    optcls.__name__ = 'Options'
+    options_name_fix(sporco.fista)
 
     import sphinx.apidoc
     module = '../../sporco' if on_rtd else 'sporco'
