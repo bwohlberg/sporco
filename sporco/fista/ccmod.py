@@ -58,19 +58,17 @@ class ConvCnstrMOD(fista.FISTADFT):
     :math:`\mathbf{s}_{c,k}` are also supported, either as
 
     .. math::
-       \mathrm{argmin}_\mathbf{d} \;
-       (1/2) \sum_c \sum_k \left\| \sum_m \mathbf{d}_m * \mathbf{x}_{c,k,m} -
-       \mathbf{s}_{c,k} \right\|_2^2 \quad \text{such that} \quad
-       \mathbf{d}_m \in C
+       \mathrm{argmin}_\mathbf{d} \; (1/2) \sum_c \sum_k \left\| \sum_m
+       \mathbf{d}_m * \mathbf{x}_{c,k,m} - \mathbf{s}_{c,k} \right\|_2^2
+       \quad \text{such that} \quad \mathbf{d}_m \in C
 
     with single-channel dictionary filters :math:`\mathbf{d}_m` and
     multi-channel coefficient maps :math:`\mathbf{x}_{c,k,m}`, or
 
     .. math::
-       \mathrm{argmin}_\mathbf{d} \;
-       (1/2) \sum_c \sum_k \left\| \sum_m \mathbf{d}_{c,m} * \mathbf{x}_{k,m} -
-       \mathbf{s}_{c,k} \right\|_2^2 \quad \text{such that} \quad
-       \mathbf{d}_{c,m} \in C
+       \mathrm{argmin}_\mathbf{d} \; (1/2) \sum_c \sum_k \left\| \sum_m
+       \mathbf{d}_{c,m} * \mathbf{x}_{k,m} - \mathbf{s}_{c,k}
+       \right\|_2^2 \quad \text{such that} \quad \mathbf{d}_{c,m} \in C
 
     with multi-channel dictionary filters :math:`\mathbf{d}_{c,m}` and
     single-channel coefficient maps :math:`\mathbf{x}_{k,m}`. In this
@@ -216,6 +214,7 @@ class ConvCnstrMOD(fista.FISTADFT):
 
         # Set gradient step parameter
         #self.set_attr('L', opt['L'], dval=self.opt['L'], dtype=self.dtype)
+        self.set_attr('L', opt['L'], dval=self.cri.K*14.0, dtype=self.dtype)
 
         # Reshape S to standard layout (Z, i.e. X in cbpdn, is assumed
         # to be taken from cbpdn, and therefore already in standard
@@ -247,7 +246,6 @@ class ConvCnstrMOD(fista.FISTADFT):
         self.Yf = sl.pyfftw_rfftn_empty_aligned(self.X.shape, self.cri.axisN,
                                                 self.dtype)
 
-
         self.Ryf = -self.Sf
 
         self.Xf = sl.rfftn(self.X, None, self.cri.axisN)
@@ -276,6 +274,7 @@ class ConvCnstrMOD(fista.FISTADFT):
         self.Zf = sl.rfftn(self.Z, self.cri.Nv, self.cri.axisN)
 
 
+
     def getdict(self, crop=True):
         """Get final dictionary. If ``crop`` is ``True``, apply
         :func:`.cnvrep.bcrop` to returned array.
@@ -287,8 +286,9 @@ class ConvCnstrMOD(fista.FISTADFT):
         return D
 
 
+
     def eval_gradf(self):
-        """ Compute gradient in Fourier domain """
+        """Compute gradient in Fourier domain."""
 
         # Compute X D - S
         self.Ryf = self.eval_Rf(self.Yf)
@@ -302,14 +302,16 @@ class ConvCnstrMOD(fista.FISTADFT):
         return gradf
 
 
+
     def eval_proxop(self, V):
-        """ Compute proximal operator of :math:`g` ."""
+        """Compute proximal operator of :math:`g`."""
 
         return self.Pcn(V)
 
 
+
     def eval_Rf(self, Vf):
-        """ Evaluate smooth term in Vf """
+        """Evaluate smooth term in Vf."""
 
         return sl.inner(self.Zf, Vf, axis=self.cri.axisM) - self.Sf
 
@@ -333,19 +335,18 @@ class ConvCnstrMOD(fista.FISTADFT):
 
 
     def obfn_dfd(self):
-        r"""Compute data fidelity term :math:`(1/2) \| \sum_m \mathbf{d}_m *
-        \mathbf{x}_m - \mathbf{s} \|_2^2`.
+        r"""Compute data fidelity term :math:`(1/2) \| \sum_m
+        \mathbf{d}_m * \mathbf{x}_m - \mathbf{s} \|_2^2`.
         """
 
-        Ef = sl.inner(self.Zf, self.Xf, axis=self.cri.axisM) - \
-          self.Sf
+        Ef = sl.inner(self.Zf, self.Xf, axis=self.cri.axisM) - self.Sf
         return sl.rfl2norm2(Ef, self.S.shape, axis=self.cri.axisN) / 2.0
 
 
 
     def obfn_cns(self):
-        r"""Compute constraint violation measure :math:`\| P(\mathbf{y}) -
-        \mathbf{y}\|_2`.
+        r"""Compute constraint violation measure :math:`\|
+        P(\mathbf{y}) - \mathbf{y}\|_2`.
         """
 
         return linalg.norm((self.Pcn(self.X) - self.X))
@@ -374,7 +375,7 @@ class ConvCnstrMODMaskDcpl(ConvCnstrMOD):
     |
 
     FISTA algorithm for Convolutional Constrained MOD problem
-    with Mask Decoupling :cite:`garcia-2017-convolutional`.
+    with a spatial mask :cite:`garcia-2017-convolutional`.
 
     Solve the optimisation problem
 
@@ -389,8 +390,9 @@ class ConvCnstrMODMaskDcpl(ConvCnstrMOD):
     FISTA problem
 
     .. math::
-       \mathrm{argmin}_{\mathbf{d}} \; (1/2) \left\|  W \left(X \mathbf{d} -
-       \mathbf{s}\right) \right\|_2^2 + \iota_C(\mathbf{d}_m) \;\;,
+       \mathrm{argmin}_{\mathbf{d}} \; (1/2) \left\|  W \left(X
+       \mathbf{d} - \mathbf{s}\right) \right\|_2^2 +
+       \iota_C(\mathbf{d}_m) \;\;,
 
     where  :math:`\iota_C(\cdot)` is the indicator function of feasible
     set :math:`C`, and :math:`X \mathbf{d} = \sum_m \mathbf{x}_m *
@@ -403,7 +405,8 @@ class ConvCnstrMODMaskDcpl(ConvCnstrMOD):
     class Options(ConvCnstrMOD.Options):
         """ConvCnstrMODMaskDcpl algorithm options
 
-        Options include all of those defined in :class:`.fista.FISTA.Options`.
+        Options include all of those defined in
+        :class:`.fista.FISTA.Options`.
         """
 
         defaults = copy.deepcopy(ConvCnstrMOD.Options.defaults)
@@ -472,12 +475,13 @@ class ConvCnstrMODMaskDcpl(ConvCnstrMOD):
         # base class)
         if self.cri.Cd == 1 and self.cri.C > 1 and hasattr(W, 'ndim'):
             # In most cases broadcasting rules make it possible for W
-            # to have a singleton dimension corresponding to a non-singleton
-            # dimension in S. However, when S is reshaped to interleave axisC
-            # and axisK on the same axis, broadcasting is no longer sufficient
-            # unless axisC and axisK of W are either both singleton or both
-            # of the same size as the corresponding axes of S. If neither of
-            # these cases holds, it is necessary to replicate the axis of W
+            # to have a singleton dimension corresponding to a
+            # non-singleton dimension in S. However, when S is
+            # reshaped to interleave axisC and axisK on the same axis,
+            # broadcasting is no longer sufficient unless axisC and
+            # axisK of W are either both singleton or both of the same
+            # size as the corresponding axes of S. If neither of these
+            # cases holds, it is necessary to replicate the axis of W
             # (axisC or axisK) that does not have the same size as the
             # corresponding axis of S.
             shpw = list(W.shape)
@@ -498,7 +502,7 @@ class ConvCnstrMODMaskDcpl(ConvCnstrMOD):
 
 
     def eval_gradf(self):
-        """ Compute gradient in Fourier domain """
+        """Compute gradient in Fourier domain."""
 
         # Compute X D - S
         self.Ryf = self.eval_Rf(self.Yf)
@@ -517,3 +521,14 @@ class ConvCnstrMODMaskDcpl(ConvCnstrMOD):
             gradf = np.sum(gradf, axis=self.cri.axisC, keepdims=True)
 
         return gradf
+
+
+    def obfn_dfd(self):
+        r"""Compute data fidelity term :math:`(1/2) \sum_k \| W (\sum_m
+        \mathbf{d}_m * \mathbf{x}_{k,m} - \mathbf{s}_k) \|_2^2`
+        """
+
+        Ef = sl.inner(self.Zf, self.Xf, axis=self.cri.axisM) - self.Sf
+        E = sl.irfftn(Ef, self.cri.Nv, self.cri.axisN)
+
+        return (np.linalg.norm(self.W * E)**2)/2.0

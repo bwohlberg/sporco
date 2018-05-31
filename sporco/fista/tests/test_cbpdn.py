@@ -230,3 +230,34 @@ class TestSet01(object):
             assert(0)
         assert(np.array(b.getitstat().Rsdl)[-1] < 1e-3)
 
+
+    def test_14(self):
+        N = 16
+        Nd = 5
+        M = 4
+        D = np.random.randn(Nd, Nd, M)
+        s = np.random.randn(N, N)
+        lmbda = 1e-1
+        try:
+            b = cbpdn.ConvBPDNMask(D, s, lmbda)
+            b.solve()
+        except Exception as e:
+            print(e)
+            assert(0)
+
+
+    def test_15(self):
+        N = 16
+        Nd = 5
+        M = 4
+        D = np.random.randn(Nd, Nd, M)
+        s = np.random.randn(N, N)
+        w = np.ones(s.shape)
+        lmbda = 1e-1
+        try:
+            b = cbpdn.ConvBPDNMask(D, s, lmbda, w)
+            b.solve()
+            b.reconstruct()
+        except Exception as e:
+            print(e)
+            assert(0)

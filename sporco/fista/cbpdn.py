@@ -61,8 +61,8 @@ class ConvBPDN(fista.FISTADFT):
     Combination step
 
     .. math::
-       \mathbf{y}_{k+1} = \mathbf{x}_k + \left( \frac{t_k - 1}{t_{k+1}} \right)
-       (\mathbf{x}_k - \mathbf{x}_{k-1}) \;\;,
+       \mathbf{y}_{k+1} = \mathbf{x}_k + \left( \frac{t_k - 1}{t_{k+1}}
+       \right) (\mathbf{x}_k - \mathbf{x}_{k-1}) \;\;,
 
     with :math:`t_{k+1} = \frac{1 + \sqrt{1 + 4 t_k^2}}{2}`.
 
@@ -116,6 +116,7 @@ class ConvBPDN(fista.FISTADFT):
         defaults = copy.deepcopy(fista.FISTADFT.Options.defaults)
         defaults.update({'NonNegCoef': False, 'NoBndryCross': False})
         defaults.update({'L1Weight': 1.0})
+        defaults.update({'L': 500.0})
 
 
         def __init__(self, opt=None):
@@ -127,8 +128,7 @@ class ConvBPDN(fista.FISTADFT):
 
 
         def __setitem__(self, key, value):
-            """Set options.
-            """
+            """Set options."""
 
             fista.FISTADFT.Options.__setitem__(self, key, value)
 
@@ -150,11 +150,11 @@ class ConvBPDN(fista.FISTADFT):
         channel, or `dimN` + 2 dimensional, in which case the final
         dimension is assumed to contain the channels (e.g. colour
         channels in the case of images). The input signal set `S` is
-        either `dimN` dimensional (no channels, only one signal), `dimN` + 1
-        dimensional (either multiple channels or multiple signals), or
-        `dimN` + 2 dimensional (multiple channels and multiple signals).
-        Determination of problem dimensions is handled by
-        :class:`.cnvrep.CSC_ConvRepIndexing`.
+        either `dimN` dimensional (no channels, only one signal),
+        `dimN` + 1 dimensional (either multiple channels or multiple
+        signals), or `dimN` + 2 dimensional (multiple channels and
+        multiple signals). Determination of problem dimensions is
+        handled by :class:`.cnvrep.CSC_ConvRepIndexing`.
 
 
         |
@@ -248,14 +248,16 @@ class ConvBPDN(fista.FISTADFT):
         self.Df = sl.rfftn(self.D, self.cri.Nv, self.cri.axisN)
 
 
+
     def getcoef(self):
         """Get final coefficient array."""
 
         return self.X
 
 
+
     def eval_gradf(self):
-        """ Compute gradient in Fourier domain """
+        """Compute gradient in Fourier domain."""
 
         # Compute X D - S
         self.Ryf = self.eval_Rf(self.Yf)
@@ -269,8 +271,9 @@ class ConvBPDN(fista.FISTADFT):
         return gradf
 
 
+
     def eval_proxop(self, V):
-        """ Compute proximal operator of :math:`g` ."""
+        """Compute proximal operator of :math:`g`."""
 
         return sl.shrink1(V, (self.lmbda/self.L) * self.wl1)
 
@@ -289,6 +292,7 @@ class ConvBPDN(fista.FISTADFT):
         return linalg.norm(self.Xf - self.Yfprv)
 
 
+
     def eval_objfn(self):
         """Compute components of objective function as well as total
         contribution to objective function.
@@ -302,12 +306,11 @@ class ConvBPDN(fista.FISTADFT):
 
 
     def obfn_dfd(self):
-        r"""Compute data fidelity term :math:`(1/2) \| \sum_m \mathbf{d}_m *
-        \mathbf{x}_m - \mathbf{s} \|_2^2`.
+        r"""Compute data fidelity term :math:`(1/2) \| \sum_m
+        \mathbf{d}_m * \mathbf{x}_m - \mathbf{s} \|_2^2`.
         """
 
-        Ef = sl.inner(self.Df, self.Xf, axis=self.cri.axisM) - \
-          self.Sf
+        Ef = sl.inner(self.Df, self.Xf, axis=self.cri.axisM) - self.Sf
         return sl.rfl2norm2(Ef, self.S.shape, axis=self.cri.axisN)/2.0
 
 
@@ -321,6 +324,7 @@ class ConvBPDN(fista.FISTADFT):
         return (self.lmbda*rl1, rl1)
 
 
+
     def reconstruct(self, X=None):
         """Reconstruct representation."""
 
@@ -329,3 +333,107 @@ class ConvBPDN(fista.FISTADFT):
         Xf = sl.rfftn(X, None, self.cri.axisN)
         Sf = np.sum(self.Df * Xf, axis=self.cri.axisM)
         return sl.irfftn(Sf, self.cri.Nv, self.cri.axisN)
+
+
+
+
+
+class ConvBPDNMask(ConvBPDN):
+    r"""**Class inheritance structure**
+
+    .. inheritance-diagram:: ConvBPDNMask
+       :parts: 2
+
+    |
+
+    FISTA algorithm for Convolutional BPDN with a spatial mask.
+
+    Solve the optimisation problem
+
+    .. math::
+       \mathrm{argmin}_\mathbf{x} \;
+       (1/2) \left\|  W \left(\sum_m \mathbf{d}_m * \mathbf{x}_m -
+       \mathbf{s}\right) \right\|_2^2 + \lambda \sum_m
+       \| \mathbf{x}_m \|_1 \;\;,
+
+    where :math:`W` is a mask array.
+
+    See :class:`ConvBPDN` for interface details.
+    """
+
+
+    def __init__(self, D, S, lmbda, W=None, opt=None, dimK=None, dimN=2):
+        """Initialise a ConvBPDNMask object with problem parameters.
+
+        |
+
+
+        Parameters
+        ----------
+        D : array_like
+          Dictionary matrix
+        S : array_like
+          Signal vector or matrix
+        lmbda : float
+          Regularisation parameter
+        W : array_like
+          Mask array. The array shape must be such that the array is
+          compatible for multiplication with input array S (see
+          :func:`.cnvrep.mskWshape` for more details).
+        opt : :class:`ConvBPDNMask.Options` object
+          Algorithm options
+        dimK : 0, 1, or None, optional (default None)
+          Number of dimensions in input signal corresponding to multiple
+          independent signals
+        dimN : int, optional (default 2)
+          Number of spatial dimensions
+        """
+
+        super(ConvBPDNMask, self).__init__(D, S, lmbda, opt, dimK=dimK,
+                                           dimN=dimN)
+
+        # Set gradient step parameter
+        #self.set_attr('L', opt['L'], dval=100.0, dtype=self.dtype)
+
+        if W is None:
+            W = np.array([1.0], dtype=self.dtype)
+        self.W = np.asarray(W.reshape(cr.mskWshape(W, self.cri)),
+                            dtype=self.dtype)
+
+        # Create byte aligned arrays for FFT calls
+        self.WRy = sl.pyfftw_empty_aligned(self.S.shape, dtype=self.dtype)
+        self.Ryf = sl.pyfftw_rfftn_empty_aligned(self.S.shape, self.cri.axisN,
+                                                self.dtype)
+
+
+    def eval_gradf(self):
+        """Compute gradient in Fourier domain."""
+
+        # Compute X D - S
+        self.Ryf[:] = self.eval_Rf(self.Yf)
+
+        # Map to spatial domain to multiply by mask
+        Ry = sl.irfftn(self.Ryf, self.cri.Nv, self.cri.axisN)
+        # Multiply by mask
+        self.WRy[:] = (self.W**2) * Ry
+        # Map back to frequency domain
+        WRyf = sl.rfftn(self.WRy, self.cri.Nv, self.cri.axisN)
+
+        gradf = np.conj(self.Df) * WRyf
+
+        # Multiple channel signal, multiple channel dictionary
+        if self.cri.Cd > 1:
+            gradf = np.sum(gradf, axis=self.cri.axisC, keepdims=True)
+
+        return gradf
+
+
+    def obfn_dfd(self):
+        r"""Compute data fidelity term :math:`(1/2) \| W (\sum_m
+        \mathbf{d}_m * \mathbf{x}_{m} - \mathbf{s}) \|_2^2`
+        """
+
+        Ef = sl.inner(self.Df, self.Xf, axis=self.cri.axisM) - self.Sf
+        E = sl.irfftn(Ef, self.cri.Nv, self.cri.axisN)
+
+        return (np.linalg.norm(self.W * E)**2)/2.0

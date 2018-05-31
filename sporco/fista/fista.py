@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2016-2017 by Brendt Wohlberg <brendt@ieee.org>
+# Copyright (C) 2016-2018 by Brendt Wohlberg <brendt@ieee.org>
 #                            Cristina Garcia-Cardona <cgarciac@lanl.gov>
 # All rights reserved. BSD 3-clause License.
 # This file is part of the SPORCO package. Details of the copyright
@@ -138,21 +138,21 @@ class FISTA(with_metaclass(_FISTA_Meta, object)):
 
           ``L`` : Inverse of gradient step parameter :math:`L`.
 
-          ``AutoStop`` : Options for adaptive stoping strategy (fixed point
-          residual, see Sec. 4.3 of :cite:`liu-2018-first`).
+          ``AutoStop`` : Options for adaptive stoping strategy (fixed
+          point residual, see Sec. 4.3 of :cite:`liu-2018-first`).
 
-            ``Enabled`` : Flag determining whether adaptive stopping relative
-            parameter strategy is enabled.
+            ``Enabled`` : Flag determining whether adaptive stopping
+            relative parameter strategy is enabled.
 
             ``Tau0`` : numerator in adaptive criterion
             (:math:`\tau_0` in :cite:`liu-2018-first`).
 
 
-          ``BackTrack`` : Options for adaptive L strategy (bactracking, see
-          Sec. 4 of :cite:`beck-2009-fast`).
+          ``BackTrack`` : Options for adaptive L strategy (backtracking,
+          see Sec. 4 of :cite:`beck-2009-fast`).
 
-            ``Enabled`` : Flag determining whether adaptive inverse step size
-            parameter strategy is enabled.
+            ``Enabled`` : Flag determining whether adaptive inverse step
+            size parameter strategy is enabled.
 
             ``Eta`` : Multiplier applied to L when updated
             (:math:`L` in :cite:`beck-2009-fast`).
@@ -258,8 +258,7 @@ class FISTA(with_metaclass(_FISTA_Meta, object)):
         else:
             self.X = self.opt['X0'].astype(self.dtype, copy=True)
 
-        # Default values for variables created only if
-        # BackTrack is used
+        # Default values for variables created only if BackTrack is enabled
         if self.opt['BackTrack', 'Enabled']:
             self.F = 0.
             self.Q = 0.
@@ -337,7 +336,7 @@ class FISTA(with_metaclass(_FISTA_Meta, object)):
 
 
     def xinit(self, xshape):
-        """Return initialiser for working variable X"""
+        """Return initialiser for working variable X."""
 
         return np.zeros(xshape, dtype=self.dtype)
 
@@ -346,9 +345,9 @@ class FISTA(with_metaclass(_FISTA_Meta, object)):
     def solve(self):
         """Start (or re-start) optimisation. This method implements the
         framework for the iterations of a FISTA algorithm. There is
-        sufficient flexibility in overriding the component methods that it
-        calls that it is usually not necessary to override this method in
-        derived clases.
+        sufficient flexibility in overriding the component methods that
+        it calls that it is usually not necessary to override this method
+        in derived clases.
 
         If option ``Verbose`` is ``True``, the progress of the
         optimisation is displayed at every iteration. At termination
@@ -393,7 +392,7 @@ class FISTA(with_metaclass(_FISTA_Meta, object)):
             # Update record of X from previous iteration
             self.store_prev()
 
-            # Compute Backtracking
+            # Compute backtracking
             if self.opt['BackTrack', 'Enabled'] and self.k > 0:
                 self.timer.stop('solve_wo_btrack')
                 # Computes proximal step and backtracking
@@ -457,8 +456,7 @@ class FISTA(with_metaclass(_FISTA_Meta, object)):
 
 
     def proximal_step(self, grad=None):
-        """ Compute proximal update (gradient descent + regularization)
-        """
+        """Compute proximal update (gradient descent + regularization)."""
 
         if grad is None:
             grad = self.eval_grad()
@@ -485,8 +483,9 @@ class FISTA(with_metaclass(_FISTA_Meta, object)):
 
 
     def compute_backtracking(self):
-        """ Estimate step size L by computing a linesearch
-        that guarantees that F <= Q """
+        """Estimate step size L by computing a linesearch that
+        guarantees that F <= Q.
+        """
 
         gradY = self.eval_grad()
         Ry = self.eval_R(self.Y)
@@ -522,7 +521,7 @@ class FISTA(with_metaclass(_FISTA_Meta, object)):
 
 
     def eval_grad(self):
-        """ Compute gradient.
+        """Compute gradient.
 
         Overriding this method is required.
         """
@@ -532,7 +531,7 @@ class FISTA(with_metaclass(_FISTA_Meta, object)):
 
 
     def eval_proxop(self, V):
-        """ Compute proximal operator of :math:`g`
+        """Compute proximal operator of :math:`g`.
 
         Overriding this method is required.
         """
@@ -552,33 +551,28 @@ class FISTA(with_metaclass(_FISTA_Meta, object)):
 
 
     def eval_Rx(self):
-        """ Evaluate smooth function :math:`f` in X
-        """
+        """Evaluate smooth function :math:`f` in X."""
 
         return self.eval_R(self.X)
 
 
 
     def store_prev(self):
-        """ Store previous X state
-        """
+        """Store previous X state."""
 
         self.Xprv = self.X.copy()
 
 
 
     def eval_Dxy(self):
-        """ Evaluate difference of state and auxiliary state updates
-        """
+        """ Evaluate difference of state and auxiliary state updates."""
 
         return self.X - self.Y
 
 
 
     def compute_residuals(self):
-        """Compute residuals and stopping thresholds.
-
-        """
+        """Compute residuals and stopping thresholds."""
 
         r = self.rsdl()
         adapt_tol = self.opt['RelStopTol']
@@ -604,7 +598,7 @@ class FISTA(with_metaclass(_FISTA_Meta, object)):
 
     @classmethod
     def hdrtxt(cls):
-        """Construct tuple of status display column title"""
+        """Construct tuple of status display column title."""
 
         return ('Itn',) + cls.hdrtxt_objfn + ('Rsdl', 'F', 'Q', 'It_Bt', 'L')
 
@@ -657,8 +651,8 @@ class FISTA(with_metaclass(_FISTA_Meta, object)):
 
 
     def getitstat(self):
-        """Get iteration stats as named tuple of arrays instead of array of
-        named tuples.
+        """Get iteration stats as named tuple of arrays instead of
+        array of named tuples.
         """
 
         return util.transpose_ntpl_list(self.itstat)
@@ -666,14 +660,14 @@ class FISTA(with_metaclass(_FISTA_Meta, object)):
 
 
     def display_start(self):
-        """Set up status display if option selected. NB: this method assumes
-        that the first entry is the iteration count and the last is
-        the L value.
+        """Set up status display if option selected.  NB: this method
+        assumes that the first entry is the iteration count and the
+        last is the L value.
         """
 
         if self.opt['Verbose']:
-            # If Backtracking option enabled F, Q, itBT, L are included in
-            # iteration status
+            # If backtracking option enabled F, Q, itBT, L are
+            # included in iteration status
             if self.opt['BackTrack', 'Enabled']:
                 hdrtxt = type(self).hdrtxt()
             else:
@@ -767,6 +761,8 @@ class FISTA(with_metaclass(_FISTA_Meta, object)):
 
 
 
+
+
 class FISTADFT(FISTA):
     r"""**Class inheritance structure**
 
@@ -775,8 +771,8 @@ class FISTADFT(FISTA):
 
     |
 
-    Base class for FISTA algorithms with gradients and updates computed in
-    the frequency domain.
+    Base class for FISTA algorithms with gradients and updates computed
+    in the frequency domain.
 
     Solve optimisation problems of the form
 
@@ -834,8 +830,7 @@ class FISTADFT(FISTA):
 
 
     def proximal_step(self, gradf=None):
-        """ Compute proximal update (gradient descent + constraint)
-
+        """ Compute proximal update (gradient descent + constraint).
         """
 
         if gradf is None:
@@ -851,8 +846,8 @@ class FISTADFT(FISTA):
 
 
     def combination_step(self):
-        """Update auxiliary state by a smart combination of previous updates
-        in the frequency domain.
+        """Update auxiliary state by a smart combination of previous
+        updates in the frequency domain.
         """
 
         # Update t step
@@ -867,8 +862,9 @@ class FISTADFT(FISTA):
 
 
     def compute_backtracking(self):
-        """ Estimate step size L by computing a linesearch
-        that guarantees that F <= Q """
+        """Estimate step size L by computing a linesearch that
+        guarantees that F <= Q.
+        """
 
         gradfYf = self.eval_gradf()
 
@@ -903,8 +899,10 @@ class FISTADFT(FISTA):
 
 
     def store_prev(self):
+        """Store previous X in frequency domain."""
 
         self.Xfprv = self.Xf.copy()
+
 
 
     def eval_Dxyf(self):
@@ -922,8 +920,8 @@ class FISTADFT(FISTA):
 
 
     def eval_gradf(self):
-        """ Compute gradient (in Fourier domain).
-        (Also computes argument of smooth function :math:`f` )
+        """Compute gradient in Fourier domain.  Also computes argument
+        of smooth function :math:`f`.
 
         Overriding this method is required.
         """
@@ -933,7 +931,7 @@ class FISTADFT(FISTA):
 
 
     def eval_proxop(self, V):
-        """ Compute proximal operator of :math:`g`
+        """Compute proximal operator of :math:`g`.
 
         Overriding this method is required.
         """

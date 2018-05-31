@@ -13,7 +13,8 @@ class TestSet01(object):
 
     def setup_method(self, method):
         np.random.seed(12345)
-    
+
+
     def test_01(self):
         N = 32
         M = 4
