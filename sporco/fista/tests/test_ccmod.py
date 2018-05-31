@@ -274,9 +274,9 @@ class TestSet01(object):
         S = np.random.randn(N, N)
         W = np.array([1.0])
         try:
-            opt = ccmod.ConvCnstrMODMaskDcpl.Options(
+            opt = ccmod.ConvCnstrMODMask.Options(
                            {'Verbose': False, 'MaxMainIter': 20})
-            c = ccmod.ConvCnstrMODMaskDcpl(X, S, W,
+            c = ccmod.ConvCnstrMODMask(X, S, W,
                     (Nd, Nd, 1, M), opt=opt, dimK=0)
             c.solve()
         except Exception as e:
@@ -292,9 +292,9 @@ class TestSet01(object):
         S = np.random.randn(N, N)
         W = np.random.randn(N, N)
         try:
-            opt = ccmod.ConvCnstrMODMaskDcpl.Options(
+            opt = ccmod.ConvCnstrMODMask.Options(
                            {'Verbose': False, 'MaxMainIter': 20})
-            c = ccmod.ConvCnstrMODMaskDcpl(X, S, W,
+            c = ccmod.ConvCnstrMODMask(X, S, W,
                     (Nd, Nd, 1, M), opt=opt, dimK=0)
             c.solve()
         except Exception as e:
@@ -311,9 +311,9 @@ class TestSet01(object):
         S = np.random.randn(N, N, K)
         W = np.random.randn(N, N)
         try:
-            opt = ccmod.ConvCnstrMODMaskDcpl.Options(
+            opt = ccmod.ConvCnstrMODMask.Options(
                            {'Verbose': False, 'MaxMainIter': 20})
-            c = ccmod.ConvCnstrMODMaskDcpl(X, S, W,
+            c = ccmod.ConvCnstrMODMask(X, S, W,
                     (Nd, Nd, 1, M), opt=opt)
             c.solve()
         except Exception as e:
@@ -330,9 +330,9 @@ class TestSet01(object):
         S = np.random.randn(N, N, K)
         W = np.random.randn(N, N, K)
         try:
-            opt = ccmod.ConvCnstrMODMaskDcpl.Options(
+            opt = ccmod.ConvCnstrMODMask.Options(
                            {'Verbose': False, 'MaxMainIter': 20})
-            c = ccmod.ConvCnstrMODMaskDcpl(X, S, W,
+            c = ccmod.ConvCnstrMODMask(X, S, W,
                     (Nd, Nd, 1, M), opt=opt)
             c.solve()
         except Exception as e:
@@ -349,9 +349,9 @@ class TestSet01(object):
         S = np.random.randn(N, N, Nc)
         W = np.random.randn(N, N, Nc)
         try:
-            opt = ccmod.ConvCnstrMODMaskDcpl.Options(
+            opt = ccmod.ConvCnstrMODMask.Options(
                            {'Verbose': False, 'MaxMainIter': 20})
-            c = ccmod.ConvCnstrMODMaskDcpl(X, S, W,
+            c = ccmod.ConvCnstrMODMask(X, S, W,
                     (Nd, Nd, 1, M), opt=opt, dimK=0)
             c.solve()
         except Exception as e:
@@ -369,9 +369,9 @@ class TestSet01(object):
         S = np.random.randn(N, N, Nc, K)
         W = np.random.randn(N, N, Nc, K)
         try:
-            opt = ccmod.ConvCnstrMODMaskDcpl.Options(
+            opt = ccmod.ConvCnstrMODMask.Options(
                            {'Verbose': False, 'MaxMainIter': 20})
-            c = ccmod.ConvCnstrMODMaskDcpl(X, S, W,
+            c = ccmod.ConvCnstrMODMask(X, S, W,
                     (Nd, Nd, 1, M), opt=opt)
             c.solve()
         except Exception as e:
@@ -389,9 +389,9 @@ class TestSet01(object):
         S = np.random.randn(N, N, Nc, K)
         W = np.random.randn(N, N, Nc)
         try:
-            opt = ccmod.ConvCnstrMODMaskDcpl.Options(
+            opt = ccmod.ConvCnstrMODMask.Options(
                            {'Verbose': False, 'MaxMainIter': 20})
-            c = ccmod.ConvCnstrMODMaskDcpl(X, S, W,
+            c = ccmod.ConvCnstrMODMask(X, S, W,
                     (Nd, Nd, 1, M), opt=opt)
             c.solve()
         except Exception as e:
@@ -409,9 +409,9 @@ class TestSet01(object):
         S = np.random.randn(N, N, Nc, K)
         W = np.random.randn(N, N, 1, K)
         try:
-            opt = ccmod.ConvCnstrMODMaskDcpl.Options(
+            opt = ccmod.ConvCnstrMODMask.Options(
                            {'Verbose': False, 'MaxMainIter': 20})
-            c = ccmod.ConvCnstrMODMaskDcpl(X, S, W,
+            c = ccmod.ConvCnstrMODMask(X, S, W,
                     (Nd, Nd, 1, M), opt=opt)
             c.solve()
         except Exception as e:
@@ -429,9 +429,9 @@ class TestSet01(object):
         S = np.random.randn(N, N, Nc, K)
         W = np.random.randn(N, N, Nc, K)
         try:
-            opt = ccmod.ConvCnstrMODMaskDcpl.Options(
+            opt = ccmod.ConvCnstrMODMask.Options(
                            {'Verbose': False, 'MaxMainIter': 20})
-            c = ccmod.ConvCnstrMODMaskDcpl(X, S, W,
+            c = ccmod.ConvCnstrMODMask(X, S, W,
                     (Nd, Nd, Nc, M), opt=opt)
             c.solve()
         except Exception as e:
@@ -449,14 +449,12 @@ class TestSet01(object):
         W = np.random.randn(N, N)
         L = 5e3
         try:
-            opt = ccmod.ConvCnstrMODMaskDcpl.Options({'Verbose': False,
+            opt = ccmod.ConvCnstrMODMask.Options({'Verbose': False,
                             'MaxMainIter': 200, 'L' : L})
-            c = ccmod.ConvCnstrMODMaskDcpl(X, S, W, (Nd, Nd, 1, M),
+            c = ccmod.ConvCnstrMODMask(X, S, W, (Nd, Nd, 1, M),
                                              opt=opt, dimK=0)
             c.solve()
         except Exception as e:
             print(e)
             assert(0)
         assert(np.array(c.getitstat().Rsdl)[-1] < 5e-3)
-
-

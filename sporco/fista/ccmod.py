@@ -366,10 +366,10 @@ class ConvCnstrMOD(fista.FISTADFT):
 
 
 
-class ConvCnstrMODMaskDcpl(ConvCnstrMOD):
+class ConvCnstrMODMask(ConvCnstrMOD):
     r"""**Class inheritance structure**
 
-    .. inheritance-diagram:: ConvCnstrMODMaskDcpl
+    .. inheritance-diagram:: ConvCnstrMODMask
        :parts: 2
 
     |
@@ -403,7 +403,7 @@ class ConvCnstrMODMaskDcpl(ConvCnstrMOD):
 
 
     class Options(ConvCnstrMOD.Options):
-        """ConvCnstrMODMaskDcpl algorithm options
+        """ConvCnstrMODMask algorithm options
 
         Options include all of those defined in
         :class:`.fista.FISTA.Options`.
@@ -422,7 +422,7 @@ class ConvCnstrMODMaskDcpl(ConvCnstrMOD):
 
 
     def __init__(self, Z, S, W, dsz, opt=None, dimK=None, dimN=2):
-        """Initialise a ConvCnstrMODMaskDcpl object with problem
+        """Initialise a ConvCnstrMODMask object with problem
         parameters.
 
 
@@ -462,17 +462,20 @@ class ConvCnstrMODMaskDcpl(ConvCnstrMOD):
 
         # Set default options if none specified
         if opt is None:
-            opt = ConvCnstrMODMaskDcpl.Options()
+            opt = ConvCnstrMODMask.Options()
 
         # Infer problem dimensions and set relevant attributes of self
         self.cri = cr.CDU_ConvRepIndexing(dsz, S, dimK=dimK, dimN=dimN)
+
+        # Set gradient step parameter
+        #self.set_attr('L', opt['L'], dval=self.cri.K*14.0, dtype=self.dtype)
 
         # Append singleton dimensions to W if necessary
         if hasattr(W, 'ndim'):
             W = sl.atleast_nd(self.cri.dimN+3, W)
 
-        # Reshape W if necessary (see discussion of reshape of S in ccmod
-        # base class)
+        # Reshape W if necessary (see discussion of reshape of S in
+        # ccmod base class)
         if self.cri.Cd == 1 and self.cri.C > 1 and hasattr(W, 'ndim'):
             # In most cases broadcasting rules make it possible for W
             # to have a singleton dimension corresponding to a
@@ -497,8 +500,7 @@ class ConvCnstrMODMaskDcpl(ConvCnstrMOD):
         else:
             self.W = W
 
-        super(ConvCnstrMODMaskDcpl, self).__init__(Z, S, dsz, opt,
-                                                       dimK, dimN)
+        super(ConvCnstrMODMask, self).__init__(Z, S, dsz, opt, dimK, dimN)
 
 
     def eval_gradf(self):

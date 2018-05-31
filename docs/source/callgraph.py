@@ -598,11 +598,10 @@ def gengraphs(pth, nopyfftw):
 
 
     ## ConvCnstrMODMaskDcpl class
-    opt = ccmod.ConvCnstrMODMaskDcpl.Options({'Verbose': False,
-                                            'MaxMainIter': 1})
+    opt = ccmod.ConvCnstrMODMask.Options({'Verbose': False, 'MaxMainIter': 1})
 
     with CallGraph(ct, mdnm, pth, 'ccmodmdfista_init.svg', **kwargs):
-        b = ccmod.ConvCnstrMODMaskDcpl(X, S, W, dsz=dsz, opt=opt)
+        b = ccmod.ConvCnstrMODMask(X, S, W, dsz=dsz, opt=opt)
 
     with CallGraph(ct, mdnm, pth, 'ccmodmdfista_solve.svg', **kwargs):
         b.solve()
@@ -683,7 +682,7 @@ def insert_solve_docs():
         'sporco.admm.tvl2.TVL2Deconv': 'tvl2dcn_solve.svg',
         'sporco.fista.cbpdn.ConvBPDN': 'fista_cbpdn_solve.svg',
         'sporco.fista.ccmod.ConvCnstrMOD': 'ccmodfista_solve.svg',
-        'sporco.fista.ccmod.ConvCnstrMODMaskDcpl': 'ccmodmdfista_solve.svg'
+        'sporco.fista.ccmod.ConvCnstrMODMask': 'ccmodmdfista_solve.svg'
         }
 
     # Iterate over fully qualified class names in class/call graph image dict

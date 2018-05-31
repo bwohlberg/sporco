@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2016-2017 by Brendt Wohlberg <brendt@ieee.org>
+# Copyright (C) 2016-2018 by Brendt Wohlberg <brendt@ieee.org>
 #                            Cristina Garcia-Cardona <cgarciac@lanl.gov>
 # All rights reserved. BSD 3-clause License.
 # This file is part of the SPORCO package. Details of the copyright
@@ -599,7 +599,7 @@ class MixConvBPDNMaskDcplDictLearn(dictlrn.DictLearn):
 
           ``CBPDN`` : Options :class:`.admm.cbpdn.ConvBPDNMaskDcpl.Options`
 
-          ``CCMOD`` : Options :func:`.ccmod.ConvCnstrMODMaskDcpl.Options`
+          ``CCMOD`` : Options :func:`.ccmod.ConvCnstrMODMask.Options`
         """
 
         defaults = copy.deepcopy(dictlrn.DictLearn.Options.defaults)
@@ -614,15 +614,14 @@ class MixConvBPDNMaskDcplDictLearn(dictlrn.DictLearn):
             """
 
             self.defaults.update({'CCMOD' : copy.deepcopy(
-                ccmod.ConvCnstrMODMaskDcpl.Options.defaults)})
+                ccmod.ConvCnstrMODMask.Options.defaults)})
 
             dictlrn.DictLearn.Options.__init__(self, {
                 'CBPDN': Acbpdn.ConvBPDNMaskDcpl.Options({'MaxMainIter': 1,
                 'AutoRho': {'Period': 10, 'AutoScaling': False,
                 'RsdlRatio': 10.0, 'Scaling': 2.0, 'RsdlTarget': 1.0}}),
-                'CCMOD': ccmod.ConvCnstrMODMaskDcpl.Options(
-                    {'MaxMainIter': 1,
-                'BackTrack': {'Eta': 1.2, 'MaxIter': 50}})
+                'CCMOD': ccmod.ConvCnstrMODMask.Options({'MaxMainIter': 1,
+                            'BackTrack': {'Eta': 1.2, 'MaxIter': 50}})
             })
 
             if opt is None:
@@ -688,8 +687,8 @@ class MixConvBPDNMaskDcplDictLearn(dictlrn.DictLearn):
                                         dimK=dimK, dimN=dimN)
 
         # Create D update object
-        dstep = ccmod.ConvCnstrMODMaskDcpl(None, S, W, dsz, opt['CCMOD'],
-                                           dimK=dimK, dimN=dimN)
+        dstep = ccmod.ConvCnstrMODMask(None, S, W, dsz, opt['CCMOD'],
+                                       dimK=dimK, dimN=dimN)
 
         # Configure iteration statistics reporting
         if self.opt['AccurateDFid']:
