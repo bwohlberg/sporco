@@ -229,7 +229,6 @@ class ConvBPDN(fista.FISTADFT):
         self.Yf = sl.pyfftw_rfftn_empty_aligned(self.X.shape, self.cri.axisN,
                                                 self.dtype)
 
-
         self.Ryf = -self.Sf
 
         self.Xf = sl.rfftn(self.X, None, self.cri.axisN)
