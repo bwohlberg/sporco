@@ -15,6 +15,7 @@ from builtins import object
 
 import sys
 import numpy as np
+import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 from matplotlib.pyplot import figure, subplot, subplots, gcf, gca, savefig
@@ -452,7 +453,15 @@ def imview(img, title=None, copy=True, fltscl=False, intrp='nearest',
     elif ax is None:
         ax = fig.gca()
 
-    ax.set_adjustable('box-forced')
+    # Deal with removal of 'box-forced' adjustable in Matplotlib 2.2.0
+    mplv = matplotlib.__version__.split('.')
+    if int(mplv[0]) >= 2 and int(mplv[1]) >= 2:
+        try:
+            ax.set_adjustable('box')
+        except:
+            ax.set_adjustable('datalim')
+    else:
+        ax.set_adjustable('box-forced')
 
     imgd = img.copy()
     if copy:
