@@ -128,7 +128,8 @@ Installation of these requirements is system dependent.
       ::
 
 	sudo apt-get -y install python3-sphinx python3-numpydoc python3-pygraphviz
-	sudo -H pip3 install sphinxcontrib-bibtex sphinx_tabs sphinx_fontawesome jonga
+	sudo -H pip3 install sphinxcontrib-bibtex sphinx_tabs sphinx_fontawesome jonga \
+			     jupyter git+https://github.com/leonardt/py2nb#egg=py2nb
 
 
    .. group-tab:: :fa:`apple` Mac OS
