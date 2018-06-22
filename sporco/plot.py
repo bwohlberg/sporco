@@ -452,7 +452,7 @@ def imview(img, title=None, copy=True, fltscl=False, intrp='nearest',
     elif ax is None:
         ax = fig.gca()
 
-    ax.set_adjustable('box')
+    ax.set_adjustable('box-forced')
 
     imgd = img.copy()
     if copy:
