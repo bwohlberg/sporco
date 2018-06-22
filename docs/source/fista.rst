@@ -1,7 +1,11 @@
 FISTA Algorithms
 ================
 
-FISTA algorithm development is supported by a base class from which classes for specific optimisation problems may be derived. This base class provides the machinery for managing iterations and stopping conditions, etc. so that only methods providing the details of a specific problem need to be defined in a derived class.
+FISTA algorithm development is supported by a base class from which
+classes for specific optimisation problems may be derived. This base
+class provides the machinery for managing iterations and stopping
+conditions, etc. so that only methods providing the details of a
+specific problem need to be defined in a derived class.
 
 * :doc:`FISTA <fista/fista>` A completely generic FISTA algorithm, for
   problems of the form
