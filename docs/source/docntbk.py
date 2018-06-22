@@ -300,7 +300,7 @@ def same_notebook_code(nb1, nb2):
 
 
 
-def execute_notebook(npth, dpth, timeout=600, kernel='python3'):
+def execute_notebook(npth, dpth, timeout=800, kernel='python3'):
     """
     Execute the notebook at `npth` using `dpth` as the execution directory.
     The execution timeout and kernel are `timeout` and `kernel`
