@@ -61,7 +61,7 @@ class TestSet01(object):
 
     def test_07(self):
         img = np.random.randn(64, 64)
-        blk = util.imageblocks(img, (8, 8))
+        blk = util.extractblocks(img, (8, 8))
 
 
     def test_08(self):
@@ -123,7 +123,7 @@ class TestSet01(object):
         assert(len(gi) > 0)
         im1 = ei.image('sail.png')
         im2 = ei.image('sail.png', scaled=True, dtype=np.float32,
-                      idxexp=np.s_[:, 10:-10], zoom=0.5)
+                       idxexp=np.s_[:, 10:-10], zoom=0.5)
 
 
     def test_18(self):
@@ -206,3 +206,23 @@ class TestSet01(object):
                         reason='Feature not supported under Windows')
     def test_28(self):
         assert(util.idle_cpu_count() >= 1)
+
+    def test_29(self):
+        A = np.random.rand(4, 5, 6, 7, 3)
+        blksz = (2, 3, 2)
+        stpsz = (2, 1, 2)
+        A_blocks = util.extractblocks(A, blksz, stpsz)
+        A_recon = util.combineblocks(A_blocks, A.shape, stpsz, np.median)
+        assert(np.allclose(np.where(np.isnan(A_recon), np.nan, A),
+                           A_recon, equal_nan=True))
+
+    def test_30(self):
+        A = np.random.rand(4, 5, 6, 7, 3)
+        blksz = (2, 3, 2)
+        stpsz = (2, 1, 2)
+        A_blocks = util.extractblocks(A, blksz, stpsz)
+        noise = np.random.rand(*A_blocks.shape)
+        A_average_recon = util.averageblocks(A_blocks+noise, A.shape, stpsz)
+        A_combine_recon = util.combineblocks(A_blocks+noise, A.shape,
+                                             stpsz, np.mean)
+        assert(np.allclose(A_combine_recon, A_average_recon, equal_nan=True))

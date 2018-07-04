@@ -19,6 +19,9 @@ Version 0.1.9   (not yet released)
 - Modifications to the interface of the plot.plot function that will
   break existing code that uses the lwidth, lstyle, msize, or mstyle
   parameters
+- Replaced function util.imageblocks with util.extractblocks, and introduced
+  new functions util.averageblocks and util.combineblocks
+- Fixed bugs in cbpdn.ConvBPDNProjL1 and cbpdn.ConvMinL1InL2Ball
 
 
 

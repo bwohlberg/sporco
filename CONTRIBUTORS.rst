@@ -10,7 +10,7 @@
 
 * Erik Skau
 
-  - Utility functions
+  - Utility functions extractblocks, averageblocks, and combineblocks
   - Comments, suggestions, and bug reports
 
 * Aric Hagberg

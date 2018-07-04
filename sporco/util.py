@@ -22,6 +22,7 @@ import io
 import platform
 import multiprocessing as mp
 import itertools
+from future.moves.itertools import zip_longest
 import collections
 import socket
 if PY2:
@@ -293,41 +294,151 @@ def tiledict(D, sz=None):
 
 
 
-def imageblocks(imgs, blksz):
-    """Extract all blocks of specified size from an image or list of images.
+def extractblocks(img, blksz, stpsz=None):
+    """Extract blocks from an ndarray signal into an ndarray.
 
     Parameters
     ----------
-    imgs: array_like or tuple of array_like
-      Single image or tuple of images from which to extract blocks
-    blksz : tuple of two ints
-      Size of the blocks
+    img : ndarray or tuple of ndarrays
+      nd array of images, or tuple of images
+    blksz : tuple
+      tuple of block sizes, blocks are taken starting from the first index
+      of img
+    stpsz : tuple, optional (default None, corresponds to steps of 1)
+      tuple of step sizes between neighboring blocks
 
     Returns
     -------
     blks : ndarray
-      Array of extracted blocks
+      image blocks
     """
 
     # See http://stackoverflow.com/questions/16774148 and
     # sklearn.feature_extraction.image.extract_patches_2d
-    if not isinstance(imgs, tuple):
-        imgs = (imgs,)
+    if isinstance(img, tuple):
+        img = np.stack(img, axis=-1)
 
-    blks = np.array([]).reshape(blksz + (0,))
-    for im in imgs:
-        Nr, Nc = im.shape
-        nr, nc = blksz
-        shape = (Nr-nr+1, Nc-nc+1, nr, nc)
-        strides = im.itemsize*np.array([Nc, 1, Nc, 1])
-        sb = np.lib.stride_tricks.as_strided(np.ascontiguousarray(im),
-                                             shape=shape, strides=strides)
-        sb = np.ascontiguousarray(sb)
-        sb.shape = (-1, nr, nc)
-        sb = np.rollaxis(sb, 0, 3)
-        blks = np.dstack((blks, sb))
+    if stpsz is None:
+        stpsz = tuple(1 for _ in blksz)
 
-    return blks
+    imgsz = img.shape
+
+    # Calculate the number of blocks that can fit in each dimension of
+    # the images
+    numblocks = tuple(int(np.floor((a-b)/c)+1) for a, b, c in
+                      zip_longest(imgsz, blksz, stpsz, fillvalue=1))
+
+    # Calculate the strides for blocks
+    blockstrides = tuple(a*b for a, b in zip_longest(img.strides, stpsz,
+                                                     fillvalue=1))
+
+    new_shape = blksz + numblocks
+    new_strides = img.strides[:len(blksz)] + blockstrides
+    blks = np.lib.stride_tricks.as_strided(img, new_shape, new_strides)
+    return np.reshape(blks, blksz+(-1, ))
+
+
+
+def averageblocks(blks, imgsz, stpsz=None):
+    """Average blocks together from an ndarray to reconstruct ndarray signal.
+
+    Parameters
+    ----------
+    blks : ndarray
+      nd array of blocks of a signal
+    imgsz : tuple
+      tuple of the signal size
+    stpsz : tuple, optional (default None, corresponds to steps of 1)
+      tuple of step sizes between neighboring blocks
+
+    Returns
+    -------
+    imgs : ndarray
+      reconstructed signal, unknown pixels are returned as np.nan
+    """
+
+    blksz = blks.shape[:-1]
+
+    if stpsz is None:
+        stpsz = tuple(1 for _ in blksz)
+
+
+    # Calculate the number of blocks that can fit in each dimension of
+    # the images
+    numblocks = tuple(int(np.floor((a-b)/c)+1) for a, b, c in
+                      zip_longest(imgsz, blksz, stpsz, fillvalue=1))
+
+    new_shape = blksz + numblocks
+    blks = np.reshape(blks, new_shape)
+
+    # Construct an imgs matrix of empty lists
+    imgs = np.zeros(imgsz, dtype=blks.dtype)
+    normalizer = np.zeros(imgsz, dtype=blks.dtype)
+
+    # Iterate over each block and append the values to the corresponding
+    # imgs cell
+    for pos in np.ndindex(numblocks):
+        slices = tuple(slice(a*c, a*c+b) for a, b, c in
+                       zip(pos, blksz, stpsz))
+        imgs[slices+pos[len(blksz):]] += blks[(Ellipsis, )+pos]
+        normalizer[slices+pos[len(blksz):]] += blks.dtype.type(1)
+
+    return np.where(normalizer > 0, (imgs/normalizer).astype(blks.dtype),
+                    np.nan)
+
+
+
+def combineblocks(blks, imgsz, stpsz=None, fn = np.median):
+    """Combine blocks from an ndarray to reconstruct ndarray signal.
+
+    Parameters
+    ----------
+    blks : ndarray
+      nd array of blocks of a signal
+    imgsz : tuple
+      tuple of the signal size
+    stpsz : tuple, optional (default None, corresponds to steps of 1)
+      tuple of step sizes between neighboring blocks
+    fn : function, optional (default np.median)
+      the function used to resolve multivalued cells
+
+    Returns
+    -------
+    imgs : ndarray
+      reconstructed signal, unknown pixels are returned as np.nan
+    """
+
+    # Construct a vectorized append function
+    def listapp(x, y):
+        x.append(y)
+    veclistapp = np.vectorize(listapp, otypes=[np.object_])
+
+    blksz = blks.shape[:-1]
+
+    if stpsz is None:
+        stpsz = tuple(1 for _ in blksz)
+
+    # Calculate the number of blocks that can fit in each dimension of
+    # the images
+    numblocks = tuple(int(np.floor((a-b)/c)+1) for a, b, c in
+            zip_longest(imgsz, blksz, stpsz, fillvalue=1))
+
+    new_shape = blksz + numblocks
+    blks = np.reshape(blks, new_shape)
+
+    # Construct an imgs matrix of empty lists
+    imgs = np.empty(imgsz, dtype=np.object_)
+    imgs.fill([])
+    imgs = np.frompyfunc(list, 1, 1)(imgs)
+
+    # Iterate over each block and append the values to the corresponding
+    # imgs cell
+    for pos in np.ndindex(numblocks):
+        slices = tuple(slice(a*c, a*c+b) for a, b, c in
+                       zip_longest(pos, blksz, stpsz, fillvalue=1))
+        veclistapp(imgs[slices].squeeze(), blks[(Ellipsis, )+pos].squeeze())
+
+    return np.vectorize(fn, otypes=[blks.dtype])(imgs)
 
 
 
