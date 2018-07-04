@@ -25,6 +25,12 @@ cbpdn_gry.py
 cbpdn_fista_gry.py
   Convolutional sparse coding of a greyscale image (FISTA solver)
 
+cminl1_gry.py
+  Convolutional sparse coding of a greyscale image (constrained data fidelity)
+
+cprjl1_gry.py
+  Convolutional sparse coding of a greyscale image (constrained penalty term)
+
 cbpdn_cuda.py
   Convolutional sparse coding of a greyscale image using the CUDA solver
 
