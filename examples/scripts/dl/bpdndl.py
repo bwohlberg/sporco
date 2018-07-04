@@ -40,7 +40,7 @@ S5 = exim.image('tulips.png', idxexp=np.s_[:, 30:542])
 Extract all 8x8 image blocks, reshape, and subtract block means.
 """
 
-S = util.imageblocks((S1, S2, S3, S4, S5), (8, 8))
+S = util.extractblocks((S1, S2, S3, S4, S5), (8, 8))
 S = np.reshape(S, (np.prod(S.shape[0:2]), S.shape[2]))
 S -= np.mean(S, axis=0)
 
