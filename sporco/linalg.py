@@ -1156,6 +1156,36 @@ def atleast_nd(n, u):
 
 
 
+def split(u, axis=0):
+    """
+    Split an array into a list of arrays on the specified axis. The length
+    of the list is the shape of the array on the specified axis, and the
+    corresponding axis is removed from each entry in the list. This function
+    does not have the same behaviour as :func:`numpy.split`.
+
+    Parameters
+    ----------
+    u : array_like
+      Input array
+    axis : int, optional (default 0)
+      Axis on which to split the input array
+
+    Returns
+    -------
+    v : list of ndarray
+      List of arrays
+    """
+
+    # Convert negative axis to positive
+    if axis < 0:
+        axis = u.ndim + axis
+
+    # Construct axis selection slice
+    slct0 = (slice(None),) * axis
+    return [u[slct0 + (k,)] for k in range(u.shape[axis])]
+
+
+
 def roll(u, shift):
     """
     Apply :func:`numpy.roll` to multiple array axes.
