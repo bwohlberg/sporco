@@ -29,6 +29,7 @@ def get_ipython():
 plot.get_ipython = get_ipython
 
 
+@pytest.mark.filterwarnings('ignore:matplotlib is currently using')
 class TestSet01(object):
 
     def setup_method(self, method):
