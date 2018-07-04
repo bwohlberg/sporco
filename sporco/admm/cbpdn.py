@@ -1206,7 +1206,7 @@ class ConvBPDNProjL1(GenericConvBPDN):
     .. math::
        \mathrm{argmin}_\mathbf{x} \;
        (1/2) \left\| \sum_m \mathbf{d}_m * \mathbf{x}_m - \mathbf{s}
-       \right\|_2^2 \; \text{such that} \; \| \mathbf{x}_m \|_1
+       \right\|_2^2 \; \text{such that} \; \sum_m \| \mathbf{x}_m \|_1
        \leq \gamma
 
     via the ADMM problem
@@ -1344,7 +1344,9 @@ class ConvBPDNProjL1(GenericConvBPDN):
         :math:`\mathbf{y}`.
         """
 
-        self.Y = sp.proj_l1(self.AX + self.U, self.gamma, axis=self.cri.axisM)
+        self.Y = sp.proj_l1(self.AX + self.U, self.gamma,
+                            axis=self.cri.axisN + (self.cri.axisC,
+                                                   self.cri.axisM))
         super(ConvBPDNProjL1, self).ystep()
 
 
@@ -1355,7 +1357,9 @@ class ConvBPDNProjL1(GenericConvBPDN):
         """
 
         dfd = self.obfn_dfd()
-        prj = sp.proj_l1(self.obfn_gvar(), self.gamma, axis=self.cri.axisM)
+        prj = sp.proj_l1(self.obfn_gvar(), self.gamma,
+                         axis=self.cri.axisN + (self.cri.axisC,
+                                                self.cri.axisM))
         cns = linalg.norm(prj - self.obfn_gvar())
         return (dfd, cns)
 
@@ -1930,6 +1934,7 @@ class ConvMinL1InL2Ball(ConvTwoBlockCnstrnt):
         if opt is None:
             opt = ConvMinL1InL2Ball.Options()
 
+        self.S = S
         super(ConvMinL1InL2Ball, self).__init__(D, S, opt, dimK=dimK,
                                                 dimN=dimN)
 
@@ -1952,7 +1957,8 @@ class ConvMinL1InL2Ball(ConvTwoBlockCnstrnt):
             # the relevant dual optimality criterion (see (3.10) in
             # boyd-2010-distributed) is satisfied.
             U0 = np.sign(self.block_sep0(self.Y)) / self.rho
-            U1 = self.block_sep1(self.Y) - self.S
+            U1 = self.block_sep1(self.Y) - sl.atleast_nd(self.cri.dimN+3,
+                                                         self.S)
             return self.block_cat(U0, U1)
 
 
@@ -1963,7 +1969,7 @@ class ConvMinL1InL2Ball(ConvTwoBlockCnstrnt):
         """
 
         AXU = self.AX + self.U
-        Y0 = sl.proj_l2ball(self.block_sep0(AXU), 0.0, self.epsilon,
+        Y0 = sl.proj_l2ball(self.block_sep0(AXU) - self.S, 0.0, self.epsilon,
                             axes=self.cri.axisN)
         Y1 = sl.shrink1(self.block_sep1(AXU), self.wl1 / self.rho)
         self.Y = self.block_cat(Y0, Y1)
