@@ -21,6 +21,8 @@ Version 0.1.9   (not yet released)
   parameters
 - Replaced function util.imageblocks with util.extractblocks, and introduced
   new functions util.averageblocks and util.combineblocks
+- Added new module admm.parcbpdn implementing the parallel ADMM CBPDN
+  solver
 - Fixed bugs in cbpdn.ConvBPDNProjL1 and cbpdn.ConvMinL1InL2Ball
 
 

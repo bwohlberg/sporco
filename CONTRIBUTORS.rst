@@ -10,6 +10,7 @@
 
 * Erik Skau
 
+  - Parallel CBPDN module and example scripts
   - Utility functions extractblocks, averageblocks, and combineblocks
   - Comments, suggestions, and bug reports
 
