@@ -12,3 +12,6 @@ bpdnprjl1.py
 
 minl1prjl2.py
   Solve a synthetic problem involving minimisation of an ℓ1 norm with ℓ2 constraint
+
+gwnden_clr.py
+  Remove Gaussian white noise from a greyscale image using sparse coding
