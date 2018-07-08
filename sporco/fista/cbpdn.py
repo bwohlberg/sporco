@@ -222,11 +222,13 @@ class ConvBPDN(fista.FISTADFT):
         self.Sf = sl.rfftn(self.S, None, self.cri.axisN)
 
         # Create byte aligned arrays for FFT calls
-        self.Xf = sl.pyfftw_rfftn_empty_aligned(self.X.shape, self.cri.axisN,
-                                                self.dtype)
+        self.Y = self.X
+        self.X = sl.pyfftw_empty_aligned(self.Y.shape, dtype=self.dtype)
+        self.X[:] = self.Y
 
-        # Initialise auxiliary variable Yf
-        self.Yf = sl.pyfftw_rfftn_empty_aligned(self.X.shape, self.cri.axisN,
+        # Initialise auxiliary variable Vf: Create byte aligned arrays
+        # for FFT calls
+        self.Vf = sl.pyfftw_rfftn_empty_aligned(self.X.shape, self.cri.axisN,
                                                 self.dtype)
 
         self.Ryf = -self.Sf
@@ -259,7 +261,7 @@ class ConvBPDN(fista.FISTADFT):
         """Compute gradient in Fourier domain."""
 
         # Compute X D - S
-        self.Ryf = self.eval_Rf(self.Yf)
+        self.Ryf[:] = self.eval_Rf(self.Yf)
 
         gradf = np.conj(self.Df) * self.Ryf
 

@@ -17,10 +17,12 @@ import collections
 import sporco.linalg as spl
 # Required due to pyFFTW bug #135 - see "Notes" section of SPORCO docs.
 spl.pyfftw_threads = 1
-from sporco.admm import cbpdndl
+from sporco.dictlrn import cbpdndl
+from sporco.dictlrn import cbpdndlmd
 import sporco.cnvrep as cr
 from sporco.util import u
 from sporco import util
+from sporco import common
 
 
 
@@ -270,8 +272,8 @@ class ConvBPDNDictLearn_Consensus(cbpdndl.ConvBPDNDictLearn):
     :cite:`garcia-2017-convolutional`. The sparse coding of each training
     image and the individual consensus problem components are computed in
     parallel, giving a substantial computational advantage, on a multi-core
-    host, over :class:`.admm.cbpdndl.ConvBPDNDictLearn` with the consensus
-    solver (``method`` = ``'cns'``) for the constrained dictionary update
+    host, over :class:`.dictlrn.cbpdndl.ConvBPDNDictLearn` with the consensus
+    solver (``dmethod`` = ``'cns'``) for the constrained dictionary update
     problem.
 
     Solve the optimisation problem
@@ -288,7 +290,7 @@ class ConvBPDNDictLearn_Consensus(cbpdndl.ConvBPDNDictLearn):
     between the ADMM steps of the sparse coding and dictionary update
     algorithms. Multi-channel signals are supported.
 
-    This class is derived from :class:`.admm.cbpdndl.ConvBPDNDictLearn` so
+    This class is derived from :class:`.dictlrn.cbpdndl.ConvBPDNDictLearn` so
     that the variable initialisation of its parent can be re-used. The entire
     :meth:`.solve` infrastructure is overidden in this class, without any
     use of inherited functionality. Variables initialised by the parent
@@ -316,14 +318,34 @@ class ConvBPDNDictLearn_Consensus(cbpdndl.ConvBPDNDictLearn):
     """
 
 
+    class Options(cbpdndl.ConvBPDNDictLearn.Options):
+        """ConvBPDNDictLearn_Consensus algorithm options
+
+        Options are the same as defined in
+        :class:`cbpdndl.ConvBPDNDictLearn.Options`.
+        """
+
+        def __init__(self, opt=None):
+            """Initialise ConvBPDNDictLearn_Consensus algorithm options
+            object.
+            """
+
+            if opt is None:
+                opt = {}
+            cbpdndl.ConvBPDNDictLearn.Options.__init__(self, opt,
+                                    xmethod='admm', dmethod='cns')
+
+
+
+
     fwiter = 4
     """Field width for iteration count display column"""
     fpothr = 2
     """Field precision for other display columns"""
 
 
-    def __init__(self, D0, S, lmbda=None, opt=None, nproc=None,
-                 dimK=1, dimN=2):
+    def __init__(self, D0, S, lmbda=None, opt=None, nproc=None, dimK=1,
+                 dimN=2):
         """
         Initialise a ConvBPDNDictLearn_Consensus object with problem size
         and options.
@@ -337,7 +359,7 @@ class ConvBPDNDictLearn_Consensus(cbpdndl.ConvBPDNDictLearn):
           Signal array
         lmbda : float
           Regularisation parameter
-        opt : :class:`.admm.cbpdndl.ConvBPDNDictLearn.Options` object
+        opt : :class:`.dictlrn.cbpdndl.ConvBPDNDictLearn.Options` object
           Algorithm options
         nproc : int
           Number of parallel processes to use
@@ -358,7 +380,7 @@ class ConvBPDNDictLearn_Consensus(cbpdndl.ConvBPDNDictLearn):
 
         # Call parent constructor
         super(ConvBPDNDictLearn_Consensus, self).__init__(D0, S, lmbda,
-                    opt=opt, method='cns', dimK=dimK, dimN=dimN)
+            opt=opt, xmethod='admm', dmethod='cns', dimK=dimK, dimN=dimN)
 
         # Set up iterations statistics
         itstat_fields = ['Iter', 'ObjFun', 'DFid', 'RegL1', 'Time']
@@ -480,8 +502,8 @@ class ConvBPDNDictLearn_Consensus(cbpdndl.ConvBPDNDictLearn):
         # Construct tuple of status display column titles and set status
         # display strings
         hdrtxt = ['Itn', 'Fnc', 'DFid', u('Regℓ1')]
-        hdrstr, fmtstr, nsep = util.solve_status_str(hdrtxt,
-                                type(self).fwiter, type(self).fpothr)
+        hdrstr, fmtstr, nsep = common.solve_status_str(hdrtxt,
+                        fwdth0=type(self).fwiter, fprec=type(self).fpothr)
 
         # Print header and separator strings
         if self.opt['Verbose']:
@@ -762,7 +784,7 @@ def md_step_group(k):
 
 
 
-class ConvBPDNMaskDcplDictLearn_Consensus(cbpdndl.ConvBPDNMaskDcplDictLearn):
+class ConvBPDNMaskDcplDictLearn_Consensus(cbpdndlmd.ConvBPDNMaskDictLearn):
     r"""**Class inheritance structure**
 
     .. inheritance-diagram:: ConvBPDNMaskDcplDictLearn_Consensus
@@ -778,7 +800,7 @@ class ConvBPDNMaskDcplDictLearn_Consensus(cbpdndl.ConvBPDNMaskDcplDictLearn):
     coding of each training image and the individual consensus problem
     components are computed in parallel, giving a substantial computational
     advantage, on a multi-core host, over
-    :class:`.admm.cbpdndl.ConvBPDNMaskDcplDictLearn` with the consensus solver
+    :class:`.cbpdndlmd.ConvBPDNMaskDictLearn` with the consensus solver
     (``method`` = ``'cns'``) for the constrained dictionary update problem.
 
     Solve the optimisation problem
@@ -795,7 +817,7 @@ class ConvBPDNMaskDcplDictLearn_Consensus(cbpdndl.ConvBPDNMaskDcplDictLearn):
     interleaved alternation between the ADMM steps of the sparse coding and
     dictionary update algorithms. Multi-channel signals are supported.
 
-    This class is derived from :class:`.admm.cbpdndl.ConvBPDNMaskDcplDictLearn`
+    This class is derived from :class:`.cbpdndlmd.ConvBPDNMaskDictLearn`
     so that the variable initialisation of its parent can be re-used. The
     entire :meth:`.solve` infrastructure is overidden in this class, without
     any use of inherited functionality. Variables initialised by the parent
@@ -823,6 +845,26 @@ class ConvBPDNMaskDcplDictLearn_Consensus(cbpdndl.ConvBPDNMaskDcplDictLearn):
     """
 
 
+    class Options(cbpdndlmd.ConvBPDNMaskDictLearn.Options):
+        """ConvBPDNMaskDcplDictLearn_Consensus algorithm options
+
+        Options are the same as defined in
+        :class:`.cbpdndlmd.ConvBPDNMaskDictLearn.Options`.
+        """
+
+        def __init__(self, opt=None):
+            """Initialise ConvBPDNMaskDcplDictLearn_Consensus algorithm
+            options object.
+            """
+
+            if opt is None:
+                opt = {}
+            cbpdndlmd.ConvBPDNMaskDictLearn.Options.__init__(self, opt,
+                                    xmethod='admm', dmethod='cns')
+
+
+
+
     fwiter = 4
     """Field width for iteration count display column"""
     fpothr = 2
@@ -848,7 +890,7 @@ class ConvBPDNMaskDcplDictLearn_Consensus(cbpdndl.ConvBPDNMaskDcplDictLearn):
           Mask array. The array shape must be such that the array is
           compatible for multiplication with input array S (see
           :func:`.cnvrep.mskWshape` for more details).
-        opt : :class:`.admm.cbpdndl.ConvBPDNMaskDcplDictLearn.Options` object
+        opt : :class:`.cbpdndlmd.ConvBPDNMaskDictLearn.Options` object
           Algorithm options
         nproc : int
           Number of parallel processes to use
@@ -869,7 +911,8 @@ class ConvBPDNMaskDcplDictLearn_Consensus(cbpdndl.ConvBPDNMaskDcplDictLearn):
 
         # Call parent constructor
         super(ConvBPDNMaskDcplDictLearn_Consensus, self).__init__(D0, S,
-                    lmbda, W, opt=opt, method='cns', dimK=dimK, dimN=dimN)
+              lmbda, W, opt=opt, xmethod='admm', dmethod='cns', dimK=dimK,
+              dimN=dimN)
 
         # Set up iterations statistics
         itstat_fields = ['Iter', 'ObjFun', 'DFid', 'RegL1', 'Time']
@@ -1005,8 +1048,8 @@ class ConvBPDNMaskDcplDictLearn_Consensus(cbpdndl.ConvBPDNMaskDcplDictLearn):
         # Construct tuple of status display column titles and set status
         # display strings
         hdrtxt = ['Itn', 'Fnc', 'DFid', u('Regℓ1')]
-        hdrstr, fmtstr, nsep = util.solve_status_str(hdrtxt,
-                                type(self).fwiter, type(self).fpothr)
+        hdrstr, fmtstr, nsep = common.solve_status_str(hdrtxt,
+                        fwdth0=type(self).fwiter, fprec=type(self).fpothr)
 
         # Print header and separator strings
         if self.opt['Verbose']:

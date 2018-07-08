@@ -438,6 +438,8 @@ def run_apidoc(_):
     options_name_fix(sporco.admm)
     import sporco.fista
     options_name_fix(sporco.fista)
+    import sporco.dictlrn
+    options_name_fix(sporco.dictlrn)
 
     import sphinx.apidoc
     module = '../../sporco' if on_rtd else 'sporco'
@@ -465,14 +467,17 @@ def run_apidoc(_):
     if LooseVersion(sphinx.__version__) < LooseVersion('1.7.0'):
         sphinx.apidoc.main(['sphinx-apidoc', '-e', '-d', '2', '-o', opath,
                                module, os.path.join(module, 'admm/tests'),
-                               os.path.join(module, 'fista/tests')])
+                               os.path.join(module, 'fista/tests'),
+                               os.path.join(module, 'dictlrn/tests')])
     else:
         sphinx.ext.apidoc.main(['-o', opath, '-e', '-d', '2', module,
                                os.path.join(module, 'admm/tests'),
-                               os.path.join(module, 'fista/tests')])
+                               os.path.join(module, 'fista/tests'),
+                               os.path.join(module, 'dictlrn/tests')])
 
     # Remove "Module contents" sections from specified autodoc generated files
-    rmmodlst = ['sporco.rst', 'sporco.admm.rst', 'sporco.fista.rst']
+    rmmodlst = ['sporco.rst', 'sporco.admm.rst', 'sporco.fista.rst',
+                'sporco.dictlrn.rst']
     for fnm in rmmodlst:
         rst = os.path.join(cpath, fnm)
         if os.path.exists(rst):

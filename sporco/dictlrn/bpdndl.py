@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2015-2017 by Brendt Wohlberg <brendt@ieee.org>
+# Copyright (C) 2015-2018 by Brendt Wohlberg <brendt@ieee.org>
 # All rights reserved. BSD 3-clause License.
 # This file is part of the SPORCO package. Details of the copyright
 # and user license can be found in the 'LICENSE.txt' file distributed
@@ -18,7 +18,7 @@ import numpy as np
 from sporco.util import u
 from sporco.admm import bpdn
 from sporco.admm import cmod
-from sporco.admm import dictlrn
+from sporco.dictlrn import dictlrn
 
 __author__ = """Brendt Wohlberg <brendt@ieee.org>"""
 
@@ -42,16 +42,15 @@ class BPDNDictLearn(dictlrn.DictLearn):
     via interleaved alternation between the ADMM steps of the
     :class:`.BPDN` and :class:`.CnstrMOD` problems.
 
-    After termination of the :meth:`solve` method, attribute :attr:`itstat` is
-    a list of tuples representing statistics of each iteration. The
+    After termination of the :meth:`solve` method, attribute :attr:`itstat`
+    is a list of tuples representing statistics of each iteration. The
     fields of the named tuple ``IterationStats`` are:
 
        ``Iter`` : Iteration number
 
        ``ObjFun`` : Objective function value
 
-       ``DFid`` : Value of data fidelity term :math:`(1/2) \| D X - S
-       \|_F^2`
+       ``DFid`` : Value of data fidelity term :math:`(1/2) \| D X - S \|_F^2`
 
        ``RegL1`` : Value of regularisation term :math:`\| X \|_1`
 
@@ -77,12 +76,12 @@ class BPDNDictLearn(dictlrn.DictLearn):
         """BPDN dictionary learning algorithm options.
 
         Options include all of those defined in
-        :class:`sporco.admm.dictlrn.DictLearn.Options`, together with
+        :class:`sporco.dictlrn.dictlrn.DictLearn.Options`, together with
         additional options:
 
           ``AccurateDFid`` : Flag determining whether data fidelity term is
-          estimated from the value computed in the X update (``False``) or is
-          computed after every outer iteration over an X update and a D
+          estimated from the value computed in the X update (``False``) or
+          is computed after every outer iteration over an X update and a D
           update (``True``), which is slower but more accurate.
 
           ``BPDN`` : Options :class:`sporco.admm.bpdn.BPDN.Options`

@@ -10,7 +10,6 @@
 
 from __future__ import division
 from __future__ import print_function
-from future.utils import with_metaclass
 from builtins import range
 from builtins import object
 
@@ -21,8 +20,7 @@ from scipy import linalg
 
 from sporco import cdict
 from sporco import util
-from sporco.util import _fix_nested_class_lookup
-
+from sporco import common
 import sporco.linalg as sl
 
 
@@ -30,39 +28,9 @@ __author__ = """Cristina Garcia-Cardona <cgarciac@lanl.gov>"""
 
 
 
-class _FISTA_Meta(type):
-    """Metaclass for FISTA class that handles intialisation of
-    IterationStats namedtuple and applies _fix_nested_class_lookup to class
-    definitions to fix problems with lookup of nested class
-    definitions when using pickle. It is also responsible for stopping
-    the object initialisation timer at the end of initialisation.
-    """
-
-    def __init__(cls, *args):
-
-        # Initialise named tuple type for recording FISTA iteration statistics
-        cls.IterationStats = collections.namedtuple('IterationStats',
-                                                    cls.itstat_fields())
-        # Apply _fix_nested_class_lookup function to class after creation
-        _fix_nested_class_lookup(cls, nstnm='Options')
-
-
-
-    def __call__(cls, *args, **kwargs):
-
-        # Initialise instance
-        instance = super(_FISTA_Meta, cls).__call__(*args, **kwargs)
-        # Stop initialisation timer
-        instance.timer.stop('init')
-        # Return instance
-        return instance
-
-
-
-
-class FISTA(with_metaclass(_FISTA_Meta, object)):
-    r"""Base class for Fast Iterative Shrinkage/Thresholding algorithm (FISTA)
-    algorithms :cite:`beck-2009-fast`.
+class FISTA(common.IterativeSolver):
+    r"""Base class for Fast Iterative Shrinkage/Thresholding algorithm
+    (FISTA) algorithms :cite:`beck-2009-fast`.
 
     Solve optimisation problems of the form
 
@@ -187,6 +155,9 @@ class FISTA(with_metaclass(_FISTA_Meta, object)):
     itstat_fields_objfn = ('ObjFun', 'FVal', 'GVal')
     """Fields in IterationStats associated with the objective function;
     see :meth:`eval_objfun`"""
+    itstat_fields_alg = ('Rsdl', 'F_Btrack', 'Q_Btrack', 'IterBTrack', 'L')
+    """Fields in IterationStats associated with the specific solver
+    algorithm"""
     itstat_fields_extra = ()
     """Non-standard fields in IterationStats; see :meth:`itstat_extra`"""
 
@@ -272,66 +243,6 @@ class FISTA(with_metaclass(_FISTA_Meta, object)):
 
         self.itstat = []
         self.k = 0
-
-
-    def set_dtype(self, opt, dtype):
-        """Set the `dtype` attribute. If opt['DataType'] has a value other
-        than None, it overrides the `dtype` parameter of this method. No
-        changes are made if the `dtype` attribute already exists and has a
-        value other than 'None'.
-
-        Parameters
-        ----------
-        opt : :class:`FISTA.Options` object
-          Algorithm options
-        dtype : data-type
-          Data type for working variables (overridden by 'DataType' option)
-        """
-
-        # Take no action of self.dtype exists has is not None
-        if not hasattr(self, 'dtype') or self.dtype is None:
-            # DataType option overrides explicitly specified data type
-            if opt['DataType'] is None:
-                self.dtype = dtype
-            else:
-                self.dtype = np.dtype(opt['DataType'])
-
-
-
-    def set_attr(self, name, val, dval=None, dtype=None, reset=False):
-        """Set an object attribute.
-
-        Parameters
-        ----------
-        name : string
-          Attribute name
-        val : any
-          Primary attribute value
-        dval : any
-          Default attribute value in case `val` is None
-        dtype : data-type, optional (default None)
-          If the `dtype` parameter is not None, the attribute `name` is
-          set to `val` after conversion to the specified type.
-          self.dtype
-        reset : bool, optional (default False)
-          Flag indicating whether attribute assignment should be conditional
-          on the attribute not existing or having value None. If False,
-          an attribute value other than None will not be not overwritten.
-        """
-
-        # If `val` is None and `dval` is not, replace it with dval
-        if dval is not None and val is None:
-            val = dval
-
-        # If val is flagged as numeric, convert it to type self.dtype
-        if dtype is not None and val is not None:
-            val = self.dtype.type(val)
-
-        # Set attribute value depending on reset flag and whether the
-        # attribute exists and is None
-        if reset or not hasattr(self, name) or \
-           (hasattr(self, name) and getattr(self, name) is None):
-            setattr(self, name, val)
 
 
 
@@ -565,7 +476,7 @@ class FISTA(with_metaclass(_FISTA_Meta, object)):
 
 
     def eval_Dxy(self):
-        """ Evaluate difference of state and auxiliary state updates."""
+        """Evaluate difference of state and auxiliary state updates."""
 
         return self.X - self.Y
 
@@ -581,18 +492,6 @@ class FISTA(with_metaclass(_FISTA_Meta, object)):
             adapt_tol = self.tau0 / (1. + self.k)
 
         return r, adapt_tol
-
-
-
-    @classmethod
-    def itstat_fields(cls):
-        """Construct tuple of field names used to initialise IterationStats
-        named tuple.
-        """
-
-        return ('Iter',) + cls.itstat_fields_objfn + \
-          ('Rsdl', 'F_Btrack', 'Q_Btrack', 'IterBTrack', 'L') + \
-          cls.itstat_fields_extra + ('Time',)
 
 
 
@@ -660,7 +559,7 @@ class FISTA(with_metaclass(_FISTA_Meta, object)):
 
 
     def display_start(self):
-        """Set up status display if option selected.  NB: this method
+        """Set up status display if option selected. NB: this method
         assumes that the first entry is the iteration count and the
         last is the L value.
         """
@@ -673,8 +572,9 @@ class FISTA(with_metaclass(_FISTA_Meta, object)):
             else:
                 hdrtxt = type(self).hdrtxt()[0:-4]
             # Call utility function to construct status display formatting
-            hdrstr, fmtstr, nsep = util.solve_status_str(
-                hdrtxt, type(self).fwiter, type(self).fpothr)
+            hdrstr, fmtstr, nsep = common.solve_status_str(
+                hdrtxt, fmtmap={'It_Bt': '%5d'}, fwdth0=type(self).fwiter,
+                fprec=type(self).fpothr)
             # Print header and separator strings
             if self.opt['StatusHeader']:
                 print(hdrstr)
@@ -824,23 +724,19 @@ class FISTADFT(FISTA):
         Nx = np.product(xshape)
         super(FISTADFT, self).__init__(Nx, xshape, dtype, opt)
 
-        self.Xf = None
-        self.Yf = None
-
 
 
     def proximal_step(self, gradf=None):
-        """ Compute proximal update (gradient descent + constraint).
-        """
+        """Compute proximal update (gradient descent + constraint)."""
 
         if gradf is None:
             gradf = self.eval_gradf()
 
 
-        Vf = self.Yf - (1. / self.L) * gradf
-        V = sl.irfftn(Vf, self.cri.Nv, self.cri.axisN)
+        self.Vf[:] = self.Yf - (1. / self.L) * gradf
+        V = sl.irfftn(self.Vf, self.cri.Nv, self.cri.axisN)
 
-        self.X = self.eval_proxop(V)
+        self.X[:] = self.eval_proxop(V)
         self.Xf = sl.rfftn(self.X, None, self.cri.axisN)
 
 
@@ -920,7 +816,7 @@ class FISTADFT(FISTA):
 
 
     def eval_gradf(self):
-        """Compute gradient in Fourier domain.  Also computes argument
+        """Compute gradient in Fourier domain. Also computes argument
         of smooth function :math:`f`.
 
         Overriding this method is required.

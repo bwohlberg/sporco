@@ -18,7 +18,7 @@ from scipy import linalg
 from sporco.admm import admm
 import sporco.cnvrep as cr
 import sporco.linalg as sl
-from sporco.util import _fix_dynamic_class_lookup
+from sporco.common import _fix_dynamic_class_lookup
 
 __author__ = """Brendt Wohlberg <brendt@ieee.org>"""
 

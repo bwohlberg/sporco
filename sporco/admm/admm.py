@@ -9,7 +9,6 @@
 
 from __future__ import division
 from __future__ import print_function
-from future.utils import with_metaclass
 from builtins import range
 from builtins import object
 
@@ -23,45 +22,14 @@ from scipy import linalg
 from sporco import cdict
 from sporco import util
 from sporco.util import u
-from sporco.util import _fix_nested_class_lookup
+from sporco import common
 
 
 __author__ = """Brendt Wohlberg <brendt@ieee.org>"""
 
 
 
-class _ADMM_Meta(type):
-    """Metaclass for ADMM class that handles intialisation of
-    IterationStats namedtuple and applies _fix_nested_class_lookup to class
-    definitions to fix problems with lookup of nested class
-    definitions when using pickle. It is also responsible for stopping
-    the object initialisation timer at the end of initialisation.
-    """
-
-    def __init__(cls, *args):
-
-        # Initialise named tuple type for recording ADMM iteration statistics
-        cls.IterationStats = collections.namedtuple('IterationStats',
-                                                    cls.itstat_fields())
-        # Apply _fix_nested_class_lookup function to class after creation
-        _fix_nested_class_lookup(cls, nstnm='Options')
-
-
-
-    def __call__(cls, *args, **kwargs):
-
-        # Initialise instance
-        instance = super(_ADMM_Meta, cls).__call__(*args, **kwargs)
-        # Stop initialisation timer
-        instance.timer.stop('init')
-        # Return instance
-        return instance
-
-
-
-
-
-class ADMM(with_metaclass(_ADMM_Meta, object)):
+class ADMM(common.IterativeSolver):
     r"""Base class for Alternating Direction Method of Multipliers (ADMM)
     algorithms :cite:`boyd-2010-distributed`.
 
@@ -213,6 +181,10 @@ class ADMM(with_metaclass(_ADMM_Meta, object)):
     itstat_fields_objfn = ('ObjFun', 'FVal', 'GVal')
     """Fields in IterationStats associated with the objective function;
     see :meth:`eval_objfn`"""
+    itstat_fields_alg = ('PrimalRsdl', 'DualRsdl', 'EpsPrimal', 'EpsDual',
+                         'Rho')
+    """Fields in IterationStats associated with the specific solver
+    algorithm"""
     itstat_fields_extra = ()
     """Non-standard fields in IterationStats; see :meth:`itstat_extra`"""
 
@@ -301,77 +273,6 @@ class ADMM(with_metaclass(_ADMM_Meta, object)):
 
         self.itstat = []
         self.k = 0
-
-
-
-    def set_dtype(self, opt, dtype):
-        """Set the `dtype` attribute. If opt['DataType'] has a value other
-        than None, it overrides the `dtype` parameter of this method. No
-        changes are made if the `dtype` attribute already exists and has a
-        value other than 'None'.
-
-        Parameters
-        ----------
-        opt : :class:`ADMM.Options` object
-          Algorithm options
-        dtype : data-type
-          Data type for working variables (overridden by 'DataType' option)
-        """
-
-        # Take no action of self.dtype exists has is not None
-        if not hasattr(self, 'dtype') or self.dtype is None:
-            # DataType option overrides explicitly specified data type
-            if opt['DataType'] is None:
-                self.dtype = dtype
-            else:
-                self.dtype = np.dtype(opt['DataType'])
-
-
-
-    def set_attr(self, name, val, dval=None, dtype=None, reset=False):
-        """Set an object attribute by its name. The attribute value can be
-        specified as a primary value `val`, and as default value 'dval` that
-        will be used if the primary value is None. This arrangement allows
-        an attribute to be set from an entry in an options object, passed
-        as `val`, while specifying a default value to use, passed as `dval`
-        in the event that the options entry is None. Unless `reset` is True,
-        the attribute is only set if it doesn't exist, or if it exists with
-        value None. This arrangement allows for attributes to be set in
-        both base and derived class initialisers, with the derived class
-        value taking preference.
-
-        Parameters
-        ----------
-        name : string
-          Attribute name
-        val : any
-          Primary attribute value
-        dval : any
-          Default attribute value in case `val` is None
-        dtype : data-type, optional (default None)
-          If the `dtype` parameter is not None, the attribute `name` is
-          set to `val` (which is assumed to be of numeric type) after
-          conversion to the specified type.
-        reset : bool, optional (default False)
-          Flag indicating whether attribute assignment should be conditional
-          on the attribute not existing or having value None. If False,
-          an attribute value other than None will not be overwritten.
-        """
-
-        # If `val` is None and `dval` is not None, replace it with dval
-        if dval is not None and val is None:
-            val = dval
-
-        # If dtype is not None, assume val is numeric and convert it to
-        # type dtype
-        if dtype is not None and val is not None:
-            val = dtype.type(val)
-
-        # Set attribute value depending on reset flag and whether the
-        # attribute exists and is None
-        if reset or not hasattr(self, name) or \
-           (hasattr(self, name) and getattr(self, name) is None):
-            setattr(self, name, val)
 
 
 
@@ -587,18 +488,6 @@ class ADMM(with_metaclass(_ADMM_Meta, object)):
 
 
     @classmethod
-    def itstat_fields(cls):
-        """Construct tuple of field names used to initialise IterationStats
-        named tuple.
-        """
-
-        return ('Iter',) + cls.itstat_fields_objfn + \
-          ('PrimalRsdl', 'DualRsdl', 'EpsPrimal', 'EpsDual', 'Rho') + \
-          cls.itstat_fields_extra + ('Time',)
-
-
-
-    @classmethod
     def hdrtxt(cls):
         """Construct tuple of status display column titles."""
 
@@ -699,8 +588,8 @@ class ADMM(with_metaclass(_ADMM_Meta, object)):
             else:
                 hdrtxt = type(self).hdrtxt()[0:-1]
             # Call utility function to construct status display formatting
-            hdrstr, fmtstr, nsep = util.solve_status_str(
-                hdrtxt, type(self).fwiter, type(self).fpothr)
+            hdrstr, fmtstr, nsep = common.solve_status_str(
+                hdrtxt, fwdth0=type(self).fwiter, fprec=type(self).fpothr)
             # Print header and separator strings
             if self.opt['StatusHeader']:
                 print(hdrstr)

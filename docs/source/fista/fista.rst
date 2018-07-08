@@ -139,8 +139,8 @@ IterationStats Definition
 
 These statistics are recorded as a :func:`collections.namedtuple`
 class, ``self.IterationStats``. The fields of this ``namedtuple`` are
-defined by class method :meth:`.FISTA.itstat_fields`, which returns a
-tuple of fields consisting of the following components:
+defined by class method :meth:`.IterativeSolver.itstat_fields`, which
+returns a tuple of fields consisting of the following components:
 
 * ``Iter`` : Iteration number
 * A tuple of field names in :attr:`.FISTA.itstat_fields_objfn` : Fields
@@ -158,7 +158,7 @@ In most cases a derived class will simply override
 :attr:`.FISTA.itstat_fields_objfn` and
 :attr:`.FISTA.itstat_fields_extra` to customise the desired iteration
 statistics fields, but if more flexibility is required,
-:meth:`.FISTA.itstat_fields` should be overridden.
+:meth:`.IterativeSolver.itstat_fields` should be overridden.
 
 
 .. _sec-fista-itstat-cnstr:
@@ -169,8 +169,9 @@ IterationStats Construction
 The actual construction of the ``self.IterationStats`` ``namedtuple``
 for each iteration is performed by :meth:`.FISTA.iteration_stats`,
 which expects that ``self.IterationStats`` follows the structure
-defined by :meth:`.FISTA.itstat_fields`. Tuples of values corresponding
-to the fields defined in :attr:`.FISTA.itstat_fields_objfn` and
+defined by :meth:`.IterativeSolver.itstat_fields`. Tuples of values
+corresponding to the fields defined in
+:attr:`.FISTA.itstat_fields_objfn` and
 :attr:`.FISTA.itstat_fields_extra` should be returned by
 :meth:`.FISTA.eval_objfn` and :meth:`.FISTA.itstat_extra`
 respectively.

@@ -13,6 +13,12 @@ cbpdndl_parcns_gry.py
 cbpdndl_parcns_clr.py
   Learn a convolutional dictionary (parallel consensus method, colour images)
 
+onlinecdl_gry.py
+  Learn a convolutional dictionary (online method, greyscale images)
+
+onlinecdl_clr.py
+  Learn a convolutional dictionary (online method, colour images)
+
 cbpdndl_video.py
   Learn a convolutional dictionary (consensus method, video data)
 

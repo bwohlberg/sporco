@@ -8,7 +8,7 @@
 Convolutional Dictionary Learning
 =================================
 
-This example demonstrates the use of :class:`.parcnsdl.ConvBPDNDictLearn_Consensus` for learning a convolutional dictionary from a set of training images. The dictionary learning algorithm is based on the ADMM consensus dictionary update :cite:`sorel-2016-fast` :cite:`garcia-2017-convolutional`.
+This example demonstrates the use of :class:`.prlcnscdl.ConvBPDNDictLearn_Consensus` for learning a convolutional dictionary from a set of training images. The dictionary learning algorithm is based on the ADMM consensus dictionary update :cite:`sorel-2016-fast` :cite:`garcia-2017-convolutional`.
 """
 
 
@@ -19,7 +19,7 @@ from builtins import range
 import pyfftw   # See https://github.com/pyFFTW/pyFFTW/issues/40
 import numpy as np
 
-from sporco.admm import parcnsdl
+from sporco.dictlrn import prlcnscdl
 from sporco import util
 from sporco import plot
 
@@ -59,7 +59,7 @@ Set regularization parameter and options for dictionary learning solver.
 """
 
 lmbda = 0.2
-opt = parcnsdl.ConvBPDNDictLearn_Consensus.Options({'Verbose': True,
+opt = prlcnscdl.ConvBPDNDictLearn_Consensus.Options({'Verbose': True,
                         'MaxMainIter': 200,
                         'CBPDN': {'rho': 50.0*lmbda + 0.5},
                         'CCMOD': {'rho': 1.0, 'ZeroMean': True}})
@@ -69,7 +69,7 @@ opt = parcnsdl.ConvBPDNDictLearn_Consensus.Options({'Verbose': True,
 Create solver object and solve.
 """
 
-d = parcnsdl.ConvBPDNDictLearn_Consensus(D0, sh, lmbda, opt)
+d = prlcnscdl.ConvBPDNDictLearn_Consensus(D0, sh, lmbda, opt)
 D1 = d.solve()
 print("ConvBPDNDictLearn_Consensus solve time: %.2fs" %
       d.timer.elapsed('solve'))

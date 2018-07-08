@@ -4,7 +4,7 @@ from builtins import object
 import pytest
 import numpy as np
 
-from sporco.admm import bpdndl
+from sporco.dictlrn import bpdndl
 
 
 class TestSet01(object):

@@ -8,7 +8,7 @@
 Convolutional Dictionary Learning
 =================================
 
-This example demonstrates the use of :class:`.fista.cbpdndl.ConvBPDNDictLearn` for learning a convolutional dictionary from a set of colour training images :cite:`wohlberg-2016-convolutional`, using FISTA solvers for both sparse coding :cite:`chalasani-2013-fast` :cite:`wohlberg-2016-efficient` and dictionary update steps :cite:`garcia-2017-convolutional`.
+This example demonstrates the use of :class:`.cbpdndl.ConvBPDNDictLearn` for learning a convolutional dictionary from a set of colour training images :cite:`wohlberg-2016-convolutional`, using FISTA solvers for both sparse coding :cite:`chalasani-2013-fast` :cite:`wohlberg-2016-efficient` and dictionary update steps :cite:`garcia-2017-convolutional`.
 """
 
 
@@ -19,7 +19,7 @@ from builtins import range
 import pyfftw   # See https://github.com/pyFFTW/pyFFTW/issues/40
 import numpy as np
 
-from sporco.fista import cbpdndl
+from sporco.dictlrn import cbpdndl
 from sporco import util
 from sporco import plot
 
@@ -60,17 +60,19 @@ lmbda = 0.2
 L_sc = 360.0
 L_du = 50.0
 dsz = ((8, 8, 3, 32), (12, 12, 3, 32), (16, 16, 3, 32))
-opt = cbpdndl.ConvBPDNDictLearn.Options({'Verbose': True,
-                'MaxMainIter': 200, 'DictSize': dsz,
+opt = cbpdndl.ConvBPDNDictLearn.Options({
+                'Verbose': True, 'MaxMainIter': 200, 'DictSize': dsz,
                 'CBPDN': {'BackTrack': {'Enabled': True }, 'L': L_sc},
-                'CCMOD': {'BackTrack': {'Enabled': True }, 'L': L_du } })
+                'CCMOD': {'BackTrack': {'Enabled': True }, 'L': L_du}},
+                xmethod='fista', dmethod='fista')
 
 
 """
 Create solver object and solve.
 """
 
-d = cbpdndl.ConvBPDNDictLearn(D0, sh, lmbda, opt)
+d = cbpdndl.ConvBPDNDictLearn(D0, sh, lmbda, opt, xmethod='fista',
+                              dmethod='fista')
 D1 = d.solve()
 print("ConvBPDNDictLearn solve time: %.2fs" % d.timer.elapsed('solve'))
 

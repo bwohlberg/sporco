@@ -1,7 +1,7 @@
-Modules cbpdndl and parcnsdl
-============================
+Modules cbpdndl, cbpdndlmd, and prlcnscdl
+=========================================
 
-These modules includes classes :class:`.admm.cbpdndl.ConvBPDNDictLearn` and :class:`.admm.parcnsdl.ConvBPDNDictLearn_Consensus` for solving the problem
+These modules includes classes :class:`.dictlrn.cbpdndl.ConvBPDNDictLearn` and :class:`.dictlrn.prlcnscdl.ConvBPDNDictLearn_Consensus` for solving the problem
 
 .. math::
    \mathrm{argmin}_{\mathbf{d}, \mathbf{x}} \;
@@ -12,7 +12,7 @@ These modules includes classes :class:`.admm.cbpdndl.ConvBPDNDictLearn` and :cla
 where :math:`C` is the feasible set consisting of filters with unit norm
 and constrained support.
 
-In addition classes :class:`.admm.cbpdndl.ConvBPDNMaskDcplDictLearn` and :class:`.admm.parcnsdl.ConvBPDNMaskDcplDictLearn_Consensus` support solving
+In addition classes :class:`.dictlrn.cbpdndlmd.ConvBPDNMaskDictLearn` and :class:`.dictlrn.prlcnscdl.ConvBPDNMaskDcplDictLearn_Consensus` support solving
 the problem
 
 .. math::
@@ -24,10 +24,9 @@ the problem
 
 where :math:`W` is a mask array.
 
-On a multi-core host, :class:`.admm.parcnsdl.ConvBPDNDictLearn_Consensus` and
-:class:`.admm.parcnsdl.ConvBPDNMaskDcplDictLearn_Consensus` can be
-substantially faster than :class:`.admm.cbpdndl.ConvBPDNDictLearn` and
-:class:`.admm.cbpdndl.ConvBPDNMaskDcplDictLearn` respectively.
+On a multi-core host, :class:`.dictlrn.prlcnscdl.ConvBPDNDictLearn_Consensus` and :class:`.dictlrn.prlcnscdl.ConvBPDNMaskDcplDictLearn_Consensus` can be
+substantially faster than :class:`.dictlrn.cbpdndl.ConvBPDNDictLearn` and
+:class:`.dictlrn.cbpdndlmd.ConvBPDNMaskDictLearn` respectively.
 
 
 :ref:`Usage examples <example_convolutional_dictionary_learning_index>` are available.

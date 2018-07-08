@@ -437,60 +437,6 @@ def gengraphs(pth, nopyfftw):
 
 
 
-    #### bpdndl module
-    from sporco.admm import bpdndl
-    mdnm = 'sporco.admm.bpdndl'
-
-    D0 = np.random.randn(8, 8)
-    S = np.random.randn(8, 16)
-    lmbda = 0.1
-
-    ## BPDNDictLearn class
-    opt = bpdndl.BPDNDictLearn.Options({'Verbose': False, 'MaxMainIter': 1,
-                                        'AccurateDFid': True})
-
-    with CallGraph(ct, mdnm, pth, 'bpdndl_init.svg', **kwargs):
-        b = bpdndl.BPDNDictLearn(D0, S, lmbda, opt)
-
-    with CallGraph(ct, mdnm, pth, 'bpdndl_solve.svg', **kwargs):
-        b.solve()
-
-
-
-
-    #### cbpdndl module
-    from sporco.admm import cbpdndl
-    mdnm = 'sporco.admm.cbpdndl'
-
-    D0 = np.random.randn(4, 4, 16)
-    s = np.random.randn(8, 8, 10)
-    lmbda = 0.1
-
-    ## ConvBPDNDictLearn class
-    opt = cbpdndl.ConvBPDNDictLearn.Options({'Verbose': False,
-                    'MaxMainIter': 1, 'AccurateDFid': True})
-
-    with CallGraph(ct, mdnm, pth, 'cbpdndl_init.svg', **kwargs):
-        b = cbpdndl.ConvBPDNDictLearn(D0, s, lmbda, opt)
-
-    with CallGraph(ct, mdnm, pth, 'cbpdndl_solve.svg', **kwargs):
-        b.solve()
-
-
-    ## ConvBPDNMaskDcplDictLearn class
-    W = np.array([1.0])
-    opt = cbpdndl.ConvBPDNMaskDcplDictLearn.Options({'Verbose': False,
-                    'MaxMainIter': 1, 'AccurateDFid': True})
-
-    with CallGraph(ct, mdnm, pth, 'cbpdnmddl_init.svg', **kwargs):
-        b = cbpdndl.ConvBPDNMaskDcplDictLearn(D0, s, lmbda, W, opt)
-
-    with CallGraph(ct, mdnm, pth, 'cbpdnmddl_solve.svg', **kwargs):
-        b.solve()
-
-
-
-
     #### tvl1 module
     from sporco.admm import tvl1
     mdnm = 'sporco.admm.tvl1'
@@ -597,14 +543,87 @@ def gengraphs(pth, nopyfftw):
         b.solve()
 
 
-    ## ConvCnstrMODMaskDcpl class
-    opt = ccmod.ConvCnstrMODMask.Options({'Verbose': False, 'MaxMainIter': 1})
+    ## ConvCnstrMODMask class
+    opt = ccmod.ConvCnstrMODMask.Options({'Verbose': False,
+                                          'MaxMainIter': 1})
 
     with CallGraph(ct, mdnm, pth, 'ccmodmdfista_init.svg', **kwargs):
         b = ccmod.ConvCnstrMODMask(X, S, W, dsz=dsz, opt=opt)
 
     with CallGraph(ct, mdnm, pth, 'ccmodmdfista_solve.svg', **kwargs):
         b.solve()
+
+
+
+
+    srcmodflt = '^sporco.dictlrn'
+    fnmsub = ('^sporco.dictlrn.', '')
+    lnksub = (r'^([^\.]*).(.*)',
+              r'../../sporco.dictlrn.\1.html#sporco.dictlrn.\1.\2')
+    ct = jonga.CallTracer(srcmodflt=srcmodflt, srcqnmflt=srcqnmflt,
+                          dstqnmflt=dstqnmflt, fnmsub=fnmsub,
+                          grpflt=grpflt, lnksub=lnksub)
+
+
+
+    #### bpdndl module
+    from sporco.dictlrn import bpdndl
+    mdnm = 'sporco.dictlrn.bpdndl'
+
+    D0 = np.random.randn(8, 8)
+    S = np.random.randn(8, 16)
+    lmbda = 0.1
+
+    ## BPDNDictLearn class
+    opt = bpdndl.BPDNDictLearn.Options({'Verbose': False, 'MaxMainIter': 1,
+                                        'AccurateDFid': True})
+
+    with CallGraph(ct, mdnm, pth, 'bpdndl_init.svg', **kwargs):
+        b = bpdndl.BPDNDictLearn(D0, S, lmbda, opt)
+
+    with CallGraph(ct, mdnm, pth, 'bpdndl_solve.svg', **kwargs):
+        b.solve()
+
+
+
+
+    #### cbpdndl module
+    from sporco.dictlrn import cbpdndl
+    mdnm = 'sporco.dictlrn.cbpdndl'
+
+    D0 = np.random.randn(4, 4, 16)
+    s = np.random.randn(8, 8, 10)
+    lmbda = 0.1
+
+    ## ConvBPDNDictLearn class
+    opt = cbpdndl.ConvBPDNDictLearn.Options({'Verbose': False,
+                    'MaxMainIter': 1, 'AccurateDFid': True})
+
+    with CallGraph(ct, mdnm, pth, 'cbpdndl_init.svg', **kwargs):
+        b = cbpdndl.ConvBPDNDictLearn(D0, s, lmbda, opt)
+
+    with CallGraph(ct, mdnm, pth, 'cbpdndl_solve.svg', **kwargs):
+        b.solve()
+
+
+
+
+    #### cbpdndlmd module
+    from sporco.dictlrn import cbpdndlmd
+    mdnm = 'sporco.dictlrn.cbpdndlmd'
+
+    ## ConvBPDNMaskDcplDictLearn class
+    W = np.array([1.0])
+    opt = cbpdndlmd.ConvBPDNMaskDictLearn.Options({'Verbose': False,
+                    'MaxMainIter': 1, 'AccurateDFid': True})
+
+    with CallGraph(ct, mdnm, pth, 'cbpdnmddl_init.svg', **kwargs):
+        b = cbpdndlmd.ConvBPDNMaskDictLearn(D0, s, lmbda, W, opt)
+
+    with CallGraph(ct, mdnm, pth, 'cbpdnmddl_solve.svg', **kwargs):
+        b.solve()
+
+
 
 
 
@@ -639,8 +658,9 @@ def insert_solve_docs():
     import sporco.admm.cmod
     import sporco.admm.ccmod
     import sporco.admm.ccmodmd
-    import sporco.admm.bpdndl
-    import sporco.admm.cbpdndl
+    import sporco.dictlrn.bpdndl
+    import sporco.dictlrn.cbpdndl
+    import sporco.dictlrn.cbpdndlmd
     import sporco.admm.tvl1
     import sporco.admm.tvl2
 
@@ -672,9 +692,9 @@ def insert_solve_docs():
         'sporco.admm.ccmodmd.ConvCnstrMODMaskDcpl_CG': 'ccmodmdcg_solve.svg',
         'sporco.admm.ccmodmd.ConvCnstrMODMaskDcpl_Consensus':
             'ccmodmdcnsns_solve.svg',
-        'sporco.admm.bpdndl.BPDNDictLearn': 'bpdndl_solve.svg',
-        'sporco.admm.cbpdndl.ConvBPDNDictLearn': 'cbpdndl_solve.svg',
-        'sporco.admm.cbpdndl.ConvBPDNMaskDcplDictLearn':
+        'sporco.dictlrn.bpdndl.BPDNDictLearn': 'bpdndl_solve.svg',
+        'sporco.dictlrn.cbpdndl.ConvBPDNDictLearn': 'cbpdndl_solve.svg',
+        'sporco.dictlrn.cbpdndlmd.ConvBPDNMaskDictLearn':
             'cbpdnmddl_solve.svg',
         'sporco.admm.tvl1.TVL1Denoise': 'tvl1den_solve.svg',
         'sporco.admm.tvl1.TVL1Deconv': 'tvl1dcn_solve.svg',

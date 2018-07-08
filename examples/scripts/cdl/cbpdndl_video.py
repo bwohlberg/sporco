@@ -8,7 +8,7 @@
 Convolutional Dictionary Learning
 =================================
 
-This example demonstrates the use of :class:`.admm.cbpdndl.ConvBPDNDictLearn` for learning a 3D convolutional dictionary from video data. The dictionary learning algorithm is based on the ADMM consensus dictionary update.
+This example demonstrates the use of :class:`.dictlrn.cbpdndl.ConvBPDNDictLearn` for learning a 3D convolutional dictionary from video data. The dictionary learning algorithm is based on the ADMM consensus dictionary update.
 """
 
 
@@ -30,7 +30,7 @@ except ImportError:
     print('Package sk-video is required by this demo script', file=sys.stderr)
     raise
 
-from sporco.admm import cbpdndl
+from sporco.dictlrn import cbpdndl
 from sporco import util
 from sporco import plot
 
@@ -68,7 +68,8 @@ Set regularization parameter and options for dictionary learning solver.
 lmbda = 0.1
 opt = cbpdndl.ConvBPDNDictLearn.Options({'Verbose': True, 'MaxMainIter': 200,
                 'CBPDN': {'rho': 5e1*lmbda, 'AutoRho': {'Enabled': True}},
-                'CCMOD': {'rho': 1e2, 'AutoRho': {'Enabled': True}}})
+                'CCMOD': {'rho': 1e2, 'AutoRho': {'Enabled': True}}},
+                dmethod='cns')
 
 
 """

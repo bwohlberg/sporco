@@ -8,6 +8,8 @@ Version 0.1.9   (not yet released)
 
 - Added new sub-package for FISTA algorithms, including algorithms for
   the CBPDN and CCMOD problems
+- Moved all dictionary learning modules into new dictlrn sub-package and
+  added new module for online CDL
 - Simplified array shape requirements for option L1Weight in modules
   admm.cbpdn and admm.cbpdntv
 - Minimum required Numpy version is now 1.11

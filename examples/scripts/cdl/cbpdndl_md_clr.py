@@ -8,7 +8,7 @@
 Convolutional Dictionary Learning with Spatial Mask
 ===================================================
 
-This example demonstrates the use of :class:`.cbpdndl.ConvBPDNMaskDcplDictLearn` for convolutional dictionary learning with a spatial mask, from a set of colour training images :cite:`wohlberg-2016-convolutional`. The dictionary learning algorithm is based on the hybrid mask decoupling / ADMM consensus dictionary update :cite:`garcia-2017-convolutional`.
+This example demonstrates the use of :class:`.cbpdndlmd.ConvBPDNMaskDictLearn` for convolutional dictionary learning with a spatial mask, from a set of colour training images :cite:`wohlberg-2016-convolutional`. The dictionary learning algorithm is based on the hybrid mask decoupling / ADMM consensus dictionary update :cite:`garcia-2017-convolutional`.
 """
 
 
@@ -20,7 +20,8 @@ import pyfftw   # See https://github.com/pyFFTW/pyFFTW/issues/40
 import numpy as np
 
 from sporco.admm import tvl2
-from sporco.admm import cbpdndl
+from sporco.dictlrn import cbpdndl
+from sporco.dictlrn import cbpdndlmd
 from sporco import util
 from sporco import plot
 
@@ -65,15 +66,15 @@ sh = Sw - sl
 
 
 """
-CDL without a spatial mask using :class:`.admm.cbpdndl.ConvBPDNDictLearn`. (Note that :class:`.parcnsdl.ConvBPDNMaskDcplDictLearn_Consensus` solves the same problem, but is substantially faster on a multi-core architecture.)
+CDL without a spatial mask using :class:`.dictlrn.cbpdndl.ConvBPDNDictLearn`. (Note that :class:`.prlcnscdl.ConvBPDNMaskDcplDictLearn_Consensus` solves the same problem, but is substantially faster on a multi-core architecture.)
 """
 
 lmbda = 0.05
 opt1 = cbpdndl.ConvBPDNDictLearn.Options({'Verbose': True,
             'MaxMainIter': 200, 'AccurateDFid': True,
             'CBPDN': {'rho': 50.0*lmbda + 0.5},
-            'CCMOD': {'rho': 3e2}})
-d1 = cbpdndl.ConvBPDNDictLearn(D0, sh, lmbda, opt1)
+            'CCMOD': {'rho': 3e2}}, dmethod='cns')
+d1 = cbpdndl.ConvBPDNDictLearn(D0, sh, lmbda, opt1, dmethod='cns')
 D1 = d1.solve()
 
 
@@ -85,14 +86,15 @@ sr1 = d1.reconstruct().squeeze() + sl
 
 
 """
-CDL with a spatial mask using :class:`.cbpdndl.ConvBPDNMaskDcplDictLearn`.
+CDL with a spatial mask using :class:`.cbpdndlmd.ConvBPDNMaskDictLearn`.
 """
 
-opt2 = cbpdndl.ConvBPDNMaskDcplDictLearn.Options({'Verbose': True,
+opt2 = cbpdndlmd.ConvBPDNMaskDictLearn.Options({'Verbose': True,
             'MaxMainIter': 200, 'AccurateDFid': True,
             'CBPDN': {'rho': 50.0*lmbda + 0.5},
-            'CCMOD': {'rho': 1.0}})
-d2 = cbpdndl.ConvBPDNMaskDcplDictLearn(D0, sh, lmbda, W, opt2)
+            'CCMOD': {'rho': 1.0}}, dmethod='cns')
+d2 = cbpdndlmd.ConvBPDNMaskDictLearn(D0, sh, lmbda, W, opt2,
+                                         dmethod='cns')
 D2 = d2.solve()
 
 

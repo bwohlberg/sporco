@@ -19,7 +19,7 @@ from builtins import range
 
 import numpy as np
 
-from sporco.admm import bpdndl
+from sporco.dictlrn import bpdndl
 from sporco import util
 from sporco import plot
 

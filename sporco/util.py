@@ -54,67 +54,6 @@ else:
 
 
 
-def _fix_nested_class_lookup(cls, nstnm):
-    """Fix name lookup problem that prevents pickling of classes with nested
-    class definitions. The approach is loosely based on that implemented at
-    https://git.io/viGqU , simplified and modified to work in both Python 2.7
-    and Python 3.x.
-
-    Parameters
-    ----------
-    cls : class
-      Outer class to which fix is to be applied
-    nstnm : string
-      Name of nested (inner) class to be renamed
-    """
-
-    # Check that nstmm is an attribute of cls
-    if nstnm in cls.__dict__:
-        # Get the attribute of cls by its name
-        nst = cls.__dict__[nstnm]
-        # Check that the attribute is a class
-        if isinstance(nst, type):
-            # Get the module in which the outer class is defined
-            mdl = sys.modules[cls.__module__]
-            # Construct an extended name by concatenating inner and outer names
-            extnm = cls.__name__ + nst.__name__
-            # Allow lookup of the nested class within the module via
-            # its extended name
-            setattr(mdl, extnm, nst)
-            # Change the nested class name to the extended name
-            nst.__name__ = extnm
-    return cls
-
-
-
-def _fix_dynamic_class_lookup(cls, pstfx):
-    """Fix name lookup problem that prevents pickling of dynamically defined
-    classes.
-
-    Parameters
-    ----------
-    cls : class
-      Dynamically generated class to which fix is to be applied
-    pstfx : string
-      Postfix that can be used to identify dynamically generated classes
-      that are equivalent by construction
-    """
-
-    # Extended name for the class that will be added to the module namespace
-    extnm = '_' + cls.__name__ + '_' + pstfx
-    # Get the module in which the dynamic class is defined
-    mdl = sys.modules[cls.__module__]
-    # Allow lookup of the dynamically generated class within the module via
-    # its extended name
-    setattr(mdl, extnm, cls)
-    # Change the dynamically generated class name to the extended name
-    if hasattr(cls, '__qualname__'):
-        cls.__qualname__ = extnm
-    else:
-        cls.__name__ = extnm
-
-
-
 def ntpl2array(ntpl):
     """
     Convert a :func:`collections.namedtuple` object to a :class:`numpy.ndarray`
@@ -181,45 +120,6 @@ def transpose_ntpl_list(lst):
                                      lst[0]._fields)
         return cls(*[[lst[k][l] for k in range(len(lst))]
                      for l in range(len(lst[0]))])
-
-
-
-def solve_status_str(hdrtxt, fwiter=4, fpothr=2):
-    """Construct header and format details for status display of an
-    iterative solver.
-
-    Parameters
-    ----------
-    hdrtxt : tuple of strings
-      Tuple of field header strings
-    fwiter : int, optional (default 4)
-      Number of characters in iteration count integer field
-    fpothr : int, optional (default 2)
-      Precision of other float field
-
-    Returns
-    -------
-    hdrstr : string
-      Complete header string
-    fmtstr : string
-      Complete print formatting string for numeric values
-    nsep : integer
-      Number of characters in separator string
-    """
-
-    # Field width for all fields other than first depends on precision
-    fwothr = fpothr + 6
-    # Construct header string from hdrtxt list of column headers
-    hdrstr = ("%-*s" % (fwiter+2, hdrtxt[0])) + \
-        ((("%%-%ds " % (fwothr+1)) * (len(hdrtxt)-1)) % \
-        tuple(hdrtxt[1:]))
-    # Construct iteration status format string
-    fmtstr = ("%%%dd" % (fwiter)) + ((("  %%%d.%de" % (fwothr, fpothr)) * \
-        (len(hdrtxt)-1)))
-    # Compute length of separator string
-    nsep = fwiter + (fwothr + 2)*(len(hdrtxt)-1)
-
-    return hdrstr, fmtstr, nsep
 
 
 

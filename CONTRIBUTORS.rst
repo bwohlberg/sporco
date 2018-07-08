@@ -5,6 +5,7 @@
 * Cristina Garcia-Cardona
 
   - FISTA sub-package
+  - Online CDL module
   - MacOS installation instructions
   - Comments, suggestions, and bug reports
 

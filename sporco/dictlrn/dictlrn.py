@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2015-2017 by Brendt Wohlberg <brendt@ieee.org>
+# Copyright (C) 2015-2018 by Brendt Wohlberg <brendt@ieee.org>
 # All rights reserved. BSD 3-clause License.
 # This file is part of the SPORCO package. Details of the copyright
 # and user license can be found in the 'LICENSE.txt' file distributed
@@ -18,8 +18,9 @@ import collections
 
 from sporco import cdict
 from sporco import util
+from sporco import common
 from sporco.util import u
-from sporco.util import _fix_nested_class_lookup
+from sporco.common import _fix_nested_class_lookup
 
 
 __author__ = """Brendt Wohlberg <brendt@ieee.org>"""
@@ -37,7 +38,8 @@ class IterStatsConfig(object):
     """Field precision for other display columns"""
 
 
-    def __init__(self, isfld, isxmap, isdmap, evlmap, hdrtxt, hdrmap):
+    def __init__(self, isfld, isxmap, isdmap, evlmap, hdrtxt, hdrmap,
+                 fmtmap=None):
         """Initialise configuration object.
 
         Parameters
@@ -60,6 +62,10 @@ class IterStatsConfig(object):
           display
         hdrmap : dict
           Dictionary mapping column header titles to IterationStats entries
+        fmtmap : dict, optional (default None)
+          A dict providing a mapping from field header strings to print
+          format strings, providing a mechanism for fields with print
+          formats that depart from the standard format
         """
 
         self.IterationStats = collections.namedtuple('IterationStats', isfld)
@@ -70,8 +76,9 @@ class IterStatsConfig(object):
         self.hdrmap = hdrmap
 
         # Call utility function to construct status display formatting
-        self.hdrstr, self.fmtstr, self.nsep = util.solve_status_str(
-            hdrtxt, type(self).fwiter, type(self).fpothr)
+        self.hdrstr, self.fmtstr, self.nsep = common.solve_status_str(
+            hdrtxt, fmtmap=fmtmap, fwdth0=type(self).fwiter,
+            fprec=type(self).fpothr)
 
 
 

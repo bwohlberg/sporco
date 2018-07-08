@@ -221,8 +221,8 @@ IterationStats Definition
 
 These statistics are recorded as a :func:`collections.namedtuple`
 class, ``self.IterationStats``. The fields of this ``namedtuple`` are
-defined by class method :meth:`.ADMM.itstat_fields`, which returns a
-tuple of fields consisting of the following components:
+defined by class method :meth:`.IterativeSolver.itstat_fields`, which
+returns a tuple of fields consisting of the following components:
 
 * ``Iter`` : Iteration number
 * A tuple of field names in :attr:`.ADMM.itstat_fields_objfn` : Fields
@@ -242,7 +242,7 @@ In most cases a derived class will simply override
 :attr:`.ADMM.itstat_fields_objfn` and
 :attr:`.ADMM.itstat_fields_extra` to customise the desired iteration
 statistics fields, but if more flexibility is required,
-:meth:`.ADMM.itstat_fields` should be overridden.
+:meth:`.IterativeSolver.itstat_fields` should be overridden.
 
 
 .. _sec-admm-itstat-cnstr:
@@ -253,8 +253,9 @@ IterationStats Construction
 The actual construction of the ``self.IterationStats`` ``namedtuple``
 for each iteration is performed by :meth:`.ADMM.iteration_stats`,
 which expects that ``self.IterationStats`` follows the structure
-defined by :meth:`.ADMM.itstat_fields`. Tuples of values corresponding
-to the fields defined in :attr:`.ADMM.itstat_fields_objfn` and
+defined by :meth:`.IterativeSolver.itstat_fields`. Tuples of values
+corresponding to the fields defined in
+:attr:`.ADMM.itstat_fields_objfn` and
 :attr:`.ADMM.itstat_fields_extra` should be returned by
 :meth:`.ADMM.eval_objfn` and :meth:`.ADMM.itstat_extra` respectively.
 
@@ -283,10 +284,10 @@ will usually *not* need to be overridden since there is a flexible
 method of customising the information displayed by these methods.
 
 Class method :meth:`.ADMM.hdrtxt` returns a tuple of strings which
-will be displayed as the headings for the displayed columns of iteration
-statistics, and class method :meth:`.ADMM.hdrval` constructs a
-dictionary that defines a mapping between these column heading strings
-and corresponding field names in the ``self.IterationStats``
+will be displayed as the headings for the displayed columns of
+iteration statistics, and class method :meth:`.ADMM.hdrval` constructs
+a dictionary that defines a mapping between these column heading
+strings and corresponding field names in the ``self.IterationStats``
 ``namedtuple``. These two methods can be overridden if necessary, but
 in most cases it is sufficient to override :attr:`.ADMM.hdrtxt_objfn`
 and :attr:`.ADMM.hdrval_objfun`, which respectively define the header

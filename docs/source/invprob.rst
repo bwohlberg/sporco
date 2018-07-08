@@ -23,10 +23,10 @@ Convolutional Sparse Representations
 Dictionary Learning
 -------------------
 
-The :class:`.DictLearn` class in the :mod:`.dictlrn` module provides a
-flexible framework for more general :doc:`dictionary learning
+The :class:`.DictLearn` class in the :mod:`.dictlrn.dictlrn` module provides
+a flexible framework for more general :doc:`dictionary learning
 <invprob/dictlrn>` problems than those in modules :doc:`bpdndl
-<invprob/bpdndl>` and :doc:`cbpdndl / parcnsdl <invprob/cbpdndl>`.
+<invprob/bpdndl>` and :doc:`cbpdndl / cbpdndlmd / prlcnscdl <invprob/cbpdndl>`.
 
 
 Miscellaneous

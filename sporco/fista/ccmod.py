@@ -239,11 +239,13 @@ class ConvCnstrMOD(fista.FISTADFT):
                              zm=opt['ZeroMean'])
 
         # Create byte aligned arrays for FFT calls
-        self.Xf = sl.pyfftw_rfftn_empty_aligned(self.X.shape, self.cri.axisN,
-                                                self.dtype)
+        self.Y = self.X
+        self.X = sl.pyfftw_empty_aligned(self.Y.shape, dtype=self.dtype)
+        self.X[:] = self.Y
 
-        # Initialise auxiliary variable Yf
-        self.Yf = sl.pyfftw_rfftn_empty_aligned(self.X.shape, self.cri.axisN,
+        # Initialise auxiliary variable Vf: Create byte aligned arrays
+        # for FFT calls
+        self.Vf = sl.pyfftw_rfftn_empty_aligned(self.X.shape, self.cri.axisN,
                                                 self.dtype)
 
         self.Ryf = -self.Sf
@@ -502,19 +504,24 @@ class ConvCnstrMODMask(ConvCnstrMOD):
 
         super(ConvCnstrMODMask, self).__init__(Z, S, dsz, opt, dimK, dimN)
 
+        # Create byte aligned arrays for FFT calls
+        self.WRy = sl.pyfftw_empty_aligned(self.S.shape, dtype=self.dtype)
+        self.Ryf = sl.pyfftw_rfftn_empty_aligned(self.S.shape, self.cri.axisN,
+                                                self.dtype)
+
 
     def eval_gradf(self):
         """Compute gradient in Fourier domain."""
 
         # Compute X D - S
-        self.Ryf = self.eval_Rf(self.Yf)
+        self.Ryf[:] = self.eval_Rf(self.Yf)
 
         # Map to spatial domain to multiply by mask
         Ry = sl.irfftn(self.Ryf, self.cri.Nv, self.cri.axisN)
         # Multiply by mask
-        WRy = (self.W**2) * Ry
+        self.WRy[:] = (self.W**2) * Ry
         # Map back to frequency domain
-        WRyf = sl.rfftn(WRy, self.cri.Nv, self.cri.axisN)
+        WRyf = sl.rfftn(self.WRy, self.cri.Nv, self.cri.axisN)
 
         gradf = sl.inner(np.conj(self.Zf), WRyf, axis=self.cri.axisK)
 
