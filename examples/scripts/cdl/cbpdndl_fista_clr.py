@@ -105,7 +105,7 @@ plot.plot(np.vstack((its.X_Rsdl, its.D_Rsdl)).T,
 plot.subplot(1, 3, 3)
 plot.plot(np.vstack((its.X_L, its.D_L)).T, xlbl='Iterations',
           ylbl='Inverse of Gradient Step Parameter', ptyp='semilogy',
-          lgnd=['$\L_X$', '$\L_D$'], fig=fig)
+          lgnd=['$L_X$', '$L_D$'], fig=fig)
 fig.show()
 
 
