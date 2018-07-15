@@ -1476,7 +1476,7 @@ class ConvTwoBlockCnstrnt(admm.ADMMTwoBlockCnstrnt):
                          'gEvalY': False, 'HighMemSolve': False,
                          'LinSolveCheck': False, 'NonNegCoef': False,
                          'NoBndryCross': False, 'RelaxParam': 1.8,
-                         'rho': 1.0, 'ReturnVar': 'Y1'})
+                         'rho': 1.0, 'ReturnVar': 'X'})
 
 
         def __init__(self, opt=None):
@@ -1880,7 +1880,7 @@ class ConvMinL1InL2Ball(ConvTwoBlockCnstrnt):
         defaults.update({'AuxVarObj': False, 'fEvalX': True,
                          'gEvalY': False, 'RelaxParam': 1.8,
                          'L1Weight': 1.0, 'NonNegCoef': False,
-                         'ReturnVar': 'Y1'})
+                         'ReturnVar': 'X'})
         defaults['AutoRho'].update({'Enabled': True, 'Period': 10,
                                     'AutoScaling': True, 'Scaling': 1000.0,
                                     'RsdlRatio': 1.2, 'RsdlTarget': 1.0})
