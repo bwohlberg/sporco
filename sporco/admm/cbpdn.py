@@ -991,7 +991,7 @@ class ConvBPDNGradReg(ConvBPDN):
     :math:`i`, via the ADMM problem
 
     .. math::
-       \mathrm{argmin}_\mathbf{x} \;
+       \mathrm{argmin}_{\mathbf{x},\mathbf{y}} \;
        (1/2) \left\| \sum_m \mathbf{d}_m * \mathbf{x}_m - \mathbf{s}
        \right\|_2^2 + \lambda \sum_m \| \mathbf{y}_m \|_1 +
        (\mu/2) \sum_i \sum_m \| G_i \mathbf{x}_m \|_2^2
@@ -1214,10 +1214,11 @@ class ConvBPDNProjL1(GenericConvBPDN):
     .. math::
        \mathrm{argmin}_{\mathbf{x}, \mathbf{y}} \;
        (1/2) \left\| \sum_m \mathbf{d}_m * \mathbf{x}_m -
-       \mathbf{s} \right\|_2^2 + \sum_m \iota_{C(\mathbf{y}_m, \gamma)}
-       \quad \text{such that} \quad \mathbf{x}_m = \mathbf{y}_m \;\;,
+       \mathbf{s} \right\|_2^2 + \sum_m \iota_{C(\gamma)}
+       (\{\mathbf{y}_m\}) \quad \text{such that} \quad \mathbf{x}_m =
+       \mathbf{y}_m \;\;,
 
-    where :math:`\iota_{C(\mathbf{x}, \gamma)}` is the indicator function
+    where :math:`\iota_{C(\gamma)}(\cdot)` is the indicator function
     of the :math:`\ell_1` ball of radius :math:`\gamma` about the origin.
     The algorithm is very similar to that for the CBPDN problem (see
     :class:`ConvBPDN`), the only difference being in the replacement in the
@@ -1392,8 +1393,8 @@ class ConvTwoBlockCnstrnt(admm.ADMMTwoBlockCnstrnt):
        \right) = \left( \begin{array}{c} \mathbf{s} \\
        \mathbf{0} \end{array} \right) \;\;.
 
-    In this case the ADMM constraint is :math:`A\mathbf{x} + B\mathbf{y} =
-    \mathbf{c}` where
+    In this case the ADMM constraint is :math:`A\mathbf{x} + B\mathbf{y}
+    = \mathbf{c}` where
 
     .. math::
        A = \left( \begin{array}{c} D \\ I \end{array} \right)
@@ -1810,23 +1811,24 @@ class ConvMinL1InL2Ball(ConvTwoBlockCnstrnt):
 
     .. math::
        \mathrm{argmin}_{\mathbf{x},\mathbf{y}_0,\mathbf{y}_1} \;
-       \| \mathbf{y}_1 \|_1 + \iota_{E(\epsilon,I,\mathbf{s})}(\mathbf{y}_0)
+       \| \mathbf{y}_1 \|_1 + \iota_{C(\epsilon)}(\mathbf{y}_0)
        \;\text{such that}\;
        \left( \begin{array}{c} D \\ I \end{array} \right) \mathbf{x}
-       - \left( \begin{array}{c} \mathbf{y}_0 \\ \mathbf{y}_1 \end{array}
-       \right) = \left( \begin{array}{c} \mathbf{s} \\
+       - \left( \begin{array}{c} \mathbf{y}_0 \\ \mathbf{y}_1
+       \end{array} \right) = \left( \begin{array}{c} \mathbf{s} \\
        \mathbf{0} \end{array} \right) \;\;,
 
-    where :math:`\iota_{E(\epsilon,I,\mathbf{s})}` is the indicator
+    where :math:`\iota_{C(\epsilon)}(\cdot)` is the indicator
     function of the :math:`\ell_2` ball of radius :math:`\epsilon`
-    about :math:`\mathbf{s}`, and :math:`D \mathbf{x} = \sum_m
+    about the origin, and :math:`D \mathbf{x} = \sum_m
     \mathbf{d}_m * \mathbf{x}_m`. The Multiple Measurement Vector
     (MMV) problem
 
     .. math::
-       \mathrm{argmin}_\mathbf{x} \sum_k \sum_m \| \mathbf{x}_{k,m} \|_1 \;
-       \text{such that} \; \left\|  \sum_m \mathbf{d}_m * \mathbf{x}_{k,m}
-       - \mathbf{s}_k \right\|_2 \leq \epsilon \;\;\; \forall k \;\;,
+       \mathrm{argmin}_\mathbf{x} \sum_k \sum_m \| \mathbf{x}_{k,m} \|_1
+       \; \text{such that} \; \left\|  \sum_m \mathbf{d}_m *
+       \mathbf{x}_{k,m} - \mathbf{s}_k \right\|_2 \leq \epsilon \;\;\;
+       \forall k \;\;,
 
     is also supported.
 

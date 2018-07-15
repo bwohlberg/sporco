@@ -42,8 +42,8 @@ class GenericBPDN(admm.ADMMEqual):
        \mathrm{argmin}_\mathbf{x} \;
        (1/2) \| D \mathbf{x} - \mathbf{s} \|_2^2 + f(\mathbf{x}) \;\;,
 
-    where :math:`f(\cdot)` is a penalty term or the indicator function of
-    a constraint, and is solved via the ADMM problem
+    where :math:`f(\cdot)` is a penalty term or the indicator function
+    of a constraint, and is solved via the ADMM problem
 
     .. math::
        \mathrm{argmin}_\mathbf{x} \;
@@ -83,7 +83,7 @@ class GenericBPDN(admm.ADMMEqual):
         """GenericBPDN algorithm options
 
         Options include all of those defined in
-        :class:`sporco.admm.admm.ADMMEqual.Options`, together with
+        :class:`.admm.ADMMEqual.Options`, together with
         additional options:
 
           ``AuxVarObj`` : Flag indicating whether the objective
@@ -123,8 +123,8 @@ class GenericBPDN(admm.ADMMEqual):
 
 
         def __setitem__(self, key, value):
-            """Set options 'fEvalX' and 'gEvalY' appropriately when option
-            'AuxVarObj' is set.
+            """Set options 'fEvalX' and 'gEvalY' appropriately when
+            option 'AuxVarObj' is set.
             """
 
             admm.ADMMEqual.Options.__setitem__(self, key, value)
@@ -190,7 +190,9 @@ class GenericBPDN(admm.ADMMEqual):
 
 
     def xstep(self):
-        r"""Minimise Augmented Lagrangian with respect to :math:`\mathbf{x}`."""
+        r"""Minimise Augmented Lagrangian with respect to
+        :math:`\mathbf{x}`.
+        """
 
         self.X = np.asarray(sl.lu_solve_ATAI(self.D, self.rho, self.DTS +
                         self.rho*(self.Y - self.U), self.lu, self.piv),
@@ -206,12 +208,12 @@ class GenericBPDN(admm.ADMMEqual):
 
 
     def ystep(self):
-        r"""Minimise Augmented Lagrangian with respect to :math:`\mathbf{y}`.
-        If this method is not overridden, the problem is solved without
-        any regularisation other than the option enforcement of
-        non-negativity of the solution. When it is overridden, it
-        should be explicitly called at the end of the overriding
-        method.
+        r"""Minimise Augmented Lagrangian with respect to
+        :math:`\mathbf{y}`.  If this method is not overridden, the
+        problem is solved without any regularisation other than the
+        option enforcement of non-negativity of the solution.  When it
+        is overridden, it should be explicitly called at the end of
+        the overriding method.
         """
 
         if self.opt['NonNegCoef']:
@@ -281,14 +283,15 @@ class BPDN(GenericBPDN):
 
     .. math::
        \mathrm{argmin}_\mathbf{x} \;
-       (1/2) \| D \mathbf{x} - \mathbf{s} \|_2^2 + \lambda \| \mathbf{x} \|_1
+       (1/2) \| D \mathbf{x} - \mathbf{s} \|_2^2 + \lambda \| \mathbf{x}
+       \|_1
 
     via the ADMM problem
 
     .. math::
        \mathrm{argmin}_\mathbf{x} \;
-       (1/2) \| D \mathbf{x} - \mathbf{s} \|_2^2 + \lambda \| \mathbf{y} \|_1
-       \quad \text{such that} \quad \mathbf{x} = \mathbf{y} \;\;.
+       (1/2) \| D \mathbf{x} - \mathbf{s} \|_2^2 + \lambda \| \mathbf{y}
+       \|_1 \quad \text{such that} \quad \mathbf{x} = \mathbf{y} \;\;.
 
 
     The Multiple Measurement Vector (MMV) BPDN problem
@@ -340,8 +343,8 @@ class BPDN(GenericBPDN):
           ``L1Weight`` : An array of weights for the :math:`\ell_1`
           norm. The array shape must be such that the array is
           compatible for multiplication with the X/Y variables. If this
-          option is defined, the regularization term is :math:`\lambda \|
-          \mathbf{w} \odot \mathbf{x} \|_1` where :math:`\mathbf{w}`
+          option is defined, the regularization term is :math:`\lambda
+          \| \mathbf{w} \odot \mathbf{x} \|_1` where :math:`\mathbf{w}`
           denotes the weighting array.
         """
 
@@ -484,15 +487,16 @@ class BPDNJoint(BPDN):
        \lambda \| Y \|_1 + \mu \| Y \|_{2,1} \quad \text{such that} \quad
        X = Y \;\;.
 
-    After termination of the :meth:`solve` method, attribute :attr:`itstat`
-    is a list of tuples representing statistics of each iteration. The
-    fields of the named tuple ``IterationStats`` are:
+    After termination of the :meth:`solve` method, attribute
+    :attr:`itstat` is a list of tuples representing statistics of each
+    iteration. The fields of the named tuple ``IterationStats`` are:
 
        ``Iter`` : Iteration number
 
        ``ObjFun`` : Objective function value
 
-       ``DFid`` :  Value of data fidelity term :math:`(1/2) \| D X - S \|_2^2`
+       ``DFid`` :  Value of data fidelity term :math:`(1/2) \| D X - S
+       \|_2^2`
 
        ``RegL1`` : Value of regularisation term :math:`\| X \|_1`
 
@@ -597,20 +601,20 @@ class ElasticNet(BPDN):
 
     .. math::
        \mathrm{argmin}_\mathbf{x} \;
-       (1/2) \| D \mathbf{x} - \mathbf{s} \|_2^2 + \lambda \| \mathbf{x} \|_1
-       + (\mu/2) \| \mathbf{x} \|_2^2
+       (1/2) \| D \mathbf{x} - \mathbf{s} \|_2^2 + \lambda \| \mathbf{x}
+       \|_1 + (\mu/2) \| \mathbf{x} \|_2^2
 
     via the ADMM problem
 
     .. math::
        \mathrm{argmin}_\mathbf{x} \;
-       (1/2) \| D \mathbf{x} - \mathbf{s} \|_2^2 + \lambda \| \mathbf{y} \|_1
-       + (\mu/2) \| \mathbf{x} \|_2^2 \quad \text{such that} \quad
+       (1/2) \| D \mathbf{x} - \mathbf{s} \|_2^2 + \lambda \| \mathbf{y}
+       \|_1 + (\mu/2) \| \mathbf{x} \|_2^2 \quad \text{such that} \quad
        \mathbf{x} = \mathbf{y} \;\;.
 
-    After termination of the :meth:`solve` method, attribute :attr:`itstat`
-    is a list of tuples representing statistics of each iteration. The
-    fields of the named tuple ``IterationStats`` are:
+    After termination of the :meth:`solve` method, attribute
+    :attr:`itstat` is a list of tuples representing statistics of each
+    iteration. The fields of the named tuple ``IterationStats`` are:
 
        ``Iter`` : Iteration number
 
@@ -750,11 +754,11 @@ class BPDNProjL1(GenericBPDN):
 
 
     ADMM algorithm for a BPDN variant with projection onto the
-    :math:`\ell_1` ball instead of an :math:`\ell_1` penalty. This variant
-    of the BPDN problem was originally referred to as the lasso
-    :cite:`tibshirani-1996-regression`, but that name is now also frequently
-    applied to the penalised form that is referred to here as the BPDN
-    problem.
+    :math:`\ell_1` ball instead of an :math:`\ell_1` penalty. This
+    variant of the BPDN problem was originally referred to as the lasso
+    :cite:`tibshirani-1996-regression`, but that name is now also
+    frequently applied to the penalised form that is referred to here as
+    the BPDN problem.
 
     Solve the problem
 
@@ -767,10 +771,11 @@ class BPDNProjL1(GenericBPDN):
 
     .. math::
        \mathrm{argmin}_\mathbf{x} \;
-       (1/2) \| D \mathbf{x} - \mathbf{s} \|_2^2 + \iota_{C(\mathbf{y},
-       \gamma)} \quad \text{such that} \quad \mathbf{x} = \mathbf{y} \;\;,
+       (1/2) \| D \mathbf{x} - \mathbf{s} \|_2^2 + \iota_{C(\gamma)}
+       (\mathbf{y}) \quad \text{such that} \quad \mathbf{x} = \mathbf{y}
+       \;\;,
 
-    where :math:`\iota_{C(\mathbf{x}, \gamma)}` is the indicator function
+    where :math:`\iota_{C(\gamma)}(\cdot)` is the indicator function
     of the :math:`\ell_1` ball of radius :math:`\gamma` about the origin.
     The algorithm is very similar to that for the BPDN problem (see
     :class:`BPDN`), the only difference being in the replacement in the
@@ -922,22 +927,22 @@ class MinL1InL2Ball(admm.ADMMTwoBlockCnstrnt):
     Solve the Single Measurement Vector (SMV) problem
 
     .. math::
-       \mathrm{argmin}_\mathbf{x} \| \mathbf{x} \|_1 \; \text{such that} \;
-       \| D \mathbf{x} - \mathbf{s} \|_2 \leq \epsilon
+       \mathrm{argmin}_\mathbf{x} \| \mathbf{x} \|_1 \; \text{such that}
+       \; \| D \mathbf{x} - \mathbf{s} \|_2 \leq \epsilon
 
     via the ADMM problem
 
     .. math::
        \mathrm{argmin}_{\mathbf{x},\mathbf{y}_0,\mathbf{y}_1} \;
-       \| \mathbf{y}_0 \|_1 + \iota_{E(\epsilon,I,\mathbf{s})}(\mathbf{y}_1)
-       \;\text{such that}\;
+       \| \mathbf{y}_0 \|_1 + \iota_{C(\mathbf{s}, \epsilon)}
+       (\mathbf{y}_1) \;\text{such that}\;
        \left( \begin{array}{c} I \\ D \end{array} \right) \mathbf{x}
-       - \left( \begin{array}{c} \mathbf{y}_0 \\ \mathbf{y}_1 \end{array}
-       \right) = \left( \begin{array}{c} \mathbf{0} \\
+       - \left( \begin{array}{c} \mathbf{y}_0 \\ \mathbf{y}_1
+       \end{array} \right) = \left( \begin{array}{c} \mathbf{0} \\
        \mathbf{0} \end{array} \right) \;\;,
 
-    where :math:`\iota_{E(\epsilon,I,\mathbf{s})}` is the indicator function
-    of the :math:`\ell_2` ball of radius :math:`\epsilon` about
+    where :math:`\iota_{C(\mathbf{s}, \epsilon)}(\cdot)` is the indicator
+    function of the :math:`\ell_2` ball of radius :math:`\epsilon` about
     :math:`\mathbf{s}`. The Multiple Measurement Vector (MMV) problem
 
     .. math::
@@ -947,9 +952,9 @@ class MinL1InL2Ball(admm.ADMMTwoBlockCnstrnt):
     where :math:`[X]_k` denotes column :math:`k` of matrix :math:`X`,
     is also supported.
 
-    After termination of the :meth:`solve` method, attribute :attr:`itstat`
-    is a list of tuples representing statistics of each iteration. The
-    fields of the named tuple ``IterationStats`` are:
+    After termination of the :meth:`solve` method, attribute
+    :attr:`itstat` is a list of tuples representing statistics of each
+    iteration. The fields of the named tuple ``IterationStats`` are:
 
        ``Iter`` : Iteration number
 
@@ -1134,10 +1139,11 @@ class MinL1InL2Ball(admm.ADMMTwoBlockCnstrnt):
 
     def eval_objfn(self):
         r"""Compute components of objective function as well as total
-        contribution to objective function. The objective function is
-        :math:`\| \mathbf{x} \|_1` and the constraint violation measure is
-        :math:`P(\mathbf{x}) - \mathbf{x}` where :math:`P(\mathbf{x})` is
-        the projection into the constraint set.
+        contribution to objective function.  The objective function is
+        :math:`\| \mathbf{x} \|_1` and the constraint violation
+        measure is :math:`P(\mathbf{x}) - \mathbf{x}` where
+        :math:`P(\mathbf{x})` is the projection into the constraint
+        set.
         """
 
         obj = linalg.norm((self.wl1 * self.obfn_g0var()).ravel(), 1)
