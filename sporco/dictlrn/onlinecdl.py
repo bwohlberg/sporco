@@ -209,6 +209,27 @@ class OnlineConvBPDNDictLearn(common.BasicIterativeSolver):
         self.fmtstr, self.nsep = self.display_start()
 
 
+    def update_shape(self, dsz, S, D_crop):
+        """Update memory allocation and cropping
+        functionality when the image size changes."""
+
+        self.cri = cr.CDU_ConvRepIndexing(dsz, S)#, 1, dimN)
+        # Update dictionary state
+        D_stdformD = cr.zpad(cr.stdformD(D_crop, self.cri.Cd, self.cri.M, self.cri.dimN),
+                              self.cri.Nv)
+        # Create byte aligned arrays for FFT calls
+        self.D = sl.pyfftw_empty_aligned(self.cri.shpD, dtype=self.dtype)
+        self.D[:] = D_stdformD.astype(self.dtype, copy=True)
+        self.Df = sl.rfftn(self.D, None, self.cri.axisN)
+
+        # Create constraint set projection function
+        self.Pcn = cr.getPcn(dsz, self.cri.Nv, self.cri.dimN, self.cri.dimCd,
+                             zm=self.opt['OCDL', 'ZeroMean'])
+
+        # Create byte aligned arrays for FFT calls
+        self.Gf = sl.pyfftw_rfftn_empty_aligned(self.D.shape, self.cri.axisN,
+                                                self.dtype)
+
 
     def solve(self, s_k):
         """Solve and compute statistics per iteration."""
@@ -243,6 +264,13 @@ class OnlineConvBPDNDictLearn(common.BasicIterativeSolver):
         self.timer.start('solve_wo_eval')
 
         D_crop = cr.bcrop(self.D, self.cri.dsz, self.cri.dimN)
+
+        # Check if image size changed
+        Nv = s_k.shape[0:self.cri.dimN]
+        if Nv != self.cri.Nv:
+            dsz = self.cri.dsz
+            self.update_shape(dsz, s_k, D_crop)
+            D_crop = cr.bcrop(self.D, self.cri.dsz, self.cri.dimN)
 
         # Create X update object (external representation is expected!)
         xstep = cbpdn.ConvBPDN(D_crop.squeeze(), s_k, lmbda,
