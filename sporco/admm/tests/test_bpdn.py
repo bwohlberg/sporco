@@ -296,6 +296,31 @@ class TestSet01(object):
 
 
     def test_18(self):
+        N = 64
+        M = 2*N
+        L = 8
+        np.random.seed(12345)
+        D = np.random.randn(N, M)
+        x0 = np.zeros((M, 1))
+        si = np.random.permutation(list(range(0, M-1)))
+        x0[si[0:L]] = np.random.randn(L, 1)
+        s = D.dot(x0)
+        lmbda = 5e-2
+        opt = bpdn.BPDN.Options({'Verbose': False, 'MaxMainIter': 300,
+                    'RelStopTol': 1e-5, 'AutoRho': {'Enabled': False}})
+        bp = bpdn.BPDN(D, s, lmbda=lmbda, opt=opt)
+        Xp = bp.solve()
+        epsilon = np.linalg.norm(D.dot(Xp) - s)
+        opt = bpdn.MinL1InL2Ball.Options({'Verbose': False,
+                    'MaxMainIter': 300, 'RelStopTol': 1e-5, 'rho': 2e1,
+                    'AutoRho': {'Enabled': False}})
+        bc = bpdn.MinL1InL2Ball(D, s, epsilon=epsilon, opt=opt)
+        Xc = bc.solve()
+        assert(np.linalg.norm(Xp - Xc)/np.linalg.norm(Xp) < 1e-3)
+        assert(np.abs(np.linalg.norm(Xp, 1) - np.linalg.norm(Xc, 1)) < 1e-3)
+
+
+    def test_19(self):
         N = 8
         M = 16
         D = np.random.randn(N, M)
@@ -310,14 +335,14 @@ class TestSet01(object):
         assert(linalg.norm(Xb-Xc)==0.0)
 
 
-    def test_19(self):
+    def test_20(self):
         opt = bpdn.GenericBPDN.Options({'AuxVarObj': False})
         assert(opt['fEvalX'] is True and opt['gEvalY'] is False)
         opt['AuxVarObj'] = True
         assert(opt['fEvalX'] is False and opt['gEvalY'] is True)
 
 
-    def test_20(self):
+    def test_21(self):
         opt = bpdn.GenericBPDN.Options({'AuxVarObj': True})
         assert(opt['fEvalX'] is False and opt['gEvalY'] is True)
         opt['AuxVarObj'] = False
@@ -325,7 +350,7 @@ class TestSet01(object):
 
 
     @pytest.mark.filterwarnings('ignore:admm.ADMM.runtime')
-    def test_21(self):
+    def test_22(self):
         N = 8
         M = 16
         D = np.random.randn(N, M)

@@ -162,8 +162,7 @@ class TestSet01(object):
         xr = np.random.randn(N, N, M)
         xp = np.abs(xr) > 3
         X0[xp] = np.random.randn(X0[xp].size)
-        S = np.sum(sl.ifftn(sl.fftn(D, (N, N), (0,1)) *
-                   sl.fftn(X0, None, (0,1)), None, (0,1)).real, axis=2)
+        S = np.sum(sl.fftconv(D, X0), axis=2)
         lmbda = 1e-4
         rho = 1e-1
         opt = cbpdn.ConvBPDN.Options({'Verbose': False, 'MaxMainIter': 500,
@@ -384,6 +383,36 @@ class TestSet01(object):
 
 
     def test_22(self):
+        N = 32
+        M = 4
+        Nd = 8
+        D = np.random.randn(Nd, Nd, M)
+        D /= np.sqrt(np.sum(D**2, axis=(0,1)))
+        X0 = np.zeros((N, N, M))
+        xr = np.random.randn(N, N, M)
+        xp = np.abs(xr) > 3
+        X0[xp] = np.random.randn(X0[xp].size)
+        S = np.sum(sl.fftconv(D, X0), axis=2)
+        lmbda = 1e-3
+        opt = cbpdn.ConvBPDN.Options({'Verbose': False, 'MaxMainIter': 500,
+                         'RelStopTol': 1e-5, 'rho': 5e-1,
+                         'AutoRho': {'Enabled': False}})
+        bp = cbpdn.ConvBPDN(D, S, lmbda, opt)
+        Xp = bp.solve()
+        epsilon = np.linalg.norm(bp.reconstruct(Xp).squeeze() - S)
+        opt = cbpdn.ConvMinL1InL2Ball.Options({'Verbose': False,
+                                  'MaxMainIter': 500,
+                                  'RelStopTol': 1e-5, 'rho': 2e2,
+                                  'RelaxParam': 1.0,
+                                  'AutoRho': {'Enabled': False}})
+        bc = cbpdn.ConvMinL1InL2Ball(D, S, epsilon=epsilon, opt=opt)
+        Xc = bc.solve()
+        assert(np.linalg.norm(Xp - Xc)/np.linalg.norm(Xp) < 1e-3)
+        assert(np.abs(np.linalg.norm(Xp.ravel(), 1) -
+                      np.linalg.norm(Xc.ravel(), 1)) < 1e-3)
+
+
+    def test_23(self):
         N = 16
         Nd = 5
         M = 4
@@ -398,7 +427,7 @@ class TestSet01(object):
             assert(0)
 
 
-    def test_23(self):
+    def test_24(self):
         N = 16
         Nd = 5
         Cs = 3
@@ -414,7 +443,7 @@ class TestSet01(object):
             assert(0)
 
 
-    def test_24(self):
+    def test_25(self):
         N = 16
         Nd = 5
         Cs = 3
@@ -431,7 +460,7 @@ class TestSet01(object):
             assert(0)
 
 
-    def test_25(self):
+    def test_26(self):
         N = 16
         Nd = 5
         Cd = 3
@@ -447,7 +476,7 @@ class TestSet01(object):
             assert(0)
 
 
-    def test_26(self):
+    def test_27(self):
         N = 16
         Nd = 5
         Cd = 3
@@ -464,7 +493,7 @@ class TestSet01(object):
             assert(0)
 
 
-    def test_27(self):
+    def test_28(self):
         N = 16
         Nd = 5
         K = 2
@@ -483,7 +512,7 @@ class TestSet01(object):
         assert(b.U.dtype == dt)
 
 
-    def test_28(self):
+    def test_29(self):
         N = 16
         Nd = 5
         M = 4
@@ -500,7 +529,7 @@ class TestSet01(object):
             assert(0)
 
 
-    def test_29(self):
+    def test_30(self):
         N = 16
         Nd = 5
         M = 4
@@ -535,14 +564,14 @@ class TestSet01(object):
         assert(np.linalg.norm(Xb-Xc)==0.0)
 
 
-    def test_32(self):
+    def test_33(self):
         opt = cbpdn.GenericConvBPDN.Options({'AuxVarObj': False})
         assert(opt['fEvalX'] is True and opt['gEvalY'] is False)
         opt['AuxVarObj'] = True
         assert(opt['fEvalX'] is False and opt['gEvalY'] is True)
 
 
-    def test_33(self):
+    def test_34(self):
         opt = cbpdn.GenericConvBPDN.Options({'AuxVarObj': True})
         assert(opt['fEvalX'] is False and opt['gEvalY'] is True)
         opt['AuxVarObj'] = False
