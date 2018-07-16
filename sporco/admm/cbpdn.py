@@ -45,7 +45,7 @@ class GenericConvBPDN(admm.ADMMEqual):
     .. math::
        \mathrm{argmin}_\mathbf{x} \;
        (1/2) \left\| \sum_m \mathbf{d}_m * \mathbf{x}_m -
-       \mathbf{s} \right\|_2^2 + \lambda g( \{ \mathbf{x}_m \} )
+       \mathbf{s} \right\|_2^2 + g( \{ \mathbf{x}_m \} )
 
     for input image :math:`\mathbf{s}`, dictionary filters
     :math:`\mathbf{d}_m`, and coefficient maps :math:`\mathbf{x}_m`,
