@@ -3,8 +3,8 @@ SPORCO Release Notes
 ====================
 
 
-Version 0.1.9   (not yet released)
-----------------------------------
+Version 0.1.9   (2018-07-15)
+----------------------------
 
 - Added new sub-package for FISTA algorithms, including algorithms for
   the CBPDN and CCMOD problems
