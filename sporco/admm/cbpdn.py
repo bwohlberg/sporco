@@ -45,17 +45,17 @@ class GenericConvBPDN(admm.ADMMEqual):
     .. math::
        \mathrm{argmin}_\mathbf{x} \;
        (1/2) \left\| \sum_m \mathbf{d}_m * \mathbf{x}_m -
-       \mathbf{s} \right\|_2^2 + \lambda f( \{ \mathbf{x}_m \} )
+       \mathbf{s} \right\|_2^2 + \lambda g( \{ \mathbf{x}_m \} )
 
     for input image :math:`\mathbf{s}`, dictionary filters
     :math:`\mathbf{d}_m`, and coefficient maps :math:`\mathbf{x}_m`,
-    and where :math:`f(\cdot)` is a penalty term or the indicator
+    and where :math:`g(\cdot)` is a penalty term or the indicator
     function of a constraint. It is solved via the ADMM problem
 
     .. math::
        \mathrm{argmin}_{\mathbf{x}, \mathbf{y}} \;
        (1/2) \left\| \sum_m \mathbf{d}_m * \mathbf{x}_m -
-       \mathbf{s} \right\|_2^2 + f ( \{ \mathbf{y}_m \} )
+       \mathbf{s} \right\|_2^2 + g( \{ \mathbf{y}_m \} )
        \quad \text{such that} \quad \mathbf{x}_m = \mathbf{y}_m \;\;.
 
     After termination of the :meth:`solve` method, attribute
@@ -177,11 +177,11 @@ class GenericConvBPDN(admm.ADMMEqual):
         channel, or `dimN` + 2 dimensional, in which case the final
         dimension is assumed to contain the channels (e.g. colour
         channels in the case of images). The input signal set `S` is
-        either `dimN` dimensional (no channels, only one signal), `dimN` + 1
-        dimensional (either multiple channels or multiple signals), or
-        `dimN` + 2 dimensional (multiple channels and multiple signals).
-        Determination of problem dimensions is handled by
-        :class:`.cnvrep.CSC_ConvRepIndexing`.
+        either `dimN` dimensional (no channels, only one signal),
+        `dimN` + 1 dimensional (either multiple channels or multiple
+        signals), or `dimN` + 2 dimensional (multiple channels and
+        multiple signals). Determination of problem dimensions is
+        handled by :class:`.cnvrep.CSC_ConvRepIndexing`.
 
 
         Parameters
@@ -1214,7 +1214,7 @@ class ConvBPDNProjL1(GenericConvBPDN):
     .. math::
        \mathrm{argmin}_{\mathbf{x}, \mathbf{y}} \;
        (1/2) \left\| \sum_m \mathbf{d}_m * \mathbf{x}_m -
-       \mathbf{s} \right\|_2^2 + \sum_m \iota_{C(\gamma)}
+       \mathbf{s} \right\|_2^2 + \iota_{C(\gamma)}
        (\{\mathbf{y}_m\}) \quad \text{such that} \quad \mathbf{x}_m =
        \mathbf{y}_m \;\;,
 

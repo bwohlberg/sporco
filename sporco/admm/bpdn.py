@@ -40,14 +40,14 @@ class GenericBPDN(admm.ADMMEqual):
 
     .. math::
        \mathrm{argmin}_\mathbf{x} \;
-       (1/2) \| D \mathbf{x} - \mathbf{s} \|_2^2 + f(\mathbf{x}) \;\;,
+       (1/2) \| D \mathbf{x} - \mathbf{s} \|_2^2 + g(\mathbf{x}) \;\;,
 
-    where :math:`f(\cdot)` is a penalty term or the indicator function
+    where :math:`g(\cdot)` is a penalty term or the indicator function
     of a constraint, and is solved via the ADMM problem
 
     .. math::
-       \mathrm{argmin}_\mathbf{x} \;
-       (1/2) \| D \mathbf{x} - \mathbf{s} \|_2^2 + f(\mathbf{y})
+       \mathrm{argmin}_{\mathbf{x}, \mathbf{y}} \;
+       (1/2) \| D \mathbf{x} - \mathbf{s} \|_2^2 + g(\mathbf{y})
        \quad \text{such that} \quad \mathbf{x} = \mathbf{y} \;\;.
 
     After termination of the :meth:`solve` method, attribute
@@ -289,7 +289,7 @@ class BPDN(GenericBPDN):
     via the ADMM problem
 
     .. math::
-       \mathrm{argmin}_\mathbf{x} \;
+       \mathrm{argmin}_{\mathbf{x}, \mathbf{y}} \;
        (1/2) \| D \mathbf{x} - \mathbf{s} \|_2^2 + \lambda \| \mathbf{y}
        \|_1 \quad \text{such that} \quad \mathbf{x} = \mathbf{y} \;\;.
 
@@ -483,7 +483,7 @@ class BPDNJoint(BPDN):
     via the ADMM problem
 
     .. math::
-       \mathrm{argmin}_X \; (1/2) \| D X - S \|_2^2 +
+       \mathrm{argmin}_{X, Y} \; (1/2) \| D X - S \|_2^2 +
        \lambda \| Y \|_1 + \mu \| Y \|_{2,1} \quad \text{such that} \quad
        X = Y \;\;.
 
@@ -607,7 +607,7 @@ class ElasticNet(BPDN):
     via the ADMM problem
 
     .. math::
-       \mathrm{argmin}_\mathbf{x} \;
+       \mathrm{argmin}_{\mathbf{x}, \mathbf{y}} \;
        (1/2) \| D \mathbf{x} - \mathbf{s} \|_2^2 + \lambda \| \mathbf{y}
        \|_1 + (\mu/2) \| \mathbf{x} \|_2^2 \quad \text{such that} \quad
        \mathbf{x} = \mathbf{y} \;\;.
@@ -770,7 +770,7 @@ class BPDNProjL1(GenericBPDN):
     via the ADMM problem
 
     .. math::
-       \mathrm{argmin}_\mathbf{x} \;
+       \mathrm{argmin}_{\mathbf{x}, \mathbf{y}} \;
        (1/2) \| D \mathbf{x} - \mathbf{s} \|_2^2 + \iota_{C(\gamma)}
        (\mathbf{y}) \quad \text{such that} \quad \mathbf{x} = \mathbf{y}
        \;\;,
