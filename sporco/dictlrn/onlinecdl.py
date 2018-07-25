@@ -127,8 +127,8 @@ class OnlineConvBPDNDictLearn(common.BasicIterativeSolver):
 
     def __init__(self, D0, S0, lmbda=None, opt=None, dimK=1, dimN=2):
         """
-        Initialise an OnlineConvBPDNDictLearn object with problem size and
-        options.
+        Initialise an OnlineConvBPDNDictLearn object with problem size
+        and options.
 
         Parameters
         ----------
@@ -213,10 +213,10 @@ class OnlineConvBPDNDictLearn(common.BasicIterativeSolver):
         """Update memory allocation and cropping
         functionality when the image size changes."""
 
-        self.cri = cr.CDU_ConvRepIndexing(dsz, S)#, 1, dimN)
+        self.cri = cr.CDU_ConvRepIndexing(dsz, S, self.cri.dimK, self.cri.dimN)
         # Update dictionary state
-        D_stdformD = cr.zpad(cr.stdformD(D_crop, self.cri.Cd, self.cri.M, self.cri.dimN),
-                              self.cri.Nv)
+        D_stdformD = cr.zpad(cr.stdformD(D_crop, self.cri.Cd, self.cri.M,
+                                         self.cri.dimN), self.cri.Nv)
         # Create byte aligned arrays for FFT calls
         self.D = sl.pyfftw_empty_aligned(self.cri.shpD, dtype=self.dtype)
         self.D[:] = D_stdformD.astype(self.dtype, copy=True)
