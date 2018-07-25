@@ -16,7 +16,6 @@ import copy
 import collections
 import warnings
 import numpy as np
-import scipy
 from scipy import linalg
 
 from sporco import cdict
@@ -465,9 +464,9 @@ class ADMM(common.IterativeSolver):
         if self.opt['AutoRho', 'StdResiduals']:
             r = linalg.norm(self.rsdl_r(self.AXnr, self.Y))
             s = linalg.norm(self.rsdl_s(self.Yprev, self.Y))
-            epri = scipy.sqrt(self.Nc)*self.opt['AbsStopTol'] + \
+            epri = np.sqrt(self.Nc)*self.opt['AbsStopTol'] + \
                 self.rsdl_rn(self.AXnr, self.Y)*self.opt['RelStopTol']
-            edua = scipy.sqrt(self.Nx)*self.opt['AbsStopTol'] + \
+            edua = np.sqrt(self.Nx)*self.opt['AbsStopTol'] + \
                 self.rsdl_sn(self.U)*self.opt['RelStopTol']
         else:
             rn = self.rsdl_rn(self.AXnr, self.Y)
@@ -478,9 +477,9 @@ class ADMM(common.IterativeSolver):
                 sn = 1.0
             r = linalg.norm(self.rsdl_r(self.AXnr, self.Y)) / rn
             s = linalg.norm(self.rsdl_s(self.Yprev, self.Y)) / sn
-            epri = scipy.sqrt(self.Nc)*self.opt['AbsStopTol']/rn + \
+            epri = np.sqrt(self.Nc)*self.opt['AbsStopTol']/rn + \
                 self.opt['RelStopTol']
-            edua = scipy.sqrt(self.Nx)*self.opt['AbsStopTol']/sn + \
+            edua = np.sqrt(self.Nx)*self.opt['AbsStopTol']/sn + \
                 self.opt['RelStopTol']
 
         return r, s, epri, edua
@@ -553,12 +552,12 @@ class ADMM(common.IterativeSolver):
             tau = self.rho_tau
             mu = self.rho_mu
             xi = self.rho_xi
-            if k != 0 and scipy.mod(k+1, self.opt['AutoRho', 'Period']) == 0:
+            if k != 0 and np.mod(k+1, self.opt['AutoRho', 'Period']) == 0:
                 if self.opt['AutoRho', 'AutoScaling']:
                     if s == 0.0 or r == 0.0:
                         rhomlt = tau
                     else:
-                        rhomlt = scipy.sqrt(r/(s*xi) if r > s*xi else (s*xi)/r)
+                        rhomlt = np.sqrt(r/(s*xi) if r > s*xi else (s*xi)/r)
                         if rhomlt > tau:
                             rhomlt = tau
                 else:
