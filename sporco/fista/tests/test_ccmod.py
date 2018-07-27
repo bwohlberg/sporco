@@ -27,17 +27,17 @@ class TestSet01(object):
         X[xp] = np.random.randn(X[xp].size)
         S = np.sum(sl.ifftn(sl.fftn(D0, (N, N), (0,1)) *
                    sl.fftn(X, None, (0,1)), None, (0,1)).real, axis=2)
-        L = 3e1
+        L = 2e1
         opt = ccmod.ConvCnstrMOD.Options({'Verbose': False,
-                    'MaxMainIter': 3000,
-                    'ZeroMean': True, 'RelStopTol': 1e-6, 'L': L,
+                    'MaxMainIter': 1000,
+                    'ZeroMean': True, 'RelStopTol': 0.0, 'L': L,
                     'BackTrack': {'Enabled': False}})
         Xr = X.reshape(X.shape[0:2] + (1,1,) + X.shape[2:])
         Sr = S.reshape(S.shape + (1,))
         c = ccmod.ConvCnstrMOD(Xr, Sr, D0.shape, opt)
         c.solve()
         D1 = cr.bcrop(c.X, D0.shape).squeeze()
-        assert(sl.rrs(D0, D1) < 1e-4)
+        assert(sl.rrs(D0, D1) < 2e-3)
         assert(np.array(c.getitstat().Rsdl)[-1] < 1e-5)
 
 
@@ -55,15 +55,15 @@ class TestSet01(object):
                    sl.fftn(X, None, (0,1)), None, (0,1)).real, axis=2)
         L = 1e1
         opt = ccmod.ConvCnstrMOD.Options({'Verbose': False,
-                    'MaxMainIter': 3000,
-                    'ZeroMean': True, 'RelStopTol': 1e-6, 'L': L,
+                    'MaxMainIter': 1000,
+                    'ZeroMean': True, 'RelStopTol': 0.0, 'L': L,
                     'BackTrack': {'Enabled': True}})
         Xr = X.reshape(X.shape[0:2] + (1,1,) + X.shape[2:])
         Sr = S.reshape(S.shape + (1,))
         c = ccmod.ConvCnstrMOD(Xr, Sr, D0.shape, opt)
         c.solve()
         D1 = cr.bcrop(c.X, D0.shape).squeeze()
-        assert(sl.rrs(D0, D1) < 1e-4)
+        assert(sl.rrs(D0, D1) < 5e-4)
         assert(np.array(c.getitstat().Rsdl)[-1] < 1e-5)
 
 
@@ -79,10 +79,10 @@ class TestSet01(object):
         X[xp] = np.random.randn(X[xp].size)
         S = np.sum(sl.ifftn(sl.fftn(D0, (N, N), (0,1)) *
                    sl.fftn(X, None, (0,1)), None, (0,1)).real, axis=2)
-        L = 1e1
+        L = 2e1
         opt = ccmod.ConvCnstrMOD.Options({'Verbose': False,
-                    'MaxMainIter': 3000,
-                    'ZeroMean': True, 'RelStopTol': 1e-6, 'L': L,
+                    'MaxMainIter': 1000,
+                    'ZeroMean': True, 'RelStopTol': 0.0, 'L': L,
                     'BackTrack': {'Enabled': True}})
         Xr = X.reshape(X.shape[0:2] + (1,1,) + X.shape[2:])
         Sr = S.reshape(S.shape + (1,))

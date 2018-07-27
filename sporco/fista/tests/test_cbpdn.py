@@ -163,14 +163,14 @@ class TestSet01(object):
         lmbda = 1e-2
         L = 1e3
         opt = cbpdn.ConvBPDN.Options({'Verbose': False, 'MaxMainIter': 2000,
-                                      'RelStopTol': 1e-5, 'L': L,
+                                      'RelStopTol': 1e-9, 'L': L,
                                       'BackTrack': {'Enabled': False}})
         b = cbpdn.ConvBPDN(D, S, lmbda, opt)
         b.solve()
         X1 = b.X.squeeze()
         assert(sl.rrs(X0,X1) < 5e-4)
         Sr = b.reconstruct().squeeze()
-        assert(sl.rrs(S,Sr) < 2e-4)
+        assert(sl.rrs(S,Sr) < 3e-4)
 
 
     def test_11(self):
@@ -187,7 +187,7 @@ class TestSet01(object):
         lmbda = 1e-2
         L = 1e3
         opt = cbpdn.ConvBPDN.Options({'Verbose': False, 'MaxMainIter': 2000,
-                                      'RelStopTol': 1e-5, 'L': L,
+                                      'RelStopTol': 1e-9, 'L': L,
                                       'BackTrack': {'Enabled': False}})
         b = cbpdn.ConvBPDN(D, S, lmbda, opt)
         b.solve()

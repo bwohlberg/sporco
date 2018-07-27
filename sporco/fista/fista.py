@@ -243,6 +243,8 @@ class FISTA(common.IterativeSolver):
 
         self.itstat = []
         self.k = 0
+        self.last_Lchange = self.k
+        self.FBtprev = 1e15
 
 
 
@@ -422,8 +424,7 @@ class FISTA(common.IterativeSolver):
             else:
                 self.L *= eta
                 self.Lchange()
-
-            iterBTrack += 1
+                iterBTrack += 1
 
         self.F = F
         self.Q = Q
@@ -657,8 +658,7 @@ class FISTA(common.IterativeSolver):
         Overriding this method is optional.
         """
 
-        pass
-
+        self.last_Lchange = self.k
 
 
 
@@ -766,6 +766,7 @@ class FISTADFT(FISTA):
 
         eta = self.L_eta
         maxiter = self.L_maxiter
+        self.FBtprev = self.F
 
         iterBTrack = 0
         linesearch = 1
@@ -785,12 +786,16 @@ class FISTADFT(FISTA):
             else:
                 self.L *= eta
                 self.Lchange()
-
-            iterBTrack += 1
+                iterBTrack += 1
 
         self.F = F
         self.Q = Q
         self.iterBTrack = iterBTrack
+        if ((self.k > 100) and (self.k - self.last_Lchange) > 50) and (self.FBtprev <= self.F):
+        
+            self.L /= 1.01
+            self.Lchange()
+        
 
 
 
