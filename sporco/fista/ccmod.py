@@ -322,7 +322,8 @@ class ConvCnstrMOD(fista.FISTADFT):
     def rsdl(self):
         """Compute fixed point residual in Fourier domain."""
 
-        return linalg.norm(self.Xf - self.Yfprv)
+        diff = self.Xf - self.Yfprv
+        return sl.rfl2norm2(diff, self.X.shape, axis=self.cri.axisN)
 
 
     def eval_objfn(self):
