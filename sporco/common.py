@@ -24,10 +24,10 @@ __author__ = """Brendt Wohlberg <brendt@ieee.org>"""
 
 
 def _fix_nested_class_lookup(cls, nstnm):
-    """Fix name lookup problem that prevents pickling of classes with nested
-    class definitions. The approach is loosely based on that implemented at
-    https://git.io/viGqU , simplified and modified to work in both Python 2.7
-    and Python 3.x.
+    """Fix name lookup problem that prevents pickling of classes with
+    nested class definitions. The approach is loosely based on that
+    implemented at https://git.io/viGqU , simplified and modified to
+    work in both Python 2.7 and Python 3.x.
 
     Parameters
     ----------
@@ -45,7 +45,8 @@ def _fix_nested_class_lookup(cls, nstnm):
         if isinstance(nst, type):
             # Get the module in which the outer class is defined
             mdl = sys.modules[cls.__module__]
-            # Construct an extended name by concatenating inner and outer names
+            # Construct an extended name by concatenating inner and outer
+            # names
             extnm = cls.__name__ + nst.__name__
             # Allow lookup of the nested class within the module via
             # its extended name
@@ -57,8 +58,8 @@ def _fix_nested_class_lookup(cls, nstnm):
 
 
 def _fix_dynamic_class_lookup(cls, pstfx):
-    """Fix name lookup problem that prevents pickling of dynamically defined
-    classes.
+    """Fix name lookup problem that prevents pickling of dynamically
+    defined classes.
 
     Parameters
     ----------
@@ -92,10 +93,10 @@ class BasicIterativeSolver(object):
     """
 
     def set_dtype(self, opt, dtype):
-        """Set the `dtype` attribute. If opt['DataType'] has a value other
-        than None, it overrides the `dtype` parameter of this method. No
-        changes are made if the `dtype` attribute already exists and has a
-        value other than 'None'.
+        """Set the `dtype` attribute. If opt['DataType'] has a value
+        other than None, it overrides the `dtype` parameter of this
+        method. No changes are made if the `dtype` attribute already
+        exists and has a value other than 'None'.
 
         Parameters
         ----------
@@ -116,16 +117,17 @@ class BasicIterativeSolver(object):
 
 
     def set_attr(self, name, val, dval=None, dtype=None, reset=False):
-        """Set an object attribute by its name. The attribute value can be
-        specified as a primary value `val`, and as default value 'dval` that
-        will be used if the primary value is None. This arrangement allows
-        an attribute to be set from an entry in an options object, passed
-        as `val`, while specifying a default value to use, passed as `dval`
-        in the event that the options entry is None. Unless `reset` is True,
-        the attribute is only set if it doesn't exist, or if it exists with
-        value None. This arrangement allows for attributes to be set in
-        both base and derived class initialisers, with the derived class
-        value taking preference.
+        """Set an object attribute by its name. The attribute value
+        can be specified as a primary value `val`, and as default
+        value 'dval` that will be used if the primary value is None.
+        This arrangement allows an attribute to be set from an entry
+        in an options object, passed as `val`, while specifying a
+        default value to use, passed as `dval` in the event that the
+        options entry is None. Unless `reset` is True, the attribute
+        is only set if it doesn't exist, or if it exists with value
+        None. This arrangement allows for attributes to be set in
+        both base and derived class initialisers, with the derived
+        class value taking preference.
 
         Parameters
         ----------
@@ -140,9 +142,10 @@ class BasicIterativeSolver(object):
           set to `val` (which is assumed to be of numeric type) after
           conversion to the specified type.
         reset : bool, optional (default False)
-          Flag indicating whether attribute assignment should be conditional
-          on the attribute not existing or having value None. If False,
-          an attribute value other than None will not be overwritten.
+          Flag indicating whether attribute assignment should be
+          conditional on the attribute not existing or having value None.
+          If False, an attribute value other than None will not be
+          overwritten.
         """
 
         # If `val` is None and `dval` is not None, replace it with dval
@@ -165,11 +168,12 @@ class BasicIterativeSolver(object):
 
 
 class _IterSolver_Meta(type):
-    """Metaclass for iterative solver classes that handles intialisation of
-    IterationStats namedtuple and applies _fix_nested_class_lookup to class
-    definitions to fix problems with lookup of nested class
-    definitions when using pickle. It is also responsible for stopping
-    the object initialisation timer at the end of initialisation.
+    """Metaclass for iterative solver classes that handles
+    intialisation of IterationStats namedtuple and applies
+    _fix_nested_class_lookup to class definitions to fix problems with
+    lookup of nested class definitions when using pickle. It is also
+    responsible for stopping the object initialisation timer at the
+    end of initialisation.
     """
 
     def __init__(cls, *args):
@@ -213,8 +217,8 @@ class IterativeSolver(with_metaclass(_IterSolver_Meta,
 
     @classmethod
     def itstat_fields(cls):
-        """Construct tuple of field names used to initialise IterationStats
-        named tuple.
+        """Construct tuple of field names used to initialise
+        IterationStats named tuple.
         """
 
         return ('Iter',) + cls.itstat_fields_objfn + \
