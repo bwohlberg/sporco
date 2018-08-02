@@ -8,7 +8,7 @@
 Online Convolutional Dictionary Learning
 ========================================
 
-This example demonstrates the use of :class:`.dictlrn.cbpdndl.ConvBPDNDictLearn` for learning a convolutional dictionary from a set of training images. The dictionary is learned using the online dictionary learning algorithm proposed in :cite:`liu-2018-first`.
+This example demonstrates the use of :class:`.dictlrn.onlinecdl.OnlineConvBPDNDictLearn` for learning a convolutional dictionary from a set of training images. The dictionary is learned using the online dictionary learning algorithm proposed in :cite:`liu-2018-first`.
 """
 
 
