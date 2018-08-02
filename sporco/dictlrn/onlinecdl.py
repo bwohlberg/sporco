@@ -288,7 +288,7 @@ class OnlineConvBPDNDictLearn(common.BasicIterativeSolver):
         # Compute gradient
         gradf = sl.inner(np.conj(self.Zf), Ryf, axis=self.cri.axisK)
 
-        # If Multiple channel signal, single channel dictionary
+        # If multiple channel signal, single channel dictionary
         if self.cri.C > 1 and self.cri.Cd == 1:
             gradf = np.sum(gradf, axis=self.cri.axisC, keepdims=True)
 
@@ -304,7 +304,7 @@ class OnlineConvBPDNDictLearn(common.BasicIterativeSolver):
         self.Df[:] = sl.rfftn(self.D, None, self.cri.axisN)
 
         # Stop solve timer
-        self.timer.start('solve_wo_eval')
+        self.timer.stop('solve_wo_eval')
 
         # For evaluation
         self.Sf_last = xstep.Sf
