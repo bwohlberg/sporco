@@ -16,6 +16,9 @@ cbpdndl_parcns_clr.py
 onlinecdl_gry.py
   Learn a convolutional dictionary (online method, greyscale images)
 
+onlinecdl_msk_gry.py
+  Learn a convolutional dictionary with spatial masking (online method, greyscale images)
+
 onlinecdl_clr.py
   Learn a convolutional dictionary (online method, colour images)
 
