@@ -55,6 +55,30 @@ def complex_dtype(dtype):
 
 
 
+def pyfftw_byte_aligned(array, dtype=None, n=None):
+    """
+    Construct a byte-aligned array for efficient use by :mod:`pyfftw`.
+    This function is a wrapper for :func:`pyfftw.byte_aligned`
+
+    Parameters
+    ----------
+    array : ndarray
+      Input array
+    dtype : dtype, optional (default None)
+      Output array dtype
+    n : int, optional (default None)
+      Output array should be aligned to n-byte boundary
+
+    Returns
+    -------
+    a :  ndarray
+      Array with required byte-alignment
+    """
+
+    return pyfftw.byte_align(array, n=n, dtype=dtype)
+
+
+
 def pyfftw_empty_aligned(shape, dtype, order='C', n=None):
     """
     Construct an empty byte-aligned array for efficient use by :mod:`pyfftw`.
