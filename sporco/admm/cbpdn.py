@@ -2160,6 +2160,7 @@ class ConvBPDNMaskDcpl(ConvTwoBlockCnstrnt):
         self.wl1 = self.wl1.reshape(cr.l1Wshape(self.wl1, self.cri))
 
 
+
     def uinit(self, ushape):
         """Return initialiser for working variable U."""
 
