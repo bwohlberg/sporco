@@ -24,15 +24,16 @@ from sporco.util import u
 import sporco.linalg as sl
 import sporco.cnvrep as cr
 from sporco.admm import cbpdn
+from sporco import cuda
 from sporco.dictlrn import dictlrn
-from sporco.common import _fix_nested_class_lookup
 
 
-__author__ = """Cristina Garcia-Cardona <cgarciac@lanl.gov>"""
+__author__ = """\n""".join(['Cristina Garcia-Cardona <cgarciac@lanl.gov>',
+                            'Brendt Wohlberg <brendt@ieee.org>'])
 
 
 
-class OnlineConvBPDNDictLearn(common.BasicIterativeSolver):
+class OnlineConvBPDNDictLearn(common.IterativeSolver):
     r"""**Class inheritance structure**
 
     .. inheritance-diagram:: OnlineConvBPDNDictLearn
@@ -40,39 +41,53 @@ class OnlineConvBPDNDictLearn(common.BasicIterativeSolver):
 
     |
 
-    Stochastic gradient descent based online convolutional dictionary
-    learning, as proposed in :cite:`liu-2018-first`.
+    Stochastic gradient descent (SGD) based online convolutional
+    dictionary learning, as proposed in :cite:`liu-2018-first`.
     """
 
 
     class Options(dictlrn.DictLearn.Options):
-        """Online CBPDN dictionary learning algorithm options.
+        r"""Online CBPDN dictionary learning algorithm options.
 
-        Options include all of those defined in
-        :class:`.dictlrn.DictLearn.Options`, together with additional
-        options:
+        Options:
 
-          ``AccurateDFid`` : Flag determining whether data fidelity term is
-          estimated from the value computed in the X update (``False``) or
-          is computed after every outer iteration over an X update and a D
-          update (``True``), which is slower but more accurate.
+          ``Verbose`` : Flag determining whether iteration status is
+          displayed.
+
+          ``StatusHeader`` : Flag determining whether status header and
+          separator are displayed.
+
+          ``IterTimer`` : Label of the timer to use for iteration times.
 
           ``DictSize`` : Dictionary size vector.
 
-          ``CBPDN`` : Options :class:`.admm.cbpdn.ConvBPDN.Options`
+          ``DataType`` : Specify data type for solution variables,
+          e.g. ``np.float32``.
+
+          ``ZeroMean`` : Flag indicating whether the solution
+          dictionary :math:`\{\mathbf{d}_m\}` should have zero-mean
+          components.
+
+          ``eta_a``, ``eta_b`` : Constants :math:`a` and :math:`b` used
+          in setting the SGD step size, :math:`\eta`, which is set to
+          :math:`a / (b + i)` where :math:`i` is the iteration index.
+          See Sec. 3 (pg. 9) of :cite:`liu-2018-first`.
+
+          ``CUDA_CBPDN`` : Flag indicating whether to use CUDA solver
+          for CBPDN problem (see :ref:`cuda_package`)
+
+          ``CBPDN`` : Options :class:`.admm.cbpdn.ConvBPDN.Options`.
         """
 
-        defaults = copy.deepcopy(dictlrn.DictLearn.Options.defaults)
-        del defaults['Callback']
-        defaults.update({'DictSize': None, 'AccurateDFid': False,
-                         'DataType': None,
-            'CBPDN': copy.deepcopy(cbpdn.ConvBPDN.Options.defaults),
-            'OCDL' : {'ZeroMean': False, 'eta_a': 10.0, 'eta_b': 5.0,
-                      'DataType': None}})
+        defaults = {'Verbose': False, 'StatusHeader': True,
+                    'IterTimer': 'solve', 'DictSize': None,
+                    'DataType': None, 'ZeroMean': False, 'eta_a': 10.0,
+                    'eta_b': 5.0, 'CUDA_CBPDN' : False,
+                    'CBPDN': copy.deepcopy(cbpdn.ConvBPDN.Options.defaults)}
 
 
         def __init__(self, opt=None):
-            """Initialise OnlineConvBPDN dictionary learning algorithm
+            """Initialise online CBPDN dictionary learning algorithm
             options.
             """
 
@@ -92,31 +107,20 @@ class OnlineConvBPDNDictLearn(common.BasicIterativeSolver):
     fpothr = 2
     """Field precision for other display columns"""
 
-    itstat_fields_objfn = ('ObjFun', 'DFid', 'RegL1', 'Cnstr')
-    """Fields in IterationStats associated with the objective function;
-    see :meth:`eval_objfn`"""
+    itstat_fields_objfn = ('ObjFun', 'DFid', 'RegL1')
+    """Fields in IterationStats associated with the objective function"""
+    itstat_fields_alg = ('PrimalRsdl', 'DualRsdl', 'Rho', 'Cnstr',
+                         'DeltaD', 'Eta')
+    """Fields in IterationStats associated with the specific solver
+    algorithm"""
     itstat_fields_extra = ()
     """Non-standard fields in IterationStats; see :meth:`itstat_extra`"""
-
-    hdrtxt_objfn = ('Fnc', 'DFid', u('Regℓ1'), 'Cnstr')
-    """Display column headers associated with the objective function;
-    see :meth:`eval_objfn`"""
-    hdrval_objfun = {'Fnc': 'ObjFun', 'DFid': 'DFid', u('Regℓ1'): 'RegL1',
-                     'Cnstr' : 'Cnstr'}
-    """Dictionary mapping display column headers in :attr:`hdrtxt_objfn`
-    to IterationStats entries"""
 
 
 
     def __new__(cls, *args, **kwargs):
         """Create an OnlineConvBPDNDictLearn object and start its
         initialisation timer."""
-
-        # Initialise named tuple type for recording FISTA iteration statistics
-        cls.IterationStats = collections.namedtuple('IterationStats',
-                                                    cls.itstat_fields())
-        # Apply _fix_nested_class_lookup function to class after creation
-        _fix_nested_class_lookup(cls, nstnm='Options')
 
         instance = super(OnlineConvBPDNDictLearn, cls).__new__(cls)
         instance.timer = util.Timer(['init', 'solve', 'solve_wo_eval'])
@@ -125,24 +129,22 @@ class OnlineConvBPDNDictLearn(common.BasicIterativeSolver):
 
 
 
-    def __init__(self, D0, S0, lmbda=None, opt=None, dimK=1, dimN=2):
-        """
-        Initialise an OnlineConvBPDNDictLearn object with problem size
-        and options.
+    def __init__(self, D0, lmbda=None, opt=None, dimK=None, dimN=2):
+        """Initialise an OnlineConvBPDNDictLearn object with problem
+        size and options.
 
         Parameters
         ----------
         D0 : array_like
           Initial dictionary array
-        S0 : array_like
-          Signal array (dummy)
         lmbda : float
           Regularisation parameter
         opt : :class:`OnlineConvBPDNDictLearn.Options` object
           Algorithm options
-        dimK : int, optional (default 1)
-          Number of signal dimensions. If there is only a single input
-          signal (e.g. if `S` is a 2D array representing a single image)
+        dimK : 0, 1, or None, optional (default None)
+          Number of signal dimensions in signal array passed to
+          :meth:`solve`. If there will only be a single input signal
+          (e.g. if `S` is a 2D array representing a single image)
           `dimK` must be set to 0.
         dimN : int, optional (default 2)
           Number of spatial/temporal dimensions
@@ -155,96 +157,77 @@ class OnlineConvBPDNDictLearn(common.BasicIterativeSolver):
                             'OnlineConvBPDNDictLearn.Options')
         self.opt = opt
 
+        if dimN != 2 and opt['CUDA_CBPDN']:
+            raise ValueError('CUDA CBPDN solver can only be used when dimN=2')
+
+        if opt['CUDA_CBPDN'] and cuda.device_count() == 0:
+            raise ValueError('SPORCO-CUDA not installed or no GPU available')
+
+        self.dimK = dimK
+        self.dimN = dimN
+
         # DataType option overrides data type inferred from __init__
         # parameters of derived class
-        self.set_dtype(opt, S0.dtype)
+        self.set_dtype(opt, D0.dtype)
 
-        # Initialise attributes representing step parameter
-        self.set_attr('eta', opt['OCDL', 'eta_a'] / opt['OCDL', 'eta_b'],
+        # Initialise attributes representing algorithm parameter
+        self.lmbda = lmbda
+        self.eta_a = opt['eta_a']
+        self.eta_b = opt['eta_b']
+        self.set_attr('eta', opt['eta_a'] / opt['eta_b'],
                       dval=2.0, dtype=self.dtype)
-        self.set_attr('rho', opt['CBPDN', 'rho'], dval=1.0, dtype=self.dtype)
 
         # Get dictionary size
         if self.opt['DictSize'] is None:
-            dsz = D0.shape
+            self.dsz = D0.shape
         else:
-            dsz = self.opt['DictSize']
+            self.dsz = self.opt['DictSize']
 
         # Construct object representing problem dimensions
-        self.cri = cr.CDU_ConvRepIndexing(dsz, S0, dimK, dimN)
+        self.cri = None
 
         # Normalise dictionary
-        D0 = cr.Pcn(D0, dsz, self.cri.Nv, dimN, self.cri.dimCd, crp=True,
-                    zm=opt['OCDL', 'ZeroMean'])
-
-        # Create byte aligned arrays for FFT calls
-        self.D = sl.pyfftw_empty_aligned(self.cri.shpD, dtype=self.dtype)
-        # Initialize dictionary state
-        D0_stdformD = cr.zpad(cr.stdformD(D0, self.cri.Cd, self.cri.M, dimN),
-                              self.cri.Nv)
-        self.D[:] = D0_stdformD.astype(self.dtype, copy=True)
-        self.Df = sl.rfftn(self.D, None, self.cri.axisN)
+        ds = cr.DictionarySize(self.dsz, dimN)
+        dimCd = ds.ndim - dimN - 1
+        D0 = cr.stdformD(D0, ds.nchn, ds.nflt, dimN).astype(self.dtype)
+        self.D = cr.Pcn(D0, self.dsz, (), dimN, dimCd, crp=True,
+                        zm=opt['ZeroMean'])
+        self.Dprv = self.D.copy()
 
         # Create constraint set projection function
-        self.Pcn = cr.getPcn(dsz, self.cri.Nv, self.cri.dimN, self.cri.dimCd,
-                             zm=opt['OCDL', 'ZeroMean'])
+        self.Pcn = cr.getPcn(self.dsz, (), dimN, dimCd, crp=True,
+                             zm=opt['ZeroMean'])
 
-        # Create byte aligned arrays for FFT calls
-        self.Gf = sl.pyfftw_rfftn_empty_aligned(self.D.shape, self.cri.axisN,
-                                                self.dtype)
-
-        # Configure algorithm parameters
-        self.eta_a = opt['OCDL', 'eta_a']
-        self.eta_b = opt['OCDL', 'eta_b']
-
-        # For function evaluation
-        self.Sf_last = None
-        self.S_last = None
-        self.lmbda = lmbda
-
+        # Initalise iterations stats list and iteration index
         self.itstat = []
         self.j = 0
 
-        # Open status display
-        self.fmtstr, self.nsep = self.display_start()
+        # Configure status display
+        self.display_config()
 
 
-    def update_shape(self, dsz, S, D_crop):
-        """Update memory allocation and cropping
-        functionality when the image size changes."""
 
-        self.cri = cr.CDU_ConvRepIndexing(dsz, S, self.cri.dimK, self.cri.dimN)
-        # Update dictionary state
-        D_stdformD = cr.zpad(cr.stdformD(D_crop, self.cri.Cd, self.cri.M,
-                                         self.cri.dimN), self.cri.Nv)
-        # Create byte aligned arrays for FFT calls
-        self.D = sl.pyfftw_empty_aligned(self.cri.shpD, dtype=self.dtype)
-        self.D[:] = D_stdformD.astype(self.dtype, copy=True)
-        self.Df = sl.rfftn(self.D, None, self.cri.axisN)
+    def solve(self, S, dimK=None):
+        """Compute sparse coding and dictionary update for training
+        data `S`."""
 
-        # Create constraint set projection function
-        self.Pcn = cr.getPcn(dsz, self.cri.Nv, self.cri.dimN, self.cri.dimCd,
-                             zm=self.opt['OCDL', 'ZeroMean'])
-
-        # Create byte aligned arrays for FFT calls
-        self.Gf = sl.pyfftw_rfftn_empty_aligned(self.D.shape, self.cri.axisN,
-                                                self.dtype)
-
-
-    def solve(self, s_k):
-        """Solve and compute statistics per iteration."""
+        # Use dimK specified in __init__ as default
+        if dimK is None and self.dimK is not None:
+            dimK = self.dimK
 
         # Start solve timer
-        self.timer.start('solve')
+        self.timer.start(['solve', 'solve_wo_eval'])
 
-        self.step(s_k, self.lmbda)
+        # Solve CSC problem on S and do dictionary step
+        self.init_vars(S, dimK)
+        self.xstep(S, self.lmbda, dimK)
+        self.dstep(S, dimK)
 
-        self.cnstr = linalg.norm((self.D - self.G))
+        # Stop solve timer
+        self.timer.stop('solve_wo_eval')
 
         # Extract and record iteration stats
-        itst = self.iteration_stats()
-        self.itstat.append(itst)
-        self.display_status(self.fmtstr, itst)
+        self.manage_itstat()
 
         # Increment iteration count
         self.j += 1
@@ -257,58 +240,51 @@ class OnlineConvBPDNDictLearn(common.BasicIterativeSolver):
 
 
 
-    def step(self, s_k, lmbda):
-        """Do a single iteration over one image."""
+    def init_vars(self, S, dimK):
+        """Initalise variables required for sparse coding and dictionary
+        update for training data `S`."""
 
-        # Start solve timer
-        self.timer.start('solve_wo_eval')
+        Nv = S.shape[0:self.dimN]
+        if self.cri is None or Nv != self.cri.Nv:
+            self.cri = cr.CDU_ConvRepIndexing(self.dsz, S, dimK, self.dimN)
+            if self.opt['CUDA_CBPDN']:
+                if self.cri.Cd > 1 or self.cri.Cx > 1:
+                    raise ValueError('CUDA CBPDN solver can only be used for '
+                                     'single channel problems')
+                if self.cri.K > 1:
+                    raise ValueError('CUDA CBPDN solver can not be used with '
+                                     'mini-batches')
+            self.Df = sl.pyfftw_byte_aligned(sl.rfftn(self.D, self.cri.Nv,
+                                                      self.cri.axisN))
+            self.Gf = sl.pyfftw_empty_aligned(self.Df.shape, self.Df.dtype)
+            self.Z = sl.pyfftw_empty_aligned(self.cri.shpX, self.dtype)
+        else:
+            self.Df[:] = sl.rfftn(self.D, self.cri.Nv, self.cri.axisN)
 
-        D_crop = cr.bcrop(self.D, self.cri.dsz, self.cri.dimN)
 
-        # Check if image size changed
-        Nv = s_k.shape[0:self.cri.dimN]
-        if Nv != self.cri.Nv:
-            dsz = self.cri.dsz
-            self.update_shape(dsz, s_k, D_crop)
-            D_crop = cr.bcrop(self.D, self.cri.dsz, self.cri.dimN)
 
-        # Create X update object (external representation is expected!)
-        xstep = cbpdn.ConvBPDN(D_crop.squeeze(), s_k, lmbda,
-                               self.opt['CBPDN'], dimK=self.cri.dimK,
-                               dimN=self.cri.dimN)
-        xstep.solve()
+    def xstep(self, S, lmbda, dimK):
+        """Solve CSC problem for training data `S`."""
 
-        self.setcoef(xstep.getcoef())
-        self.rho = xstep.rho
-        self.xstep_itstat = xstep.itstat[-1] if len(xstep.itstat) > 0 \
-                                             else None
-
-        # Compute X D - S
-        Ryf = sl.inner(self.Zf, self.Df, axis=self.cri.axisM) - xstep.Sf
-        # Compute gradient
-        gradf = sl.inner(np.conj(self.Zf), Ryf, axis=self.cri.axisK)
-
-        # If multiple channel signal, single channel dictionary
-        if self.cri.C > 1 and self.cri.Cd == 1:
-            gradf = np.sum(gradf, axis=self.cri.axisC, keepdims=True)
-
-        # Update gradient step
-        self.eta = self.eta_a / (self.j + self.eta_b)
-
-        # Compute gradient descent
-        self.Gf[:] = self.Df - self.eta * gradf
-        self.G = sl.irfftn(self.Gf, self.cri.Nv, self.cri.axisN)
-
-        # Eval proximal operator
-        self.D[:] = self.Pcn(self.G)
-        self.Df[:] = sl.rfftn(self.D, None, self.cri.axisN)
-
-        # Stop solve timer
-        self.timer.stop('solve_wo_eval')
-
-        # For evaluation
-        self.Sf_last = xstep.Sf
-        self.S_last = s_k
+        if self.opt['CUDA_CBPDN']:
+            Z = cuda.cbpdn(self.D.squeeze(), S[..., 0], lmbda,
+                           self.opt['CBPDN'])
+            Z = Z.reshape(self.cri.Nv + (1, 1, self.cri.M,))
+            self.Z[:] = np.asarray(Z, dtype=self.dtype)
+            self.Zf = sl.rfftn(self.Z, self.cri.Nv, self.cri.axisN)
+            self.Sf = sl.rfftn(S.reshape(self.cri.shpS), self.cri.Nv,
+                               self.cri.axisN)
+            self.xstep_itstat = None
+        else:
+            # Create X update object (external representation is expected!)
+            xstep = cbpdn.ConvBPDN(self.D.squeeze(), S, lmbda,
+                                   self.opt['CBPDN'], dimK=dimK,
+                                   dimN=self.cri.dimN)
+            xstep.solve()
+            self.Sf = xstep.Sf
+            self.setcoef(xstep.getcoef())
+            self.xstep_itstat = xstep.itstat[-1] if len(xstep.itstat) > 0 \
+                                                 else None
 
 
 
@@ -324,50 +300,50 @@ class OnlineConvBPDNDictLearn(common.BasicIterativeSolver):
         if self.cri.Cd == 1 and self.cri.C > 1:
             Z = Z.reshape(self.cri.Nv + (1,) + (self.cri.Cx*self.cri.K,) +
                           (self.cri.M,))
-        self.Z = np.asarray(Z, dtype=self.dtype)
-
+        self.Z[:] = np.asarray(Z, dtype=self.dtype)
         self.Zf = sl.rfftn(self.Z, self.cri.Nv, self.cri.axisN)
 
 
 
-    def getdict(self, crop=True):
-        """Get final dictionary. If ``crop`` is ``True``, apply
-        :func:`.cnvrep.bcrop` to returned array.
-        """
+    def dstep(self, S, dimK):
+        """Compute dictionary update for training data `S`."""
 
-        D = self.D
-        if crop:
-            D = cr.bcrop(D, self.cri.dsz, self.cri.dimN)
-        return D
+        # Compute X D - S
+        Ryf = sl.inner(self.Zf, self.Df, axis=self.cri.axisM) - self.Sf
+        # Compute gradient
+        gradf = sl.inner(np.conj(self.Zf), Ryf, axis=self.cri.axisK)
 
+        # If multiple channel signal, single channel dictionary
+        if self.cri.C > 1 and self.cri.Cd == 1:
+            gradf = np.sum(gradf, axis=self.cri.axisC, keepdims=True)
 
+        # Update gradient step
+        self.eta = self.eta_a / (self.j + self.eta_b)
 
-    def reconstruct(self, D=None, X=None):
-        """Reconstruct representation."""
+        # Compute gradient descent
+        self.Gf[:] = self.Df - self.eta * gradf
+        self.G = sl.irfftn(self.Gf, self.cri.Nv, self.cri.axisN)
 
-        if D is None:
-            D = self.getdict(crop=False)
-        if X is None:
-            X = self.Z
-        Df = sl.rfftn(D, self.cri.Nv, self.cri.axisN)
-        Xf = sl.rfftn(X, self.cri.Nv, self.cri.axisN)
-        DXf = sl.inner(Df, Xf, axis=self.cri.axisM)
-        return sl.irfftn(DXf, self.cri.Nv, self.cri.axisN)
-
+        # Eval proximal operator
+        self.Dprv[:] = self.D
+        self.D[:] = self.Pcn(self.G)
 
 
-    def evaluate(self):
-        """Evaluate functional value of previous iteration."""
 
-        D = self.getdict(crop=False)
-        X = self.Z
-        Df = sl.rfftn(D, self.cri.Nv, self.cri.axisN)
-        Xf = sl.rfftn(X, self.cri.Nv, self.cri.axisN)
-        Sf = self.Sf_last
-        Ef = sl.inner(Df, Xf, axis=self.cri.axisM) - Sf
-        dfd = sl.rfl2norm2(Ef, self.S_last.shape, axis=self.cri.axisN)/2.0
-        rl1 = np.sum(np.abs(X))
-        return dict(DFid=dfd, RegL1=rl1, ObjFun=dfd+self.lmbda*rl1)
+    def manage_itstat(self):
+        """Compute, record, and display iteration statistics."""
+
+        # Extract and record iteration stats
+        itst = self.iteration_stats()
+        self.itstat.append(itst)
+        self.display_status(self.fmtstr, itst)
+
+
+
+    def getdict(self):
+        """Get final dictionary."""
+
+        return self.D
 
 
 
@@ -379,21 +355,10 @@ class OnlineConvBPDNDictLearn(common.BasicIterativeSolver):
 
 
     @classmethod
-    def itstat_fields(cls):
-        """Construct tuple of field names used to initialise IterationStats
-        named tuple.
-        """
-
-        return ('Iter',) + cls.itstat_fields_objfn + \
-          ('Rho', 'Eta') + cls.itstat_fields_extra + ('Time',)
-
-
-
-    @classmethod
     def hdrtxt(cls):
         """Construct tuple of status display column title."""
 
-        return ('Itn',) + cls.hdrtxt_objfn + (u('ρ'), u('η'))
+        return ('Itn', 'X r', 'X s', u('X ρ'), 'D cnstr', 'D dlt', u('D η'))
 
 
 
@@ -403,10 +368,9 @@ class OnlineConvBPDNDictLearn(common.BasicIterativeSolver):
         IterationStats entries.
         """
 
-        dict = {'Itn': 'Iter'}
-        dict.update(cls.hdrval_objfun)
-        dict.update({u('ρ'): 'Rho', u('η') : 'Eta'})
-
+        dict = {'Itn': 'Iter', 'X r': 'PrimalRsdl', 'X s': 'DualRsdl',
+                u('X ρ'): 'Rho', 'D cnstr': 'Cnstr', 'D dlt': 'DeltaD',
+                u('D η'): 'Eta'}
         return dict
 
 
@@ -415,50 +379,57 @@ class OnlineConvBPDNDictLearn(common.BasicIterativeSolver):
         """Construct iteration stats record tuple."""
 
         tk = self.timer.elapsed(self.opt['IterTimer'])
-        if self.opt['AccurateDFid']:
-            evl = self.evaluate()
-            objfn = (evl['ObjFun'], evl['DFid'], evl['RegL1'])
+        if self.xstep_itstat is None:
+            objfn = (0.0,) * 3
+            rsdl = (0.0,) * 2
+            rho = (0.0,)
         else:
-            if self.xstep_itstat is None:
-                objfn = (0.0,) * 3
-            else:
-                objfn = (self.xstep_itstat.ObjFun, self.xstep_itstat.DFid,
-                         self.xstep_itstat.RegL1)
+            objfn = (self.xstep_itstat.ObjFun, self.xstep_itstat.DFid,
+                     self.xstep_itstat.RegL1)
+            rsdl = (self.xstep_itstat.PrimalRsdl,
+                    self.xstep_itstat.DualRsdl)
+            rho = (self.xstep_itstat.Rho,)
 
-        tpl = (self.j,) + objfn + (self.cnstr, self.rho, self.eta) + \
+        cnstr = linalg.norm(cr.zpad(self.D, self.cri.Nv) - self.G)
+        dltd = linalg.norm(self.D - self.Dprv)
+
+        tpl = (self.j,) + objfn + rsdl + rho + (cnstr, dltd, self.eta) + \
               self.itstat_extra() + (tk,)
         return type(self).IterationStats(*tpl)
 
 
 
     def getitstat(self):
-        """Get iteration stats as named tuple of arrays instead of array of
-        named tuples.
+        """Get iteration stats as named tuple of arrays instead of
+        array of named tuples.
         """
 
         return util.transpose_ntpl_list(self.itstat)
 
 
 
-    def display_start(self):
-        """Set up status display if option selected. NB: this method assumes
-        that the first entry is the iteration count and the last is
-        the rho value.
+    def display_config(self):
+        """Set up status display if option selected. NB: this method
+        assumes that the first entry is the iteration count and the
+        last is the rho value.
         """
 
         if self.opt['Verbose']:
             hdrtxt = type(self).hdrtxt()
             # Call utility function to construct status display formatting
-            hdrstr, fmtstr, nsep = common.solve_status_str(
+            self.hdrstr, self.fmtstr, self.nsep = common.solve_status_str(
                 hdrtxt, fwdth0=type(self).fwiter, fprec=type(self).fpothr)
-            # Print header and separator strings
-            if self.opt['StatusHeader']:
-                print(hdrstr)
-                print("-" * nsep)
         else:
-            fmtstr, nsep = '', 0
+            self.hdrstr, self.fmtstr, self.nsep = '', '', 0
 
-        return fmtstr, nsep
+
+
+    def display_start(self):
+        """Start status display if option selected."""
+
+        if self.opt['Verbose'] and self.opt['StatusHeader']:
+            print(self.hdrstr)
+            print("-" * self.nsep)
 
 
 
@@ -481,3 +452,141 @@ class OnlineConvBPDNDictLearn(common.BasicIterativeSolver):
 
         if self.opt['Verbose'] and self.opt['StatusHeader']:
             print("-" * self.nsep)
+
+
+
+
+
+class OnlineConvBPDNMaskDictLearn(OnlineConvBPDNDictLearn):
+    r"""**Class inheritance structure**
+
+    .. inheritance-diagram:: OnlineConvBPDNMaskDictLearn
+       :parts: 2
+
+    |
+
+    Stochastic gradient descent (SGD) based online convolutional
+    dictionary learning with a spatial mask, as proposed in
+    :cite:`liu-2018-first`.
+    """
+
+    class Options(OnlineConvBPDNDictLearn.Options):
+        r"""Online masked CBPDN dictionary learning algorithm options.
+
+        Options are the same as those of
+        :class:`OnlineConvBPDNDictLearn.Options`, except for
+
+          ``CBPDN`` : Options :class:`.admm.cbpdn.ConvBPDNMaskDcpl.Options`.
+        """
+
+        defaults = copy.deepcopy(OnlineConvBPDNDictLearn.Options.defaults)
+        defaults.update({'CBPDN': copy.deepcopy(
+                                cbpdn.ConvBPDNMaskDcpl.Options.defaults)})
+
+
+        def __init__(self, opt=None):
+            """Initialise online masked CBPDN dictionary learning
+            algorithm options.
+            """
+
+            OnlineConvBPDNDictLearn.Options.__init__(self, {
+                'CBPDN': cbpdn.ConvBPDNMaskDcpl.Options({
+                    'AutoRho': {'Period': 10, 'AutoScaling': False,
+                    'RsdlRatio': 10.0, 'Scaling': 2.0, 'RsdlTarget': 1.0}})
+                })
+
+            if opt is None:
+                opt = {}
+            self.update(opt)
+
+
+
+    def solve(self, S, W=None, dimK=None):
+        """Compute sparse coding and dictionary update for training
+        data `S`."""
+
+        # Use dimK specified in __init__ as default
+        if dimK is None and self.dimK is not None:
+            dimK = self.dimK
+
+        # Start solve timer
+        self.timer.start(['solve', 'solve_wo_eval'])
+
+        # Solve CSC problem on S and do dictionary step
+        self.init_vars(S, dimK)
+        if W is None:
+            W = np.array([1.0], dtype=self.dtype)
+        W = np.asarray(W.reshape(cr.mskWshape(W, self.cri)),
+                       dtype=self.dtype)
+        self.xstep(S, W, self.lmbda, dimK)
+        self.dstep(S, W, dimK)
+
+        # Stop solve timer
+        self.timer.stop('solve_wo_eval')
+
+        # Extract and record iteration stats
+        self.manage_itstat()
+
+        # Increment iteration count
+        self.j += 1
+
+        # Stop solve timer
+        self.timer.stop('solve')
+
+        # Return current dictionary
+        return self.getdict()
+
+
+
+    def xstep(self, S, W, lmbda, dimK):
+        """Solve CSC problem for training data `S`."""
+
+        if self.opt['CUDA_CBPDN']:
+            Z = cuda.cbpdnmsk(self.D.squeeze(), S[..., 0], W.squeeze(), lmbda,
+                              self.opt['CBPDN'])
+            Z = Z.reshape(self.cri.Nv + (1, 1, self.cri.M,))
+            self.Z[:] = np.asarray(Z, dtype=self.dtype)
+            self.Zf = sl.rfftn(self.Z, self.cri.Nv, self.cri.axisN)
+            self.Sf = sl.rfftn(S.reshape(self.cri.shpS), self.cri.Nv,
+                               self.cri.axisN)
+            self.xstep_itstat = None
+        else:
+            # Create X update object (external representation is expected!)
+            xstep = cbpdn.ConvBPDNMaskDcpl(self.D.squeeze(), S, lmbda, W,
+                                   self.opt['CBPDN'], dimK=dimK,
+                                   dimN=self.cri.dimN)
+            xstep.solve()
+            self.Sf = sl.rfftn(S.reshape(self.cri.shpS), self.cri.Nv,
+                               self.cri.axisN)
+            self.setcoef(xstep.getcoef())
+            self.xstep_itstat = xstep.itstat[-1] if len(xstep.itstat) > 0 \
+                                                 else None
+
+
+
+    def dstep(self, S, W, dimK):
+        """Compute dictionary update for training data `S`."""
+
+        # Compute residual X D - S in frequency domain
+        Ryf = sl.inner(self.Zf, self.Df, axis=self.cri.axisM) - self.Sf
+        # Transform to spatial domain, apply mask, and transform back to
+        # frequency domain
+        Ryf[:] = sl.rfftn(W * sl.irfftn(Ryf, self.cri.Nv, self.cri.axisN),
+                          None, self.cri.axisN)
+        # Compute gradient
+        gradf = sl.inner(np.conj(self.Zf), Ryf, axis=self.cri.axisK)
+
+        # If multiple channel signal, single channel dictionary
+        if self.cri.C > 1 and self.cri.Cd == 1:
+            gradf = np.sum(gradf, axis=self.cri.axisC, keepdims=True)
+
+        # Update gradient step
+        self.eta = self.eta_a / (self.j + self.eta_b)
+
+        # Compute gradient descent
+        self.Gf[:] = self.Df - self.eta * gradf
+        self.G = sl.irfftn(self.Gf, self.cri.Nv, self.cri.axisN)
+
+        # Eval proximal operator
+        self.Dprv[:] = self.D
+        self.D[:] = self.Pcn(self.G)

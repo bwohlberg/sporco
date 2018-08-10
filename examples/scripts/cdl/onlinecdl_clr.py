@@ -60,21 +60,22 @@ Set regularization parameter and options for dictionary learning solver.
 
 lmbda = 0.2
 opt = onlinecdl.OnlineConvBPDNDictLearn.Options({
-    'Verbose': True, 'MaxMainIter': 50, 'AccurateDFid' : True,
-    'CBPDN': {'rho': 3.0, 'AutoRho': {'Enabled': False},
-              'RelaxParam': 1.0, 'RelStopTol': 1e-7, 'MaxMainIter': 50,
-              'FastSolve': False, 'DataType': np.float32},
-    'OCDL': {'ZeroMean': False, 'eta_a': 10.0, 'eta_b': 20.0,
-             'DataType': np.float32}})
+                'Verbose': True, 'ZeroMean': False, 'eta_a': 10.0,
+                'eta_b': 20.0, 'DataType': np.float32,
+                'CBPDN': {'rho': 5.0, 'AutoRho': {'Enabled': True},
+                    'RelaxParam': 1.8, 'RelStopTol': 1e-7, 'MaxMainIter': 50,
+                    'FastSolve': False, 'DataType': np.float32}})
 
 
 """
 Create solver object and solve.
 """
 
-d = onlinecdl.OnlineConvBPDNDictLearn(D0, sh[..., [0]], lmbda, opt)
+d = onlinecdl.OnlineConvBPDNDictLearn(D0, lmbda, opt)
 
-for it in range(opt['MaxMainIter']):
+iter = 50
+d.display_start()
+for it in range(iter):
     img_index = np.random.randint(0, sh.shape[-1])
     d.solve(sh[..., [img_index]])
 
@@ -102,7 +103,8 @@ Get iterations statistics from solver object and plot functional value.
 
 its = d.getitstat()
 fig = plot.figure(figsize=(7, 7))
-plot.plot(its.ObjFun, xlbl='Iterations', ylbl='Functional', fig=fig)
+plot.plot(np.vstack((its.DeltaD, its.Eta)).T, xlbl='Iterations',
+          lgnd=('Delta D', 'Eta'), fig=fig)
 fig.show()
 
 
