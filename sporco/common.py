@@ -37,7 +37,7 @@ def _fix_nested_class_lookup(cls, nstnm):
       Name of nested (inner) class to be renamed
     """
 
-    # Check that nstmm is an attribute of cls
+    # Check that nstnm is an attribute of cls
     if nstnm in cls.__dict__:
         # Get the attribute of cls by its name
         nst = cls.__dict__[nstnm]
@@ -87,10 +87,63 @@ def _fix_dynamic_class_lookup(cls, pstfx):
 
 
 
-class BasicIterativeSolver(object):
+class _IterSolver_Meta(type):
+    """Metaclass for iterative solver classes that handles
+    intialisation of IterationStats namedtuple and applies
+    _fix_nested_class_lookup to class definitions to fix problems with
+    lookup of nested class definitions when using pickle.  It is also
+    responsible for stopping the object initialisation timer at the
+    end of initialisation.
+    """
+
+    def __init__(cls, *args):
+
+        # Initialise named tuple type for recording iteration statistics
+        cls.IterationStats = collections.namedtuple('IterationStats',
+                                                    cls.itstat_fields())
+        # Apply _fix_nested_class_lookup function to class after creation
+        _fix_nested_class_lookup(cls, nstnm='Options')
+
+
+
+    def __call__(cls, *args, **kwargs):
+
+        # Initialise instance
+        instance = super(_IterSolver_Meta, cls).__call__(*args, **kwargs)
+        # Stop initialisation timer
+        instance.timer.stop('init')
+        # Return instance
+        return instance
+
+
+
+
+
+class IterativeSolver(with_metaclass(_IterSolver_Meta, object)):
     """Base class for iterative solver classes, providing some common
     infrastructure.
     """
+
+    itstat_fields_objfn = ()
+    """Fields in IterationStats associated with the objective function"""
+    itstat_fields_alg = ()
+    """Fields in IterationStats associated with the specific solver
+    algorithm, e.g. ADMM or FISTA"""
+    itstat_fields_extra = ()
+    """Non-standard fields in IterationStats"""
+
+
+
+    @classmethod
+    def itstat_fields(cls):
+        """Construct tuple of field names used to initialise
+        IterationStats named tuple.
+        """
+
+        return ('Iter',) + cls.itstat_fields_objfn + \
+          cls.itstat_fields_alg + cls.itstat_fields_extra + ('Time',)
+
+
 
     def set_dtype(self, opt, dtype):
         """Set the `dtype` attribute. If opt['DataType'] has a value
@@ -100,7 +153,7 @@ class BasicIterativeSolver(object):
 
         Parameters
         ----------
-        opt : :class:`ADMM.Options` object
+        opt : :class:`cdict.ConstrainedDict` object
           Algorithm options
         dtype : data-type
           Data type for working variables (overridden by 'DataType' option)
@@ -155,76 +208,16 @@ class BasicIterativeSolver(object):
         # If dtype is not None, assume val is numeric and convert it to
         # type dtype
         if dtype is not None and val is not None:
-            val = dtype.type(val)
+            if type(dtype) == type:
+                val = dtype(val)
+            else:
+                val = dtype.type(val)
 
         # Set attribute value depending on reset flag and whether the
         # attribute exists and is None
         if reset or not hasattr(self, name) or \
            (hasattr(self, name) and getattr(self, name) is None):
             setattr(self, name, val)
-
-
-
-
-
-class _IterSolver_Meta(type):
-    """Metaclass for iterative solver classes that handles
-    intialisation of IterationStats namedtuple and applies
-    _fix_nested_class_lookup to class definitions to fix problems with
-    lookup of nested class definitions when using pickle. It is also
-    responsible for stopping the object initialisation timer at the
-    end of initialisation.
-    """
-
-    def __init__(cls, *args):
-
-        # Initialise named tuple type for recording ADMM iteration statistics
-        cls.IterationStats = collections.namedtuple('IterationStats',
-                                                    cls.itstat_fields())
-        # Apply _fix_nested_class_lookup function to class after creation
-        _fix_nested_class_lookup(cls, nstnm='Options')
-
-
-
-    def __call__(cls, *args, **kwargs):
-
-        # Initialise instance
-        instance = super(_IterSolver_Meta, cls).__call__(*args, **kwargs)
-        # Stop initialisation timer
-        instance.timer.stop('init')
-        # Return instance
-        return instance
-
-
-
-
-
-class IterativeSolver(with_metaclass(_IterSolver_Meta,
-                                     BasicIterativeSolver)):
-    """Base class for iterative solver classes, providing additional
-    infrastructure with respect to :class:`BasicIterativeSolver`.
-    """
-
-    itstat_fields_objfn = ()
-    """Fields in IterationStats associated with the objective function"""
-    itstat_fields_alg = ()
-    """Fields in IterationStats associated with the specific solver
-    algorithm, e.g. ADMM or FISTA"""
-    itstat_fields_extra = ()
-    """Non-standard fields in IterationStats"""
-
-
-
-    @classmethod
-    def itstat_fields(cls):
-        """Construct tuple of field names used to initialise
-        IterationStats named tuple.
-        """
-
-        return ('Iter',) + cls.itstat_fields_objfn + \
-          cls.itstat_fields_alg + cls.itstat_fields_extra + ('Time',)
-
-
 
 
 
