@@ -93,8 +93,7 @@ opt2 = cbpdndlmd.ConvBPDNMaskDictLearn.Options({'Verbose': True,
             'MaxMainIter': 200, 'AccurateDFid': True,
             'CBPDN': {'rho': 20.0*lmbda + 0.5},
             'CCMOD': {'rho': 2e-1}}, dmethod='cns')
-d2 = cbpdndlmd.ConvBPDNMaskDictLearn(D0, sh, lmbda, W, opt2,
-                                         dmethod='cns')
+d2 = cbpdndlmd.ConvBPDNMaskDictLearn(D0, sh, lmbda, W, opt2, dmethod='cns')
 D2 = d2.solve()
 
 
