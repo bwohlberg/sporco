@@ -6,6 +6,9 @@ SPORCO Release Notes
 Version 0.1.10   (not yet released)
 -----------------------------------
 
+- Significant changes to online CDL module, including addition of
+  support for masked online CDL problem, and optional use of CUDA
+  accelerated CBPDN solver
 
 
 Version 0.1.9   (2018-07-15)
