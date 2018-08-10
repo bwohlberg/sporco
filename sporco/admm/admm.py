@@ -235,7 +235,7 @@ class ADMM(common.IterativeSolver):
         self.Nx = Nx
         # Working variable U has the same dimensionality as constant c
         # in the constraint Ax + By = c
-        self.Nc = np.product(ushape)
+        self.Nc = np.product(np.array(ushape))
 
         # DataType option overrides data type inferred from __init__
         # parameters of derived class
@@ -856,7 +856,7 @@ class ADMMEqual(ADMM):
 
         if opt is None:
             opt = ADMMEqual.Options()
-        Nx = np.product(xshape)
+        Nx = np.product(np.array(xshape))
         super(ADMMEqual, self).__init__(Nx, xshape, xshape, dtype, opt)
 
 
