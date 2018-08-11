@@ -16,6 +16,7 @@ ignore:
   - "sporco/tests"
   - "sporco/admm/tests"
   - "sporco/fista/tests"
+  - "sporco/dictlrn/tests"
   - "test_*.py"
 
 parsers:
