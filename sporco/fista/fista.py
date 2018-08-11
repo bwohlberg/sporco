@@ -514,9 +514,9 @@ class FISTA(common.IterativeSolver):
         hdrmap = {'Itn': 'Iter'}
         hdrmap.update(cls.hdrval_objfun)
         hdrmap.update({'Rsdl': 'Rsdl', 'F': 'F_Btrack', 'Q': 'Q_Btrack',
-                     'It_Bt': 'IterBTrack', 'L': 'L'})
+                       'It_Bt': 'IterBTrack', 'L': 'L'})
 
-        return dict
+        return hdrmap
 
 
 
