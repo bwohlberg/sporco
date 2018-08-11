@@ -51,6 +51,7 @@ sl, sh = util.tikhonov_filter(S, fltlmbd, npd)
 Create random mask and apply to highpass filtered training image set.
 """
 
+np.random.seed(12345)
 frc = 0.25
 W = util.rndmask(S.shape, frc, dtype=np.float32)
 shw = W * sh
@@ -60,7 +61,6 @@ shw = W * sh
 Construct initial dictionary.
 """
 
-np.random.seed(12345)
 D0 = np.random.randn(8, 8, 32)
 
 
