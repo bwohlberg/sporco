@@ -24,10 +24,10 @@ def evlmap(accdfid):
     """
 
     if accdfid:
-        map = {'ObjFun': 'ObjFun', 'DFid': 'DFid', 'RegL1': 'RegL1'}
+        evl = {'ObjFun': 'ObjFun', 'DFid': 'DFid', 'RegL1': 'RegL1'}
     else:
-        map = {}
-    return map
+        evl = {}
+    return evl
 
 
 
@@ -36,14 +36,14 @@ def isxmap(xmethod, opt):
     """
 
     if xmethod == 'admm':
-        map = {'XPrRsdl': 'PrimalRsdl', 'XDlRsdl': 'DualRsdl',
-                  'XRho': 'Rho'}
+        isx = {'XPrRsdl': 'PrimalRsdl', 'XDlRsdl': 'DualRsdl',
+               'XRho': 'Rho'}
     else:
-        map = {'X_F_Btrack': 'F_Btrack', 'X_Q_Btrack': 'Q_Btrack',
+        isx = {'X_F_Btrack': 'F_Btrack', 'X_Q_Btrack': 'Q_Btrack',
                'X_ItBt': 'IterBTrack', 'X_L': 'L', 'X_Rsdl': 'Rsdl'}
     if not opt['AccurateDFid']:
-        map.update(evlmap(True))
-    return map
+        isx.update(evlmap(True))
+    return isx
 
 
 
@@ -52,13 +52,13 @@ def isdmap(dmethod):
     """
 
     if dmethod == 'fista':
-        map = {'Cnstr': 'Cnstr', 'D_F_Btrack': 'F_Btrack',
+        isd = {'Cnstr': 'Cnstr', 'D_F_Btrack': 'F_Btrack',
                'D_Q_Btrack': 'Q_Btrack', 'D_ItBt': 'IterBTrack',
                'D_L': 'L', 'D_Rsdl': 'Rsdl'}
     else:
-        map= {'Cnstr':  'Cnstr', 'DPrRsdl': 'PrimalRsdl',
+        isd= {'Cnstr':  'Cnstr', 'DPrRsdl': 'PrimalRsdl',
               'DDlRsdl': 'DualRsdl', 'DRho': 'Rho'}
-    return map
+    return isd
 
 
 
@@ -72,7 +72,7 @@ def isfld(xmethod, dmethod, opt):
     else:
         if opt['CBPDN', 'BackTrack', 'Enabled']:
             fld.extend(['X_F_Btrack', 'X_Q_Btrack', 'X_ItBt', 'X_L',
-                          'X_Rsdl'])
+                        'X_Rsdl'])
         else:
             fld.extend(['X_L', 'X_Rsdl'])
     if dmethod != 'fista':
@@ -80,7 +80,7 @@ def isfld(xmethod, dmethod, opt):
     else:
         if opt['CCMOD', 'BackTrack', 'Enabled']:
             fld.extend(['D_F_Btrack', 'D_Q_Btrack', 'D_ItBt', 'D_L',
-                          'D_Rsdl'])
+                        'D_Rsdl'])
         else:
             fld.extend(['D_L', 'D_Rsdl'])
     fld.extend('Time')
@@ -115,24 +115,22 @@ def hdrmap(xmethod, dmethod, opt):
     """Return ``hdrmap`` argument for ``.IterStatsConfig`` initialiser.
     """
 
-    map = {'Itn': 'Iter', 'Fnc': 'ObjFun', 'DFid': 'DFid',
-              u('ℓ1'): 'RegL1', 'Cnstr': 'Cnstr'}
+    hdr = {'Itn': 'Iter', 'Fnc': 'ObjFun', 'DFid': 'DFid',
+           u('ℓ1'): 'RegL1', 'Cnstr': 'Cnstr'}
     if xmethod == 'admm':
-        map.update({'r_X': 'XPrRsdl', 's_X': 'XDlRsdl',
-                       u('ρ_X'): 'XRho'})
+        hdr.update({'r_X': 'XPrRsdl', 's_X': 'XDlRsdl', u('ρ_X'): 'XRho'})
     else:
         if opt['CBPDN', 'BackTrack', 'Enabled']:
-            map.update({'F_X': 'X_F_Btrack','Q_X': 'X_Q_Btrack',
-                           'It_X': 'X_ItBt', 'L_X': 'X_L'})
+            hdr.update({'F_X': 'X_F_Btrack','Q_X': 'X_Q_Btrack',
+                        'It_X': 'X_ItBt', 'L_X': 'X_L'})
         else:
-            map.update({'L_X': 'X_L'})
+            hdr.update({'L_X': 'X_L'})
     if dmethod != 'fista':
-        map.update({'r_D': 'DPrRsdl', 's_D': 'DDlRsdl',
-                       u('ρ_D'): 'DRho'})
+        hdr.update({'r_D': 'DPrRsdl', 's_D': 'DDlRsdl', u('ρ_D'): 'DRho'})
     else:
         if opt['CCMOD', 'BackTrack', 'Enabled']:
-            map.update({'F_D': 'D_F_Btrack', 'Q_D': 'D_Q_Btrack',
-                           'It_D': 'D_ItBt', 'L_D': 'D_L'})
+            hdr.update({'F_D': 'D_F_Btrack', 'Q_D': 'D_Q_Btrack',
+                        'It_D': 'D_ItBt', 'L_D': 'D_L'})
         else:
-            map.update({'L_D': 'D_L'})
-    return map
+            hdr.update({'L_D': 'D_L'})
+    return hdr
