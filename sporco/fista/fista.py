@@ -511,9 +511,9 @@ class FISTA(common.IterativeSolver):
         IterationStats entries.
         """
 
-        dict = {'Itn': 'Iter'}
-        dict.update(cls.hdrval_objfun)
-        dict.update({'Rsdl': 'Rsdl', 'F': 'F_Btrack', 'Q': 'Q_Btrack',
+        hdrmap = {'Itn': 'Iter'}
+        hdrmap.update(cls.hdrval_objfun)
+        hdrmap.update({'Rsdl': 'Rsdl', 'F': 'F_Btrack', 'Q': 'Q_Btrack',
                      'It_Bt': 'IterBTrack', 'L': 'L'})
 
         return dict

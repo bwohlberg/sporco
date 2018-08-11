@@ -14,7 +14,6 @@ from __future__ import print_function
 from builtins import range
 
 import copy
-from types import MethodType
 import numpy as np
 from scipy import linalg
 

@@ -4,17 +4,12 @@ from __future__ import print_function
 from builtins import range
 
 import copy
-from types import MethodType
-import pprint
 import numpy as np
-from scipy import linalg
 
-from sporco.admm import admm
 import sporco.linalg as sl
 import sporco.prox as sp
 from sporco.util import u
 from sporco.admm.cbpdn import GenericConvBPDN
-from sporco import util
 import sporco.cnvrep as cr
 import multiprocessing as mp
 # Required due to pyFFTW bug #135 - see "Notes" section of SPORCO docs.
@@ -222,7 +217,7 @@ def par_y1step(i):
 
 
 def par_u0step(i):
-    """Dual variable update for :math:`\mathbf{u}_{0,i}`, one of the
+    r"""Dual variable update for :math:`\mathbf{u}_{0,i}`, one of the
     disjoint problems for updating :math:`\mathbf{u}_0`.
 
     Parameters
@@ -236,7 +231,7 @@ def par_u0step(i):
 
 
 def par_u1step(i):
-    """Dual variable update for :math:`\mathbf{u}_{1,G_i}`, one of the
+    r"""Dual variable update for :math:`\mathbf{u}_{1,G_i}`, one of the
     disjoint problems for updating :math:`\mathbf{u}_1`.
 
     Parameters
@@ -880,7 +875,7 @@ class ParConvBPDN(GenericConvBPDN):
 
 
     def obfn_reg(self):
-        """Compute regularisation term, :math:`\| x \|_1`, and
+        r"""Compute regularisation term, :math:`\| x \|_1`, and
         contribution to objective function.
         """
         l1 = np.sum(mp_wl1*np.abs(self.obfn_gvar()))

@@ -13,7 +13,6 @@ from builtins import range
 from builtins import object
 
 import copy
-import collections
 import warnings
 import numpy as np
 from scipy import linalg
@@ -500,10 +499,10 @@ class ADMM(common.IterativeSolver):
         IterationStats entries.
         """
 
-        dict = {'Itn': 'Iter'}
-        dict.update(cls.hdrval_objfun)
-        dict.update({'r': 'PrimalRsdl', 's': 'DualRsdl', u('ρ'): 'Rho'})
-        return dict
+        hdrmap = {'Itn': 'Iter'}
+        hdrmap.update(cls.hdrval_objfun)
+        hdrmap.update({'r': 'PrimalRsdl', 's': 'DualRsdl', u('ρ'): 'Rho'})
+        return hdrmap
 
 
 

@@ -14,7 +14,6 @@ from builtins import range
 from builtins import object
 
 import copy
-import collections
 import numpy as np
 from scipy import linalg
 
@@ -221,7 +220,7 @@ class OnlineConvBPDNDictLearn(common.IterativeSolver):
         # Solve CSC problem on S and do dictionary step
         self.init_vars(S, dimK)
         self.xstep(S, self.lmbda, dimK)
-        self.dstep(S, dimK)
+        self.dstep()
 
         # Stop solve timer
         self.timer.stop('solve_wo_eval')
@@ -305,8 +304,10 @@ class OnlineConvBPDNDictLearn(common.IterativeSolver):
 
 
 
-    def dstep(self, S, dimK):
-        """Compute dictionary update for training data `S`."""
+    def dstep(self):
+        """Compute dictionary update for training data of preceding
+        :meth:`xstep`.
+        """
 
         # Compute X D - S
         Ryf = sl.inner(self.Zf, self.Df, axis=self.cri.axisM) - self.Sf
@@ -368,10 +369,10 @@ class OnlineConvBPDNDictLearn(common.IterativeSolver):
         IterationStats entries.
         """
 
-        dict = {'Itn': 'Iter', 'X r': 'PrimalRsdl', 'X s': 'DualRsdl',
-                u('X ρ'): 'Rho', 'D cnstr': 'Cnstr', 'D dlt': 'DeltaD',
-                u('D η'): 'Eta'}
-        return dict
+        hdrmap = {'Itn': 'Iter', 'X r': 'PrimalRsdl', 'X s': 'DualRsdl',
+                  u('X ρ'): 'Rho', 'D cnstr': 'Cnstr', 'D dlt': 'DeltaD',
+                  u('D η'): 'Eta'}
+        return hdrmap
 
 
 
@@ -481,7 +482,7 @@ class OnlineConvBPDNMaskDictLearn(OnlineConvBPDNDictLearn):
 
         defaults = copy.deepcopy(OnlineConvBPDNDictLearn.Options.defaults)
         defaults.update({'CBPDN': copy.deepcopy(
-                                cbpdn.ConvBPDNMaskDcpl.Options.defaults)})
+                         cbpdn.ConvBPDNMaskDcpl.Options.defaults)})
 
 
         def __init__(self, opt=None):
@@ -519,7 +520,7 @@ class OnlineConvBPDNMaskDictLearn(OnlineConvBPDNDictLearn):
         W = np.asarray(W.reshape(cr.mskWshape(W, self.cri)),
                        dtype=self.dtype)
         self.xstep(S, W, self.lmbda, dimK)
-        self.dstep(S, W, dimK)
+        self.dstep(W)
 
         # Stop solve timer
         self.timer.stop('solve_wo_eval')
@@ -553,19 +554,20 @@ class OnlineConvBPDNMaskDictLearn(OnlineConvBPDNDictLearn):
         else:
             # Create X update object (external representation is expected!)
             xstep = cbpdn.ConvBPDNMaskDcpl(self.D.squeeze(), S, lmbda, W,
-                                   self.opt['CBPDN'], dimK=dimK,
-                                   dimN=self.cri.dimN)
+                                           self.opt['CBPDN'], dimK=dimK,
+                                           dimN=self.cri.dimN)
             xstep.solve()
             self.Sf = sl.rfftn(S.reshape(self.cri.shpS), self.cri.Nv,
                                self.cri.axisN)
             self.setcoef(xstep.getcoef())
-            self.xstep_itstat = xstep.itstat[-1] if len(xstep.itstat) > 0 \
-                                                 else None
+            self.xstep_itstat = xstep.itstat[-1] if xstep.itstat else None
 
 
 
-    def dstep(self, S, W, dimK):
-        """Compute dictionary update for training data `S`."""
+    def dstep(self, W):
+        """Compute dictionary update for training data of preceding
+        :meth:`xstep`.
+        """
 
         # Compute residual X D - S in frequency domain
         Ryf = sl.inner(self.Zf, self.Df, axis=self.cri.axisM) - self.Sf
