@@ -791,11 +791,10 @@ class FISTADFT(FISTA):
         self.F = F
         self.Q = Q
         self.iterBTrack = iterBTrack
-        if ((self.k > 100) and (self.k - self.last_Lchange) > 50) and (self.FBtprev <= self.F):
-        
+        if ((self.k > 100) and (self.k - self.last_Lchange) > 50) \
+                           and (self.FBtprev <= self.F):
             self.L /= 1.01
             self.Lchange()
-        
 
 
 
