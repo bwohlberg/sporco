@@ -8,7 +8,7 @@
 Basis Pursuit DeNoising
 =======================
 
-This example demonstrates the use of class :class:`.bpdn.BPDN` to solve the Basis Pursuit DeNoising (BPDN) problem :cite:`chen-1998-atomic`
+This example demonstrates the use of class :class:`.admm.bpdn.BPDN` to solve the Basis Pursuit DeNoising (BPDN) problem :cite:`chen-1998-atomic`
 
   $$\mathrm{argmin}_\mathbf{x} \; (1/2) \| D \mathbf{x} - \mathbf{s} \|_2^2 + \lambda \| \mathbf{x} \|_1 \;,$$
 

@@ -2,7 +2,10 @@ Sparse Coding
 -------------
 
 bpdn.py
-  Solve a synthetic Basis Pursuit DeNoising (BPDN) problem
+  Solve a synthetic Basis Pursuit DeNoising (BPDN) problem (ADMM solver)
+
+bpdn_fista.py
+  Solve a synthetic Basis Pursuit DeNoising (BPDN) problem (FISTA solver)
 
 bpdnjnt.py
   Solve a synthetic Basis Pursuit DeNoising (BPDN) problem with joint sparsity via an ℓ2,1 norm term

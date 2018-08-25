@@ -3,7 +3,7 @@ Module bpdn
 
 This module includes the following classes:
 
-* :class:`.BPDN`
+* :class:`admm.bpdn.BPDN`
 
   Solve the BPDN problem
 

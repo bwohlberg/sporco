@@ -10,7 +10,7 @@ for solving problems of the form
    f(\mathbf{x}) + g(\mathbf{y}) \;\mathrm{such\;that}\;
    \mathbf{x} = \mathbf{y} \;\;.
 
-See :class:`.BPDN` as an example of a class derived from
+See :class:`.admm.bpdn.BPDN` as an example of a class derived from
 :class:`.ADMMEqual`.
 
 The methods and attributes that should be overridden or defined are
