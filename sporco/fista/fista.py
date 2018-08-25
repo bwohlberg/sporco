@@ -108,12 +108,11 @@ class FISTA(common.IterativeSolver):
           ``AutoStop`` : Options for adaptive stoping strategy (fixed
           point residual, see Sec. 4.3 of :cite:`liu-2018-first`).
 
-            ``Enabled`` : Flag determining whether adaptive stopping
+            ``Enabled`` : Flag determining whether the adaptive stopping
             relative parameter strategy is enabled.
 
             ``Tau0`` : numerator in adaptive criterion
             (:math:`\tau_0` in :cite:`liu-2018-first`).
-
 
           ``BackTrack`` : Options for adaptive L strategy (backtracking,
           see Sec. 4 of :cite:`beck-2009-fast`).
@@ -305,7 +304,7 @@ class FISTA(common.IterativeSolver):
             self.store_prev()
 
             # Compute backtracking
-            if self.opt['BackTrack', 'Enabled'] and self.k > 0:
+            if self.opt['BackTrack', 'Enabled'] and self.k >= 0:
                 self.timer.stop('solve_wo_btrack')
                 # Computes proximal step and backtracking
                 self.compute_backtracking()
