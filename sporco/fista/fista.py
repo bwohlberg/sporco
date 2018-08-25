@@ -412,9 +412,9 @@ class FISTA(common.IterativeSolver):
             self.proximal_step(gradY)
             Rx = self.eval_Rx()
 
-            F = 0.5 * linalg.norm(Rx.flatten(), 2)**2
+            F = 0.5 * np.linalg.norm(Rx.flatten(), 2)**2
             Dxy = self.eval_Dxy()
-            Q = 0.5 * linalg.norm(Ry.flatten(), 2)**2 + \
+            Q = 0.5 * np.linalg.norm(Ry.flatten(), 2)**2 + \
                 np.sum(Dxy * gradY) + \
                 (self.L/2.) * np.linalg.norm(Dxy.flatten(), 2)**2
 
@@ -774,11 +774,11 @@ class FISTADFT(FISTA):
             self.proximal_step(gradfYf)
             Rxf = self.eval_Rxf()
 
-            F = 0.5 * linalg.norm(Rxf.flatten(), 2)**2
+            F = 0.5 * np.linalg.norm(Rxf.flatten(), 2)**2
             Dxyf = self.eval_Dxyf()
-            Q = 0.5 * linalg.norm(self.Ryf.flatten(), 2)**2 + \
+            Q = 0.5 * np.linalg.norm(self.Ryf.flatten(), 2)**2 + \
                 np.sum(np.real(Dxyf * gradfYf)) + \
-                (self.L/2.) * linalg.norm(Dxyf.flatten(), 2)**2
+                (self.L/2.) * np.linalg.norm(Dxyf.flatten(), 2)**2
 
             if F <= Q:
                 linesearch = 0
