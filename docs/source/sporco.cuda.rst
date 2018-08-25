@@ -3,7 +3,7 @@
 sporco.cuda package
 ===================
 
-This package allows the `SPORCO-CUDA extension package <https://github.com/bwohlberg/sporco-cuda>`_ to be accessed within the ``sporco`` namespace, i.e.
+This subpackage allows the `SPORCO-CUDA extension package <https://github.com/bwohlberg/sporco-cuda>`_ to be accessed within the ``sporco`` namespace, i.e.
 
 ::
 
@@ -54,7 +54,7 @@ Always available
    Returns
    -------
    ndev : int
-      Number of installed deviced
+      Number of installed devices
 
 
 Only available if ``have_cuda`` is `True`
