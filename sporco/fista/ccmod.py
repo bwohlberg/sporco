@@ -448,8 +448,8 @@ class ConvCnstrMODMask(ConvCnstrMOD):
         W : array_like
             Mask array. The array shape must be such that the array is
             compatible for multiplication with the *internal* shape of
-            input array S (see :class:`.cnvrep.CDU_ConvRepIndexing` for
-            a discussion of the distinction between *external* and
+            input array S (see :class:`.cnvrep.CDU_ConvRepIndexing` for a
+            discussion of the distinction between *external* and
             *internal* data layouts).
         dsz : tuple
             Filter support size(s)
