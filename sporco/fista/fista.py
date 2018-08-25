@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2016-2018 by Brendt Wohlberg <brendt@ieee.org>
-#                            Cristina Garcia-Cardona <cgarciac@lanl.gov>
+# Copyright (C) 2016-2018 by Cristina Garcia-Cardona <cgarciac@lanl.gov>
+#                            Brendt Wohlberg <brendt@ieee.org>
 # All rights reserved. BSD 3-clause License.
 # This file is part of the SPORCO package. Details of the copyright
 # and user license can be found in the 'LICENSE.txt' file distributed
@@ -16,7 +16,6 @@ from builtins import object
 import copy
 import collections
 import numpy as np
-from scipy import linalg
 
 from sporco import cdict
 from sporco import util
@@ -417,7 +416,7 @@ class FISTA(common.IterativeSolver):
             Dxy = self.eval_Dxy()
             Q = 0.5 * linalg.norm(Ry.flatten(), 2)**2 + \
                 np.sum(Dxy * gradY) + \
-                (self.L/2.) * linalg.norm(Dxy.flatten(), 2)**2
+                (self.L/2.) * np.linalg.norm(Dxy.flatten(), 2)**2
 
             if F <= Q:
                 linesearch = 0
