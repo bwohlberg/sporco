@@ -15,7 +15,6 @@ from builtins import object
 
 import copy
 import numpy as np
-from scipy import linalg
 
 from sporco import util
 from sporco import common
@@ -391,8 +390,8 @@ class OnlineConvBPDNDictLearn(common.IterativeSolver):
                     self.xstep_itstat.DualRsdl)
             rho = (self.xstep_itstat.Rho,)
 
-        cnstr = linalg.norm(cr.zpad(self.D, self.cri.Nv) - self.G)
-        dltd = linalg.norm(self.D - self.Dprv)
+        cnstr = np.linalg.norm(cr.zpad(self.D, self.cri.Nv) - self.G)
+        dltd = np.linalg.norm(self.D - self.Dprv)
 
         tpl = (self.j,) + objfn + rsdl + rho + (cnstr, dltd, self.eta) + \
               self.itstat_extra() + (tk,)

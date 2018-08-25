@@ -15,7 +15,6 @@ from builtins import range
 
 import copy
 import numpy as np
-from scipy import linalg
 
 import sporco.cnvrep as cr
 import sporco.linalg as sl
@@ -321,7 +320,7 @@ class ConvBPDN(fista.FISTADFT):
         function.
         """
 
-        rl1 = linalg.norm((self.wl1 * self.X).ravel(), 1)
+        rl1 = np.linalg.norm((self.wl1 * self.X).ravel(), 1)
         return (self.lmbda*rl1, rl1)
 
 
