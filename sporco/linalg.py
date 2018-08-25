@@ -357,7 +357,7 @@ def inner(x, y, axis=-1):
       Input array x
     y : array_like
       Input array y
-    axes : int, optional (default -1)
+    axis : int, optional (default -1)
       Axis over which to compute the sum
 
     Returns
