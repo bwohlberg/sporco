@@ -14,7 +14,6 @@ from builtins import range
 
 import copy
 import numpy as np
-from scipy import linalg
 
 from sporco.admm import admm
 import sporco.linalg as sl
@@ -266,7 +265,7 @@ class TVL2Denoise(admm.ADMM):
         \sqrt{(G_r \mathbf{x})^2 + (G_c \mathbf{x})^2}\|_1`.
         """
 
-        dfd = 0.5*(linalg.norm(self.Wdf * (self.X - self.S))**2)
+        dfd = 0.5*(np.linalg.norm(self.Wdf * (self.X - self.S))**2)
         reg = np.sum(self.Wtv * np.sqrt(np.sum(self.obfn_gvar()**2,
                                                axis=self.saxes)))
         obj = dfd + self.lmbda*reg

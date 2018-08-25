@@ -14,7 +14,6 @@ from builtins import range
 
 import copy
 import numpy as np
-from scipy import linalg
 
 from sporco.admm import admm
 import sporco.linalg as sl
@@ -336,14 +335,14 @@ class TVL1Denoise(admm.ADMM):
     def rsdl_s(self, Yprev, Y):
         """Compute dual residual vector."""
 
-        return self.rho*linalg.norm(self.cnst_AT(self.U))
+        return self.rho*np.linalg.norm(self.cnst_AT(self.U))
 
 
 
     def rsdl_sn(self, U):
         """Compute dual residual normalisation term."""
 
-        return self.rho*linalg.norm(U)
+        return self.rho*np.linalg.norm(U)
 
 
 
@@ -686,11 +685,11 @@ class TVL1Deconv(admm.ADMM):
     def rsdl_s(self, Yprev, Y):
         """Compute dual residual vector."""
 
-        return self.rho*linalg.norm(self.cnst_AT(self.U))
+        return self.rho*np.linalg.norm(self.cnst_AT(self.U))
 
 
 
     def rsdl_sn(self, U):
         """Compute dual residual normalisation term."""
 
-        return self.rho*linalg.norm(U)
+        return self.rho*np.linalg.norm(U)

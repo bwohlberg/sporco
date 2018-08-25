@@ -14,7 +14,6 @@ from builtins import range
 from builtins import object
 
 import numpy as np
-from scipy import linalg
 import copy
 
 from sporco.admm import admm
@@ -432,7 +431,7 @@ class ConvBPDNScalarTV(admm.ADMM):
         function.
         """
 
-        rl1 = linalg.norm((self.Wl1 * self.obfn_g1var()).ravel(), 1)
+        rl1 = np.linalg.norm((self.Wl1 * self.obfn_g1var()).ravel(), 1)
         rtv = np.sum(np.sqrt(np.sum(self.obfn_g0var()**2, axis=-1)))
         return (self.lmbda*rl1 + self.mu*rtv, rl1, rtv)
 
@@ -713,7 +712,7 @@ class ConvBPDNVectorTV(ConvBPDNScalarTV):
         function.
         """
 
-        rl1 = linalg.norm((self.Wl1 * self.obfn_g1var()).ravel(), 1)
+        rl1 = np.linalg.norm((self.Wl1 * self.obfn_g1var()).ravel(), 1)
         rtv = np.sum(np.sqrt(np.sum(self.obfn_g0var()**2,
                                     axis=(self.cri.axisM, -1))))
         return (self.lmbda*rl1 + self.mu*rtv, rl1, rtv)
@@ -1212,7 +1211,7 @@ class ConvBPDNRecTV(admm.ADMM):
         function.
         """
 
-        rl1 = linalg.norm((self.Wl1 * self.obfn_g0var()).ravel(), 1)
+        rl1 = np.linalg.norm((self.Wl1 * self.obfn_g0var()).ravel(), 1)
         rtv = np.sum(np.sqrt(np.sum(self.obfn_g1var()**2,
                                     axis=(self.cri.axisC, -1))))
         return (self.lmbda*rl1 + self.mu*rtv, rl1, rtv)

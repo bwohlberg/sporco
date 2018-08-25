@@ -13,7 +13,6 @@ from builtins import range
 
 import copy
 import numpy as np
-from scipy import linalg
 
 from sporco.admm import admm
 import sporco.cnvrep as cr
@@ -390,7 +389,7 @@ class ConvCnstrMODBase(admm.ADMMEqual):
         \mathbf{y}\|_2`.
         """
 
-        return linalg.norm((self.Pcn(self.obfn_gvar()) - self.obfn_gvar()))
+        return np.linalg.norm((self.Pcn(self.obfn_gvar()) - self.obfn_gvar()))
 
 
 
@@ -858,7 +857,7 @@ class ConvCnstrMOD_Consensus(admm.ADMMConsensus):
         """
 
         Y = self.obfn_gvar()
-        return linalg.norm((self.Pcn(Y) - Y))
+        return np.linalg.norm((self.Pcn(Y) - Y))
 
 
 

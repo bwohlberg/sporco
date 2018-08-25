@@ -15,7 +15,6 @@ from builtins import object
 import copy
 import warnings
 import numpy as np
-from scipy import linalg
 
 from sporco import cdict
 from sporco import util
@@ -461,8 +460,8 @@ class ADMM(common.IterativeSolver):
         """Compute residuals and stopping thresholds."""
 
         if self.opt['AutoRho', 'StdResiduals']:
-            r = linalg.norm(self.rsdl_r(self.AXnr, self.Y))
-            s = linalg.norm(self.rsdl_s(self.Yprev, self.Y))
+            r = np.linalg.norm(self.rsdl_r(self.AXnr, self.Y))
+            s = np.linalg.norm(self.rsdl_s(self.Yprev, self.Y))
             epri = np.sqrt(self.Nc)*self.opt['AbsStopTol'] + \
                 self.rsdl_rn(self.AXnr, self.Y)*self.opt['RelStopTol']
             edua = np.sqrt(self.Nx)*self.opt['AbsStopTol'] + \
@@ -474,8 +473,8 @@ class ADMM(common.IterativeSolver):
             sn = self.rsdl_sn(self.U)
             if sn == 0.0:
                 sn = 1.0
-            r = linalg.norm(self.rsdl_r(self.AXnr, self.Y)) / rn
-            s = linalg.norm(self.rsdl_s(self.Yprev, self.Y)) / sn
+            r = np.linalg.norm(self.rsdl_r(self.AXnr, self.Y)) / rn
+            s = np.linalg.norm(self.rsdl_s(self.Yprev, self.Y)) / sn
             epri = np.sqrt(self.Nc)*self.opt['AbsStopTol']/rn + \
                 self.opt['RelStopTol']
             edua = np.sqrt(self.Nx)*self.opt['AbsStopTol']/sn + \
@@ -566,7 +565,7 @@ class ADMM(common.IterativeSolver):
                     rsf = rhomlt
                 elif s > (mu/xi)*r:
                     rsf = 1.0/rhomlt
-                self.rho = self.dtype.type(rsf*self.rho)
+                self.rho *= rsf
                 self.U /= rsf
                 if rsf != 1.0:
                     self.rhochange()
@@ -755,8 +754,8 @@ class ADMM(common.IterativeSolver):
         # Avoid computing the norm of the value returned by cnst_c()
         # more than once
         if not hasattr(self, '_nrm_cnst_c'):
-            self._nrm_cnst_c = linalg.norm(self.cnst_c())
-        return max((linalg.norm(AX), linalg.norm(self.cnst_B(Y)),
+            self._nrm_cnst_c = np.linalg.norm(self.cnst_c())
+        return max((np.linalg.norm(AX), np.linalg.norm(self.cnst_B(Y)),
                     self._nrm_cnst_c))
 
 
@@ -769,7 +768,7 @@ class ADMM(common.IterativeSolver):
         overridden.
         """
 
-        return self.rho*linalg.norm(self.cnst_AT(U))
+        return self.rho*np.linalg.norm(self.cnst_AT(U))
 
 
 
@@ -966,14 +965,14 @@ class ADMMEqual(ADMM):
     def rsdl_rn(self, AX, Y):
         """Compute primal residual normalisation term."""
 
-        return max((linalg.norm(AX), linalg.norm(Y)))
+        return max((np.linalg.norm(AX), np.linalg.norm(Y)))
 
 
 
     def rsdl_sn(self, U):
         """Compute dual residual normalisation term."""
 
-        return self.rho*linalg.norm(U)
+        return self.rho*np.linalg.norm(U)
 
 
 
@@ -1411,9 +1410,9 @@ class ADMMTwoBlockCnstrnt(ADMM):
         """
 
         if not hasattr(self, '_cnst_nrm_c'):
-            self._cnst_nrm_c = np.sqrt(linalg.norm(self.cnst_c0())**2 +
-                                       linalg.norm(self.cnst_c1())**2)
-        return max((linalg.norm(AX), linalg.norm(Y), self._cnst_nrm_c))
+            self._cnst_nrm_c = np.sqrt(np.linalg.norm(self.cnst_c0())**2 +
+                                       np.linalg.norm(self.cnst_c1())**2)
+        return max((np.linalg.norm(AX), np.linalg.norm(Y), self._cnst_nrm_c))
 
 
 
@@ -1425,7 +1424,7 @@ class ADMMTwoBlockCnstrnt(ADMM):
         overridden.
         """
 
-        return self.rho*linalg.norm(self.cnst_AT(U))
+        return self.rho*np.linalg.norm(self.cnst_AT(U))
 
 
 
@@ -1680,11 +1679,11 @@ class ADMMConsensus(ADMM):
         # max( ||A x^(k)||_2, ||B y^(k)||_2 ) and B = -(I I I ...)^T.
         # The scaling by sqrt(Nb) of the l2 norm of Y accounts for the
         # block replication introduced by multiplication by B
-        return max((linalg.norm(AX), np.sqrt(self.Nb)*linalg.norm(Y)))
+        return max((np.linalg.norm(AX), np.sqrt(self.Nb)*np.linalg.norm(Y)))
 
 
 
     def rsdl_sn(self, U):
         """Compute dual residual normalisation term."""
 
-        return self.rho*linalg.norm(U)
+        return self.rho*np.linalg.norm(U)

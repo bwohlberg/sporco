@@ -15,7 +15,6 @@ from builtins import range
 import copy
 from types import MethodType
 import numpy as np
-from scipy import linalg
 
 from sporco.admm import admm
 import sporco.cnvrep as cr
@@ -609,7 +608,7 @@ class ConvBPDN(GenericConvBPDN):
         function.
         """
 
-        rl1 = linalg.norm((self.wl1 * self.obfn_gvar()).ravel(), 1)
+        rl1 = np.linalg.norm((self.wl1 * self.obfn_gvar()).ravel(), 1)
         return (self.lmbda*rl1, rl1)
 
 
@@ -778,7 +777,7 @@ class ConvBPDNJoint(ConvBPDN):
         :math:`\| Y \|_{2,1}`.
         """
 
-        rl1 = linalg.norm((self.wl1 * self.obfn_gvar()).ravel(), 1)
+        rl1 = np.linalg.norm((self.wl1 * self.obfn_gvar()).ravel(), 1)
         rl21 = np.sum(self.wl21 * np.sqrt(np.sum(self.obfn_gvar()**2,
                                           axis=self.cri.axisC)))
         return (self.lmbda*rl1 + self.mu*rl21, rl1, rl21)
@@ -959,8 +958,8 @@ class ConvElasticNet(ConvBPDN):
         function.
         """
 
-        rl1 = linalg.norm((self.wl1 * self.obfn_gvar()).ravel(), 1)
-        rl2 = 0.5*linalg.norm(self.obfn_gvar())**2
+        rl1 = np.linalg.norm((self.wl1 * self.obfn_gvar()).ravel(), 1)
+        rl2 = 0.5*np.linalg.norm(self.obfn_gvar())**2
         return (self.lmbda*rl1 + self.mu*rl2, rl1, rl2)
 
 
@@ -1181,7 +1180,7 @@ class ConvBPDNGradReg(ConvBPDN):
         """
 
         fvf = self.obfn_fvarf()
-        rl1 = linalg.norm((self.wl1 * self.obfn_gvar()).ravel(), 1)
+        rl1 = np.linalg.norm((self.wl1 * self.obfn_gvar()).ravel(), 1)
         rgr = sl.rfl2norm2(np.sqrt(self.GHGf*np.conj(fvf)*fvf), self.cri.Nv,
                            self.cri.axisN)/2.0
         return (self.lmbda*rl1 + self.mu*rgr, rl1, rgr)
@@ -1361,7 +1360,7 @@ class ConvBPDNProjL1(GenericConvBPDN):
         prj = sp.proj_l1(self.obfn_gvar(), self.gamma,
                          axis=self.cri.axisN + (self.cri.axisC,
                                                 self.cri.axisM))
-        cns = linalg.norm(prj - self.obfn_gvar())
+        cns = np.linalg.norm(prj - self.obfn_gvar())
         return (dfd, cns)
 
 
@@ -1769,14 +1768,14 @@ class ConvTwoBlockCnstrnt(admm.ADMMTwoBlockCnstrnt):
     def rsdl_s(self, Yprev, Y):
         """Compute dual residual vector."""
 
-        return self.rho*linalg.norm(self.cnst_AT(self.U))
+        return self.rho*np.linalg.norm(self.cnst_AT(self.U))
 
 
 
     def rsdl_sn(self, U):
         """Compute dual residual normalisation term."""
 
-        return self.rho*linalg.norm(U)
+        return self.rho*np.linalg.norm(U)
 
 
 
@@ -1985,7 +1984,7 @@ class ConvMinL1InL2Ball(ConvTwoBlockCnstrnt):
         function.
         """
 
-        return linalg.norm(sl.proj_l2ball(Y0, 0.0, self.epsilon,
+        return np.linalg.norm(sl.proj_l2ball(Y0, 0.0, self.epsilon,
                                           axes=self.cri.axisN) - Y0)
 
 
@@ -1995,7 +1994,7 @@ class ConvMinL1InL2Ball(ConvTwoBlockCnstrnt):
         function.
         """
 
-        return linalg.norm((self.wl1 * Y1).ravel(), 1)
+        return np.linalg.norm((self.wl1 * Y1).ravel(), 1)
 
 
 
@@ -2207,7 +2206,7 @@ class ConvBPDNMaskDcpl(ConvTwoBlockCnstrnt):
         function.
         """
 
-        return (linalg.norm(self.W * Y0)**2) / 2.0
+        return (np.linalg.norm(self.W * Y0)**2) / 2.0
 
 
 
@@ -2216,7 +2215,7 @@ class ConvBPDNMaskDcpl(ConvTwoBlockCnstrnt):
         function.
         """
 
-        return linalg.norm((self.wl1 * Y1).ravel(), 1)
+        return np.linalg.norm((self.wl1 * Y1).ravel(), 1)
 
 
 

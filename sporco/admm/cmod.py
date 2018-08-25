@@ -12,7 +12,6 @@ from __future__ import absolute_import
 
 import copy
 import numpy as np
-from scipy import linalg
 
 from sporco.admm import admm
 import sporco.linalg as sl
@@ -259,7 +258,7 @@ class CnstrMOD(admm.ADMMEqual):
         \mathbf{s} \|_2^2`.
         """
 
-        return 0.5*linalg.norm((self.obfn_fvar().dot(self.Z) - self.S))**2
+        return 0.5*np.linalg.norm((self.obfn_fvar().dot(self.Z) - self.S))**2
 
 
 
@@ -268,7 +267,7 @@ class CnstrMOD(admm.ADMMEqual):
         \mathbf{y}\|_2`.
         """
 
-        return linalg.norm((self.Pcn(self.obfn_gvar()) - self.obfn_gvar()))
+        return np.linalg.norm((self.Pcn(self.obfn_gvar()) - self.obfn_gvar()))
 
 
 

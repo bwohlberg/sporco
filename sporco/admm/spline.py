@@ -12,7 +12,6 @@ from __future__ import absolute_import
 
 import copy
 import numpy as np
-from scipy import linalg
 
 from sporco.admm import admm
 import sporco.linalg as sl
@@ -234,7 +233,7 @@ class SplineL1(admm.ADMM):
 
         gvr = self.obfn_gvar()
         dfd = np.sum(np.abs(self.Wdf * gvr))
-        reg = 0.5*linalg.norm(sl.idctii(self.Alpha*sl.dctii(self.X,
+        reg = 0.5*np.linalg.norm(sl.idctii(self.Alpha*sl.dctii(self.X,
                         axes=self.axes), axes=self.axes))**2
         obj = dfd + self.lmbda*reg
         return (obj, dfd, reg)
