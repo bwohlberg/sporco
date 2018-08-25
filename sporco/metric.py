@@ -54,7 +54,7 @@ def mae(vref, vcmp):
 
     r = np.asarray(vref, dtype=np.float64).ravel()
     c = np.asarray(vcmp, dtype=np.float64).ravel()
-    return np.mean(np.fabs(r - c))
+    return np.mean(np.abs(r - c))
 
 
 
@@ -77,7 +77,7 @@ def mse(vref, vcmp):
 
     r = np.asarray(vref, dtype=np.float64).ravel()
     c = np.asarray(vcmp, dtype=np.float64).ravel()
-    return np.mean(np.fabs(r - c)**2)
+    return np.mean(np.abs(r - c)**2)
 
 
 
