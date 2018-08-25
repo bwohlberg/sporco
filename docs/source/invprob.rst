@@ -1,7 +1,7 @@
 Inverse Problems
 ================
 
-SPORCO provides a :doc:`set of classes <admm>` supporting the construction of new optimisation algorithms within the ADMM :cite:`boyd-2010-distributed` and FISTA :cite:`beck-2009-fast` frameworks, as well as a set of complete algorithms, based on this framework, for solving optimisation problems within the following categories:
+SPORCO provides a set of classes supporting the construction of new optimisation algorithms within the :doc:`ADMM <admm>` :cite:`boyd-2010-distributed` and :doc:`FISTA <fista>` :cite:`beck-2009-fast` frameworks, as well as a set of complete algorithms, based on these frameworks, for solving optimisation problems within the following categories:
 
 
 Standard Sparse Representations
@@ -23,10 +23,7 @@ Convolutional Sparse Representations
 Dictionary Learning
 -------------------
 
-The :class:`.DictLearn` class in the :mod:`.dictlrn.dictlrn` module provides
-a flexible framework for more general :doc:`dictionary learning
-<invprob/dictlrn>` problems than those in modules :doc:`bpdndl
-<invprob/bpdndl>` and :doc:`cbpdndl / cbpdndlmd / prlcnscdl <invprob/cbpdndl>`.
+The :class:`.DictLearn` class in the :mod:`.dictlrn.dictlrn` module provides a flexible framework for more general :doc:`dictionary learning <invprob/dictlrn>` problems than those in modules :doc:`bpdndl <invprob/bpdndl>` and :doc:`cbpdndl / cbpdndlmd / prlcnscdl <invprob/cbpdndl>`.
 
 
 Miscellaneous
@@ -41,4 +38,4 @@ Miscellaneous
 Extensions
 ----------
 
-The :doc:`ADMM <admm>` and :doc:`FISTA <fista>` classes are designed to for ease of implementation of new problems and simplicity of extension of existing problems. See :class:`.BPDN` as an example of the methods that need to be defined to implement a complete ADMM algorithm, and :class:`.BPDNJoint` as an example of the minor additional code required to extend an existing problem.
+The :doc:`ADMM <admm>` and :doc:`FISTA <fista>` classes are designed to for ease of implementation of new problems and simplicity of extension of existing problems. See :class:`.admm.bpdn.BPDN` as an example of the methods that need to be defined to implement a complete ADMM algorithm, and :class:`.BPDNJoint` as an example of the minor additional code required to extend an existing problem.
