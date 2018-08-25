@@ -1282,7 +1282,7 @@ def fl2norm2(xf, axis=(0, 1)):
     """
 
     xfs = xf.shape
-    return (linalg.norm(xf)**2)/np.prod(np.array([xfs[k] for k in axis]))
+    return (np.linalg.norm(xf)**2)/np.prod(np.array([xfs[k] for k in axis]))
 
 
 
@@ -1313,11 +1313,11 @@ def rfl2norm2(xf, xs, axis=(0, 1)):
 
     scl = 1.0 / np.prod(np.array([xs[k] for k in axis]))
     slc0 = (slice(None),)*axis[-1]
-    nrm0 = linalg.norm(xf[slc0 + (0,)])
+    nrm0 = np.linalg.norm(xf[slc0 + (0,)])
     idx1 = (xs[axis[-1]]+1)//2
-    nrm1 = linalg.norm(xf[slc0 + (slice(1, idx1),)])
+    nrm1 = np.linalg.norm(xf[slc0 + (slice(1, idx1),)])
     if xs[axis[-1]] % 2 == 0:
-        nrm2 = linalg.norm(xf[slc0 + (slice(-1, None),)])
+        nrm2 = np.linalg.norm(xf[slc0 + (slice(-1, None),)])
     else:
         nrm2 = 0.0
     return scl*(nrm0**2 + 2.0*nrm1**2 + nrm2**2)
@@ -1343,8 +1343,8 @@ def rrs(ax, b):
       Relative residual
     """
 
-    nrm = linalg.norm(b.ravel())
+    nrm = np.linalg.norm(b.ravel())
     if nrm == 0.0:
         return 1.0
     else:
-        return linalg.norm((ax - b).ravel()) / nrm
+        return np.linalg.norm((ax - b).ravel()) / nrm
