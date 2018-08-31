@@ -69,7 +69,7 @@ def ntpl2array(ntpl):
       Array representation of input named tuple
     """
 
-    return np.asarray((np.vstack([col for col in ntpl]), ntpl._fields,
+    return np.asarray((np.hstack([col for col in ntpl]), ntpl._fields,
                        ntpl.__class__.__name__))
 
 
