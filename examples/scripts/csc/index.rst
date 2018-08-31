@@ -49,6 +49,9 @@ cbpdn_grd_cuda.py
 cbpdn_clr_cd.py
   Convolutional sparse coding of a colour image with a colour dictionary
 
+cbpdn_fista_clr.py
+  Convolutional sparse coding of a colour image with a colour dictionary (FISTA solver)
+
 cbpdn_clr_gd.py
   Convolutional sparse coding of a colour image with a greyscale dictionary
 
