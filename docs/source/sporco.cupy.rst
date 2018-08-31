@@ -5,6 +5,7 @@ sporco.cupy package
 
 This subpackage provides GPU acceleration for selected SPORCO modules via copies of these modules that are patched to replace `NumPy <http://www.numpy.org/>`__ arrays and operations with the equivalent ones provided by `CuPy <https://cupy.chainer.org/>`__. The boolean value of attribute ``sporco.cupy.have_cupy`` indicates whether `CuPy <https://cupy.chainer.org/>`__ is installed and a GPU device is available. The modules within the ``sporco.cupy`` subpackage can still be used when ``sporco.cupy.have_cupy`` is ``False``, but they will not be GPU accelerated.
 
+Note that the ``sporco.cupy`` subpackage is not supported under versions of Python, such as Python 2.7.x, that do not have the :mod:`importlib.util` module.
 
 
 Installation and Configuration
