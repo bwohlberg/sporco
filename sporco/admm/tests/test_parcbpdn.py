@@ -1,9 +1,8 @@
 from __future__ import division
 from builtins import object
 
-import pytest
-import numpy as np
 import pickle
+import numpy as np
 
 from sporco.admm import parcbpdn
 import sporco.linalg as sl
@@ -25,8 +24,8 @@ class TestSet01(object):
         s = np.random.randn(N, N, Cs)
         lmbda = 1e-1
         b = parcbpdn.ParConvBPDN(D, s, lmbda, dimK=0)
-        assert(b.cri.dimC == 1)
-        assert(b.cri.dimK == 0)
+        assert b.cri.dimC == 1
+        assert b.cri.dimK == 0
 
 
     def test_02(self):
@@ -39,8 +38,8 @@ class TestSet01(object):
         s = np.random.randn(N, N, Cs, K)
         lmbda = 1e-1
         b = parcbpdn.ParConvBPDN(D, s, lmbda)
-        assert(b.cri.dimC == 1)
-        assert(b.cri.dimK == 1)
+        assert b.cri.dimC == 1
+        assert b.cri.dimK == 1
 
 
     def test_03(self):
@@ -52,8 +51,8 @@ class TestSet01(object):
         s = np.random.randn(N, N, Cd)
         lmbda = 1e-1
         b = parcbpdn.ParConvBPDN(D, s, lmbda)
-        assert(b.cri.dimC == 1)
-        assert(b.cri.dimK == 0)
+        assert b.cri.dimC == 1
+        assert b.cri.dimK == 0
 
 
     def test_04(self):
@@ -66,8 +65,8 @@ class TestSet01(object):
         s = np.random.randn(N, N, Cd, K)
         lmbda = 1e-1
         b = parcbpdn.ParConvBPDN(D, s, lmbda)
-        assert(b.cri.dimC == 1)
-        assert(b.cri.dimK == 1)
+        assert b.cri.dimC == 1
+        assert b.cri.dimK == 1
 
 
     def test_05(self):
@@ -79,8 +78,8 @@ class TestSet01(object):
         s = np.random.randn(N, N, K)
         lmbda = 1e-1
         b = parcbpdn.ParConvBPDN(D, s, lmbda)
-        assert(b.cri.dimC == 0)
-        assert(b.cri.dimK == 1)
+        assert b.cri.dimC == 0
+        assert b.cri.dimK == 1
 
 
     def test_06(self):
@@ -97,9 +96,9 @@ class TestSet01(object):
         lmbda = 1e-1
         b = parcbpdn.ParConvBPDN(D, s, lmbda, opt=opt)
         b.solve()
-        assert(b.X.dtype == dt)
-        assert(b.Y.dtype == dt)
-        assert(b.U.dtype == dt)
+        assert b.X.dtype == dt
+        assert b.Y.dtype == dt
+        assert b.U.dtype == dt
 
 
     def test_07(self):
@@ -116,9 +115,9 @@ class TestSet01(object):
         lmbda = 1e-1
         b = parcbpdn.ParConvBPDN(D, s, lmbda, opt=opt)
         b.solve()
-        assert(b.X.dtype == dt)
-        assert(b.Y.dtype == dt)
-        assert(b.U.dtype == dt)
+        assert b.X.dtype == dt
+        assert b.Y.dtype == dt
+        assert b.U.dtype == dt
 
 
     def test_08(self):
@@ -132,7 +131,7 @@ class TestSet01(object):
             b.solve()
         except Exception as e:
             print(e)
-            assert(0)
+            assert 0
 
 
     def test_09(self):
@@ -155,9 +154,9 @@ class TestSet01(object):
         b = parcbpdn.ParConvBPDN(D, S, lmbda, opt=opt)
         b.solve()
         X1 = b.Y.squeeze()
-        assert(sl.rrs(X0, X1) < 5e-5)
+        assert sl.rrs(X0, X1) < 5e-5
         Sr = b.reconstruct().squeeze()
-        assert(sl.rrs(S, Sr) < 1e-4)
+        assert sl.rrs(S, Sr) < 1e-4
 
 
     def test_10(self):
@@ -181,9 +180,9 @@ class TestSet01(object):
         b = parcbpdn.ParConvBPDN(D, S, lmbda, opt=opt)
         b.solve()
         X1 = b.Y.squeeze()
-        assert(sl.rrs(X0, X1) < 5e-5)
+        assert sl.rrs(X0, X1) < 5e-5
         Sr = b.reconstruct().squeeze()
-        assert(sl.rrs(S, Sr) < 1e-4)
+        assert sl.rrs(S, Sr) < 1e-4
 
 
     def test_11(self):
@@ -198,7 +197,7 @@ class TestSet01(object):
             b.solve()
         except Exception as e:
             print(e)
-            assert(0)
+            assert 0
 
 
     def test_12(self):
@@ -214,7 +213,7 @@ class TestSet01(object):
             b.solve()
         except Exception as e:
             print(e)
-            assert(0)
+            assert 0
 
 
     def test_13(self):
@@ -231,7 +230,7 @@ class TestSet01(object):
             b.solve()
         except Exception as e:
             print(e)
-            assert(0)
+            assert 0
 
 
     def test_14(self):
@@ -247,7 +246,7 @@ class TestSet01(object):
             b.solve()
         except Exception as e:
             print(e)
-            assert(0)
+            assert 0
 
 
     def test_15(self):
@@ -264,7 +263,7 @@ class TestSet01(object):
             b.solve()
         except Exception as e:
             print(e)
-            assert(0)
+            assert 0
 
 
     def test_16(self):
@@ -281,9 +280,9 @@ class TestSet01(object):
         lmbda = 1e-1
         b = parcbpdn.ParConvBPDN(D, s, lmbda, opt=opt)
         b.solve()
-        assert(b.X.dtype == dt)
-        assert(b.Y.dtype == dt)
-        assert(b.U.dtype == dt)
+        assert b.X.dtype == dt
+        assert b.Y.dtype == dt
+        assert b.U.dtype == dt
 
 
     def test_17(self):
@@ -300,7 +299,7 @@ class TestSet01(object):
             b.reconstruct()
         except Exception as e:
             print(e)
-            assert(0)
+            assert 0
 
 
     def test_18(self):
@@ -317,9 +316,9 @@ class TestSet01(object):
         lmbda = 1e-1
         b = parcbpdn.ParConvBPDN(D, s, lmbda, W=w, opt=opt)
         b.solve()
-        assert(b.X.dtype == dt)
-        assert(b.Y.dtype == dt)
-        assert(b.U.dtype == dt)
+        assert b.X.dtype == dt
+        assert b.Y.dtype == dt
+        assert b.U.dtype == dt
 
 
 
@@ -337,4 +336,4 @@ class TestSet01(object):
         c = pickle.loads(bp)
         Xb = b.solve()
         Xc = c.solve()
-        assert(np.linalg.norm(Xb - Xc) == 0.0)
+        assert np.linalg.norm(Xb - Xc) == 0.0

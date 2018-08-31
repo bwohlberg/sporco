@@ -566,9 +566,9 @@ class ConvCnstrMOD_CG(ConvCnstrMODBase):
         self.YU[:] = self.Y - self.U
         b = self.ZSf + self.rho*sl.rfftn(self.YU, None, self.cri.axisN)
         self.Xf[:], cgit = sl.solvemdbi_cg(self.Zf, self.rho, b,
-                                self.cri.axisM, self.cri.axisK,
-                                self.opt['CG', 'StopTol'],
-                                self.opt['CG', 'MaxIter'], self.Xf)
+                                           self.cri.axisM, self.cri.axisK,
+                                           self.opt['CG', 'StopTol'],
+                                           self.opt['CG', 'MaxIter'], self.Xf)
         self.cgit = cgit
         self.X = sl.irfftn(self.Xf, self.cri.Nv, self.cri.axisN)
         self.xstep_check(b)
@@ -762,8 +762,9 @@ class ConvCnstrMOD_Consensus(admm.ADMMConsensus):
             b = np.swapaxes(self.ZSf[..., np.newaxis], self.cri.axisK, -1) \
                 + self.rho*sl.rfftn(self.YU, None, self.cri.axisN)
             for i in range(self.Nb):
-                self.Xf[..., i] = sl.solvedbi_sm(self.Zf[..., [i], :],
-                                self.rho, b[..., i], axis=self.cri.axisM)
+                self.Xf[..., i] = sl.solvedbi_sm(
+                    self.Zf[..., [i], :], self.rho, b[..., i],
+                    axis=self.cri.axisM)
             self.X = sl.irfftn(self.Xf, self.cri.Nv, self.cri.axisN)
 
 
@@ -791,8 +792,9 @@ class ConvCnstrMOD_Consensus(admm.ADMMConsensus):
         b = np.take(self.ZSf, [i], axis=self.cri.axisK) + \
             self.rho*sl.rfftn(self.YU, None, self.cri.axisN)
 
-        self.Xf[..., i] = sl.solvedbi_sm(np.take(self.Zf, [i],
-                axis=self.cri.axisK), self.rho, b, axis=self.cri.axisM)
+        self.Xf[..., i] = sl.solvedbi_sm(np.take(
+            self.Zf, [i], axis=self.cri.axisK),
+                                         self.rho, b, axis=self.cri.axisM)
         self.X[..., i] = sl.irfftn(self.Xf[..., i], self.cri.Nv,
                                    self.cri.axisN)
 

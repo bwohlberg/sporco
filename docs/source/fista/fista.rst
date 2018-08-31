@@ -5,8 +5,7 @@ The fundamental class from which all FISTA algorithms are derived is
 :class:`.FISTA`, which supports problems of the form
 
 .. math::
-   \mathrm{argmin}_{\mathbf{x}} \;
-    f(\mathbf{x}) + g(\mathbf{x}) \;\;,
+   \mathrm{argmin}_{\mathbf{x}} \; f(\mathbf{x}) + g(\mathbf{x}) \;\;,
 
 where :math:`f, g` are convex functions and :math:`f` is smooth. All
 the updates are made in input domain.

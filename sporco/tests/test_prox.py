@@ -1,8 +1,6 @@
 from __future__ import division
 from builtins import object
 
-import pytest
-
 import numpy as np
 import scipy.optimize as optim
 from sporco import prox
@@ -23,8 +21,8 @@ def prox_test(v, nrm, prx, alpha):
     px = prx(v, alpha)
     pf = prox_func(px, v, nrm, alpha)
     mx, mf = prox_solve(v, px, nrm, alpha)
-    assert(np.abs(pf - mf) <= 1e-15)
-    assert(np.linalg.norm(px - mx) <= 1e-14)
+    assert np.abs(pf - mf) <= 1e-15
+    assert np.linalg.norm(px - mx) <= 1e-14
 
 
 def prox_test_axes(v, nrm, prx, alpha):
@@ -32,8 +30,8 @@ def prox_test_axes(v, nrm, prx, alpha):
         px = prx(v, alpha, axis=ax)
         pf = prox_func(px, v, nrm, alpha, axis=ax)
         mx, mf = prox_solve(v, px, nrm, alpha, axis=ax)
-        assert(np.abs(pf - mf) <= 1e-15)
-        assert(np.linalg.norm(px - mx) <= 1e-14)
+        assert np.abs(pf - mf) <= 1e-15
+        assert np.linalg.norm(px - mx) <= 1e-14
 
 
 def proj_solve(v, v0, f, gamma, axis=None):
@@ -49,9 +47,9 @@ def proj_test(v, nrm, prj, gamma):
     pj = prj(v, gamma)
     pf = 0.5*np.sum((pj - v)**2)
     mx, mf = proj_solve(v, pj, nrm, gamma)
-    assert(nrm(pj) - gamma <= 1e-14)
-    assert(np.abs(pf - mf) <= 1e-6)
-    assert(np.linalg.norm(pj - mx) <= 1e-4)
+    assert nrm(pj) - gamma <= 1e-14
+    assert np.abs(pf - mf) <= 1e-6
+    assert np.linalg.norm(pj - mx) <= 1e-4
 
 
 
@@ -103,6 +101,5 @@ class TestSet01(object):
 
 
     def test_12(self):
-        assert(np.sum(np.abs(prox.prox_l1l2(self.V1, 1e-2, 1e-2))) > 0)
-        assert(prox.norm_nuclear(self.V1) > 0)
-
+        assert np.sum(np.abs(prox.prox_l1l2(self.V1, 1e-2, 1e-2))) > 0
+        assert prox.norm_nuclear(self.V1) > 0

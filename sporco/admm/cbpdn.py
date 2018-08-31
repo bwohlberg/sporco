@@ -256,7 +256,7 @@ class GenericConvBPDN(admm.ADMMEqual):
 
         self.YU[:] = self.Y - self.U
 
-        b = self.DSf + self.rho*sl.rfftn(self.YU, None, self.cri.axisN)
+        b = self.DSf + self.rho * sl.rfftn(self.YU, None, self.cri.axisN)
         if self.cri.Cd == 1:
             self.Xf[:] = sl.solvedbi_sm(self.Df, self.rho, b, self.c,
                                         self.cri.axisM)
@@ -273,7 +273,7 @@ class GenericConvBPDN(admm.ADMMEqual):
             else:
                 DHop = lambda x: sl.inner(np.conj(self.Df), x,
                                           axis=self.cri.axisC)
-            ax = DHop(Dop(self.Xf)) + self.rho*self.Xf
+            ax = DHop(Dop(self.Xf)) + self.rho * self.Xf
             self.xrrs = sl.rrs(ax, b)
         else:
             self.xrrs = None
@@ -293,8 +293,8 @@ class GenericConvBPDN(admm.ADMMEqual):
             self.Y[self.Y < 0.0] = 0.0
         if self.opt['NoBndryCross']:
             for n in range(0, self.cri.dimN):
-                self.Y[(slice(None),)*n +
-                       (slice(1-self.D.shape[n], None),)] = 0.0
+                self.Y[(slice(None),) * n +
+                       (slice(1 - self.D.shape[n], None),)] = 0.0
 
 
 
@@ -326,8 +326,8 @@ class GenericConvBPDN(admm.ADMMEqual):
         """
 
         Ef = sl.inner(self.Df, self.obfn_fvarf(), axis=self.cri.axisM) - \
-          self.Sf
-        return sl.rfl2norm2(Ef, self.S.shape, axis=self.cri.axisN)/2.0
+            self.Sf
+        return sl.rfl2norm2(Ef, self.S.shape, axis=self.cri.axisN) / 2.0
 
 
 
@@ -554,13 +554,13 @@ class ConvBPDN(GenericConvBPDN):
             Df = sl.rfftn(D.reshape(cri.shpD), cri.Nv, axes=cri.axisN)
             Sf = sl.rfftn(S.reshape(cri.shpS), axes=cri.axisN)
             b = np.conj(Df) * Sf
-            lmbda = 0.1*abs(b).max()
+            lmbda = 0.1 * abs(b).max()
 
         # Set l1 term scaling
         self.lmbda = self.dtype.type(lmbda)
 
         # Set penalty parameter
-        self.set_attr('rho', opt['rho'], dval=(50.0*self.lmbda + 1.0),
+        self.set_attr('rho', opt['rho'], dval=(50.0 * self.lmbda + 1.0),
                       dtype=self.dtype)
 
         # Set rho_xi attribute (see Sec. VI.C of wohlberg-2015-adaptive)
@@ -583,7 +583,7 @@ class ConvBPDN(GenericConvBPDN):
     def uinit(self, ushape):
         """Return initialiser for working variable U"""
 
-        if  self.opt['Y0'] is None:
+        if self.opt['Y0'] is None:
             return np.zeros(ushape, dtype=self.dtype)
         else:
             # If initial Y is non-zero, initial U is chosen so that
@@ -598,7 +598,7 @@ class ConvBPDN(GenericConvBPDN):
         :math:`\mathbf{y}`."""
 
         self.Y = sl.shrink1(self.AX + self.U,
-                            (self.lmbda/self.rho) * self.wl1)
+                            (self.lmbda / self.rho) * self.wl1)
         super(ConvBPDN, self).ystep()
 
 
@@ -779,7 +779,7 @@ class ConvBPDNJoint(ConvBPDN):
 
         rl1 = np.linalg.norm((self.wl1 * self.obfn_gvar()).ravel(), 1)
         rl21 = np.sum(self.wl21 * np.sqrt(np.sum(self.obfn_gvar()**2,
-                                          axis=self.cri.axisC)))
+                                                 axis=self.cri.axisC)))
         return (self.lmbda*rl1 + self.mu*rl21, rl1, rl21)
 
 
@@ -1135,8 +1135,9 @@ class ConvBPDNGradReg(ConvBPDN):
         if self.cri.Cd > 1:
             self.DSf = np.sum(self.DSf, axis=self.cri.axisC, keepdims=True)
         if self.opt['HighMemSolve'] and self.cri.Cd == 1:
-            self.c = sl.solvedbd_sm_c(self.Df, np.conj(self.Df),
-                        self.mu*self.GHGf + self.rho, self.cri.axisM)
+            self.c = sl.solvedbd_sm_c(
+                self.Df, np.conj(self.Df), self.mu*self.GHGf + self.rho,
+                self.cri.axisM)
         else:
             self.c = None
 
@@ -1328,7 +1329,7 @@ class ConvBPDNProjL1(GenericConvBPDN):
     def uinit(self, ushape):
         """Return initialiser for working variable U."""
 
-        if  self.opt['Y0'] is None:
+        if self.opt['Y0'] is None:
             return np.zeros(ushape, dtype=self.dtype)
         else:
             # If initial Y is non-zero, initial U is chosen so that
@@ -1702,7 +1703,7 @@ class ConvTwoBlockCnstrnt(admm.ADMMTwoBlockCnstrnt):
         if Xf is None:
             Xf = sl.rfftn(X, None, self.cri.axisN)
         return sl.irfftn(sl.inner(self.Df, Xf, axis=self.cri.axisM),
-                                  self.cri.Nv, self.cri.axisN)
+                         self.cri.Nv, self.cri.axisN)
 
 
 
@@ -1719,8 +1720,9 @@ class ConvTwoBlockCnstrnt(admm.ADMMTwoBlockCnstrnt):
             return sl.irfftn(np.conj(self.Df) * Y0f, self.cri.Nv,
                              self.cri.axisN)
         else:
-            return sl.irfftn(sl.inner(np.conj(self.Df), Y0f,
-                    axis=self.cri.axisC), self.cri.Nv, self.cri.axisN)
+            return sl.irfftn(sl.inner(
+                np.conj(self.Df), Y0f, axis=self.cri.axisC),
+                self.cri.Nv, self.cri.axisN)
 
 
 
@@ -1951,7 +1953,7 @@ class ConvMinL1InL2Ball(ConvTwoBlockCnstrnt):
     def uinit(self, ushape):
         """Return initialiser for working variable U."""
 
-        if  self.opt['Y0'] is None:
+        if self.opt['Y0'] is None:
             return np.zeros(ushape, dtype=self.dtype)
         else:
             # If initial Y is non-zero, initial U is chosen so that
@@ -1985,7 +1987,7 @@ class ConvMinL1InL2Ball(ConvTwoBlockCnstrnt):
         """
 
         return np.linalg.norm(sl.proj_l2ball(Y0, 0.0, self.epsilon,
-                                          axes=self.cri.axisN) - Y0)
+                                             axes=self.cri.axisN) - Y0)
 
 
 
@@ -2163,7 +2165,7 @@ class ConvBPDNMaskDcpl(ConvTwoBlockCnstrnt):
     def uinit(self, ushape):
         """Return initialiser for working variable U."""
 
-        if  self.opt['Y0'] is None:
+        if self.opt['Y0'] is None:
             return np.zeros(ushape, dtype=self.dtype)
         else:
             # If initial Y is non-zero, initial U is chosen so that
@@ -2181,8 +2183,10 @@ class ConvBPDNMaskDcpl(ConvTwoBlockCnstrnt):
         """
 
         AXU = self.AX + self.U
-        Y0 = (self.rho*(self.block_sep0(AXU) - self.S)) / (self.W**2 + self.rho)
-        Y1 = sl.shrink1(self.block_sep1(AXU), (self.lmbda/self.rho)*self.wl1)
+        Y0 = (self.rho*(self.block_sep0(AXU) - self.S)) / \
+             (self.W**2 + self.rho)
+        Y1 = sl.shrink1(self.block_sep1(AXU),
+                        (self.lmbda / self.rho) * self.wl1)
         self.Y = self.block_cat(Y0, Y1)
 
         super(ConvBPDNMaskDcpl, self).ystep()

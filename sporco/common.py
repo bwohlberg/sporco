@@ -10,7 +10,6 @@
 from __future__ import division
 from __future__ import print_function
 from future.utils import with_metaclass
-from builtins import range
 from builtins import object
 
 import sys
@@ -141,7 +140,7 @@ class IterativeSolver(with_metaclass(_IterSolver_Meta, object)):
         """
 
         return ('Iter',) + cls.itstat_fields_objfn + \
-          cls.itstat_fields_alg + cls.itstat_fields_extra + ('Time',)
+            cls.itstat_fields_alg + cls.itstat_fields_extra + ('Time',)
 
 
 
@@ -208,7 +207,7 @@ class IterativeSolver(with_metaclass(_IterSolver_Meta, object)):
         # If dtype is not None, assume val is numeric and convert it to
         # type dtype
         if dtype is not None and val is not None:
-            if type(dtype) == type:
+            if isinstance(dtype, type):
                 val = dtype(val)
             else:
                 val = dtype.type(val)
@@ -263,9 +262,9 @@ def solve_status_str(hdrlbl, fmtmap=None, fwdth0=4, fwdthdlt=6,
     # or a %e specifier with field width fwdthn and precision
     # fprec
     fldfmt = [fmtmap[lbl] if lbl in fmtmap else
-                  (('%%%dd' % (fwdth0)) if idx == 0 else
-                       (('%%%d.%de' % (fwdthn, fprec))))
-                  for idx, lbl in enumerate(hdrlbl)]
+              (('%%%dd' % (fwdth0)) if idx == 0 else
+               (('%%%d.%de' % (fwdthn, fprec))))
+              for idx, lbl in enumerate(hdrlbl)]
     fmtstr = ('  ').join(fldfmt)
 
     # Construct a list of field widths for each field by extracting

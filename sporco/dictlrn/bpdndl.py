@@ -9,8 +9,6 @@
 
 from __future__ import print_function
 from __future__ import absolute_import
-from builtins import range
-from builtins import object
 
 import copy
 import numpy as np
@@ -90,21 +88,24 @@ class BPDNDictLearn(dictlrn.DictLearn):
         """
 
         defaults = copy.deepcopy(dictlrn.DictLearn.Options.defaults)
-        defaults.update({'AccurateDFid': False,
-            'BPDN' : copy.deepcopy(bpdn.BPDN.Options.defaults),
-            'CMOD' : copy.deepcopy(cmod.CnstrMOD.Options.defaults)})
+        defaults.update(
+            {'AccurateDFid': False,
+             'BPDN' : copy.deepcopy(bpdn.BPDN.Options.defaults),
+             'CMOD' : copy.deepcopy(cmod.CnstrMOD.Options.defaults)})
 
 
         def __init__(self, opt=None):
             """Initialise BPDN dictionary learning algorithm options."""
 
-            dictlrn.DictLearn.Options.__init__(self, {
-                'BPDN': bpdn.BPDN.Options({'MaxMainIter': 1,
-                    'AutoRho': {'Period': 10, 'AutoScaling': False,
-                    'RsdlRatio': 10.0, 'Scaling': 2.0, 'RsdlTarget': 1.0}}),
-                'CMOD': cmod.CnstrMOD.Options({'MaxMainIter': 1,
-                    'AutoRho': {'Period': 10}, 'AuxVarObj': False})
-                })
+            dictlrn.DictLearn.Options.__init__(
+                self, {'BPDN': bpdn.BPDN.Options(
+                    {'MaxMainIter': 1, 'AutoRho':
+                     {'Period': 10, 'AutoScaling': False, 'RsdlRatio': 10.0,
+                      'Scaling': 2.0, 'RsdlTarget': 1.0}}),
+                       'CMOD': cmod.CnstrMOD.Options(
+                           {'MaxMainIter': 1, 'AutoRho': {'Period': 10},
+                            'AuxVarObj': False})
+                      })
 
             if opt is None:
                 opt = {}

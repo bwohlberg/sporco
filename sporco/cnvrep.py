@@ -515,14 +515,14 @@ def l1Wshape(W, cri):
     if W.ndim < sdim:
         if W.size == 1:
             # Weight array is a scalar
-            shpW = (1,) * (cri.dimN+3)
+            shpW = (1,) * (cri.dimN + 3)
         else:
             # Invalid weight array shape
             raise ValueError('weight array must be scalar or have at least '
                              'the same number of dimensions as input array')
     elif W.ndim == sdim:
         # Weight array has the same number of dimensions as the input array
-        shpW = W.shape + (1,) * (3-cri.dimC-cri.dimK)
+        shpW = W.shape + (1,) * (3 - cri.dimC - cri.dimK)
     else:
         # Weight array has more dimensions than the input array
         if W.ndim == cri.dimN + 3:
@@ -531,7 +531,8 @@ def l1Wshape(W, cri):
         else:
             # Assume that the final axis in the input array is the filter
             # index
-            shpW = W.shape[0:-1] + (1,) * (2-cri.dimC-cri.dimK) + W.shape[-1:]
+            shpW = W.shape[0:-1] + (1,) * (2 - cri.dimC - cri.dimK) + \
+                W.shape[-1:]
 
     return shpW
 
@@ -621,14 +622,15 @@ def zeromean(v, dsz, dimN=2):
             # Determine end index of current block of filters
             if isinstance(dsz[mb][0], tuple):
                 m1 = m0 + dsz[mb][0][-1]
-                c0 = 0  # Init. idx. of current channel-block of equi-sized flt.
+                c0 = 0  # Init. idx. of current chnl-block of equi-sized flt.
                 for cb in range(0, len(dsz[mb])):
                     c1 = c0 + dsz[mb][cb][-2]
                     # Construct slice corresponding to cropped part of
                     # current block of filters in output array and set from
                     # input array
-                    cbslc = tuple([slice(0, x) for x in dsz[mb][cb][0:dimN]]) \
-                            + (slice(c0, c1),) + (Ellipsis,) + (slice(m0, m1),)
+                    cbslc = tuple([slice(0, x) for x in dsz[mb][cb][0:dimN]]
+                                  ) + (slice(c0, c1),) + (Ellipsis,) + \
+                                      (slice(m0, m1),)
                     vz[cbslc] -= np.mean(v[cbslc], axisN)
                     c0 = c1  # Update initial index for start of next block
             else:
@@ -636,8 +638,8 @@ def zeromean(v, dsz, dimN=2):
                 # Construct slice corresponding to cropped part of
                 # current block of filters in output array and set from
                 # input array
-                mbslc = tuple([slice(0, x) for x in dsz[mb][0:-1]]) + \
-                        (Ellipsis,) + (slice(m0, m1),)
+                mbslc = tuple([slice(0, x) for x in dsz[mb][0:-1]]
+                              ) + (Ellipsis,) + (slice(m0, m1),)
                 vz[mbslc] -= np.mean(v[mbslc], axisN)
             m0 = m1  # Update initial index for start of next block
     else:
@@ -809,15 +811,15 @@ def bcrop(v, dsz, dimN=2):
             # Determine end index of current block of filters
             if isinstance(dsz[mb][0], tuple):
                 m1 = m0 + dsz[mb][0][-1]
-                c0 = 0  # Init. idx. of current channel-block of equi-sized flt.
+                c0 = 0  # Init. idx. of current chnl-block of equi-sized flt.
                 for cb in range(0, len(dsz[mb])):
                     c1 = c0 + dsz[mb][cb][-2]
                     # Construct slice corresponding to cropped part of
                     # current block of filters in output array and set from
                     # input array
-                    cbslc = tuple([slice(0, x) for x in
-                            dsz[mb][cb][0:dimN]]) + (slice(c0, c1),) + \
-                                 (Ellipsis,) + (slice(m0, m1),)
+                    cbslc = tuple([slice(0, x) for x in dsz[mb][cb][0:dimN]]
+                                  ) + (slice(c0, c1),) + (Ellipsis,) + \
+                                      (slice(m0, m1),)
                     vc[cbslc] = v[cbslc]
                     c0 = c1  # Update initial index for start of next block
             else:
@@ -825,8 +827,8 @@ def bcrop(v, dsz, dimN=2):
                 # Construct slice corresponding to cropped part of
                 # current block of filters in output array and set from
                 # input array
-                mbslc = tuple([slice(0, x) for x in dsz[mb][0:-1]]) + \
-                        (Ellipsis,) + (slice(m0, m1),)
+                mbslc = tuple([slice(0, x) for x in dsz[mb][0:-1]]
+                              ) + (Ellipsis,) + (slice(m0, m1),)
                 vc[mbslc] = v[mbslc]
             m0 = m1  # Update initial index for start of next block
         return vc
@@ -868,16 +870,20 @@ def Pcn(x, dsz, Nv, dimN=2, dimC=1, crp=False, zm=False):
     """
 
     if crp:
-        zpadfn = lambda x: x
+        def zpadfn(x):
+            return x
     else:
-        zpadfn = lambda x: zpad(x, Nv)
+        def zpadfn(x):
+            return zpad(x, Nv)
 
     if zm:
-        zmeanfn = lambda x: zeromean(x, dsz, dimN)
+        def zmeanfn(x):
+            return zeromean(x, dsz, dimN)
     else:
-        zmeanfn = lambda x: x
+        def zmeanfn(x):
+            return x
 
-    return normalise(zmeanfn(zpadfn(bcrop(x, dsz, dimN))), dimN+dimC)
+    return normalise(zmeanfn(zpadfn(bcrop(x, dsz, dimN))), dimN + dimC)
 
 
 
@@ -909,8 +915,10 @@ def getPcn(dsz, Nv, dimN=2, dimC=1, crp=False, zm=False):
       Constraint set projection function
     """
 
-    fncdict = {(False, False): _Pcn,     (False, True): _Pcn_zm,
-               (True, False):  _Pcn_crp, (True, True):  _Pcn_zm_crp}
+    fncdict = {(False, False): _Pcn,
+               (False, True): _Pcn_zm,
+               (True, False): _Pcn_crp,
+               (True, True): _Pcn_zm_crp}
     fnc = fncdict[(crp, zm)]
     return functools.partial(fnc, dsz=dsz, Nv=Nv, dimN=dimN, dimC=dimC)
 
@@ -942,7 +950,7 @@ def _Pcn(x, dsz, Nv, dimN=2, dimC=1):
       Projection of input onto constraint set
     """
 
-    return normalise(zpad(bcrop(x, dsz, dimN), Nv), dimN+dimC)
+    return normalise(zpad(bcrop(x, dsz, dimN), Nv), dimN + dimC)
 
 
 
@@ -972,7 +980,7 @@ def _Pcn_zm(x, dsz, Nv, dimN=2, dimC=1):
       Projection of input onto constraint set
     """
 
-    return normalise(zeromean(zpad(bcrop(x, dsz, dimN), Nv), dsz), dimN+dimC)
+    return normalise(zeromean(zpad(bcrop(x, dsz, dimN), Nv), dsz), dimN + dimC)
 
 
 
@@ -1002,7 +1010,7 @@ def _Pcn_crp(x, dsz, Nv, dimN=2, dimC=1):
       Projection of input onto constraint set
     """
 
-    return normalise(zeromean(bcrop(x, dsz, dimN), dsz, dimN), dimN+dimC)
+    return normalise(zeromean(bcrop(x, dsz, dimN), dsz, dimN), dimN + dimC)
 
 
 
@@ -1032,4 +1040,4 @@ def _Pcn_zm_crp(x, dsz, Nv, dimN=2, dimC=1):
       Projection of input onto constraint set
     """
 
-    return normalise(bcrop(x, dsz, dimN), dimN+dimC)
+    return normalise(bcrop(x, dsz, dimN), dimN + dimC)

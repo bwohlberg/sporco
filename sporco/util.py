@@ -16,7 +16,6 @@ from builtins import object
 
 from timeit import default_timer as timer
 import os
-import sys
 import imghdr
 import io
 import platform
@@ -113,7 +112,7 @@ def transpose_ntpl_list(lst):
       corresponding fields of the named tuple objects in list ``lst``
     """
 
-    if len(lst) == 0:
+    if not lst:
         return None
     else:
         cls = collections.namedtuple(lst[0].__class__.__name__,
@@ -168,11 +167,11 @@ def tiledict(D, sz=None):
     # Construct tiled image
     N = dsz[axisM]
     Vr = int(np.floor(np.sqrt(N)))
-    Vc = int(np.ceil(N/float(Vr)))
+    Vc = int(np.ceil(N / float(Vr)))
     if D.ndim == 4:
-        im = np.ones((Vr*mxsz[0] + Vr-1, Vc*mxsz[1] + Vc-1, dsz[2]))
+        im = np.ones((Vr*mxsz[0] + Vr - 1, Vc*mxsz[1] + Vc - 1, dsz[2]))
     else:
-        im = np.ones((Vr*mxsz[0] + Vr-1, Vc*mxsz[1] + Vc-1))
+        im = np.ones((Vr*mxsz[0] + Vr - 1, Vc*mxsz[1] + Vc - 1))
     k = 0
     for l in range(0, Vr):
         for m in range(0, Vc):
@@ -225,17 +224,17 @@ def extractblocks(img, blksz, stpsz=None):
 
     # Calculate the number of blocks that can fit in each dimension of
     # the images
-    numblocks = tuple(int(np.floor((a-b)/c)+1) for a, b, c in
+    numblocks = tuple(int(np.floor((a - b) / c) + 1) for a, b, c in
                       zip_longest(imgsz, blksz, stpsz, fillvalue=1))
 
     # Calculate the strides for blocks
-    blockstrides = tuple(a*b for a, b in zip_longest(img.strides, stpsz,
-                                                     fillvalue=1))
+    blockstrides = tuple(a * b for a, b in zip_longest(img.strides, stpsz,
+                                                       fillvalue=1))
 
     new_shape = blksz + numblocks
     new_strides = img.strides[:len(blksz)] + blockstrides
     blks = np.lib.stride_tricks.as_strided(img, new_shape, new_strides)
-    return np.reshape(blks, blksz+(-1, ))
+    return np.reshape(blks, blksz + (-1,))
 
 
 
@@ -288,7 +287,7 @@ def averageblocks(blks, imgsz, stpsz=None):
 
 
 
-def combineblocks(blks, imgsz, stpsz=None, fn = np.median):
+def combineblocks(blks, imgsz, stpsz=None, fn=np.median):
     """Combine blocks from an ndarray to reconstruct ndarray signal.
 
     Parameters
@@ -320,8 +319,8 @@ def combineblocks(blks, imgsz, stpsz=None, fn = np.median):
 
     # Calculate the number of blocks that can fit in each dimension of
     # the images
-    numblocks = tuple(int(np.floor((a-b)/c)+1) for a, b, c in
-            zip_longest(imgsz, blksz, stpsz, fillvalue=1))
+    numblocks = tuple(int(np.floor((a-b)/c) + 1) for a, b, c in
+                      zip_longest(imgsz, blksz, stpsz, fillvalue=1))
 
     new_shape = blksz + numblocks
     blks = np.reshape(blks, new_shape)
@@ -334,9 +333,9 @@ def combineblocks(blks, imgsz, stpsz=None, fn = np.median):
     # Iterate over each block and append the values to the corresponding
     # imgs cell
     for pos in np.ndindex(numblocks):
-        slices = tuple(slice(a*c, a*c+b) for a, b, c in
+        slices = tuple(slice(a*c, a*c + b) for a, b, c in
                        zip_longest(pos, blksz, stpsz, fillvalue=1))
-        veclistapp(imgs[slices].squeeze(), blks[(Ellipsis, )+pos].squeeze())
+        veclistapp(imgs[slices].squeeze(), blks[(Ellipsis, ) + pos].squeeze())
 
     return np.vectorize(fn, otypes=[blks.dtype])(imgs)
 
@@ -357,7 +356,7 @@ def rgb2gray(rgb):
     """
 
     w = sla.atleast_nd(rgb.ndim, np.array([0.299, 0.587, 0.144],
-                        dtype=rgb.dtype, ndmin=3))
+                                          dtype=rgb.dtype, ndmin=3))
     return np.sum(w * rgb, axis=2)
 
 
@@ -474,14 +473,14 @@ def tikhonov_filter(s, lmbda, npd=16):
 
     grv = np.array([-1.0, 1.0]).reshape([2, 1])
     gcv = np.array([-1.0, 1.0]).reshape([1, 2])
-    Gr = sla.fftn(grv, (s.shape[0]+2*npd, s.shape[1]+2*npd), (0, 1))
-    Gc = sla.fftn(gcv, (s.shape[0]+2*npd, s.shape[1]+2*npd), (0, 1))
+    Gr = sla.fftn(grv, (s.shape[0] + 2*npd, s.shape[1] + 2*npd), (0, 1))
+    Gc = sla.fftn(gcv, (s.shape[0] + 2*npd, s.shape[1] + 2*npd), (0, 1))
     A = 1.0 + lmbda*np.conj(Gr)*Gr + lmbda*np.conj(Gc)*Gc
     if s.ndim > 2:
         A = A[(slice(None),)*2 + (np.newaxis,)*(s.ndim-2)]
     sp = np.pad(s, ((npd, npd),)*2 + ((0, 0),)*(s.ndim-2), 'symmetric')
     slp = np.real(sla.ifftn(sla.fftn(sp, axes=(0, 1)) / A, axes=(0, 1)))
-    sl = slp[npd:(slp.shape[0]-npd), npd:(slp.shape[1]-npd)]
+    sl = slp[npd:(slp.shape[0] - npd), npd:(slp.shape[1] - npd)]
     sh = s - sl
     return sl.astype(s.dtype), sh.astype(s.dtype)
 
@@ -581,7 +580,7 @@ def grid_search(fn, grd, fmin=True, nproc=None):
         nfnv = len(fval[0])
         fvmx = np.reshape(fval, [a.size for a in grd] + [nfnv,])
         sidx = np.unravel_index(slct(fvmx.reshape((-1, nfnv)), axis=0),
-                        fvmx.shape[0:-1]) + (np.array((range(nfnv))),)
+                                fvmx.shape[0:-1]) + (np.array((range(nfnv))),)
         sprm = np.array([grd[k][sidx[k]] for k in range(len(grd))])
         sfvl = tuple(fvmx[sidx])
     else:
@@ -1046,8 +1045,6 @@ class Timer(object):
           :meth:`__init__`, stop all timers.
         """
 
-        # Get current time
-        t = timer()
         # Default label is self.dfltlbl
         if labels is None:
             labels = self.dfltlbl

@@ -1,7 +1,6 @@
 from __future__ import division
 from builtins import object
 
-import pytest
 import numpy as np
 
 from sporco.dictlrn import onlinecdl
@@ -30,7 +29,7 @@ class TestSet01(object):
                 b.solve(self.S[..., img_index])
         except Exception as e:
             print(e)
-            assert(0)
+            assert 0
 
 
     def test_02(self):
@@ -43,7 +42,7 @@ class TestSet01(object):
                 b.solve(self.S[..., [img_index]])
         except Exception as e:
             print(e)
-            assert(0)
+            assert 0
 
 
     def test_03(self):
@@ -57,7 +56,7 @@ class TestSet01(object):
                 b.solve(self.S[..., img_index], W)
         except Exception as e:
             print(e)
-            assert(0)
+            assert 0
 
 
 
@@ -84,7 +83,7 @@ class TestSet02(object):
                 b.solve(self.S[..., img_index])
         except Exception as e:
             print(e)
-            assert(0)
+            assert 0
 
 
     def test_02(self):
@@ -98,7 +97,7 @@ class TestSet02(object):
                 b.solve(self.S[..., [img_index]])
         except Exception as e:
             print(e)
-            assert(0)
+            assert 0
 
 
     def test_03(self):
@@ -112,4 +111,4 @@ class TestSet02(object):
                 b.solve(self.S[..., img_index], W)
         except Exception as e:
             print(e)
-            assert(0)
+            assert 0

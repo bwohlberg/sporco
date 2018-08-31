@@ -10,9 +10,9 @@
 from __future__ import print_function
 from builtins import range
 
-import numpy as np
-import multiprocessing as mp
 import collections
+import multiprocessing as mp
+import numpy as np
 
 import sporco.linalg as spl
 # Required due to pyFFTW bug #135 - see "Notes" section of SPORCO docs.
@@ -332,8 +332,8 @@ class ConvBPDNDictLearn_Consensus(cbpdndl.ConvBPDNDictLearn):
 
             if opt is None:
                 opt = {}
-            cbpdndl.ConvBPDNDictLearn.Options.__init__(self, opt,
-                                    xmethod='admm', dmethod='cns')
+            cbpdndl.ConvBPDNDictLearn.Options.__init__(
+                self, opt, xmethod='admm', dmethod='cns')
 
 
 
@@ -379,8 +379,9 @@ class ConvBPDNDictLearn_Consensus(cbpdndl.ConvBPDNDictLearn):
             self.nproc = nproc
 
         # Call parent constructor
-        super(ConvBPDNDictLearn_Consensus, self).__init__(D0, S, lmbda,
-            opt=opt, xmethod='admm', dmethod='cns', dimK=dimK, dimN=dimN)
+        super(ConvBPDNDictLearn_Consensus, self).__init__(
+            D0, S, lmbda, opt=opt, xmethod='admm', dmethod='cns',
+            dimK=dimK, dimN=dimN)
 
         # Set up iterations statistics
         itstat_fields = ['Iter', 'ObjFun', 'DFid', 'RegL1', 'Time']
@@ -502,8 +503,8 @@ class ConvBPDNDictLearn_Consensus(cbpdndl.ConvBPDNDictLearn):
         # Construct tuple of status display column titles and set status
         # display strings
         hdrtxt = ['Itn', 'Fnc', 'DFid', u('Regℓ1')]
-        hdrstr, fmtstr, nsep = common.solve_status_str(hdrtxt,
-                        fwdth0=type(self).fwiter, fprec=type(self).fpothr)
+        hdrstr, fmtstr, nsep = common.solve_status_str(
+            hdrtxt, fwdth0=type(self).fwiter, fprec=type(self).fpothr)
 
         # Print header and separator strings
         if self.opt['Verbose']:
@@ -655,7 +656,7 @@ def cbpdnmd_xstep(k):
         Xf = spl.solvedbi_sm(mp_Df, 1.0, b, axis=mp_cri.axisM)
     else:
         b = spl.inner(np.conj(mp_Df), spl.rfftn(YU0, None, mp_cri.axisN),
-                         axis=mp_cri.axisC) + \
+                      axis=mp_cri.axisC) + \
             spl.rfftn(YU1, None, mp_cri.axisN)
         Xf = spl.solvemdbi_ism(mp_Df, 1.0, b, mp_cri.axisM, mp_cri.axisC)
     mp_Z_X[k] = spl.irfftn(Xf, mp_cri.Nv, mp_cri.axisN)
@@ -859,8 +860,8 @@ class ConvBPDNMaskDcplDictLearn_Consensus(cbpdndlmd.ConvBPDNMaskDictLearn):
 
             if opt is None:
                 opt = {}
-            cbpdndlmd.ConvBPDNMaskDictLearn.Options.__init__(self, opt,
-                                    xmethod='admm', dmethod='cns')
+            cbpdndlmd.ConvBPDNMaskDictLearn.Options.__init__(
+                self, opt, xmethod='admm', dmethod='cns')
 
 
 
@@ -910,9 +911,9 @@ class ConvBPDNMaskDcplDictLearn_Consensus(cbpdndlmd.ConvBPDNMaskDictLearn):
             self.nproc = nproc
 
         # Call parent constructor
-        super(ConvBPDNMaskDcplDictLearn_Consensus, self).__init__(D0, S,
-              lmbda, W, opt=opt, xmethod='admm', dmethod='cns', dimK=dimK,
-              dimN=dimN)
+        super(ConvBPDNMaskDcplDictLearn_Consensus, self).__init__(
+            D0, S, lmbda, W, opt=opt, xmethod='admm', dmethod='cns',
+            dimK=dimK, dimN=dimN)
 
         # Set up iterations statistics
         itstat_fields = ['Iter', 'ObjFun', 'DFid', 'RegL1', 'Time']
@@ -1048,8 +1049,8 @@ class ConvBPDNMaskDcplDictLearn_Consensus(cbpdndlmd.ConvBPDNMaskDictLearn):
         # Construct tuple of status display column titles and set status
         # display strings
         hdrtxt = ['Itn', 'Fnc', 'DFid', u('Regℓ1')]
-        hdrstr, fmtstr, nsep = common.solve_status_str(hdrtxt,
-                        fwdth0=type(self).fwiter, fprec=type(self).fpothr)
+        hdrstr, fmtstr, nsep = common.solve_status_str(
+            hdrtxt, fwdth0=type(self).fwiter, fprec=type(self).fpothr)
 
         # Print header and separator strings
         if self.opt['Verbose']:
@@ -1141,8 +1142,9 @@ class ConvBPDNMaskDcplDictLearn_Consensus(cbpdndlmd.ConvBPDNMaskDictLearn):
             S = mp_S
             Xf = mp_Zf
             Df = mp_Df
-            DX = spl.irfftn(spl.inner(Df[np.newaxis, ...], Xf,
-                            axis=self.xstep.cri.axisM+1), self.xstep.cri.Nv,
+            DX = spl.irfftn(spl.inner(
+                Df[np.newaxis, ...], Xf, axis=self.xstep.cri.axisM+1),
+                            self.xstep.cri.Nv,
                             np.array(self.xstep.cri.axisN) + 1)
 
         dfd = (np.linalg.norm(W * (DX - S))**2) / 2.0

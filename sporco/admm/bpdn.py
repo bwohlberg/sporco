@@ -194,12 +194,12 @@ class GenericBPDN(admm.ADMMEqual):
         :math:`\mathbf{x}`.
         """
 
-        self.X = np.asarray(sl.lu_solve_ATAI(self.D, self.rho, self.DTS +
-                        self.rho*(self.Y - self.U), self.lu, self.piv),
-                        dtype=self.dtype)
+        self.X = np.asarray(sl.lu_solve_ATAI(
+            self.D, self.rho, self.DTS + self.rho * (self.Y - self.U),
+            self.lu, self.piv), dtype=self.dtype)
 
         if self.opt['LinSolveCheck']:
-            b = self.DTS + self.rho*(self.Y - self.U)
+            b = self.DTS + self.rho * (self.Y - self.U)
             ax = self.D.T.dot(self.D.dot(self.X)) + self.rho*self.X
             self.xrrs = sl.rrs(ax, b)
         else:
@@ -404,7 +404,7 @@ class BPDN(GenericBPDN):
         # Set default lambda value if not specified
         if lmbda is None:
             DTS = D.T.dot(S)
-            lmbda = 0.1*abs(DTS).max()
+            lmbda = 0.1 * abs(DTS).max()
 
         # Set l1 term scaling and weight array
         self.lmbda = self.dtype.type(lmbda)
@@ -429,13 +429,13 @@ class BPDN(GenericBPDN):
     def uinit(self, ushape):
         """Return initialiser for working variable U"""
 
-        if  self.opt['Y0'] is None:
+        if self.opt['Y0'] is None:
             return np.zeros(ushape, dtype=self.dtype)
         else:
             # If initial Y is non-zero, initial U is chosen so that
             # the relevant dual optimality criterion (see (3.10) in
             # boyd-2010-distributed) is satisfied.
-            return (self.lmbda/self.rho)*np.sign(self.Y)
+            return (self.lmbda / self.rho) * np.sign(self.Y)
 
 
 
@@ -444,7 +444,7 @@ class BPDN(GenericBPDN):
         :math:`\mathbf{y}`."""
 
         self.Y = np.asarray(sl.shrink1(self.AX + self.U,
-                            (self.lmbda/self.rho)*self.wl1),
+                                       (self.lmbda / self.rho) * self.wl1),
                             dtype=self.dtype)
         super(BPDN, self).ystep()
 
@@ -565,9 +565,9 @@ class BPDNJoint(BPDN):
         r"""Minimise Augmented Lagrangian with respect to
         :math:`\mathbf{y}`."""
 
-        self.Y = np.asarray(sl.shrink12(self.AX + self.U,
-                            (self.lmbda/self.rho)*self.wl1, self.mu/self.rho),
-                            dtype=self.dtype)
+        self.Y = np.asarray(sl.shrink12(
+            self.AX + self.U, (self.lmbda / self.rho) * self.wl1,
+            self.mu / self.rho), dtype=self.dtype)
         GenericBPDN.ystep(self)
 
 
@@ -710,12 +710,13 @@ class ElasticNet(BPDN):
         :math:`\mathbf{x}`.
         """
 
-        self.X = np.asarray(sl.lu_solve_ATAI(self.D, self.mu + self.rho,
-                    self.DTS + self.rho*(self.Y - self.U), self.lu,
-                    self.piv), dtype=self.dtype)
+        self.X = np.asarray(sl.lu_solve_ATAI(
+            self.D, self.mu + self.rho, self.DTS +
+            self.rho * (self.Y - self.U),
+            self.lu, self.piv), dtype=self.dtype)
 
         if self.opt['LinSolveCheck']:
-            b = self.DTS + self.rho*(self.Y - self.U)
+            b = self.DTS + self.rho * (self.Y - self.U)
             ax = self.D.T.dot(self.D.dot(self.X)) + (self.mu+self.rho)*self.X
             self.xrrs = sl.rrs(ax, b)
         else:
@@ -729,7 +730,7 @@ class ElasticNet(BPDN):
         """
 
         rl1 = linalg.norm((self.wl1 * self.obfn_gvar()).ravel(), 1)
-        rl2 = 0.5*linalg.norm(self.obfn_gvar())**2
+        rl2 = 0.5 * linalg.norm(self.obfn_gvar())**2
         return (self.lmbda*rl1 + self.mu*rl2, rl1, rl2)
 
 
@@ -1050,7 +1051,7 @@ class MinL1InL2Ball(admm.ADMMTwoBlockCnstrnt):
         Nm = S.shape[1]
         if opt is None:
             opt = MinL1InL2Ball.Options()
-        super(MinL1InL2Ball, self).__init__(Nc*Nm, (Nc+Nr, Nm), 0, Nc,
+        super(MinL1InL2Ball, self).__init__(Nc * Nm, (Nc + Nr, Nm), 0, Nc,
                                             S.dtype, opt)
 
         # Record epsilon value and l1 weight array
@@ -1065,7 +1066,7 @@ class MinL1InL2Ball(admm.ADMMTwoBlockCnstrnt):
     def uinit(self, ushape):
         """Return initialiser for working variable U."""
 
-        if  self.opt['Y0'] is None:
+        if self.opt['Y0'] is None:
             return np.zeros(ushape, dtype=self.dtype)
         else:
             # If initial Y is non-zero, initial U is chosen so that
@@ -1100,9 +1101,10 @@ class MinL1InL2Ball(admm.ADMMTwoBlockCnstrnt):
         """
 
         YU = self.Y - self.U
-        self.X = np.asarray(sl.lu_solve_ATAI(self.D, 1.0, self.block_sep0(YU) +
-                    self.D.T.dot(self.block_sep1(YU)), self.lu, self.piv),
-                    dtype=self.dtype)
+        self.X = np.asarray(sl.lu_solve_ATAI(
+            self.D, 1.0, self.block_sep0(YU) +
+            self.D.T.dot(self.block_sep1(YU)), self.lu, self.piv),
+            dtype=self.dtype)
 
 
 
@@ -1147,8 +1149,9 @@ class MinL1InL2Ball(admm.ADMMTwoBlockCnstrnt):
         """
 
         obj = linalg.norm((self.wl1 * self.obfn_g0var()).ravel(), 1)
-        cns = linalg.norm(sl.proj_l2ball(self.obfn_g1var(), self.S,
-                            self.epsilon, axes=0) - self.obfn_g1var())
+        cns = linalg.norm(sl.proj_l2ball(
+            self.obfn_g1var(), self.S, self.epsilon, axes=0) -
+            self.obfn_g1var())
         return (obj, cns)
 
 
@@ -1156,11 +1159,11 @@ class MinL1InL2Ball(admm.ADMMTwoBlockCnstrnt):
     def rsdl_s(self, Yprev, Y):
         """Compute dual residual vector."""
 
-        return self.rho*linalg.norm(self.cnst_AT(self.U))
+        return self.rho * linalg.norm(self.cnst_AT(self.U))
 
 
 
     def rsdl_sn(self, U):
         """Compute dual residual normalisation term."""
 
-        return self.rho*linalg.norm(U)
+        return self.rho * linalg.norm(U)

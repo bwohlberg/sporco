@@ -1,11 +1,9 @@
 from __future__ import division
 from builtins import object
 
-import pytest
 import numpy as np
 
 from sporco.admm import cmod
-import sporco.linalg as sl
 
 
 
@@ -26,7 +24,7 @@ class TestSet01(object):
             b.solve()
         except Exception as e:
             print(e)
-            assert(0)
+            assert 0
 
 
     def test_02(self):
@@ -40,7 +38,7 @@ class TestSet01(object):
             b.solve()
         except Exception as e:
             print(e)
-            assert(0)
+            assert 0
 
 
     def test_03(self):
@@ -55,9 +53,9 @@ class TestSet01(object):
                                      'DataType': dt})
         b = cmod.CnstrMOD(X, S, opt=opt)
         b.solve()
-        assert(b.X.dtype == dt)
-        assert(b.Y.dtype == dt)
-        assert(b.U.dtype == dt)
+        assert b.X.dtype == dt
+        assert b.Y.dtype == dt
+        assert b.U.dtype == dt
 
 
     def test_04(self):
@@ -72,9 +70,9 @@ class TestSet01(object):
                                      'DataType': dt})
         b = cmod.CnstrMOD(X, S, opt=opt)
         b.solve()
-        assert(b.X.dtype == dt)
-        assert(b.Y.dtype == dt)
-        assert(b.U.dtype == dt)
+        assert b.X.dtype == dt
+        assert b.Y.dtype == dt
+        assert b.U.dtype == dt
 
 
     def test_05(self):
@@ -89,20 +87,20 @@ class TestSet01(object):
                                      'DataType': dt})
         b = cmod.CnstrMOD(X, S, opt=opt)
         b.solve()
-        assert(b.X.dtype == dt)
-        assert(b.Y.dtype == dt)
-        assert(b.U.dtype == dt)
+        assert b.X.dtype == dt
+        assert b.Y.dtype == dt
+        assert b.U.dtype == dt
 
 
     def test_06(self):
         opt = cmod.CnstrMOD.Options({'AuxVarObj': False})
-        assert(opt['fEvalX'] is True and opt['gEvalY'] is False)
+        assert opt['fEvalX'] is True and opt['gEvalY'] is False
         opt['AuxVarObj'] = True
-        assert(opt['fEvalX'] is False and opt['gEvalY'] is True)
+        assert opt['fEvalX'] is False and opt['gEvalY'] is True
 
 
     def test_07(self):
         opt = cmod.CnstrMOD.Options({'AuxVarObj': True})
-        assert(opt['fEvalX'] is False and opt['gEvalY'] is True)
+        assert opt['fEvalX'] is False and opt['gEvalY'] is True
         opt['AuxVarObj'] = False
-        assert(opt['fEvalX'] is True and opt['gEvalY'] is False)
+        assert opt['fEvalX'] is True and opt['gEvalY'] is False

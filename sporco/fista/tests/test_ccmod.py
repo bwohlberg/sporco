@@ -1,6 +1,5 @@
 from builtins import object
 
-import pytest
 import numpy as np
 
 from sporco.fista import ccmod
@@ -104,20 +103,20 @@ class TestSet01(object):
             c.solve()
         except Exception as e:
             print(e)
-            assert(0)
+            assert 0
 
 
-    def test_05(self):
+    def test_02(self):
         N = 16
         M = 8
         X = np.random.randn(N, N, 1, 1, M)
         S = np.random.randn(N, N, 1)
         try:
-            c = ccmod.ConvCnstrMOD(X, S, ((4, 4, 4),(8, 8, 4)))
+            c = ccmod.ConvCnstrMOD(X, S, ((4, 4, 4), (8, 8, 4)))
             c.solve()
         except Exception as e:
             print(e)
-            assert(0)
+            assert 0
 
 
     def test_06(self):
@@ -129,14 +128,14 @@ class TestSet01(object):
         S = np.random.randn(N, N, Nc)
         L = 2e3
         try:
-            opt = ccmod.ConvCnstrMODOptions({'Verbose': False,
-                            'MaxMainIter': 100, 'L' : L})
+            opt = ccmod.ConvCnstrMOD.Options({'Verbose': False,
+                                              'MaxMainIter': 100, 'L': L})
             c = ccmod.ConvCnstrMOD(X, S, (Nd, Nd, 1, M), opt=opt, dimK=0)
             c.solve()
         except Exception as e:
             print(e)
-            assert(0)
-        assert(np.array(c.getitstat().Rsdl)[-1] < 5e-3)
+            assert 0
+        assert np.array(c.getitstat().Rsdl)[-1] < 5e-3
 
 
     def test_07(self):
@@ -146,15 +145,15 @@ class TestSet01(object):
         X = np.random.randn(N, N, 1, 1, M)
         S = np.random.randn(N, N, 1)
         dt = np.float32
-        opt = ccmod.ConvCnstrMODOptions(
+        opt = ccmod.ConvCnstrMOD.Options(
             {'Verbose': False, 'MaxMainIter': 20,
              'BackTrack': {'Enabled': True},
              'DataType': dt})
         c = ccmod.ConvCnstrMOD(X, S, (Nd, Nd, M), opt=opt)
         c.solve()
-        assert(c.X.dtype == dt)
-        assert(c.Xf.dtype == sl.complex_dtype(dt))
-        assert(c.Yf.dtype == sl.complex_dtype(dt))
+        assert c.X.dtype == dt
+        assert c.Xf.dtype == sl.complex_dtype(dt)
+        assert c.Yf.dtype == sl.complex_dtype(dt)
 
 
     def test_08(self):
@@ -164,15 +163,15 @@ class TestSet01(object):
         X = np.random.randn(N, N, 1, 1, M)
         S = np.random.randn(N, N, 1)
         dt = np.float64
-        opt = ccmod.ConvCnstrMODOptions(
+        opt = ccmod.ConvCnstrMOD.Options(
             {'Verbose': False, 'MaxMainIter': 20,
              'BackTrack': {'Enabled': True},
              'DataType': dt})
         c = ccmod.ConvCnstrMOD(X, S, (Nd, Nd, M), opt=opt)
         c.solve()
-        assert(c.X.dtype == dt)
-        assert(c.Xf.dtype == sl.complex_dtype(dt))
-        assert(c.Yf.dtype == sl.complex_dtype(dt))
+        assert c.X.dtype == dt
+        assert c.Xf.dtype == sl.complex_dtype(dt)
+        assert c.Yf.dtype == sl.complex_dtype(dt)
 
 
     def test_09(self):
@@ -182,14 +181,14 @@ class TestSet01(object):
         X = np.random.randn(N, N, 1, 1, M)
         S = np.random.randn(N, N)
         try:
-            opt = ccmod.ConvCnstrMODOptions(
-            {'Verbose': False, 'MaxMainIter': 20})
+            opt = ccmod.ConvCnstrMOD.Options(
+                {'Verbose': False, 'MaxMainIter': 20})
             c = ccmod.ConvCnstrMOD(X, S, (Nd, Nd, 1, M),
-                opt=opt, dimK=0)
+                                   opt=opt, dimK=0)
             c.solve()
         except Exception as e:
             print(e)
-            assert(0)
+            assert 0
 
 
     def test_10(self):
@@ -200,14 +199,14 @@ class TestSet01(object):
         X = np.random.randn(N, N, 1, K, M)
         S = np.random.randn(N, N, K)
         try:
-            opt = ccmod.ConvCnstrMODOptions(
-            {'Verbose': False, 'MaxMainIter': 20})
+            opt = ccmod.ConvCnstrMOD.Options(
+                {'Verbose': False, 'MaxMainIter': 20})
             c = ccmod.ConvCnstrMOD(X, S, (Nd, Nd, 1, M),
-                opt=opt)
+                                   opt=opt)
             c.solve()
         except Exception as e:
             print(e)
-            assert(0)
+            assert 0
 
 
     def test_11(self):
@@ -218,14 +217,14 @@ class TestSet01(object):
         X = np.random.randn(N, N, Nc, 1, M)
         S = np.random.randn(N, N, Nc)
         try:
-            opt = ccmod.ConvCnstrMODOptions(
-            {'Verbose': False, 'MaxMainIter': 20})
+            opt = ccmod.ConvCnstrMOD.Options(
+                {'Verbose': False, 'MaxMainIter': 20})
             c = ccmod.ConvCnstrMOD(X, S, (Nd, Nd, 1, M),
-                opt=opt, dimK=0)
+                                   opt=opt, dimK=0)
             c.solve()
         except Exception as e:
             print(e)
-            assert(0)
+            assert 0
 
 
     def test_12(self):
@@ -237,14 +236,14 @@ class TestSet01(object):
         X = np.random.randn(N, N, Nc, K, M)
         S = np.random.randn(N, N, Nc, K)
         try:
-            opt = ccmod.ConvCnstrMODOptions(
-            {'Verbose': False, 'MaxMainIter': 20})
+            opt = ccmod.ConvCnstrMOD.Options(
+                {'Verbose': False, 'MaxMainIter': 20})
             c = ccmod.ConvCnstrMOD(X, S, (Nd, Nd, 1, M),
-                opt=opt)
+                                   opt=opt)
             c.solve()
         except Exception as e:
             print(e)
-            assert(0)
+            assert 0
 
 
     def test_13(self):
@@ -256,14 +255,14 @@ class TestSet01(object):
         X = np.random.randn(N, N, Nc, K, M)
         S = np.random.randn(N, N, Nc, K)
         try:
-            opt = ccmod.ConvCnstrMODOptions(
-            {'Verbose': False, 'MaxMainIter': 20})
+            opt = ccmod.ConvCnstrMOD.Options(
+                {'Verbose': False, 'MaxMainIter': 20})
             c = ccmod.ConvCnstrMOD(X, S, (Nd, Nd, Nc, M),
-                opt=opt)
+                                   opt=opt)
             c.solve()
         except Exception as e:
             print(e)
-            assert(0)
+            assert 0
 
 
     def test_14(self):
@@ -275,13 +274,13 @@ class TestSet01(object):
         W = np.array([1.0])
         try:
             opt = ccmod.ConvCnstrMODMask.Options(
-                           {'Verbose': False, 'MaxMainIter': 20})
-            c = ccmod.ConvCnstrMODMask(X, S, W,
-                    (Nd, Nd, 1, M), opt=opt, dimK=0)
+                {'Verbose': False, 'MaxMainIter': 20})
+            c = ccmod.ConvCnstrMODMask(X, S, W, (Nd, Nd, 1, M), opt=opt,
+                                       dimK=0)
             c.solve()
         except Exception as e:
             print(e)
-            assert(0)
+            assert 0
 
 
     def test_15(self):
@@ -293,13 +292,13 @@ class TestSet01(object):
         W = np.random.randn(N, N)
         try:
             opt = ccmod.ConvCnstrMODMask.Options(
-                           {'Verbose': False, 'MaxMainIter': 20})
-            c = ccmod.ConvCnstrMODMask(X, S, W,
-                    (Nd, Nd, 1, M), opt=opt, dimK=0)
+                {'Verbose': False, 'MaxMainIter': 20})
+            c = ccmod.ConvCnstrMODMask(X, S, W, (Nd, Nd, 1, M), opt=opt,
+                                       dimK=0)
             c.solve()
         except Exception as e:
             print(e)
-            assert(0)
+            assert 0
 
 
     def test_16(self):
@@ -312,13 +311,12 @@ class TestSet01(object):
         W = np.random.randn(N, N)
         try:
             opt = ccmod.ConvCnstrMODMask.Options(
-                           {'Verbose': False, 'MaxMainIter': 20})
-            c = ccmod.ConvCnstrMODMask(X, S, W,
-                    (Nd, Nd, 1, M), opt=opt)
+                {'Verbose': False, 'MaxMainIter': 20})
+            c = ccmod.ConvCnstrMODMask(X, S, W, (Nd, Nd, 1, M), opt=opt)
             c.solve()
         except Exception as e:
             print(e)
-            assert(0)
+            assert 0
 
 
     def test_17(self):
@@ -331,13 +329,12 @@ class TestSet01(object):
         W = np.random.randn(N, N, K)
         try:
             opt = ccmod.ConvCnstrMODMask.Options(
-                           {'Verbose': False, 'MaxMainIter': 20})
-            c = ccmod.ConvCnstrMODMask(X, S, W,
-                    (Nd, Nd, 1, M), opt=opt)
+                {'Verbose': False, 'MaxMainIter': 20})
+            c = ccmod.ConvCnstrMODMask(X, S, W, (Nd, Nd, 1, M), opt=opt)
             c.solve()
         except Exception as e:
             print(e)
-            assert(0)
+            assert 0
 
 
     def test_18(self):
@@ -350,13 +347,13 @@ class TestSet01(object):
         W = np.random.randn(N, N, Nc)
         try:
             opt = ccmod.ConvCnstrMODMask.Options(
-                           {'Verbose': False, 'MaxMainIter': 20})
-            c = ccmod.ConvCnstrMODMask(X, S, W,
-                    (Nd, Nd, 1, M), opt=opt, dimK=0)
+                {'Verbose': False, 'MaxMainIter': 20})
+            c = ccmod.ConvCnstrMODMask(X, S, W, (Nd, Nd, 1, M), opt=opt,
+                                       dimK=0)
             c.solve()
         except Exception as e:
             print(e)
-            assert(0)
+            assert 0
 
 
     def test_19(self):
@@ -370,13 +367,12 @@ class TestSet01(object):
         W = np.random.randn(N, N, Nc, K)
         try:
             opt = ccmod.ConvCnstrMODMask.Options(
-                           {'Verbose': False, 'MaxMainIter': 20})
-            c = ccmod.ConvCnstrMODMask(X, S, W,
-                    (Nd, Nd, 1, M), opt=opt)
+                {'Verbose': False, 'MaxMainIter': 20})
+            c = ccmod.ConvCnstrMODMask(X, S, W, (Nd, Nd, 1, M), opt=opt)
             c.solve()
         except Exception as e:
             print(e)
-            assert(0)
+            assert 0
 
 
     def test_20(self):
@@ -390,13 +386,12 @@ class TestSet01(object):
         W = np.random.randn(N, N, Nc)
         try:
             opt = ccmod.ConvCnstrMODMask.Options(
-                           {'Verbose': False, 'MaxMainIter': 20})
-            c = ccmod.ConvCnstrMODMask(X, S, W,
-                    (Nd, Nd, 1, M), opt=opt)
+                {'Verbose': False, 'MaxMainIter': 20})
+            c = ccmod.ConvCnstrMODMask(X, S, W, (Nd, Nd, 1, M), opt=opt)
             c.solve()
         except Exception as e:
             print(e)
-            assert(0)
+            assert 0
 
 
     def test_21(self):
@@ -410,13 +405,12 @@ class TestSet01(object):
         W = np.random.randn(N, N, 1, K)
         try:
             opt = ccmod.ConvCnstrMODMask.Options(
-                           {'Verbose': False, 'MaxMainIter': 20})
-            c = ccmod.ConvCnstrMODMask(X, S, W,
-                    (Nd, Nd, 1, M), opt=opt)
+                {'Verbose': False, 'MaxMainIter': 20})
+            c = ccmod.ConvCnstrMODMask(X, S, W, (Nd, Nd, 1, M), opt=opt)
             c.solve()
         except Exception as e:
             print(e)
-            assert(0)
+            assert 0
 
 
     def test_22(self):
@@ -430,13 +424,12 @@ class TestSet01(object):
         W = np.random.randn(N, N, Nc, K)
         try:
             opt = ccmod.ConvCnstrMODMask.Options(
-                           {'Verbose': False, 'MaxMainIter': 20})
-            c = ccmod.ConvCnstrMODMask(X, S, W,
-                    (Nd, Nd, Nc, M), opt=opt)
+                {'Verbose': False, 'MaxMainIter': 20})
+            c = ccmod.ConvCnstrMODMask(X, S, W, (Nd, Nd, Nc, M), opt=opt)
             c.solve()
         except Exception as e:
             print(e)
-            assert(0)
+            assert 0
 
 
     def test_23(self):
@@ -449,12 +442,12 @@ class TestSet01(object):
         W = np.random.randn(N, N)
         L = 5e3
         try:
-            opt = ccmod.ConvCnstrMODMask.Options({'Verbose': False,
-                            'MaxMainIter': 200, 'L' : L})
+            opt = ccmod.ConvCnstrMODMask.Options(
+                {'Verbose': False, 'MaxMainIter': 200, 'L': L})
             c = ccmod.ConvCnstrMODMask(X, S, W, (Nd, Nd, 1, M),
-                                             opt=opt, dimK=0)
+                                       opt=opt, dimK=0)
             c.solve()
         except Exception as e:
             print(e)
-            assert(0)
-        assert(np.array(c.getitstat().Rsdl)[-1] < 5e-3)
+            assert 0
+        assert np.array(c.getitstat().Rsdl)[-1] < 5e-3

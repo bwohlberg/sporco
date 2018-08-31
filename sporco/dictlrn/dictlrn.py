@@ -341,12 +341,12 @@ class DictLearn(with_metaclass(_DictLearn_Meta, object)):
             t = self.timer.elapsed(self.opt['IterTimer'])
 
             # Extract and record iteration stats
-            xitstat = self.xstep.itstat[-1] if len(self.xstep.itstat) > 0 else\
-                      self.xstep.IterationStats(*([0.0,] *
-                            len(self.xstep.IterationStats._fields)))
-            ditstat = self.dstep.itstat[-1] if len(self.dstep.itstat) > 0 else\
-                      self.dstep.IterationStats(*([0.0,] *
-                            len(self.dstep.IterationStats._fields)))
+            xitstat = self.xstep.itstat[-1] if self.xstep.itstat else \
+                      self.xstep.IterationStats(
+                          *([0.0,] * len(self.xstep.IterationStats._fields)))
+            ditstat = self.dstep.itstat[-1] if self.dstep.itstat else \
+                      self.dstep.IterationStats(
+                          *([0.0,] * len(self.dstep.IterationStats._fields)))
             itst = self.isc.iterstats(self.j, t, xitstat, ditstat, evl)
             self.itstat.append(itst)
 

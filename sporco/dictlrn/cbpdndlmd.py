@@ -11,13 +11,10 @@ the data fidelity term
 
 from __future__ import print_function
 from __future__ import absolute_import
-from builtins import range
-from builtins import object
 
 import copy
 import numpy as np
 
-from sporco.util import u
 import sporco.linalg as sl
 import sporco.cnvrep as cr
 import sporco.admm.cbpdn as admm_cbpdn
@@ -52,9 +49,10 @@ def ConvBPDNMaskOptionsDefaults(method='admm'):
 
     dflt = copy.deepcopy(cbpdnmsk_class_label_lookup(method).Options.defaults)
     if method == 'admm':
-        dflt.update({'MaxMainIter': 1, 'AutoRho': {'Period': 10,
-                     'AutoScaling': False, 'RsdlRatio': 10.0, 'Scaling': 2.0,
-                     'RsdlTarget': 1.0}})
+        dflt.update({'MaxMainIter': 1, 'AutoRho':
+                     {'Period': 10, 'AutoScaling': False,
+                      'RsdlRatio': 10.0, 'Scaling': 2.0,
+                      'RsdlTarget': 1.0}})
     else:
         dflt.update({'MaxMainIter': 1, 'BackTrack': {'Eta': 1.2,
                      'MaxIter': 50}})
@@ -151,9 +149,10 @@ def ConvCnstrMODMaskOptionsDefaults(method='fista'):
         dflt.update({'MaxMainIter': 1, 'BackTrack': {'Eta': 1.2,
                      'MaxIter': 50}})
     else:
-        dflt.update({'MaxMainIter': 1, 'AutoRho': {'Period': 10,
-                     'AutoScaling': False, 'RsdlRatio': 10.0,
-                     'Scaling': 2.0, 'RsdlTarget': 1.0}})
+        dflt.update({'MaxMainIter': 1, 'AutoRho':
+                     {'Period': 10, 'AutoScaling': False,
+                      'RsdlRatio': 10.0, 'Scaling': 2.0,
+                      'RsdlTarget': 1.0}})
     return dflt
 
 
@@ -382,8 +381,7 @@ class ConvBPDNMaskDictLearn(dictlrn.DictLearn):
                 'CBPDN': ConvBPDNMaskOptions(self.defaults['CBPDN'],
                                              method=xmethod),
                 'CCMOD': ConvCnstrMODMaskOptions(self.defaults['CCMOD'],
-                                                 method=dmethod)
-                })
+                                                 method=dmethod)})
 
             if opt is None:
                 opt = {}
@@ -440,7 +438,7 @@ class ConvBPDNMaskDictLearn(dictlrn.DictLearn):
 
         if opt is None:
             opt = ConvBPDNMaskDictLearn.Options(xmethod=xmethod,
-                                                    dmethod=dmethod)
+                                                dmethod=dmethod)
         if xmethod is None:
             xmethod = opt.xmethod
         if dmethod is None:
@@ -490,12 +488,13 @@ class ConvBPDNMaskDictLearn(dictlrn.DictLearn):
                                  method=dmethod, dimK=dimK, dimN=dimN)
 
         # Configure iteration statistics reporting
-        isc = dictlrn.IterStatsConfig(isfld=dc.isfld(xmethod, dmethod, opt),
-                isxmap=dc.isxmap(xmethod, opt), isdmap=dc.isdmap(dmethod),
-                evlmap=dc.evlmap(opt['AccurateDFid']),
-                hdrtxt=dc.hdrtxt(xmethod, dmethod, opt),
-                hdrmap=dc.hdrmap(xmethod, dmethod, opt),
-                fmtmap={'It_X': '%4d', 'It_D': '%4d'})
+        isc = dictlrn.IterStatsConfig(
+            isfld=dc.isfld(xmethod, dmethod, opt),
+            isxmap=dc.isxmap(xmethod, opt), isdmap=dc.isdmap(dmethod),
+            evlmap=dc.evlmap(opt['AccurateDFid']),
+            hdrtxt=dc.hdrtxt(xmethod, dmethod, opt),
+            hdrmap=dc.hdrmap(xmethod, dmethod, opt),
+            fmtmap={'It_X': '%4d', 'It_D': '%4d'})
 
         # Call parent constructor
         super(ConvBPDNMaskDictLearn, self).__init__(xstep, dstep, opt, isc)
@@ -537,6 +536,7 @@ class ConvBPDNMaskDictLearn(dictlrn.DictLearn):
             else:
                 X = self.xstep.var_y1()
             rl1 = np.sum(np.abs(X))
-            return dict(DFid=dfd, RegL1=rl1, ObjFun=dfd+self.xstep.lmbda*rl1)
+            return dict(DFid=dfd, RegL1=rl1,
+                        ObjFun=dfd + self.xstep.lmbda * rl1)
         else:
             return None

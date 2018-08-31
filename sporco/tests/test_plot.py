@@ -69,14 +69,14 @@ class TestSet01(object):
 
     def test_05(self):
         plot.contour(self.z, x=self.x, y=self.y, title='Contour Test',
-                    xlbl='x', ylbl='y')
+                     xlbl='x', ylbl='y')
         plot.close()
 
 
     def test_06(self):
         fig = plot.figure()
         plot.contour(self.z, title='Contour Test', xlbl='x', ylbl='y',
-                    fig=fig)
+                     fig=fig)
         plot.close()
 
 
@@ -93,7 +93,7 @@ class TestSet01(object):
 
     def test_09(self):
         fg, ax = plot.imview(self.z, title='Imview Test', fltscl=True,
-                            cbar=None)
+                             cbar=None)
         ax.format_coord(0, 0)
         plot.close(fg)
 
@@ -129,4 +129,4 @@ class TestSet01(object):
 
     def test_15(self):
         plot.config_notebook_plotting()
-        assert(plot.plot.__name__ == 'plot_wrap')
+        assert plot.plot.__name__ == 'plot_wrap'

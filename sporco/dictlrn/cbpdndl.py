@@ -9,13 +9,10 @@
 
 from __future__ import print_function
 from __future__ import absolute_import
-from builtins import range
-from builtins import object
 
 import copy
 import numpy as np
 
-from sporco.util import u
 import sporco.linalg as sl
 import sporco.cnvrep as cr
 import sporco.admm.cbpdn as admm_cbpdn
@@ -50,9 +47,10 @@ def ConvBPDNOptionsDefaults(method='admm'):
 
     dflt = copy.deepcopy(cbpdn_class_label_lookup(method).Options.defaults)
     if method == 'admm':
-        dflt.update({'MaxMainIter': 1, 'AutoRho': {'Period': 10,
-                     'AutoScaling': False, 'RsdlRatio': 10.0, 'Scaling': 2.0,
-                     'RsdlTarget': 1.0}})
+        dflt.update({'MaxMainIter': 1, 'AutoRho':
+                     {'Period': 10, 'AutoScaling': False,
+                      'RsdlRatio': 10.0, 'Scaling': 2.0,
+                      'RsdlTarget': 1.0}})
     else:
         dflt.update({'MaxMainIter': 1, 'BackTrack': {'Eta': 1.2,
                      'MaxIter': 50}})
@@ -363,8 +361,9 @@ class ConvBPDNDictLearn(dictlrn.DictLearn):
             self.xmethod = xmethod
             self.dmethod = dmethod
 
-            self.defaults.update({'CBPDN': ConvBPDNOptionsDefaults(xmethod),
-                            'CCMOD': ConvCnstrMODOptionsDefaults(dmethod)})
+            self.defaults.update(
+                {'CBPDN': ConvBPDNOptionsDefaults(xmethod),
+                 'CCMOD': ConvCnstrMODOptionsDefaults(dmethod)})
 
             # Initialisation of CBPDN and CCMOD keys here is required to
             # ensure that the corresponding options have types appropriate
@@ -374,8 +373,7 @@ class ConvBPDNDictLearn(dictlrn.DictLearn):
                 'CBPDN': ConvBPDNOptions(self.defaults['CBPDN'],
                                          method=xmethod),
                 'CCMOD': ConvCnstrMODOptions(self.defaults['CCMOD'],
-                                             method=dmethod)
-                })
+                                             method=dmethod)})
 
             if opt is None:
                 opt = {}
@@ -464,12 +462,13 @@ class ConvBPDNDictLearn(dictlrn.DictLearn):
                              dimK=dimK, dimN=dimN)
 
         # Configure iteration statistics reporting
-        isc = dictlrn.IterStatsConfig(isfld=dc.isfld(xmethod, dmethod, opt),
-                isxmap=dc.isxmap(xmethod, opt), isdmap=dc.isdmap(dmethod),
-                evlmap=dc.evlmap(opt['AccurateDFid']),
-                hdrtxt=dc.hdrtxt(xmethod, dmethod, opt),
-                hdrmap=dc.hdrmap(xmethod, dmethod, opt),
-                fmtmap={'It_X': '%4d', 'It_D': '%4d'})
+        isc = dictlrn.IterStatsConfig(
+            isfld=dc.isfld(xmethod, dmethod, opt),
+            isxmap=dc.isxmap(xmethod, opt), isdmap=dc.isdmap(dmethod),
+            evlmap=dc.evlmap(opt['AccurateDFid']),
+            hdrtxt=dc.hdrtxt(xmethod, dmethod, opt),
+            hdrmap=dc.hdrmap(xmethod, dmethod, opt),
+            fmtmap={'It_X': '%4d', 'It_D': '%4d'})
 
         # Call parent constructor
         super(ConvBPDNDictLearn, self).__init__(xstep, dstep, opt, isc)
@@ -517,8 +516,9 @@ class ConvBPDNDictLearn(dictlrn.DictLearn):
             Sf = self.xstep.Sf
             Ef = sl.inner(Df, Xf, axis=self.xstep.cri.axisM) - Sf
             dfd = sl.rfl2norm2(Ef, self.xstep.S.shape,
-                               axis=self.xstep.cri.axisN)/2.0
+                               axis=self.xstep.cri.axisN) / 2.0
             rl1 = np.sum(np.abs(X))
-            return dict(DFid=dfd, RegL1=rl1, ObjFun=dfd+self.xstep.lmbda*rl1)
+            return dict(DFid=dfd, RegL1=rl1,
+                        ObjFun=dfd + self.xstep.lmbda * rl1)
         else:
             return None

@@ -2,21 +2,15 @@ from __future__ import division
 from builtins import range
 from builtins import object
 
-import pytest
-import numpy as np
-from scipy import linalg
 import pickle
+import numpy as np
 
 from sporco.fista import bpdn
-import sporco.linalg as sl
 
 
 
 def CallbackTest(obj):
-    if obj.k > 5:
-        return True
-    else:
-        return False
+    return bool(obj.k > 5)
 
 
 class TestSet01(object):
@@ -36,7 +30,7 @@ class TestSet01(object):
             b.solve()
         except Exception as e:
             print(e)
-            assert(0)
+            assert 0
 
 
     def test_02(self):
@@ -49,7 +43,7 @@ class TestSet01(object):
             b.solve()
         except Exception as e:
             print(e)
-            assert(0)
+            assert 0
 
 
     def test_03(self):
@@ -65,8 +59,8 @@ class TestSet01(object):
             b.solve()
         except Exception as e:
             print(e)
-            assert(0)
-        assert(np.array(b.getitstat().Rsdl).min() < 2.e-4)
+            assert 0
+        assert np.array(b.getitstat().Rsdl).min() < 2.e-4
 
 
     def test_05(self):
@@ -75,13 +69,14 @@ class TestSet01(object):
         D = np.random.randn(N, M)
         s = np.random.randn(N, 1)
         try:
-            opt = bpdn.BPDN.Options({'FastSolve': True, 'Verbose': False,
-                'MaxMainIter': 10, 'BackTrack': {'Enabled': False}})
+            opt = bpdn.BPDN.Options(
+                {'FastSolve': True, 'Verbose': False, 'MaxMainIter': 10,
+                 'BackTrack': {'Enabled': False}})
             b = bpdn.BPDN(D, s, lmbda=1.0, opt=opt)
             b.solve()
         except Exception as e:
             print(e)
-            assert(0)
+            assert 0
 
 
     def test_06(self):
@@ -95,8 +90,8 @@ class TestSet01(object):
                                  'DataType': dt})
         b = bpdn.BPDN(D, s, lmbda=1.0, opt=opt)
         b.solve()
-        assert(b.X.dtype == dt)
-        assert(b.Y.dtype == dt)
+        assert b.X.dtype == dt
+        assert b.Y.dtype == dt
 
 
     def test_07(self):
@@ -110,8 +105,8 @@ class TestSet01(object):
                                  'DataType': dt})
         b = bpdn.BPDN(D, s, lmbda=1.0, opt=opt)
         b.solve()
-        assert(b.X.dtype == dt)
-        assert(b.Y.dtype == dt)
+        assert b.X.dtype == dt
+        assert b.Y.dtype == dt
 
 
     def test_08(self):
@@ -125,8 +120,8 @@ class TestSet01(object):
                                  'DataType': dt})
         b = bpdn.BPDN(D, s, lmbda=1.0, opt=opt)
         b.solve()
-        assert(b.X.dtype == dt)
-        assert(b.Y.dtype == dt)
+        assert b.X.dtype == dt
+        assert b.Y.dtype == dt
 
 
     def test_10(self):
@@ -141,4 +136,4 @@ class TestSet01(object):
         c = pickle.loads(bp)
         Xb = b.solve()
         Xc = c.solve()
-        assert(linalg.norm(Xb-Xc)==0.0)
+        assert np.linalg.norm(Xb - Xc) == 0.0

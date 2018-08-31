@@ -10,7 +10,6 @@
 
 from __future__ import division
 from __future__ import absolute_import
-from builtins import range
 
 import copy
 import numpy as np
@@ -507,7 +506,7 @@ class ConvCnstrMODMask(ConvCnstrMOD):
         # Create byte aligned arrays for FFT calls
         self.WRy = sl.pyfftw_empty_aligned(self.S.shape, dtype=self.dtype)
         self.Ryf = sl.pyfftw_rfftn_empty_aligned(self.S.shape, self.cri.axisN,
-                                                self.dtype)
+                                                 self.dtype)
 
 
     def eval_gradf(self):

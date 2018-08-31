@@ -1,10 +1,8 @@
 from builtins import object
 
-import pytest
 import numpy as np
 
 from sporco.admm import ccmodmd
-import sporco.linalg as sl
 
 
 
@@ -30,7 +28,7 @@ class TestSet01(object):
             c.solve()
         except Exception as e:
             print(e)
-            assert(0)
+            assert 0
 
 
     def test_02(self):
@@ -49,7 +47,7 @@ class TestSet01(object):
             c.solve()
         except Exception as e:
             print(e)
-            assert(0)
+            assert 0
 
 
     def test_03(self):
@@ -69,7 +67,7 @@ class TestSet01(object):
             c.solve()
         except Exception as e:
             print(e)
-            assert(0)
+            assert 0
 
 
     def test_04(self):
@@ -89,7 +87,7 @@ class TestSet01(object):
             c.solve()
         except Exception as e:
             print(e)
-            assert(0)
+            assert 0
 
 
     def test_05(self):
@@ -109,7 +107,7 @@ class TestSet01(object):
             c.solve()
         except Exception as e:
             print(e)
-            assert(0)
+            assert 0
 
 
     def test_06(self):
@@ -130,7 +128,7 @@ class TestSet01(object):
             c.solve()
         except Exception as e:
             print(e)
-            assert(0)
+            assert 0
 
 
     def test_07(self):
@@ -151,7 +149,7 @@ class TestSet01(object):
             c.solve()
         except Exception as e:
             print(e)
-            assert(0)
+            assert 0
 
 
     def test_08(self):
@@ -172,7 +170,7 @@ class TestSet01(object):
             c.solve()
         except Exception as e:
             print(e)
-            assert(0)
+            assert 0
 
 
     def test_09(self):
@@ -193,7 +191,7 @@ class TestSet01(object):
             c.solve()
         except Exception as e:
             print(e)
-            assert(0)
+            assert 0
 
 
     def test_10(self):
@@ -211,7 +209,7 @@ class TestSet01(object):
             c.solve()
         except Exception as e:
             print(e)
-            assert(0)
+            assert 0
 
 
     def test_11(self):
@@ -230,7 +228,7 @@ class TestSet01(object):
             c.solve()
         except Exception as e:
             print(e)
-            assert(0)
+            assert 0
 
 
     def test_12(self):
@@ -249,7 +247,7 @@ class TestSet01(object):
             c.solve()
         except Exception as e:
             print(e)
-            assert(0)
+            assert 0
 
 
     def test_13(self):
@@ -268,7 +266,7 @@ class TestSet01(object):
             c.solve()
         except Exception as e:
             print(e)
-            assert(0)
+            assert 0
 
 
     def test_14(self):
@@ -288,7 +286,7 @@ class TestSet01(object):
             c.solve()
         except Exception as e:
             print(e)
-            assert(0)
+            assert 0
 
 
     def test_15(self):
@@ -308,7 +306,7 @@ class TestSet01(object):
             c.solve()
         except Exception as e:
             print(e)
-            assert(0)
+            assert 0
 
 
     def test_16(self):
@@ -329,7 +327,7 @@ class TestSet01(object):
             c.solve()
         except Exception as e:
             print(e)
-            assert(0)
+            assert 0
 
 
     def test_17(self):
@@ -350,7 +348,7 @@ class TestSet01(object):
             c.solve()
         except Exception as e:
             print(e)
-            assert(0)
+            assert 0
 
 
     def test_18(self):
@@ -371,7 +369,7 @@ class TestSet01(object):
             c.solve()
         except Exception as e:
             print(e)
-            assert(0)
+            assert 0
 
 
     def test_19(self):
@@ -392,7 +390,7 @@ class TestSet01(object):
             c.solve()
         except Exception as e:
             print(e)
-            assert(0)
+            assert 0
 
 
     def test_20(self):
@@ -411,19 +409,19 @@ class TestSet01(object):
             c.solve()
         except Exception as e:
             print(e)
-            assert(0)
-        assert(np.array(c.getitstat().XSlvRelRes).max() < 1e-5)
+            assert 0
+        assert np.array(c.getitstat().XSlvRelRes).max() < 1e-5
 
 
     def test_21(self):
         opt = ccmodmd.ConvCnstrMODMaskDcplBase.Options({'AuxVarObj': False})
-        assert(opt['fEvalX'] is True and opt['gEvalY'] is False)
+        assert opt['fEvalX'] is True and opt['gEvalY'] is False
         opt['AuxVarObj'] = True
-        assert(opt['fEvalX'] is False and opt['gEvalY'] is True)
+        assert opt['fEvalX'] is False and opt['gEvalY'] is True
 
 
     def test_22(self):
         opt = ccmodmd.ConvCnstrMODMaskDcplBase.Options({'AuxVarObj': True})
-        assert(opt['fEvalX'] is False and opt['gEvalY'] is True)
+        assert opt['fEvalX'] is False and opt['gEvalY'] is True
         opt['AuxVarObj'] = False
-        assert(opt['fEvalX'] is True and opt['gEvalY'] is False)
+        assert opt['fEvalX'] is True and opt['gEvalY'] is False

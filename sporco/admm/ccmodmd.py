@@ -10,7 +10,6 @@ Mask Decoupling"""
 
 from __future__ import division
 from __future__ import absolute_import
-from builtins import range
 
 import copy
 import numpy as np
@@ -259,7 +258,8 @@ class ConvCnstrMODMaskDcplBase(admm.ADMMTwoBlockCnstrnt):
                 else:
                     shpw[self.cri.axisC] = self.cri.C
                 W = np.broadcast_to(W, shpw)
-            self.W = W.reshape(W.shape[0:self.cri.dimN] +
+            self.W = W.reshape(
+                W.shape[0:self.cri.dimN] +
                 (1, W.shape[self.cri.axisC] * W.shape[self.cri.axisK], 1))
         else:
             self.W = W
@@ -271,8 +271,8 @@ class ConvCnstrMODMaskDcplBase(admm.ADMMTwoBlockCnstrnt):
         shpY[self.cri.axisC] = self.cri.Cd
         shpY[self.cri.axisK] = 1
         shpY[self.cri.axisM] += CK
-        super(ConvCnstrMODMaskDcplBase, self).__init__(Nx, shpY,
-                                    self.cri.axisM, CK, S.dtype, opt)
+        super(ConvCnstrMODMaskDcplBase, self).__init__(
+            Nx, shpY, self.cri.axisM, CK, S.dtype, opt)
 
         # Reshape S to standard layout (Z, i.e. X in cbpdn, is assumed
         # to be taken from cbpdn, and therefore already in standard
@@ -410,8 +410,9 @@ class ConvCnstrMODMaskDcplBase(admm.ADMMTwoBlockCnstrnt):
         shapes are (N x 1 x C K x 1) and (N x 1 x 1 x M) respectively.
         """
 
-        return np.swapaxes(Y[(slice(None),)*self.blkaxis +
-            (slice(0, self.blkidx),)], self.cri.axisK, self.cri.axisM)
+        return np.swapaxes(
+            Y[(slice(None),)*self.blkaxis + (slice(0, self.blkidx),)],
+            self.cri.axisK, self.cri.axisM)
 
 
 
@@ -435,7 +436,8 @@ class ConvCnstrMODMaskDcplBase(admm.ADMMTwoBlockCnstrnt):
         """
 
         return np.concatenate((np.swapaxes(Y0, self.cri.axisK,
-                              self.cri.axisM), Y1), axis=self.blkaxis)
+                                           self.cri.axisM), Y1),
+                              axis=self.blkaxis)
 
 
 
@@ -484,7 +486,8 @@ class ConvCnstrMODMaskDcplBase(admm.ADMMTwoBlockCnstrnt):
         # (dual residual) to avoid this cost.
         Y0f = sl.rfftn(Y0, None, self.cri.axisN)
         return sl.irfftn(sl.inner(np.conj(self.Zf), Y0f,
-                    axis=self.cri.axisK), self.cri.Nv, self.cri.axisN)
+                                  axis=self.cri.axisK), self.cri.Nv,
+                         self.cri.axisN)
 
 
 
@@ -729,10 +732,9 @@ class ConvCnstrMODMaskDcpl_CG(ConvCnstrMODMaskDcplBase):
         b = sl.inner(np.conj(self.Zf), self.block_sep0(YUf),
                      axis=self.cri.axisK) + self.block_sep1(YUf)
 
-        self.Xf[:], cgit = sl.solvemdbi_cg(self.Zf, 1.0, b,
-                                self.cri.axisM, self.cri.axisK,
-                                self.opt['CG', 'StopTol'],
-                                self.opt['CG', 'MaxIter'], self.Xf)
+        self.Xf[:], cgit = sl.solvemdbi_cg(
+            self.Zf, 1.0, b, self.cri.axisM, self.cri.axisK,
+            self.opt['CG', 'StopTol'], self.opt['CG', 'MaxIter'], self.Xf)
         self.cgit = cgit
         self.X = sl.irfftn(self.Xf, self.cri.Nv, self.cri.axisN)
         self.xstep_check(b)
@@ -818,8 +820,8 @@ class ConvCnstrMODMaskDcpl_Consensus(ccmod.ConvCnstrMOD_Consensus):
         if opt is None:
             opt = ccmod.ConvCnstrMOD_Consensus.Options()
 
-        super(ConvCnstrMODMaskDcpl_Consensus, self).__init__(Z, S, dsz,
-                                        opt=opt, dimK=dimK, dimN=dimN)
+        super(ConvCnstrMODMaskDcpl_Consensus, self).__init__(
+            Z, S, dsz, opt=opt, dimK=dimK, dimN=dimN)
 
         # Convert W to internal shape
         if W is None:
@@ -847,7 +849,8 @@ class ConvCnstrMODMaskDcpl_Consensus(ccmod.ConvCnstrMOD_Consensus):
                 else:
                     shpw[self.cri.axisC] = self.cri.C
                 W = np.broadcast_to(W, shpw)
-            self.W = W.reshape(W.shape[0:self.cri.dimN] +
+            self.W = W.reshape(
+                W.shape[0:self.cri.dimN] +
                 (1, W.shape[self.cri.axisC] * W.shape[self.cri.axisK], 1))
         else:
             self.W = W
@@ -961,7 +964,7 @@ class ConvCnstrMODMaskDcpl_Consensus(ccmod.ConvCnstrMOD_Consensus):
         Ef = sl.inner(self.Zf, self.obfn_fvarf(), axis=self.cri.axisM) \
           - self.Sf
         return (linalg.norm(self.W * sl.irfftn(Ef, self.cri.Nv,
-                            self.cri.axisN))**2) / 2.0
+                                               self.cri.axisN))**2) / 2.0
 
 
 
@@ -981,9 +984,9 @@ class ConvCnstrMODMaskDcpl_Consensus(ccmod.ConvCnstrMOD_Consensus):
 
         # The full dual residual is more complicated to compute than the
         # full primary residual
-        ATU = self.swapaxes(self.U) + sl.irfftn(np.conj(self.Zf) *
-                sl.rfftn(self.U1, self.cri.Nv, self.cri.axisN),
-                self.cri.Nv, self.cri.axisN)
+        ATU = self.swapaxes(self.U) + sl.irfftn(
+            np.conj(self.Zf) * sl.rfftn(self.U1, self.cri.Nv, self.cri.axisN),
+            self.cri.Nv, self.cri.axisN)
         s = self.rho * np.linalg.norm(ATU)
 
         # The normalisation factor for the full primal residual is also not

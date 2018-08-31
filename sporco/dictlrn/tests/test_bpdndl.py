@@ -1,7 +1,6 @@
 from __future__ import division
 from builtins import object
 
-import pytest
 import numpy as np
 
 from sporco.dictlrn import bpdndl
@@ -24,7 +23,7 @@ class TestSet01(object):
             b.solve()
         except Exception as e:
             print(e)
-            assert(0)
+            assert 0
 
 
     def test_02(self):
@@ -33,7 +32,7 @@ class TestSet01(object):
             b.solve()
         except Exception as e:
             print(e)
-            assert(0)
+            assert 0
 
 
     def test_03(self):
@@ -45,4 +44,4 @@ class TestSet01(object):
             b.solve()
         except Exception as e:
             print(e)
-            assert(0)
+            assert 0

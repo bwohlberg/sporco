@@ -149,7 +149,7 @@ class ConstrainedDict(dict):
         # class __setitem__. Otherwise the value is itself a dict that
         # must be processed recursively via the update method.
         if not isinstance(value, dict) or \
-          isinstance(value, ConstrainedDict) or kc not in sd:
+           isinstance(value, ConstrainedDict) or kc not in sd:
             vc = value
             # If value is a dict but not a ConstrainedDict (if it is a
             # ConstrainedDict instance, it has already been
@@ -157,7 +157,7 @@ class ConstrainedDict(dict):
             # constructor to instantiate a ConstrainedDict object
             # which becomes the value actually associated with the key
             if isinstance(value, dict) and \
-              not isinstance(value, ConstrainedDict):
+               not isinstance(value, ConstrainedDict):
                 # ConstrainedDict constructor is called instead of the
                 # constructor of the derived class because it is
                 # undesirable to force the derived class constructor to

@@ -11,7 +11,6 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 from builtins import range
-from builtins import object
 
 import sys
 import numpy as np
@@ -55,9 +54,9 @@ def attach_keypress(fig):
         if event.key == 'q':
             plt.close(fig)
         elif event.key == 'e':
-            fig.set_size_inches(a*fig.get_size_inches(), forward=True)
+            fig.set_size_inches(a * fig.get_size_inches(), forward=True)
         elif event.key == 'c':
-            fig.set_size_inches(fig.get_size_inches()/a, forward=True)
+            fig.set_size_inches(fig.get_size_inches() / a, forward=True)
 
     # Avoid multiple even handlers attached to the same figure
     if not hasattr(fig, '_sporco_keypress_cid'):
@@ -365,8 +364,8 @@ def contour(z, x=None, y=None, v=5, xlbl=None, ylbl=None, title=None,
     if cfntsz is not None and cfntsz > 0:
         plt.clabel(cntr, inline=True, fontsize=cfntsz)
     im = ax.imshow(z, origin='lower', interpolation=intrp, aspect='auto',
-                extent=[x.min(), x.max(), y.min(), y.max()], cmap=cmap,
-                vmin=vmin, vmax=vmax, alpha=alpha)
+                   extent=[x.min(), x.max(), y.min(), y.max()], cmap=cmap,
+                   vmin=vmin, vmax=vmax, alpha=alpha)
 
     if title is not None:
         ax.set_title(title)
@@ -517,8 +516,8 @@ def imview(img, title=None, copy=True, fltscl=False, intrp='nearest',
 
     def format_coord(x, y):
         nr, nc = imgd.shape[0:2]
-        col = int(x+0.5)
-        row = int(y+0.5)
+        col = int(x + 0.5)
+        row = int(y + 0.5)
         if col >= 0 and col < nc and row >= 0 and row < nr:
             z = img[row, col]
             if imgd.ndim == 2:
@@ -538,7 +537,9 @@ def imview(img, title=None, copy=True, fltscl=False, intrp='nearest',
                 s = event.inaxes.format_coord(event.xdata, event.ydata)
                 self.set_message(s)
 
-        mouse_move_patch = lambda arg: mouse_move(fig.canvas.toolbar, arg)
+        def mouse_move_patch(arg):
+            return mouse_move(fig.canvas.toolbar, arg)
+
         fig.canvas.toolbar._idDrag = fig.canvas.mpl_connect(
             'motion_notify_event', mouse_move_patch)
 

@@ -51,7 +51,7 @@ def complex_dtype(dtype):
       The complex dtype corresponding to the input dtype
     """
 
-    return (np.zeros(1, dtype)+1j).dtype
+    return (np.zeros(1, dtype) + 1j).dtype
 
 
 
@@ -137,7 +137,7 @@ def pyfftw_rfftn_empty_aligned(shape, axes, dtype, order='C', n=None):
 
     ashp = list(shape)
     raxis = axes[-1]
-    ashp[raxis] = ashp[raxis]//2 + 1
+    ashp[raxis] = ashp[raxis] // 2 + 1
     cdtype = complex_dtype(dtype)
     return pyfftw.empty_aligned(ashp, cdtype, order, n)
 
@@ -165,9 +165,9 @@ def fftn(a, s=None, axes=None):
       DFT of input array
     """
 
-    return pyfftw.interfaces.numpy_fft.fftn(a, s=s, axes=axes,
-                    overwrite_input=False, planner_effort='FFTW_MEASURE',
-                    threads=pyfftw_threads)
+    return pyfftw.interfaces.numpy_fft.fftn(
+        a, s=s, axes=axes, overwrite_input=False,
+        planner_effort='FFTW_MEASURE', threads=pyfftw_threads)
 
 
 
@@ -193,9 +193,9 @@ def ifftn(a, s=None, axes=None):
       Inverse DFT of input array
     """
 
-    return pyfftw.interfaces.numpy_fft.ifftn(a, s=s, axes=axes,
-                    overwrite_input=False, planner_effort='FFTW_MEASURE',
-                    threads=pyfftw_threads)
+    return pyfftw.interfaces.numpy_fft.ifftn(
+        a, s=s, axes=axes, overwrite_input=False,
+        planner_effort='FFTW_MEASURE', threads=pyfftw_threads)
 
 
 
@@ -221,9 +221,9 @@ def rfftn(a, s=None, axes=None):
       DFT of input array
     """
 
-    return pyfftw.interfaces.numpy_fft.rfftn(a, s=s, axes=axes,
-                    overwrite_input=False, planner_effort='FFTW_MEASURE',
-                    threads=pyfftw_threads)
+    return pyfftw.interfaces.numpy_fft.rfftn(
+        a, s=s, axes=axes, overwrite_input=False,
+        planner_effort='FFTW_MEASURE', threads=pyfftw_threads)
 
 
 
@@ -252,9 +252,9 @@ def irfftn(a, s, axes=None):
       Inverse DFT of input array
     """
 
-    return pyfftw.interfaces.numpy_fft.irfftn(a, s=s, axes=axes,
-                    overwrite_input=False, planner_effort='FFTW_MEASURE',
-                    threads=pyfftw_threads)
+    return pyfftw.interfaces.numpy_fft.irfftn(
+        a, s=s, axes=axes, overwrite_input=False,
+        planner_effort='FFTW_MEASURE', threads=pyfftw_threads)
 
 
 
@@ -342,7 +342,7 @@ def fftconv(a, b, axes=(0, 1)):
     dims = np.maximum([a.shape[i] for i in axes], [b.shape[i] for i in axes])
     af = fft(a, dims, axes)
     bf = fft(b, dims, axes)
-    return ifft(af*bf, dims, axes)
+    return ifft(af * bf, dims, axes)
 
 
 
@@ -390,7 +390,7 @@ def inner(x, y, axis=-1):
 
     # Roll axis back to original position if necessary
     if axis != 0:
-        ip = np.rollaxis(ip, 0, axis+1)
+        ip = np.rollaxis(ip, 0, axis + 1)
 
     return ip
 
@@ -596,17 +596,17 @@ def solvemdbi_ism(ah, rho, b, axisM, axisK):
     del b
     for k in range(0, K):
 
-        slck = slcnc + (slice(k, k+1),)
+        slck = slcnc + (slice(k, k + 1),)
         gamma[slck] = alpha
         delta[slck] = 1.0 + inner(ah[slck], gamma[slck], axis=axisM)
 
         d = gamma[slck] * inner(ah[slck], beta, axis=axisM)
         beta[:] -= d / delta[slck]
 
-        if k < K-1:
-            alpha[:] = np.take(a, [k+1], axisK) / rho
-            for l in range(0, k+1):
-                slcl = slcnc + (slice(l, l+1),)
+        if k < K - 1:
+            alpha[:] = np.take(a, [k + 1], axisK) / rho
+            for l in range(0, k + 1):
+                slcl = slcnc + (slice(l, l + 1),)
                 d = gamma[slcl] * inner(ah[slcl], alpha, axis=axisM)
                 alpha[:] -= d / delta[slcl]
 
@@ -657,24 +657,25 @@ def solvemdbi_rsm(ah, rho, b, axisK, dimN=2):
     """
 
     axisM = dimN + 2
-    slcnc = (slice(None),)*axisK
+    slcnc = (slice(None),) * axisK
     M = ah.shape[axisM]
     K = ah.shape[axisK]
     a = np.conj(ah)
     Ainv = np.ones(ah.shape[0:dimN] + (1,)*4) * \
-        np.reshape(np.eye(M, M) / rho, (1,)*(dimN+2) + (M, M))
+        np.reshape(np.eye(M, M) / rho, (1,)*(dimN + 2) + (M, M))
 
     for k in range(0, K):
-        slck = slcnc + (slice(k, k+1),) + (slice(None), np.newaxis,)
-        Aia = inner(Ainv, np.swapaxes(a[slck], dimN+2, dimN+3),
-                    axis=dimN+3)
-        ahAia = 1.0 + inner(ah[slck], Aia, axis=dimN+2)
-        ahAi = inner(ah[slck], Ainv, axis=dimN+2)
+        slck = slcnc + (slice(k, k + 1),) + (slice(None), np.newaxis,)
+        Aia = inner(Ainv, np.swapaxes(a[slck], dimN + 2, dimN + 3),
+                    axis=dimN + 3)
+        ahAia = 1.0 + inner(ah[slck], Aia, axis=dimN + 2)
+        ahAi = inner(ah[slck], Ainv, axis=dimN + 2)
         AiaahAi = Aia * ahAi
         Ainv = Ainv - AiaahAi / ahAia
 
-    return np.sum(Ainv * np.swapaxes(b[(slice(None),)*b.ndim + (np.newaxis,)],
-                                     dimN+2, dimN+3), dimN+3)
+    return np.sum(Ainv * np.swapaxes(b[(slice(None),) * b.ndim +
+                                       (np.newaxis,)], dimN + 2, dimN + 3),
+                  dimN + 3)
 
 
 
@@ -730,7 +731,7 @@ def solvemdbi_cg(ah, rho, b, axisM, axisK, tol=1e-5, mit=1000, isn=None):
     Aop = lambda x: inner(ah, x, axis=axisM)
     AHop = lambda x: inner(a, x, axis=axisK)
     AHAop = lambda x: AHop(Aop(x))
-    vAHAoprI = lambda x: AHAop(x.reshape(b.shape)).ravel() + rho*x.ravel()
+    vAHAoprI = lambda x: AHAop(x.reshape(b.shape)).ravel() + rho * x.ravel()
     lop = LinearOperator((b.size, b.size), matvec=vAHAoprI, dtype=b.dtype)
     vx, cgit = cg(lop, b.ravel(), isn, tol, mit)
     return vx.reshape(b.shape), cgit
@@ -763,11 +764,11 @@ def lu_factor(A, rho):
     # If N < M it is cheaper to factorise A*A^T + rho*I and then use the
     # matrix inversion lemma to compute the inverse of A^T*A + rho*I
     if N >= M:
-        lu, piv = linalg.lu_factor(A.T.dot(A) + rho*np.identity(M,
-                                   dtype=A.dtype))
+        lu, piv = linalg.lu_factor(A.T.dot(A) +
+                                   rho * np.identity(M, dtype=A.dtype))
     else:
-        lu, piv = linalg.lu_factor(A.dot(A.T) + rho*np.identity(N,
-                                   dtype=A.dtype))
+        lu, piv = linalg.lu_factor(A.dot(A.T) +
+                                   rho * np.identity(N, dtype=A.dtype))
     return lu, piv
 
 
@@ -884,7 +885,7 @@ def Gax(x, ax):
       Output array
     """
 
-    slc = (slice(None),)*ax + (slice(-1,None),)
+    slc = (slice(None),)*ax + (slice(-1, None),)
     xg = np.roll(x, -1, axis=ax) - x
     xg[slc] = 0.0
     return xg
@@ -908,7 +909,7 @@ def GTax(x, ax):
       Output array
     """
 
-    slc0 = (slice(None),)*ax
+    slc0 = (slice(None),) * ax
     xg = np.roll(x, 1, axis=ax) - x
     xg[slc0 + (slice(0, 1),)] = -x[slc0 + (slice(0, 1),)]
     xg[slc0 + (slice(-1, None),)] = x[slc0 + (slice(-2, -1),)]
@@ -946,7 +947,8 @@ def GradientFilters(ndim, axes, axshp, dtype=None):
     g = np.zeros([2 if k in axes else 1 for k in range(ndim)] +
                  [len(axes),], dtype)
     for k in axes:
-        g[(0,) * k + (slice(None),) + (0,) * (g.ndim-2-k) + (k,)] = [1, -1]
+        g[(0,) * k + (slice(None),) + (0,) * (g.ndim - 2 - k) + (k,)] = \
+            np.array([1, -1])
     Gf = rfftn(g, axshp, axes=axes)
     GHGf = np.sum(np.conj(Gf) * Gf, axis=-1)
     return Gf, GHGf
@@ -971,7 +973,7 @@ def zdivide(x, y):
     """
 
     # See https://stackoverflow.com/a/37977222
-    return np.divide(x, y, out=np.zeros_like(x), where=y!=0)
+    return np.divide(x, y, out=np.zeros_like(x), where=(y != 0))
 
 
 
@@ -1037,7 +1039,7 @@ def shrink2(x, alpha, axis=-1):
     a = np.sqrt(np.sum(x**2, axis=axis, keepdims=True))
     b = np.maximum(0, a - alpha)
     b = zdivide(b, a)
-    return np.asarray(b*x, dtype=x.dtype)
+    return np.asarray(b * x, dtype=x.dtype)
 
 
 
@@ -1109,19 +1111,21 @@ def proj_l2ball(b, s, r, axes=None):
 def promote16(u, fn=None, *args, **kwargs):
     r"""
     Utility function for use with functions that do not support arrays
-    of dtype np.float16. This function has two distinct modes of
+    of dtype ``np.float16``. This function has two distinct modes of
     operation. If called with only the `u` parameter specified, the
     returned value is either `u` itself if u is not of dtype
     np.float16, or `u` promoted to np.float32 dtype if it is. If the
     function parameter `fn` is specified then `u` is conditionally
     promoted as described above, passed as the first argument to
     function `fn`, and the returned values are converted back to dtype
-    np.float16 if u is of that dtype.
+    ``np.float16`` if `u` is of that dtype. Note that if parameter `fn`
+    is specified, it may not be be specified as a keyword argument if it
+    is followed by any non-keyword arguments.
 
     Parameters
     ----------
     u : array_like
-      Array to be promoted to np.float32 if it is of dtype np.float16
+      Array to be promoted to np.float32 if it is of dtype ``np.float16``
     fn : function or None, optional (default None)
       Function to be called with promoted `u` as first parameter and
       \*args and \*\*kwargs as additional parameters
@@ -1250,11 +1254,11 @@ def blockcirculant(A):
     """
 
     r, c = A[0].shape
-    B = np.zeros((len(A)*r, len(A)*c), dtype=A[0].dtype)
+    B = np.zeros((len(A) * r, len(A) * c), dtype=A[0].dtype)
     for k in range(len(A)):
         for l in range(len(A)):
             kl = np.mod(k + l, len(A))
-            B[r*kl:r*(kl+1), c*k:c*(k+1)] = A[l]
+            B[r*kl:r*(kl + 1), c*k:c*(k + 1)] = A[l]
     return B
 
 
@@ -1282,7 +1286,7 @@ def fl2norm2(xf, axis=(0, 1)):
     """
 
     xfs = xf.shape
-    return (np.linalg.norm(xf)**2)/np.prod(np.array([xfs[k] for k in axis]))
+    return (np.linalg.norm(xf)**2) / np.prod(np.array([xfs[k] for k in axis]))
 
 
 
@@ -1312,9 +1316,9 @@ def rfl2norm2(xf, xs, axis=(0, 1)):
     """
 
     scl = 1.0 / np.prod(np.array([xs[k] for k in axis]))
-    slc0 = (slice(None),)*axis[-1]
+    slc0 = (slice(None),) * axis[-1]
     nrm0 = np.linalg.norm(xf[slc0 + (0,)])
-    idx1 = (xs[axis[-1]]+1)//2
+    idx1 = (xs[axis[-1]] + 1) // 2
     nrm1 = np.linalg.norm(xf[slc0 + (slice(1, idx1),)])
     if xs[axis[-1]] % 2 == 0:
         nrm2 = np.linalg.norm(xf[slc0 + (slice(-1, None),)])

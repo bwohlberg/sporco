@@ -4,14 +4,13 @@ from __future__ import print_function
 from builtins import range
 
 import copy
+import multiprocessing as mp
 import numpy as np
 
 import sporco.linalg as sl
-import sporco.prox as sp
 from sporco.util import u
 from sporco.admm.cbpdn import GenericConvBPDN
 import sporco.cnvrep as cr
-import multiprocessing as mp
 # Required due to pyFFTW bug #135 - see "Notes" section of SPORCO docs.
 sl.pyfftw_threads = 1
 
@@ -624,34 +623,34 @@ class ParConvBPDN(GenericConvBPDN):
         shp_Y0[0] = self.ngrp
         shp_Y0[mp_axisC] = mp_C
         if self.opt['Y0'] is not None:
-            init_mpraw('Y0',
-                       np.moveaxis(self.opt['Y0'].astype(self.dtype,
-                                    copy=True), self.cri.axisM, mp_axisM))
+            init_mpraw('Y0', np.moveaxis(
+                self.opt['Y0'].astype(self.dtype, copy=True),
+                self.cri.axisM, mp_axisM))
         else:
             mp_Y0 = mpraw_as_np(shp_Y0, mp_X.dtype)
         global mp_Y0old
         mp_Y0old = mpraw_as_np(shp_Y0, mp_X.dtype)
         global mp_Y1
         if self.opt['Y1'] is not None:
-            init_mpraw('Y1',
-                       np.moveaxis(self.opt['Y1'].astype(self.dtype,
-                            copy=True), self.cri.axisM, mp_axisM))
+            init_mpraw('Y1', np.moveaxis(
+                self.opt['Y1'].astype(self.dtype, copy=True),
+                self.cri.axisM, mp_axisM))
         else:
             mp_Y1 = mpraw_as_np(shp_X, mp_X.dtype)
         global mp_Y1old
         mp_Y1old = mpraw_as_np(shp_X, mp_X.dtype)
         global mp_U0
         if self.opt['U0'] is not None:
-            init_mpraw('U0',
-                       np.moveaxis(self.opt['U0'].astype(self.dtype,
-                                    copy=True), self.cri.axisM, mp_axisM))
+            init_mpraw('U0', np.moveaxis(
+                self.opt['U0'].astype(self.dtype, copy=True),
+                self.cri.axisM, mp_axisM))
         else:
             mp_U0 = mpraw_as_np(shp_Y0, mp_X.dtype)
         global mp_U1
         if self.opt['U1'] is not None:
-            init_mpraw('U1',
-                       np.moveaxis(self.opt['U1'].astype(self.dtype,
-                                    copy=True), self.cri.axisM, mp_axisM))
+            init_mpraw('U1', np.moveaxis(
+                self.opt['U1'].astype(self.dtype, copy=True),
+                self.cri.axisM, mp_axisM))
         else:
             mp_U1 = mpraw_as_np(shp_X, mp_X.dtype)
         global mp_DX
@@ -662,9 +661,9 @@ class ParConvBPDN(GenericConvBPDN):
         # Variables used to solve the optimization efficiently
         global mp_inv_off_diag
         if self.W.ndim is self.cri.axisM+1:
-            init_mpraw('mp_inv_off_diag',
-                    np.moveaxis(-self.W**2/(mp_rho*(mp_rho+self.W**2*mp_ngrp)),
-                                self.cri.axisM, mp_axisM))
+            init_mpraw('mp_inv_off_diag', np.moveaxis(
+                -self.W**2/(mp_rho*(mp_rho+self.W**2*mp_ngrp)),
+                self.cri.axisM, mp_axisM))
         else:
             init_mpraw('mp_inv_off_diag',
                        -self.W**2/(mp_rho*(mp_rho+self.W**2*mp_ngrp)))

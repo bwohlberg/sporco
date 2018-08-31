@@ -10,7 +10,6 @@ with an :math:`\ell_1` data fidelity term"""
 
 from __future__ import division
 from __future__ import absolute_import
-from builtins import range
 
 import copy
 import numpy as np
@@ -244,10 +243,12 @@ class TVL1Denoise(admm.ADMM):
         :math:`\mathbf{y}`.
         """
 
-        self.Y[..., 0:-1] = sl.shrink2(self.AX[..., 0:-1] + self.U[..., 0:-1],
-                        (self.lmbda/self.rho)*self.Wtvna, axis=self.saxes)
-        self.Y[..., -1] = sl.shrink1(self.AX[..., -1] + self.U[..., -1] -
-                                     self.S, (1.0/self.rho)*self.Wdf)
+        self.Y[..., 0:-1] = sl.shrink2(
+            self.AX[..., 0:-1] + self.U[..., 0:-1],
+            (self.lmbda/self.rho)*self.Wtvna, axis=self.saxes)
+        self.Y[..., -1] = sl.shrink1(
+            self.AX[..., -1] + self.U[..., -1] - self.S,
+            (1.0/self.rho)*self.Wdf)
 
 
 
@@ -354,7 +355,7 @@ class TVL1Denoise(admm.ADMM):
             sz[ax] = self.S.shape[ax]
         lcw = 2*len(self.axes)*np.ones(sz, dtype=self.dtype)
         for ax in self.axes:
-            lcw[(slice(None),)*ax + ((0, -1),)] -= 1.0
+            lcw[(slice(None),)*ax + ([0, -1],)] -= 1.0
         return lcw
 
 
@@ -451,10 +452,12 @@ class TVL1Deconv(admm.ADMM):
         """
 
         defaults = copy.deepcopy(admm.ADMM.Options.defaults)
-        defaults.update({'gEvalY': True, 'RelaxParam': 1.8,
-            'LinSolveCheck': False, 'DFidWeight': 1.0, 'TVWeight': 1.0})
-        defaults['AutoRho'].update({'Enabled': False, 'Period': 1,
-            'AutoScaling': True, 'Scaling': 1000.0, 'RsdlRatio': 1.2})
+        defaults.update(
+            {'gEvalY': True, 'RelaxParam': 1.8, 'LinSolveCheck': False,
+             'DFidWeight': 1.0, 'TVWeight': 1.0})
+        defaults['AutoRho'].update(
+            {'Enabled': False, 'Period': 1, 'AutoScaling': True,
+             'Scaling': 1000.0, 'RsdlRatio': 1.2})
 
 
         def __init__(self, opt=None):
@@ -564,7 +567,7 @@ class TVL1Deconv(admm.ADMM):
             # the relevant dual optimality criterion (see (3.10) in
             # boyd-2010-distributed) is satisfied.
             Yss = np.sqrt(np.sum(self.Y[..., 0:-1]**2, axis=self.S.ndim,
-                        keepdims=True))
+                                 keepdims=True))
             U0 = (self.lmbda/self.rho)*sl.zdivide(self.Y[..., 0:-1], Yss)
             U1 = (1.0 / self.rho)*np.sign(self.Y[..., -1:])
             return np.concatenate((U0, U1), axis=self.S.ndim)
@@ -576,8 +579,9 @@ class TVL1Deconv(admm.ADMM):
         :math:`\mathbf{x}`.
         """
 
-        b = self.AHSf + np.sum(np.conj(self.GAf) *
-            sl.rfftn(self.Y-self.U, axes=self.axes), axis=self.Y.ndim-1)
+        b = self.AHSf + np.sum(
+            np.conj(self.GAf) * sl.rfftn(self.Y-self.U, axes=self.axes),
+            axis=self.Y.ndim-1)
         self.Xf = b / (self.AHAf + self.GHGf)
         self.X = sl.irfftn(self.Xf, self.axsz, axes=self.axes)
 
@@ -594,10 +598,12 @@ class TVL1Deconv(admm.ADMM):
         :math:`\mathbf{y}`.
         """
 
-        self.Y[..., 0:-1] = sl.shrink2(self.AX[..., 0:-1] + self.U[..., 0:-1],
-                        (self.lmbda/self.rho)*self.Wtvna, axis=self.saxes)
-        self.Y[..., -1] = sl.shrink1(self.AX[..., -1] + self.U[..., -1] -
-                                     self.S, (1.0/self.rho)*self.Wdf)
+        self.Y[..., 0:-1] = sl.shrink2(
+            self.AX[..., 0:-1] + self.U[..., 0:-1],
+            (self.lmbda/self.rho)*self.Wtvna, axis=self.saxes)
+        self.Y[..., -1] = sl.shrink1(
+            self.AX[..., -1] + self.U[..., -1] - self.S,
+            (1.0/self.rho)*self.Wdf)
 
 
 
@@ -658,7 +664,7 @@ class TVL1Deconv(admm.ADMM):
 
         Xf = sl.rfftn(X, axes=self.axes)
         return np.sum(sl.irfftn(np.conj(self.GAf)*Xf, self.axsz,
-                      axes=self.axes), axis=self.Y.ndim-1)
+                                axes=self.axes), axis=self.Y.ndim-1)
 
 
 

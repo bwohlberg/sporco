@@ -4,10 +4,8 @@ from builtins import object
 import pytest
 
 import numpy as np
-from scipy import misc
 import os
 import platform
-import tempfile
 import collections
 
 from sporco import util
@@ -30,13 +28,14 @@ class TestSet01(object):
         t0 = nt(0, 1, 2)
         t0a = util.ntpl2array(t0)
         t1 = util.array2ntpl(t0a)
+        assert t0 == t1
 
 
     def test_02(self):
         nt = collections.namedtuple('NT', ('A', 'B', 'C'))
         lst = [nt(0, 1, 2), nt(3, 4, 5)]
         lsttp = util.transpose_ntpl_list(lst)
-        assert(lst[0].A == lsttp.A[0])
+        assert lst[0].A == lsttp.A[0]
 
 
     def test_03(self):
@@ -95,32 +94,32 @@ class TestSet01(object):
     def test_14(self):
         x = np.linspace(-1, 1, 21)
         sprm, sfvl, fvmx, sidx = util.grid_search(fn, (x,))
-        assert(np.abs(sprm[0] - 0.1) < 1e-14)
-        assert(sidx[0] == 11)
+        assert np.abs(sprm[0] - 0.1) < 1e-14
+        assert sidx[0] == 11
 
 
     def test_15(self):
         x = np.linspace(-1, 1, 21)
         sprm, sfvl, fvmx, sidx = util.grid_search(fnv, (x,))
-        assert(np.abs(sprm[0][0] - 0.1) < 1e-14)
-        assert(np.abs(sprm[0][1] - 0.5) < 1e-14)
-        assert(sidx[0][0] == 11)
-        assert(sidx[0][1] == 15)
+        assert np.abs(sprm[0][0] - 0.1) < 1e-14
+        assert np.abs(sprm[0][1] - 0.5) < 1e-14
+        assert sidx[0][0] == 11
+        assert sidx[0][1] == 15
 
 
     def test_16(self):
         D = util.convdicts()['G:12x12x72']
-        assert(D.shape == (12,12,72))
+        assert D.shape == (12, 12, 72)
 
 
     def test_17(self):
         ei = util.ExampleImages()
         im = ei.images()
-        assert(len(im) > 0)
+        assert len(im) > 0
         gp = ei.groups()
-        assert(len(gp) > 0)
+        assert len(gp) > 0
         gi = ei.groupimages(gp[0])
-        assert(len(gi) > 0)
+        assert len(gi) > 0
         im1 = ei.image('sail.png')
         im2 = ei.image('sail.png', scaled=True, dtype=np.float32,
                        idxexp=np.s_[:, 10:-10], zoom=0.5)
@@ -130,7 +129,7 @@ class TestSet01(object):
         pth = os.path.join(os.path.dirname(util.__file__), 'data')
         ei = util.ExampleImages(pth=pth)
         im = ei.images()
-        assert(len(im) > 0)
+        assert len(im) > 0
 
 
     def test_19(self):
@@ -139,10 +138,10 @@ class TestSet01(object):
         t0 = t.elapsed()
         t.stop()
         t1 = t.elapsed()
-        assert(t0 >= 0.0)
-        assert(t1 >= t0)
-        assert(len(t.__str__()) > 0)
-        assert(len(t.labels()) > 0)
+        assert t0 >= 0.0
+        assert t1 >= t0
+        assert len(t.__str__()) > 0
+        assert len(t.labels()) > 0
 
 
     def test_20(self):
@@ -152,25 +151,25 @@ class TestSet01(object):
         t.stop('a')
         t.stop('b')
         t.stop(['a', 'b'])
-        assert(t.elapsed('a') >= 0.0)
-        assert(t.elapsed('b') >= 0.0)
-        assert(t.elapsed('a', total=False) == 0.0)
+        assert t.elapsed('a') >= 0.0
+        assert t.elapsed('b') >= 0.0
+        assert t.elapsed('a', total=False) == 0.0
 
 
     def test_21(self):
         t = util.Timer('a')
         t.start(['a', 'b'])
         t.reset('a')
-        assert(t.elapsed('a') == 0.0)
+        assert t.elapsed('a') == 0.0
         t.reset('all')
-        assert(t.elapsed('b') == 0.0)
+        assert t.elapsed('b') == 0.0
 
 
     def test_22(self):
         t = util.Timer()
         with util.ContextTimer(t):
             t0 = t.elapsed()
-        assert(t.elapsed() >= 0.0)
+        assert t.elapsed() >= 0.0
 
 
     def test_23(self):
@@ -179,7 +178,7 @@ class TestSet01(object):
         with util.ContextTimer(t, action='StopStart'):
             t0 = t.elapsed()
         t.stop()
-        assert(t.elapsed() >= 0.0)
+        assert t.elapsed() >= 0.0
 
 
     def test_24(self):
@@ -194,18 +193,18 @@ class TestSet01(object):
 
     def test_26(self):
         val = util.in_ipython()
-        assert(val is True or val is False)
+        assert val is True or val is False
 
 
     def test_27(self):
         val = util.in_notebook()
-        assert(val is True or val is False)
+        assert val is True or val is False
 
 
     @pytest.mark.skipif(platform.system() == 'Windows',
                         reason='Feature not supported under Windows')
     def test_28(self):
-        assert(util.idle_cpu_count() >= 1)
+        assert util.idle_cpu_count() >= 1
 
     def test_29(self):
         A = np.random.rand(4, 5, 6, 7, 3)
@@ -222,7 +221,7 @@ class TestSet01(object):
         stpsz = (2, 1, 2)
         A_blocks = util.extractblocks(A, blksz, stpsz)
         noise = np.random.rand(*A_blocks.shape)
-        A_average_recon = util.averageblocks(A_blocks+noise, A.shape, stpsz)
-        A_combine_recon = util.combineblocks(A_blocks+noise, A.shape,
+        A_average_recon = util.averageblocks(A_blocks + noise, A.shape, stpsz)
+        A_combine_recon = util.combineblocks(A_blocks + noise, A.shape,
                                              stpsz, np.mean)
-        assert(np.allclose(A_combine_recon, A_average_recon, equal_nan=True))
+        assert np.allclose(A_combine_recon, A_average_recon, equal_nan=True)

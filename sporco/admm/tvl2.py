@@ -10,7 +10,6 @@ with an :math:`\ell_2` data fidelity term"""
 
 from __future__ import division
 from __future__ import absolute_import
-from builtins import range
 
 import copy
 import numpy as np
@@ -239,9 +238,9 @@ class TVL2Denoise(admm.ADMM):
         :math:`\mathbf{y}`.
         """
 
-        self.Y = np.asarray(sl.shrink2(self.AX + self.U,
-                    (self.lmbda/self.rho)*self.Wtvna, axis=self.saxes),
-                    dtype=self.dtype)
+        self.Y = np.asarray(sl.shrink2(
+            self.AX + self.U, (self.lmbda/self.rho)*self.Wtvna,
+            axis=self.saxes), dtype=self.dtype)
 
 
 
@@ -330,7 +329,7 @@ class TVL2Denoise(admm.ADMM):
             sz[ax] = self.S.shape[ax]
         lcw = 2*len(self.axes)*np.ones(sz, dtype=self.dtype)
         for ax in self.axes:
-            lcw[(slice(None),)*ax + ((0, -1),)] -= 1.0
+            lcw[(slice(None),)*ax + ([0, -1],)] -= 1.0
         return lcw
 
 
@@ -546,9 +545,9 @@ class TVL2Deconv(admm.ADMM):
         :math:`\mathbf{x}`.
         """
 
-        b = self.AHSf + self.rho*np.sum(np.conj(self.Gf)*
-                    sl.rfftn(self.Y-self.U, axes=self.axes),
-                             axis=self.Y.ndim-1)
+        b = self.AHSf + self.rho*np.sum(
+            np.conj(self.Gf)*sl.rfftn(self.Y-self.U, axes=self.axes),
+            axis=self.Y.ndim-1)
         self.Xf = b / (self.AHAf + self.rho*self.GHGf)
         self.X = sl.irfftn(self.Xf, self.axsz, axes=self.axes)
 
@@ -593,7 +592,7 @@ class TVL2Deconv(admm.ADMM):
         Ef = self.Af * self.Xf - self.Sf
         dfd = sl.rfl2norm2(Ef, self.S.shape, axis=self.axes) / 2.0
         reg = np.sum(self.Wtv * np.sqrt(np.sum(self.obfn_gvar()**2,
-                     axis=self.saxes)))
+                                               axis=self.saxes)))
         obj = dfd + self.lmbda*reg
         return (obj, dfd, reg)
 
@@ -627,7 +626,7 @@ class TVL2Deconv(admm.ADMM):
 
         Xf = sl.rfftn(X, axes=self.axes)
         return np.sum(sl.irfftn(np.conj(self.Gf)*Xf, self.axsz,
-                      axes=self.axes), axis=self.Y.ndim-1)
+                                axes=self.axes), axis=self.Y.ndim-1)
 
 
 

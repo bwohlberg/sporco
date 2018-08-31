@@ -10,8 +10,6 @@
 
 from __future__ import print_function
 from __future__ import absolute_import
-from builtins import range
-from builtins import object
 
 import copy
 import numpy as np
@@ -92,7 +90,8 @@ class OnlineConvBPDNDictLearn(common.IterativeSolver):
             dictlrn.DictLearn.Options.__init__(self, {
                 'CBPDN': cbpdn.ConvBPDN.Options({
                     'AutoRho': {'Period': 10, 'AutoScaling': False,
-                    'RsdlRatio': 10.0, 'Scaling': 2.0, 'RsdlTarget': 1.0}})
+                                'RsdlRatio': 10.0, 'Scaling': 2.0,
+                                'RsdlTarget': 1.0}})
                 })
 
             if opt is None:
@@ -281,8 +280,7 @@ class OnlineConvBPDNDictLearn(common.IterativeSolver):
             xstep.solve()
             self.Sf = xstep.Sf
             self.setcoef(xstep.getcoef())
-            self.xstep_itstat = xstep.itstat[-1] if len(xstep.itstat) > 0 \
-                                                 else None
+            self.xstep_itstat = xstep.itstat[-1] if xstep.itstat else None
 
 
 
@@ -481,7 +479,7 @@ class OnlineConvBPDNMaskDictLearn(OnlineConvBPDNDictLearn):
 
         defaults = copy.deepcopy(OnlineConvBPDNDictLearn.Options.defaults)
         defaults.update({'CBPDN': copy.deepcopy(
-                         cbpdn.ConvBPDNMaskDcpl.Options.defaults)})
+            cbpdn.ConvBPDNMaskDcpl.Options.defaults)})
 
 
         def __init__(self, opt=None):
@@ -492,7 +490,8 @@ class OnlineConvBPDNMaskDictLearn(OnlineConvBPDNDictLearn):
             OnlineConvBPDNDictLearn.Options.__init__(self, {
                 'CBPDN': cbpdn.ConvBPDNMaskDcpl.Options({
                     'AutoRho': {'Period': 10, 'AutoScaling': False,
-                    'RsdlRatio': 10.0, 'Scaling': 2.0, 'RsdlTarget': 1.0}})
+                                'RsdlRatio': 10.0, 'Scaling': 2.0,
+                                'RsdlTarget': 1.0}})
                 })
 
             if opt is None:

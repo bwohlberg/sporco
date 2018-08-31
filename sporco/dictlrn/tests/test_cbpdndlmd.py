@@ -1,7 +1,6 @@
 from __future__ import division
 from builtins import object
 
-import pytest
 import numpy as np
 
 from sporco.dictlrn import cbpdndlmd
@@ -26,11 +25,11 @@ class TestSet01(object):
         opt = cbpdndlmd.ConvBPDNMaskDictLearn.Options({'MaxMainIter': 10})
         try:
             b = cbpdndlmd.ConvBPDNMaskDictLearn(self.D0, self.S, lmbda,
-                                                    W, opt=opt)
+                                                W, opt=opt)
             b.solve()
         except Exception as e:
             print(e)
-            assert(0)
+            assert 0
 
 
     def test_02(self):
@@ -38,42 +37,42 @@ class TestSet01(object):
         W = np.ones(self.S.shape[0:2] + (1, self.S.shape[2], 1))
         opt = cbpdndlmd.ConvBPDNMaskDictLearn.Options(
             {'MaxMainIter': 5, 'CCMOD': {'CG': {'MaxIter': 1}}},
-             dmethod='cg')
+            dmethod='cg')
         try:
             b = cbpdndlmd.ConvBPDNMaskDictLearn(self.D0, self.S, lmbda,
-                                                    W, opt=opt, dmethod='cg')
+                                                W, opt=opt, dmethod='cg')
             b.solve()
         except Exception as e:
             print(e)
-            assert(0)
+            assert 0
 
 
     def test_03(self):
         lmbda = 1e-1
         W = np.ones(self.S.shape[0:2] + (1, self.S.shape[2], 1))
         opt = cbpdndlmd.ConvBPDNMaskDictLearn.Options({'MaxMainIter': 10},
-                                                          dmethod='cns')
+                                                      dmethod='cns')
         try:
             b = cbpdndlmd.ConvBPDNMaskDictLearn(self.D0, self.S, lmbda, W,
-                                                    opt=opt, dmethod='cns')
+                                                opt=opt, dmethod='cns')
             b.solve()
         except Exception as e:
             print(e)
-            assert(0)
+            assert 0
 
 
     def test_04(self):
         lmbda = 1e-1
         W = np.ones(self.S.shape[0:2] + (1, self.S.shape[2], 1))
         opt = cbpdndlmd.ConvBPDNMaskDictLearn.Options(
-            {'AccurateDFid': True,'MaxMainIter': 10})
+            {'AccurateDFid': True, 'MaxMainIter': 10})
         try:
             b = cbpdndlmd.ConvBPDNMaskDictLearn(self.D0, self.S, lmbda, W,
-                                                    opt=opt)
+                                                opt=opt)
             b.solve()
         except Exception as e:
             print(e)
-            assert(0)
+            assert 0
 
 
     def test_05(self):
@@ -92,7 +91,7 @@ class TestSet01(object):
             b.solve()
         except Exception as e:
             print(e)
-            assert(0)
+            assert 0
 
 
     def test_06(self):
@@ -111,47 +110,48 @@ class TestSet01(object):
             b.solve()
         except Exception as e:
             print(e)
-            assert(0)
+            assert 0
 
 
     def test_07(self):
         lmbda = 1e-1
         W = np.ones(self.S.shape[0:2] + (1, self.S.shape[2], 1))
         opt = cbpdndlmd.ConvBPDNMaskDictLearn.Options(
-            {'AccurateDFid': True,'MaxMainIter': 10}, dmethod='fista')
+            {'AccurateDFid': True, 'MaxMainIter': 10}, dmethod='fista')
         try:
             b = cbpdndlmd.ConvBPDNMaskDictLearn(self.D0, self.S, lmbda, W,
-                                                    opt=opt, dmethod='fista')
+                                                opt=opt, dmethod='fista')
             b.solve()
         except Exception as e:
             print(e)
-            assert(0)
+            assert 0
 
 
     def test_08(self):
         lmbda = 1e-1
         W = np.ones(self.S.shape[0:2] + (1, self.S.shape[2], 1))
         opt = cbpdndlmd.ConvBPDNMaskDictLearn.Options(
-            {'AccurateDFid': True,'MaxMainIter': 10}, xmethod='fista')
+            {'AccurateDFid': True, 'MaxMainIter': 10}, xmethod='fista')
         try:
             b = cbpdndlmd.ConvBPDNMaskDictLearn(self.D0, self.S, lmbda, W,
-                                                    opt=opt, xmethod='fista')
+                                                opt=opt, xmethod='fista')
             b.solve()
         except Exception as e:
             print(e)
-            assert(0)
+            assert 0
 
 
     def test_09(self):
         lmbda = 1e-1
         W = np.ones(self.S.shape[0:2] + (1, self.S.shape[2], 1))
         opt = cbpdndlmd.ConvBPDNMaskDictLearn.Options(
-            {'AccurateDFid': True,'MaxMainIter': 10},
+            {'AccurateDFid': True, 'MaxMainIter': 10},
             xmethod='fista', dmethod='cns')
         try:
-            b = cbpdndlmd.ConvBPDNMaskDictLearn(self.D0, self.S, lmbda, W,
-                                    opt=opt, xmethod='fista', dmethod='cns')
+            b = cbpdndlmd.ConvBPDNMaskDictLearn(
+                self.D0, self.S, lmbda, W, opt=opt, xmethod='fista',
+                dmethod='cns')
             b.solve()
         except Exception as e:
             print(e)
-            assert(0)
+            assert 0

@@ -9,8 +9,6 @@
 
 from __future__ import print_function
 from __future__ import absolute_import
-from builtins import range
-from builtins import object
 
 from sporco.util import u
 
@@ -56,8 +54,8 @@ def isdmap(dmethod):
                'D_Q_Btrack': 'Q_Btrack', 'D_ItBt': 'IterBTrack',
                'D_L': 'L', 'D_Rsdl': 'Rsdl'}
     else:
-        isd= {'Cnstr':  'Cnstr', 'DPrRsdl': 'PrimalRsdl',
-              'DDlRsdl': 'DualRsdl', 'DRho': 'Rho'}
+        isd = {'Cnstr':  'Cnstr', 'DPrRsdl': 'PrimalRsdl',
+               'DDlRsdl': 'DualRsdl', 'DRho': 'Rho'}
     return isd
 
 
@@ -76,7 +74,7 @@ def isfld(xmethod, dmethod, opt):
         else:
             fld.extend(['X_L', 'X_Rsdl'])
     if dmethod != 'fista':
-        fld.extend([ 'DPrRsdl', 'DDlRsdl', 'DRho'])
+        fld.extend(['DPrRsdl', 'DDlRsdl', 'DRho'])
     else:
         if opt['CCMOD', 'BackTrack', 'Enabled']:
             fld.extend(['D_F_Btrack', 'D_Q_Btrack', 'D_ItBt', 'D_L',
@@ -121,7 +119,7 @@ def hdrmap(xmethod, dmethod, opt):
         hdr.update({'r_X': 'XPrRsdl', 's_X': 'XDlRsdl', u('ρ_X'): 'XRho'})
     else:
         if opt['CBPDN', 'BackTrack', 'Enabled']:
-            hdr.update({'F_X': 'X_F_Btrack','Q_X': 'X_Q_Btrack',
+            hdr.update({'F_X': 'X_F_Btrack', 'Q_X': 'X_Q_Btrack',
                         'It_X': 'X_ItBt', 'L_X': 'X_L'})
         else:
             hdr.update({'L_X': 'X_L'})

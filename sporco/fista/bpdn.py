@@ -11,15 +11,13 @@
 from __future__ import division
 from __future__ import absolute_import
 from __future__ import print_function
-from builtins import range
-
 
 import copy
 import numpy as np
+from scipy import linalg
 
 from sporco.fista import fista
 import sporco.linalg as sl
-import sporco.prox as sp
 from sporco.util import u
 
 
@@ -180,7 +178,7 @@ class BPDN(fista.FISTA):
         Nm = S.shape[1]
 
         xshape = (Nc, Nm)
-        super(BPDN, self).__init__(Nc*Nm, xshape, S.dtype, opt)
+        super(BPDN, self).__init__(Nc * Nm, xshape, S.dtype, opt)
 
         self.S = np.asarray(S, dtype=self.dtype)
 
@@ -232,7 +230,7 @@ class BPDN(fista.FISTA):
     def rsdl(self):
         """Compute fixed point residual."""
 
-        return np.linalg.norm((self.X - self.Yprv).ravel())
+        return linalg.norm((self.X - self.Yprv).ravel())
 
 
 
@@ -253,7 +251,7 @@ class BPDN(fista.FISTA):
         function.
         """
 
-        rl1 = np.linalg.norm((self.wl1 * self.X).ravel(), 1)
+        rl1 = linalg.norm((self.wl1 * self.X).ravel(), 1)
         return (self.lmbda*rl1, rl1)
 
 
@@ -265,7 +263,7 @@ class BPDN(fista.FISTA):
         if X is None:
             X = self.X
 
-        return 0.5*np.linalg.norm((self.D.dot(X) - self.S).ravel())**2
+        return 0.5 * linalg.norm((self.D.dot(X) - self.S).ravel())**2
 
 
 

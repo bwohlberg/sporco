@@ -2,21 +2,17 @@ from __future__ import division
 from builtins import range
 from builtins import object
 
+import pickle
 import pytest
 import numpy as np
-from scipy import linalg
-import pickle
 
 from sporco.admm import bpdn
-import sporco.linalg as sl
 
 
 
 def CallbackTest(obj):
-    if obj.k > 5:
-        return True
-    else:
-        return False
+    return bool(obj.k > 5)
+
 
 
 class TestSet01(object):
@@ -36,7 +32,7 @@ class TestSet01(object):
             b.solve()
         except Exception as e:
             print(e)
-            assert(0)
+            assert 0
 
 
     def test_02(self):
@@ -49,7 +45,7 @@ class TestSet01(object):
             b.solve()
         except Exception as e:
             print(e)
-            assert(0)
+            assert 0
 
 
     def test_03(self):
@@ -65,8 +61,8 @@ class TestSet01(object):
             b.solve()
         except Exception as e:
             print(e)
-            assert(0)
-        assert(np.array(b.getitstat().XSlvRelRes).max() < 1e-5)
+            assert 0
+        assert np.array(b.getitstat().XSlvRelRes).max() < 1e-5
 
 
     def test_04(self):
@@ -81,7 +77,7 @@ class TestSet01(object):
             b.solve()
         except Exception as e:
             print(e)
-            assert(0)
+            assert 0
 
 
     def test_05(self):
@@ -95,9 +91,9 @@ class TestSet01(object):
                                  'DataType': dt})
         b = bpdn.BPDN(D, s, lmbda=1.0, opt=opt)
         b.solve()
-        assert(b.X.dtype == dt)
-        assert(b.Y.dtype == dt)
-        assert(b.U.dtype == dt)
+        assert b.X.dtype == dt
+        assert b.Y.dtype == dt
+        assert b.U.dtype == dt
 
 
     def test_06(self):
@@ -111,9 +107,9 @@ class TestSet01(object):
                                  'DataType': dt})
         b = bpdn.BPDN(D, s, lmbda=1.0, opt=opt)
         b.solve()
-        assert(b.X.dtype == dt)
-        assert(b.Y.dtype == dt)
-        assert(b.U.dtype == dt)
+        assert b.X.dtype == dt
+        assert b.Y.dtype == dt
+        assert b.U.dtype == dt
 
 
     def test_07(self):
@@ -127,9 +123,9 @@ class TestSet01(object):
                                  'DataType': dt})
         b = bpdn.BPDN(D, s, lmbda=1.0, opt=opt)
         b.solve()
-        assert(b.X.dtype == dt)
-        assert(b.Y.dtype == dt)
-        assert(b.U.dtype == dt)
+        assert b.X.dtype == dt
+        assert b.Y.dtype == dt
+        assert b.U.dtype == dt
 
 
     def test_08(self):
@@ -148,10 +144,10 @@ class TestSet01(object):
         b = bpdn.BPDN(D, s0, lmbda, opt)
         b.solve()
         x1 = b.Y
-        assert(np.abs(b.itstat[-1].ObjFun - 0.012009) < 1e-5)
-        assert(np.abs(b.itstat[-1].DFid - 1.9636082e-06) < 1e-5)
-        assert(np.abs(b.itstat[-1].RegL1 - 2.401446) < 1e-5)
-        assert(linalg.norm(x1-x0) < 1e-3)
+        assert np.abs(b.itstat[-1].ObjFun - 0.012009) < 1e-5
+        assert np.abs(b.itstat[-1].DFid - 1.9636082e-06) < 1e-5
+        assert np.abs(b.itstat[-1].RegL1 - 2.401446) < 1e-5
+        assert np.linalg.norm(x1 - x0) < 1e-3
 
 
     def test_09(self):
@@ -166,7 +162,7 @@ class TestSet01(object):
             b.solve()
         except Exception as e:
             print(e)
-            assert(0)
+            assert 0
 
 
     def test_10(self):
@@ -180,9 +176,9 @@ class TestSet01(object):
                                  'DataType': dt})
         b = bpdn.BPDNJoint(D, s, lmbda=1.0, mu=0.1, opt=opt)
         b.solve()
-        assert(b.X.dtype == dt)
-        assert(b.Y.dtype == dt)
-        assert(b.U.dtype == dt)
+        assert b.X.dtype == dt
+        assert b.Y.dtype == dt
+        assert b.U.dtype == dt
 
 
     def test_11(self):
@@ -197,7 +193,7 @@ class TestSet01(object):
             b.solve()
         except Exception as e:
             print(e)
-            assert(0)
+            assert 0
 
 
     def test_12(self):
@@ -215,8 +211,8 @@ class TestSet01(object):
             b.solve()
         except Exception as e:
             print(e)
-            assert(0)
-        assert(np.array(b.getitstat().XSlvRelRes).max() < 1e-5)
+            assert 0
+        assert np.array(b.getitstat().XSlvRelRes).max() < 1e-5
 
 
     def test_13(self):
@@ -230,9 +226,9 @@ class TestSet01(object):
                                  'DataType': dt})
         b = bpdn.ElasticNet(D, s, lmbda=1.0, mu=0.1, opt=opt)
         b.solve()
-        assert(b.X.dtype == dt)
-        assert(b.Y.dtype == dt)
-        assert(b.U.dtype == dt)
+        assert b.X.dtype == dt
+        assert b.Y.dtype == dt
+        assert b.U.dtype == dt
 
 
     def test_14(self):
@@ -246,7 +242,7 @@ class TestSet01(object):
             b.solve()
         except Exception as e:
             print(e)
-            assert(0)
+            assert 0
 
 
     def test_15(self):
@@ -260,9 +256,9 @@ class TestSet01(object):
                                  'DataType': dt})
         b = bpdn.BPDNProjL1(D, s, gamma=1.0, opt=opt)
         b.solve()
-        assert(b.X.dtype == dt)
-        assert(b.Y.dtype == dt)
-        assert(b.U.dtype == dt)
+        assert b.X.dtype == dt
+        assert b.Y.dtype == dt
+        assert b.U.dtype == dt
 
 
     def test_16(self):
@@ -276,7 +272,7 @@ class TestSet01(object):
             b.solve()
         except Exception as e:
             print(e)
-            assert(0)
+            assert 0
 
 
     def test_17(self):
@@ -290,9 +286,9 @@ class TestSet01(object):
                                  'DataType': dt})
         b = bpdn.MinL1InL2Ball(D, s, epsilon=1.0, opt=opt)
         b.solve()
-        assert(b.X.dtype == dt)
-        assert(b.Y.dtype == dt)
-        assert(b.U.dtype == dt)
+        assert b.X.dtype == dt
+        assert b.Y.dtype == dt
+        assert b.U.dtype == dt
 
 
     def test_18(self):
@@ -316,8 +312,8 @@ class TestSet01(object):
                     'AutoRho': {'Enabled': False}})
         bc = bpdn.MinL1InL2Ball(D, s, epsilon=epsilon, opt=opt)
         Xc = bc.solve()
-        assert(np.linalg.norm(Xp - Xc)/np.linalg.norm(Xp) < 1e-3)
-        assert(np.abs(np.linalg.norm(Xp, 1) - np.linalg.norm(Xc, 1)) < 1e-3)
+        assert np.linalg.norm(Xp - Xc)/np.linalg.norm(Xp) < 1e-3
+        assert np.abs(np.linalg.norm(Xp, 1) - np.linalg.norm(Xc, 1)) < 1e-3
 
 
     def test_19(self):
@@ -332,21 +328,21 @@ class TestSet01(object):
         c = pickle.loads(bp)
         Xb = b.solve()
         Xc = c.solve()
-        assert(linalg.norm(Xb-Xc)==0.0)
+        assert np.linalg.norm(Xb - Xc) == 0.0
 
 
     def test_20(self):
         opt = bpdn.GenericBPDN.Options({'AuxVarObj': False})
-        assert(opt['fEvalX'] is True and opt['gEvalY'] is False)
+        assert opt['fEvalX'] is True and opt['gEvalY'] is False
         opt['AuxVarObj'] = True
-        assert(opt['fEvalX'] is False and opt['gEvalY'] is True)
+        assert opt['fEvalX'] is False and opt['gEvalY'] is True
 
 
     def test_21(self):
         opt = bpdn.GenericBPDN.Options({'AuxVarObj': True})
-        assert(opt['fEvalX'] is False and opt['gEvalY'] is True)
+        assert opt['fEvalX'] is False and opt['gEvalY'] is True
         opt['AuxVarObj'] = False
-        assert(opt['fEvalX'] is True and opt['gEvalY'] is False)
+        assert opt['fEvalX'] is True and opt['gEvalY'] is False
 
 
     @pytest.mark.filterwarnings('ignore:admm.ADMM.runtime')
@@ -357,12 +353,12 @@ class TestSet01(object):
         s = np.random.randn(N, 1)
         lmbda = 1e-1
         opt = bpdn.BPDN.Options({'Verbose': False, 'MaxMainIter': 10,
-                        'Callback': CallbackTest, 'RelaxParam': 1.0})
+                                 'Callback': CallbackTest, 'RelaxParam': 1.0})
         b = bpdn.BPDN(D, s, lmbda, opt=opt)
-        assert(b.getitstat() is None)
+        assert b.getitstat() is None
         b.solve()
-        assert(b.runtime > 0.0)
-        assert(b.k == 7)
-        assert(b.var_x() is not None)
-        assert(b.var_y() is not None)
-        assert(b.var_u() is not None)
+        assert b.runtime > 0.0
+        assert b.k == 7
+        assert b.var_x() is not None
+        assert b.var_y() is not None
+        assert b.var_u() is not None

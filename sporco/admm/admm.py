@@ -9,7 +9,6 @@
 
 from __future__ import division
 from __future__ import print_function
-from builtins import range
 from builtins import object
 
 import copy
@@ -151,7 +150,7 @@ class ADMM(common.IterativeSolver):
                     'MaxMainIter': 1000, 'IterTimer': 'solve',
                     'AbsStopTol': 0.0, 'RelStopTol': 1e-3,
                     'RelaxParam': 1.0, 'rho': None,
-                    'AutoRho' :
+                    'AutoRho':
                     {
                         'Enabled': False, 'Period': 10,
                         'Scaling': 2.0, 'RsdlRatio': 10.0,
@@ -393,9 +392,9 @@ class ADMM(common.IterativeSolver):
         mechanism. This will be removed in the future.
         """
 
-        warnings.warn("admm.ADMM.runtime attribute has been replaced by "\
-            "an upgraded timer class: please see the documentation for "\
-            "admm.ADMM.solve method and util.Timer class",
+        warnings.warn("admm.ADMM.runtime attribute has been replaced by "
+                      "an upgraded timer class: please see the documentation "
+                      "for admm.ADMM.solve method and util.Timer class",
                       PendingDeprecationWarning)
         return self.timer.elapsed('init') + self.timer.elapsed('solve')
 
@@ -451,8 +450,8 @@ class ADMM(common.IterativeSolver):
                 self._cnst_c = self.cnst_c()
             # Compute relaxed version of AX
             alpha = self.rlx
-            self.AX = alpha*self.AXnr - (1-alpha)*(self.cnst_B(self.Y) -
-                                                   self._cnst_c)
+            self.AX = alpha*self.AXnr - (1 - alpha)*(self.cnst_B(self.Y) -
+                                                     self._cnst_c)
 
 
 
@@ -462,10 +461,10 @@ class ADMM(common.IterativeSolver):
         if self.opt['AutoRho', 'StdResiduals']:
             r = np.linalg.norm(self.rsdl_r(self.AXnr, self.Y))
             s = np.linalg.norm(self.rsdl_s(self.Yprev, self.Y))
-            epri = np.sqrt(self.Nc)*self.opt['AbsStopTol'] + \
-                self.rsdl_rn(self.AXnr, self.Y)*self.opt['RelStopTol']
-            edua = np.sqrt(self.Nx)*self.opt['AbsStopTol'] + \
-                self.rsdl_sn(self.U)*self.opt['RelStopTol']
+            epri = np.sqrt(self.Nc) * self.opt['AbsStopTol'] + \
+                self.rsdl_rn(self.AXnr, self.Y) * self.opt['RelStopTol']
+            edua = np.sqrt(self.Nx) * self.opt['AbsStopTol'] + \
+                self.rsdl_sn(self.U) * self.opt['RelStopTol']
         else:
             rn = self.rsdl_rn(self.AXnr, self.Y)
             if rn == 0.0:
@@ -475,9 +474,9 @@ class ADMM(common.IterativeSolver):
                 sn = 1.0
             r = np.linalg.norm(self.rsdl_r(self.AXnr, self.Y)) / rn
             s = np.linalg.norm(self.rsdl_s(self.Yprev, self.Y)) / sn
-            epri = np.sqrt(self.Nc)*self.opt['AbsStopTol']/rn + \
+            epri = np.sqrt(self.Nc) * self.opt['AbsStopTol'] / rn + \
                 self.opt['RelStopTol']
-            edua = np.sqrt(self.Nx)*self.opt['AbsStopTol']/sn + \
+            edua = np.sqrt(self.Nx) * self.opt['AbsStopTol'] / sn + \
                 self.opt['RelStopTol']
 
         return r, s, epri, edua
@@ -510,7 +509,7 @@ class ADMM(common.IterativeSolver):
 
         tk = self.timer.elapsed(self.opt['IterTimer'])
         tpl = (k,) + self.eval_objfn() + (r, s, epri, edua, self.rho) + \
-              self.itstat_extra() + (tk,)
+            self.itstat_extra() + (tk,)
         return type(self).IterationStats(*tpl)
 
 
@@ -550,22 +549,23 @@ class ADMM(common.IterativeSolver):
             tau = self.rho_tau
             mu = self.rho_mu
             xi = self.rho_xi
-            if k != 0 and np.mod(k+1, self.opt['AutoRho', 'Period']) == 0:
+            if k != 0 and np.mod(k + 1, self.opt['AutoRho', 'Period']) == 0:
                 if self.opt['AutoRho', 'AutoScaling']:
                     if s == 0.0 or r == 0.0:
                         rhomlt = tau
                     else:
-                        rhomlt = np.sqrt(r/(s*xi) if r > s*xi else (s*xi)/r)
+                        rhomlt = np.sqrt(r / (s * xi) if r > s * xi else
+                                         (s * xi) / r)
                         if rhomlt > tau:
                             rhomlt = tau
                 else:
                     rhomlt = tau
                 rsf = 1.0
-                if r > xi*mu*s:
+                if r > xi * mu * s:
                     rsf = rhomlt
-                elif s > (mu/xi)*r:
-                    rsf = 1.0/rhomlt
-                self.rho *= rsf
+                elif s > (mu / xi) * r:
+                    rsf = 1.0 / rhomlt
+                self.rho *= self.dtype.type(rsf)
                 self.U /= rsf
                 if rsf != 1.0:
                     self.rhochange()
@@ -739,7 +739,7 @@ class ADMM(common.IterativeSolver):
         overridden.
         """
 
-        return self.rho*self.cnst_AT(self.cnst_B(Y - Yprev))
+        return self.rho * self.cnst_AT(self.cnst_B(Y - Yprev))
 
 
 
@@ -768,7 +768,7 @@ class ADMM(common.IterativeSolver):
         overridden.
         """
 
-        return self.rho*np.linalg.norm(self.cnst_AT(U))
+        return self.rho * np.linalg.norm(self.cnst_AT(U))
 
 
 
@@ -874,7 +874,7 @@ class ADMMEqual(ADMM):
             self.AX = self.X
         else:
             alpha = self.rlx
-            self.AX = alpha*self.X + (1-alpha)*self.Y
+            self.AX = alpha*self.X + (1 - alpha)*self.Y
 
 
 
@@ -958,7 +958,7 @@ class ADMMEqual(ADMM):
     def rsdl_s(self, Yprev, Y):
         """Compute dual residual vector."""
 
-        return self.rho*(Yprev - Y)
+        return self.rho * (Yprev - Y)
 
 
 
@@ -972,7 +972,7 @@ class ADMMEqual(ADMM):
     def rsdl_sn(self, U):
         """Compute dual residual normalisation term."""
 
-        return self.rho*np.linalg.norm(U)
+        return self.rho * np.linalg.norm(U)
 
 
 
@@ -1163,9 +1163,9 @@ class ADMMTwoBlockCnstrnt(ADMM):
             if not hasattr(self, '_cnst_c1'):
                 self._cnst_c1 = self.cnst_c1()
             alpha = self.rlx
-            self.AX = alpha*self.AXnr + \
-                      (1-alpha)*self.block_cat(self.var_y0() + self._cnst_c0,
-                                               self.var_y1() + self._cnst_c1)
+            self.AX = alpha*self.AXnr + (1 - alpha)*self.block_cat(
+                self.var_y0() + self._cnst_c0,
+                self.var_y1() + self._cnst_c1)
 
 
 
@@ -1226,8 +1226,8 @@ class ADMMTwoBlockCnstrnt(ADMM):
         g_1(\mathbf{y}_1)` component of ADMM objective function.
         """
 
-        return self.obfn_g0(self.obfn_g0var()) \
-          + self.obfn_g1(self.obfn_g1var())
+        return self.obfn_g0(self.obfn_g0var()) + \
+            self.obfn_g1(self.obfn_g1var())
 
 
 
@@ -1397,7 +1397,7 @@ class ADMMTwoBlockCnstrnt(ADMM):
         overridden.
         """
 
-        return self.rho*self.cnst_AT(Yprev - Y)
+        return self.rho * self.cnst_AT(Yprev - Y)
 
 
 
@@ -1424,7 +1424,7 @@ class ADMMTwoBlockCnstrnt(ADMM):
         overridden.
         """
 
-        return self.rho*np.linalg.norm(self.cnst_AT(U))
+        return self.rho * np.linalg.norm(self.cnst_AT(U))
 
 
 
@@ -1595,7 +1595,7 @@ class ADMMConsensus(ADMM):
             self.AX = self.X
         else:
             alpha = self.rlx
-            self.AX = alpha*self.X + (1-alpha)*self.Y[..., np.newaxis]
+            self.AX = alpha*self.X + (1 - alpha)*self.Y[..., np.newaxis]
 
 
 
@@ -1668,7 +1668,7 @@ class ADMMConsensus(ADMM):
         # require allocating additional memory, and since it is only the norm
         # of s that is required, instead of replicating the vector it is
         # scaled to have the same l2 norm as the replicated vector
-        return np.sqrt(self.Nb)*self.rho*(Yprev - Y)
+        return np.sqrt(self.Nb) * self.rho * (Yprev - Y)
 
 
 
@@ -1679,11 +1679,11 @@ class ADMMConsensus(ADMM):
         # max( ||A x^(k)||_2, ||B y^(k)||_2 ) and B = -(I I I ...)^T.
         # The scaling by sqrt(Nb) of the l2 norm of Y accounts for the
         # block replication introduced by multiplication by B
-        return max((np.linalg.norm(AX), np.sqrt(self.Nb)*np.linalg.norm(Y)))
+        return max((np.linalg.norm(AX), np.sqrt(self.Nb) * np.linalg.norm(Y)))
 
 
 
     def rsdl_sn(self, U):
         """Compute dual residual normalisation term."""
 
-        return self.rho*np.linalg.norm(U)
+        return self.rho * np.linalg.norm(U)

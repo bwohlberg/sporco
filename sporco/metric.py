@@ -26,7 +26,6 @@ Python code:
 """
 
 from __future__ import division
-from builtins import range
 
 import numpy as np
 from scipy import ndimage
@@ -100,8 +99,8 @@ def snr(vref, vcmp):
 
     dv = np.var(vref)
     with np.errstate(divide='ignore'):
-        rt = dv/mse(vref, vcmp)
-    return 10.0*np.log10(rt)
+        rt = dv / mse(vref, vcmp)
+    return 10.0 * np.log10(rt)
 
 
 
@@ -133,8 +132,8 @@ def psnr(vref, vcmp, rng=None):
         rng = vref.max() - vref.min()
     dv = (rng + 0.0)**2
     with np.errstate(divide='ignore'):
-        rt = dv/mse(vref, vcmp)
-    return 10.0*np.log10(rt)
+        rt = dv / mse(vref, vcmp)
+    return 10.0 * np.log10(rt)
 
 
 
@@ -161,8 +160,8 @@ def isnr(vref, vdeg, vrst):
     msedeg = mse(vref, vdeg)
     mserst = mse(vref, vrst)
     with np.errstate(divide='ignore'):
-        rt = msedeg/mserst
-    return 10.0*np.log10(rt)
+        rt = msedeg / mserst
+    return 10.0 * np.log10(rt)
 
 
 
@@ -187,8 +186,8 @@ def bsnr(vblr, vnsy):
     blrvar = np.var(vblr)
     nsevar = np.var(vnsy - vblr)
     with np.errstate(divide='ignore'):
-        rt = blrvar/nsevar
-    return 10.0*np.log10(rt)
+        rt = blrvar / nsevar
+    return 10.0 * np.log10(rt)
 
 
 
@@ -218,11 +217,11 @@ def pamse(vref, vcmp, rescale=True):
     # Calculate difference, promoting to float if vref and vcmp have integer
     # dtype
     emap = np.asarray(vref, dtype=np.float64) - \
-           np.asarray(vcmp, dtype=np.float64)
+        np.asarray(vcmp, dtype=np.float64)
     # Input images in reference code on which this implementation is
     # based are assumed to be on range [0,...,255].
     if rescale:
-        emap *= (255.0/vref.max())
+        emap *= (255.0 / vref.max())
     sigma = 0.8
     herr = ndimage.filters.gaussian_filter(emap, sigma)
     score = np.mean(herr**2)
@@ -261,18 +260,18 @@ def gmsd(vref, vcmp, rescale=True, returnMap=False):
     # Input images in reference code on which this implementation is
     # based are assumed to be on range [0,...,255].
     if rescale:
-        scl = (255.0/vref.max())
+        scl = (255.0 / vref.max())
     else:
         scl = np.float32(1.0)
 
     T = 170.0
     dwn = 2
-    dx = np.array([[1, 0, -1], [1, 0, -1], [1, 0, -1]])/3.0
+    dx = np.array([[1, 0, -1], [1, 0, -1], [1, 0, -1]]) / 3.0
     dy = dx.T
 
-    ukrn = np.ones((2, 2))/4.0
-    aveY1 = signal.convolve2d(scl*vref, ukrn, mode='same', boundary='symm')
-    aveY2 = signal.convolve2d(scl*vcmp, ukrn, mode='same', boundary='symm')
+    ukrn = np.ones((2, 2)) / 4.0
+    aveY1 = signal.convolve2d(scl * vref, ukrn, mode='same', boundary='symm')
+    aveY2 = signal.convolve2d(scl * vcmp, ukrn, mode='same', boundary='symm')
     Y1 = aveY1[0::dwn, 0::dwn]
     Y2 = aveY2[0::dwn, 0::dwn]
 

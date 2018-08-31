@@ -1,8 +1,6 @@
 from __future__ import division
 from builtins import object
 
-import pytest
-
 import numpy as np
 from sporco import linalg
 from sporco import util
@@ -102,9 +100,9 @@ class TestSet01(object):
         D = util.complex_randn(N, N, 1, 1, M)
         X = util.complex_randn(N, N, 1, K, M)
         S = np.sum(D*X, axis=4, keepdims=True)
-        d = 1e-1 * (np.random.randn(N, N, 1, 1, M).astype('complex') + \
+        d = 1e-1 * (np.random.randn(N, N, 1, 1, M).astype('complex') +
             np.random.randn(N, N, 1, 1, M).astype('complex') * 1.0j)
-        Z = (D.conj()*np.sum(D*X, axis=4, keepdims=True) + \
+        Z = (D.conj()*np.sum(D*X, axis=4, keepdims=True) +
              d*X - D.conj()*S) / d
         Xslv = linalg.solvedbd_sm(D, d, D.conj()*S + d*Z)
         assert(linalg.rrs(D.conj()*np.sum(D*Xslv, axis=4, keepdims=True) +
@@ -124,9 +122,9 @@ class TestSet01(object):
         Xop = lambda x: np.sum(X * x, axis=4, keepdims=True)
         XHop = lambda x: np.sum(np.conj(X) * x, axis=3, keepdims=True)
         Z = (XHop(Xop(D)) + rho*D - XHop(S)) / rho
-        Dslv = linalg.solvemdbi_ism(X, rho,  XHop(S) + rho*Z, 4, 3)
+        Dslv = linalg.solvemdbi_ism(X, rho, XHop(S) + rho*Z, 4, 3)
 
-        assert(linalg.rrs(XHop(Xop(Dslv)) + rho*Dslv, XHop(S) + rho*Z) < 1e-11)
+        assert linalg.rrs(XHop(Xop(Dslv)) + rho*Dslv, XHop(S) + rho*Z) < 1e-11
 
 
 
@@ -143,9 +141,9 @@ class TestSet01(object):
         Xop = lambda x: np.sum(X * x, axis=4, keepdims=True)
         XHop = lambda x: np.sum(np.conj(X)* x, axis=3, keepdims=True)
         Z = (XHop(Xop(D)) + rho*D - XHop(S)) / rho
-        Dslv = linalg.solvemdbi_ism(X, rho,  XHop(S) + rho*Z, 4, 3)
+        Dslv = linalg.solvemdbi_ism(X, rho, XHop(S) + rho*Z, 4, 3)
 
-        assert(linalg.rrs(XHop(Xop(Dslv)) + rho*Dslv, XHop(S) + rho*Z) < 1e-11)
+        assert linalg.rrs(XHop(Xop(Dslv)) + rho*Dslv, XHop(S) + rho*Z) < 1e-11
 
 
 
@@ -161,9 +159,9 @@ class TestSet01(object):
         Xop = lambda x: np.sum(X * x, axis=4, keepdims=True)
         XHop = lambda x: np.sum(np.conj(X) * x, axis=3, keepdims=True)
         Z = (XHop(Xop(D)) + rho*D - XHop(S)) / rho
-        Dslv = linalg.solvemdbi_rsm(X, rho,  XHop(S) + rho*Z, 3)
+        Dslv = linalg.solvemdbi_rsm(X, rho, XHop(S) + rho*Z, 3)
 
-        assert(linalg.rrs(XHop(Xop(Dslv)) + rho*Dslv, XHop(S) + rho*Z) < 1e-11)
+        assert linalg.rrs(XHop(Xop(Dslv)) + rho*Dslv, XHop(S) + rho*Z) < 1e-11
 
 
 
@@ -180,9 +178,9 @@ class TestSet01(object):
         Xop = lambda x: np.sum(X * x, axis=4, keepdims=True)
         XHop = lambda x: np.sum(np.conj(X) * x, axis=3, keepdims=True)
         Z = (XHop(Xop(D)) + rho*D - XHop(S)) / rho
-        Dslv = linalg.solvemdbi_rsm(X, rho,  XHop(S) + rho*Z, 3)
+        Dslv = linalg.solvemdbi_rsm(X, rho, XHop(S) + rho*Z, 3)
 
-        assert(linalg.rrs(XHop(Xop(Dslv)) + rho*Dslv, XHop(S) + rho*Z) < 1e-11)
+        assert linalg.rrs(XHop(Xop(Dslv)) + rho*Dslv, XHop(S) + rho*Z) < 1e-11
 
 
 
@@ -200,7 +198,7 @@ class TestSet01(object):
         Z = (XHop(Xop(D)) + rho*D - XHop(S)) / rho
         Dslv, cgit = linalg.solvemdbi_cg(X, rho, XHop(S)+rho*Z, 4, 3, tol=1e-6)
 
-        assert(linalg.rrs(XHop(Xop(Dslv)) + rho*Dslv, XHop(S) + rho*Z) <= 1e-6)
+        assert linalg.rrs(XHop(Xop(Dslv)) + rho*Dslv, XHop(S) + rho*Z) <= 1e-6
 
 
 
@@ -219,68 +217,68 @@ class TestSet01(object):
         Z = (XHop(Xop(D)) + rho*D - XHop(S)) / rho
         Dslv, cgit = linalg.solvemdbi_cg(X, rho, XHop(S)+rho*Z, 4, 3, tol=1e-6)
 
-        assert(linalg.rrs(XHop(Xop(Dslv)) + rho*Dslv, XHop(S) + rho*Z) <= 1e-6)
+        assert linalg.rrs(XHop(Xop(Dslv)) + rho*Dslv, XHop(S) + rho*Z) <= 1e-6
 
 
 
     def test_13(self):
-        b = np.array([0.0,0.0,2.0])
-        s = np.array([0.0,0.0,0.0])
+        b = np.array([0.0, 0.0, 2.0])
+        s = np.array([0.0, 0.0, 0.0])
         r = 1.0
         p = linalg.proj_l2ball(b, s, r)
-        assert(linalg.rrs(p, np.array([0.0,0.0,1.0])) < 1e-14)
+        assert linalg.rrs(p, np.array([0.0, 0.0, 1.0])) < 1e-14
 
 
 
     def test_14(self):
-        u = np.array([[0,1],[2,3]])
+        u = np.array([[0, 1], [2, 3]])
         v = linalg.roll(u, [1, 1])
-        assert(v[0,0] == 3)
+        assert v[0, 0] == 3
 
 
 
     def test_15(self):
-        u0 = np.array([[0,1],[2,3]])
-        u1 = np.array([[4,5],[6,7]])
-        C = linalg.blockcirculant((u0,u1))
-        assert(C[3,0] == 6)
-        assert(C[3,3] == 3)
+        u0 = np.array([[0, 1], [2, 3]])
+        u1 = np.array([[4, 5], [6, 7]])
+        C = linalg.blockcirculant((u0, u1))
+        assert C[3, 0] == 6
+        assert C[3, 3] == 3
 
 
 
     def test_16(self):
-        x = np.random.randn(16,8)
+        x = np.random.randn(16, 8)
         xf = linalg.fftn(x, axes=(0,))
         n1 = np.linalg.norm(x)**2
         n2 = linalg.fl2norm2(xf, axis=(0,))
-        assert(np.abs(n1-n2) < 1e-12)
+        assert np.abs(n1 - n2) < 1e-12
 
 
 
     def test_17(self):
-        x = np.random.randn(16,8)
+        x = np.random.randn(16, )
         xf = linalg.rfftn(x, axes=(0,))
         n1 = np.linalg.norm(x)**2
         n2 = linalg.rfl2norm2(xf, xs=x.shape, axis=(0,))
-        assert(np.abs(n1-n2) < 1e-12)
+        assert np.abs(n1 - n2) < 1e-12
 
 
 
     def test_18(self):
-        x = np.random.randn(16,8)
-        y = np.random.randn(16,8)
+        x = np.random.randn(16, 8)
+        y = np.random.randn(16, 8)
         ip1 = np.sum(x * y, axis=0, keepdims=True)
         ip2 = linalg.inner(x, y, axis=0)
-        assert(np.linalg.norm(ip1 - ip2) < 1e-13)
+        assert np.linalg.norm(ip1 - ip2) < 1e-13
 
 
 
     def test_19(self):
-        x = np.random.randn(8,8,3,12)
-        y = np.random.randn(8,1,1,12)
+        x = np.random.randn(8, 8, 3, 12)
+        y = np.random.randn(8, 1, 1, 12)
         ip1 = np.sum(x * y, axis=-1, keepdims=True)
         ip2 = linalg.inner(x, y, axis=-1)
-        assert(np.linalg.norm(ip1 - ip2) < 1e-13)
+        assert np.linalg.norm(ip1 - ip2) < 1e-13
 
 
 
@@ -288,4 +286,4 @@ class TestSet01(object):
         x = np.array([[0, 1], [2, 3]])
         y = np.array([[4, 5], [6, 7]])
         xy = np.array([[38, 36], [30, 28]])
-        assert(np.allclose(linalg.fftconv(x, y), xy))
+        assert np.allclose(linalg.fftconv(x, y), xy)

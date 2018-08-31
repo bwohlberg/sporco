@@ -186,11 +186,13 @@ class SplineL1(admm.ADMM):
         :math:`\mathbf{x}`."""
 
         self.X = sl.idctii(self.Gamma*sl.dctii(self.Y + self.S - self.U,
-                                         axes=self.axes), axes=self.axes)
+                                               axes=self.axes), axes=self.axes)
         if self.opt['LinSolveCheck']:
-            self.xrrs = sl.rrs(self.X + (self.lmbda/self.rho) *
-                    sl.idctii((self.Alpha**2)*sl.dctii(self.X, axes=self.axes),
-                    axes=self.axes), self.Y + self.S - self.U)
+            self.xrrs = sl.rrs(
+                self.X + (self.lmbda/self.rho) *
+                sl.idctii((self.Alpha**2) *
+                          sl.dctii(self.X, axes=self.axes),
+                          axes=self.axes), self.Y + self.S - self.U)
         else:
             self.xrrs = None
 
@@ -233,8 +235,9 @@ class SplineL1(admm.ADMM):
 
         gvr = self.obfn_gvar()
         dfd = np.sum(np.abs(self.Wdf * gvr))
-        reg = 0.5*np.linalg.norm(sl.idctii(self.Alpha*sl.dctii(self.X,
-                        axes=self.axes), axes=self.axes))**2
+        reg = 0.5*np.linalg.norm(
+            sl.idctii(self.Alpha*sl.dctii(self.X, axes=self.axes),
+                      axes=self.axes))**2
         obj = dfd + self.lmbda*reg
         return (obj, dfd, reg)
 

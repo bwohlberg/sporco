@@ -1,6 +1,5 @@
 from builtins import object
 
-import pytest
 import numpy as np
 
 from sporco.admm import spline
@@ -16,8 +15,8 @@ class TestSet01(object):
     def test_01(self):
         N = 64
         L = 20
-        x = np.cos(np.linspace(0, np.pi, N))[np.newaxis,:]
-        y = np.cos(np.linspace(0, np.pi, N))[:,np.newaxis]
+        x = np.cos(np.linspace(0, np.pi, N))[np.newaxis, :]
+        y = np.cos(np.linspace(0, np.pi, N))[:, np.newaxis]
         U = x*y
         V = np.random.randn(N, N)
         t = np.sort(np.abs(V).ravel())[V.size-L]
@@ -30,8 +29,8 @@ class TestSet01(object):
                               'AutoRho': {'Enabled': True}})
         b = spline.SplineL1(D, lmbda, opt)
         X = b.solve()
-        assert(np.abs(b.itstat[-1].ObjFun - 0.333606246) < 1e-6)
-        assert(sm.mse(U,X) < 1e-6)
+        assert np.abs(b.itstat[-1].ObjFun - 0.333606246) < 1e-6
+        assert sm.mse(U, X) < 1e-6
 
 
     def test_02(self):
@@ -43,7 +42,7 @@ class TestSet01(object):
             b.solve()
         except Exception as e:
             print(e)
-            assert(0)
+            assert 0
 
 
     def test_03(self):
@@ -55,12 +54,12 @@ class TestSet01(object):
                               'AutoRho': {'Enabled': True}, 'DataType': dt})
         b = spline.SplineL1(D, lmbda, opt=opt)
         b.solve()
-        assert(b.X.dtype == dt)
-        assert(b.Y.dtype == dt)
-        assert(b.U.dtype == dt)
+        assert b.X.dtype == dt
+        assert b.Y.dtype == dt
+        assert b.U.dtype == dt
 
 
-    def test_03(self):
+    def test_04(self):
         N = 8
         D = np.random.randn(N, N)
         lmbda = 0.1
@@ -69,6 +68,6 @@ class TestSet01(object):
                               'AutoRho': {'Enabled': True}, 'DataType': dt})
         b = spline.SplineL1(D, lmbda, opt=opt)
         b.solve()
-        assert(b.X.dtype == dt)
-        assert(b.Y.dtype == dt)
-        assert(b.U.dtype == dt)
+        assert b.X.dtype == dt
+        assert b.Y.dtype == dt
+        assert b.U.dtype == dt

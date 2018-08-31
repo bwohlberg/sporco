@@ -1,9 +1,8 @@
 from __future__ import division
 from builtins import object
 
-import pytest
-import numpy as np
 import pickle
+import numpy as np
 
 from sporco.admm import cbpdn
 import sporco.linalg as sl
@@ -25,8 +24,8 @@ class TestSet01(object):
         s = np.random.randn(N, N, Cs)
         lmbda = 1e-1
         b = cbpdn.ConvBPDN(D, s, lmbda, dimK=0)
-        assert(b.cri.dimC == 1)
-        assert(b.cri.dimK == 0)
+        assert b.cri.dimC == 1
+        assert b.cri.dimK == 0
 
 
     def test_02(self):
@@ -39,8 +38,8 @@ class TestSet01(object):
         s = np.random.randn(N, N, Cs, K)
         lmbda = 1e-1
         b = cbpdn.ConvBPDN(D, s, lmbda)
-        assert(b.cri.dimC == 1)
-        assert(b.cri.dimK == 1)
+        assert b.cri.dimC == 1
+        assert b.cri.dimK == 1
 
 
     def test_03(self):
@@ -52,8 +51,8 @@ class TestSet01(object):
         s = np.random.randn(N, N, Cd)
         lmbda = 1e-1
         b = cbpdn.ConvBPDN(D, s, lmbda)
-        assert(b.cri.dimC == 1)
-        assert(b.cri.dimK == 0)
+        assert b.cri.dimC == 1
+        assert b.cri.dimK == 0
 
 
     def test_04(self):
@@ -66,8 +65,8 @@ class TestSet01(object):
         s = np.random.randn(N, N, Cd, K)
         lmbda = 1e-1
         b = cbpdn.ConvBPDN(D, s, lmbda)
-        assert(b.cri.dimC == 1)
-        assert(b.cri.dimK == 1)
+        assert b.cri.dimC == 1
+        assert b.cri.dimK == 1
 
 
     def test_05(self):
@@ -79,8 +78,8 @@ class TestSet01(object):
         s = np.random.randn(N, N, K)
         lmbda = 1e-1
         b = cbpdn.ConvBPDN(D, s, lmbda)
-        assert(b.cri.dimC == 0)
-        assert(b.cri.dimK == 1)
+        assert b.cri.dimC == 0
+        assert b.cri.dimK == 1
 
 
     def test_06(self):
@@ -92,14 +91,14 @@ class TestSet01(object):
         s = np.random.randn(N, N, K)
         dt = np.float32
         opt = cbpdn.ConvBPDN.Options({'Verbose': False, 'MaxMainIter': 20,
-                                 'AutoRho': {'Enabled': True},
-                                 'DataType': dt})
+                                      'AutoRho': {'Enabled': True},
+                                      'DataType': dt})
         lmbda = 1e-1
         b = cbpdn.ConvBPDN(D, s, lmbda, opt=opt)
         b.solve()
-        assert(b.X.dtype == dt)
-        assert(b.Y.dtype == dt)
-        assert(b.U.dtype == dt)
+        assert b.X.dtype == dt
+        assert b.Y.dtype == dt
+        assert b.U.dtype == dt
 
 
     def test_07(self):
@@ -111,14 +110,14 @@ class TestSet01(object):
         s = np.random.randn(N, N, K)
         dt = np.float64
         opt = cbpdn.ConvBPDN.Options({'Verbose': False, 'MaxMainIter': 20,
-                                 'AutoRho': {'Enabled': True},
-                                 'DataType': dt})
+                                      'AutoRho': {'Enabled': True},
+                                      'DataType': dt})
         lmbda = 1e-1
         b = cbpdn.ConvBPDN(D, s, lmbda, opt=opt)
         b.solve()
-        assert(b.X.dtype == dt)
-        assert(b.Y.dtype == dt)
-        assert(b.U.dtype == dt)
+        assert b.X.dtype == dt
+        assert b.Y.dtype == dt
+        assert b.U.dtype == dt
 
 
     def test_08(self):
@@ -135,8 +134,8 @@ class TestSet01(object):
             b.solve()
         except Exception as e:
             print(e)
-            assert(0)
-        assert(np.array(b.getitstat().XSlvRelRes).max() < 1e-5)
+            assert 0
+        assert np.array(b.getitstat().XSlvRelRes).max() < 1e-5
 
 
     def test_09(self):
@@ -150,7 +149,7 @@ class TestSet01(object):
             b.solve()
         except Exception as e:
             print(e)
-            assert(0)
+            assert 0
 
 
     def test_10(self):
@@ -171,9 +170,9 @@ class TestSet01(object):
         b = cbpdn.ConvBPDN(D, S, lmbda, opt)
         b.solve()
         X1 = b.Y.squeeze()
-        assert(sl.rrs(X0,X1) < 5e-5)
+        assert sl.rrs(X0, X1) < 5e-5
         Sr = b.reconstruct().squeeze()
-        assert(sl.rrs(S,Sr) < 1e-4)
+        assert sl.rrs(S, Sr) < 1e-4
 
 
     def test_11(self):
@@ -185,8 +184,8 @@ class TestSet01(object):
         xr = np.random.randn(N, N, M)
         xp = np.abs(xr) > 3
         X0[xp] = np.random.randn(X0[xp].size)
-        S = np.sum(sl.ifftn(sl.fftn(D, (N, N), (0,1)) *
-                   sl.fftn(X0, None, (0,1)), None, (0,1)).real, axis=2)
+        S = np.sum(sl.ifftn(sl.fftn(D, (N, N), (0, 1)) *
+                   sl.fftn(X0, None, (0, 1)), None, (0, 1)).real, axis=2)
         lmbda = 1e-4
         rho = 1e-1
         opt = cbpdn.ConvBPDN.Options({'Verbose': False, 'MaxMainIter': 500,
@@ -195,9 +194,9 @@ class TestSet01(object):
         b = cbpdn.ConvBPDN(D, S, lmbda, opt)
         b.solve()
         X1 = b.Y.squeeze()
-        assert(sl.rrs(X0,X1) < 5e-5)
+        assert sl.rrs(X0, X1) < 5e-5
         Sr = b.reconstruct().squeeze()
-        assert(sl.rrs(S,Sr) < 1e-4)
+        assert sl.rrs(S, Sr) < 1e-4
 
 
     def test_12(self):
@@ -214,8 +213,8 @@ class TestSet01(object):
             b.solve()
         except Exception as e:
             print(e)
-            assert(0)
-        assert(np.array(b.getitstat().XSlvRelRes).max() < 1e-5)
+            assert 0
+        assert np.array(b.getitstat().XSlvRelRes).max() < 1e-5
 
 
     def test_13(self):
@@ -232,8 +231,8 @@ class TestSet01(object):
             b.solve()
         except Exception as e:
             print(e)
-            assert(0)
-        assert(np.array(b.getitstat().XSlvRelRes).max() < 1e-5)
+            assert 0
+        assert np.array(b.getitstat().XSlvRelRes).max() < 1e-5
 
 
     def test_14(self):
@@ -250,8 +249,8 @@ class TestSet01(object):
             b.solve()
         except Exception as e:
             print(e)
-            assert(0)
-        assert(np.array(b.getitstat().XSlvRelRes).max() < 1e-5)
+            assert 0
+        assert np.array(b.getitstat().XSlvRelRes).max() < 1e-5
 
 
     def test_15(self):
@@ -269,9 +268,9 @@ class TestSet01(object):
         mu = 1e-2
         b = cbpdn.ConvBPDNJoint(D, s, lmbda, mu, opt=opt)
         b.solve()
-        assert(b.X.dtype == dt)
-        assert(b.Y.dtype == dt)
-        assert(b.U.dtype == dt)
+        assert b.X.dtype == dt
+        assert b.Y.dtype == dt
+        assert b.U.dtype == dt
 
 
     def test_16(self):
@@ -288,7 +287,7 @@ class TestSet01(object):
             b.solve()
         except Exception as e:
             print(e)
-            assert(0)
+            assert 0
 
 
     def test_17(self):
@@ -306,9 +305,9 @@ class TestSet01(object):
         mu = 1e-2
         b = cbpdn.ConvElasticNet(D, s, lmbda, mu, opt=opt)
         b.solve()
-        assert(b.X.dtype == dt)
-        assert(b.Y.dtype == dt)
-        assert(b.U.dtype == dt)
+        assert b.X.dtype == dt
+        assert b.Y.dtype == dt
+        assert b.U.dtype == dt
 
 
     def test_18(self):
@@ -325,7 +324,7 @@ class TestSet01(object):
             b.solve()
         except Exception as e:
             print(e)
-            assert(0)
+            assert 0
 
 
     def test_19(self):
@@ -343,9 +342,9 @@ class TestSet01(object):
         mu = 1e-2
         b = cbpdn.ConvBPDNGradReg(D, s, lmbda, mu, opt=opt)
         b.solve()
-        assert(b.X.dtype == dt)
-        assert(b.Y.dtype == dt)
-        assert(b.U.dtype == dt)
+        assert b.X.dtype == dt
+        assert b.Y.dtype == dt
+        assert b.U.dtype == dt
 
 
     def test_20(self):
@@ -360,7 +359,7 @@ class TestSet01(object):
             b.solve()
         except Exception as e:
             print(e)
-            assert(0)
+            assert 0
 
 
     def test_21(self):
@@ -377,9 +376,9 @@ class TestSet01(object):
         epsilon = 1e0
         b = cbpdn.ConvMinL1InL2Ball(D, s, epsilon, opt=opt)
         b.solve()
-        assert(b.X.dtype == dt)
-        assert(b.Y.dtype == dt)
-        assert(b.U.dtype == dt)
+        assert b.X.dtype == dt
+        assert b.Y.dtype == dt
+        assert b.U.dtype == dt
 
 
     def test_22(self):
@@ -387,7 +386,7 @@ class TestSet01(object):
         M = 4
         Nd = 8
         D = np.random.randn(Nd, Nd, M)
-        D /= np.sqrt(np.sum(D**2, axis=(0,1)))
+        D /= np.sqrt(np.sum(D**2, axis=(0, 1)))
         X0 = np.zeros((N, N, M))
         xr = np.random.randn(N, N, M)
         xp = np.abs(xr) > 3
@@ -401,13 +400,12 @@ class TestSet01(object):
         Xp = bp.solve()
         epsilon = np.linalg.norm(bp.reconstruct(Xp).squeeze() - S)
         opt = cbpdn.ConvMinL1InL2Ball.Options({'Verbose': False,
-                                  'MaxMainIter': 500,
-                                  'RelStopTol': 1e-5, 'rho': 2e2,
-                                  'RelaxParam': 1.0,
+                                  'MaxMainIter': 500, 'RelStopTol': 1e-5,
+                                  'rho': 2e2, 'RelaxParam': 1.0,
                                   'AutoRho': {'Enabled': False}})
         bc = cbpdn.ConvMinL1InL2Ball(D, S, epsilon=epsilon, opt=opt)
         Xc = bc.solve()
-        assert(np.linalg.norm(Xp - Xc)/np.linalg.norm(Xp) < 1e-3)
+        assert np.linalg.norm(Xp - Xc) / np.linalg.norm(Xp) < 1e-3
         assert(np.abs(np.linalg.norm(Xp.ravel(), 1) -
                       np.linalg.norm(Xc.ravel(), 1)) < 1e-3)
 
@@ -424,7 +422,7 @@ class TestSet01(object):
             b.solve()
         except Exception as e:
             print(e)
-            assert(0)
+            assert 0
 
 
     def test_24(self):
@@ -440,7 +438,7 @@ class TestSet01(object):
             b.solve()
         except Exception as e:
             print(e)
-            assert(0)
+            assert 0
 
 
     def test_25(self):
@@ -457,7 +455,7 @@ class TestSet01(object):
             b.solve()
         except Exception as e:
             print(e)
-            assert(0)
+            assert 0
 
 
     def test_26(self):
@@ -473,7 +471,7 @@ class TestSet01(object):
             b.solve()
         except Exception as e:
             print(e)
-            assert(0)
+            assert 0
 
 
     def test_27(self):
@@ -490,7 +488,7 @@ class TestSet01(object):
             b.solve()
         except Exception as e:
             print(e)
-            assert(0)
+            assert 0
 
 
     def test_28(self):
@@ -507,9 +505,9 @@ class TestSet01(object):
         lmbda = 1e-1
         b = cbpdn.ConvBPDNMaskDcpl(D, s, lmbda, opt=opt)
         b.solve()
-        assert(b.X.dtype == dt)
-        assert(b.Y.dtype == dt)
-        assert(b.U.dtype == dt)
+        assert b.X.dtype == dt
+        assert b.Y.dtype == dt
+        assert b.U.dtype == dt
 
 
     def test_29(self):
@@ -526,7 +524,7 @@ class TestSet01(object):
             b.reconstruct()
         except Exception as e:
             print(e)
-            assert(0)
+            assert 0
 
 
     def test_30(self):
@@ -543,9 +541,9 @@ class TestSet01(object):
         lmbda = 1e-1
         b = cbpdn.AddMaskSim(cbpdn.ConvBPDN, D, s, w, lmbda, opt=opt)
         b.solve()
-        assert(b.cbpdn.X.dtype == dt)
-        assert(b.cbpdn.Y.dtype == dt)
-        assert(b.cbpdn.U.dtype == dt)
+        assert b.cbpdn.X.dtype == dt
+        assert b.cbpdn.Y.dtype == dt
+        assert b.cbpdn.U.dtype == dt
 
 
     def test_31(self):
@@ -561,18 +559,18 @@ class TestSet01(object):
         c = pickle.loads(bp)
         Xb = b.solve()
         Xc = c.solve()
-        assert(np.linalg.norm(Xb-Xc)==0.0)
+        assert np.linalg.norm(Xb - Xc) == 0.0
 
 
     def test_33(self):
         opt = cbpdn.GenericConvBPDN.Options({'AuxVarObj': False})
-        assert(opt['fEvalX'] is True and opt['gEvalY'] is False)
+        assert opt['fEvalX'] is True and opt['gEvalY'] is False
         opt['AuxVarObj'] = True
-        assert(opt['fEvalX'] is False and opt['gEvalY'] is True)
+        assert opt['fEvalX'] is False and opt['gEvalY'] is True
 
 
     def test_34(self):
         opt = cbpdn.GenericConvBPDN.Options({'AuxVarObj': True})
-        assert(opt['fEvalX'] is False and opt['gEvalY'] is True)
+        assert opt['fEvalX'] is False and opt['gEvalY'] is True
         opt['AuxVarObj'] = False
-        assert(opt['fEvalX'] is True and opt['gEvalY'] is False)
+        assert opt['fEvalX'] is True and opt['gEvalY'] is False

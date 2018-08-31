@@ -1,7 +1,6 @@
 from __future__ import division
 from builtins import object
 
-import pytest
 import numpy as np
 
 from sporco.dictlrn import prlcnscdl
@@ -24,38 +23,41 @@ class TestSet01(object):
 
     def test_01(self):
         lmbda = 1e-1
-        opt = prlcnscdl.ConvBPDNDictLearn_Consensus.Options({'MaxMainIter': 10})
+        opt = prlcnscdl.ConvBPDNDictLearn_Consensus.Options(
+            {'MaxMainIter': 10})
         try:
-            b = prlcnscdl.ConvBPDNDictLearn_Consensus(self.D0, self.S[...,0],
+            b = prlcnscdl.ConvBPDNDictLearn_Consensus(self.D0, self.S[..., 0],
                                             lmbda, opt=opt, nproc=2, dimK=0)
             b.solve()
         except Exception as e:
             print(e)
-            assert(0)
+            assert 0
 
 
     def test_02(self):
         lmbda = 1e-1
-        opt = prlcnscdl.ConvBPDNDictLearn_Consensus.Options({'MaxMainIter': 10})
+        opt = prlcnscdl.ConvBPDNDictLearn_Consensus.Options(
+            {'MaxMainIter': 10})
         try:
             b = prlcnscdl.ConvBPDNDictLearn_Consensus(self.D0, self.S, lmbda,
-                                                     opt=opt, nproc=2)
+                                                      opt=opt, nproc=2)
             b.solve()
         except Exception as e:
             print(e)
-            assert(0)
+            assert 0
 
 
     def test_03(self):
         lmbda = 1e-1
-        opt = prlcnscdl.ConvBPDNDictLearn_Consensus.Options({'MaxMainIter': 10})
+        opt = prlcnscdl.ConvBPDNDictLearn_Consensus.Options(
+            {'MaxMainIter': 10})
         try:
             b = prlcnscdl.ConvBPDNDictLearn_Consensus(self.D0, self.S, lmbda,
-                                                     opt=opt, nproc=0)
+                                                      opt, nproc=0)
             b.solve()
         except Exception as e:
             print(e)
-            assert(0)
+            assert 0
 
 
     def test_04(self):
@@ -67,14 +69,15 @@ class TestSet01(object):
         D0 = np.random.randn(Nd, Nd, Nc, M)
         S = np.random.randn(N, N, Nc, K)
         lmbda = 1e-1
-        opt = prlcnscdl.ConvBPDNDictLearn_Consensus.Options({'MaxMainIter': 10})
+        opt = prlcnscdl.ConvBPDNDictLearn_Consensus.Options(
+            {'MaxMainIter': 10})
         try:
             b = prlcnscdl.ConvBPDNDictLearn_Consensus(D0, S, lmbda, opt=opt,
-                                                     nproc=2)
+                                                      nproc=2)
             b.solve()
         except Exception as e:
             print(e)
-            assert(0)
+            assert 0
 
 
     def test_05(self):
@@ -94,9 +97,9 @@ class TestSet01(object):
         bp = prlcnscdl.ConvBPDNDictLearn_Consensus(self.D0, self.S, lmbda,
                                                    opt=optp, nproc=2)
         Dp = bp.solve()
-        assert(np.linalg.norm(Ds - Dp) < 1e-7)
-        assert(np.abs(bs.getitstat().ObjFun[-1] - bp.getitstat().ObjFun[-1])
-               < 1e-7)
+        assert np.linalg.norm(Ds - Dp) < 1e-7
+        assert np.abs(
+            bs.getitstat().ObjFun[-1] - bp.getitstat().ObjFun[-1] < 1e-7)
 
 
     def test_06(self):
@@ -116,9 +119,9 @@ class TestSet01(object):
         bp = prlcnscdl.ConvBPDNDictLearn_Consensus(self.D0, self.S, lmbda,
                                                    opt=optp, nproc=2)
         Dp = bp.solve()
-        assert(np.linalg.norm(Ds - Dp) < 1e-7)
-        assert(np.abs(bs.getitstat().ObjFun[-1] - bp.getitstat().ObjFun[-1])
-               < 1e-7)
+        assert np.linalg.norm(Ds - Dp) < 1e-7
+        assert np.abs(
+            bs.getitstat().ObjFun[-1] - bp.getitstat().ObjFun[-1] < 1e-7)
 
 
     def test_07(self):
@@ -128,11 +131,11 @@ class TestSet01(object):
             {'MaxMainIter': 10})
         try:
             b = prlcnscdl.ConvBPDNMaskDcplDictLearn_Consensus(self.D0,
-                        self.S[...,0], lmbda, W, opt=opt, nproc=2, dimK=0)
+                        self.S[..., 0], lmbda, W, opt=opt, nproc=2, dimK=0)
             b.solve()
         except Exception as e:
             print(e)
-            assert(0)
+            assert 0
 
 
     def test_08(self):
@@ -146,7 +149,7 @@ class TestSet01(object):
             b.solve()
         except Exception as e:
             print(e)
-            assert(0)
+            assert 0
 
 
     def test_09(self):
@@ -156,11 +159,11 @@ class TestSet01(object):
             {'MaxMainIter': 10})
         try:
             b = prlcnscdl.ConvBPDNMaskDcplDictLearn_Consensus(self.D0,
-                        self.S, lmbda, W,  opt=opt, nproc=0)
+                        self.S, lmbda, W, opt=opt, nproc=0)
             b.solve()
         except Exception as e:
             print(e)
-            assert(0)
+            assert 0
 
 
     def test_10(self):
@@ -181,7 +184,7 @@ class TestSet01(object):
             b.solve()
         except Exception as e:
             print(e)
-            assert(0)
+            assert 0
 
 
     def test_11(self):
@@ -202,9 +205,9 @@ class TestSet01(object):
         bp = prlcnscdl.ConvBPDNMaskDcplDictLearn_Consensus(self.D0,
                     self.S, lmbda, W, opt=optp, nproc=2)
         Dp = bp.solve()
-        assert(np.linalg.norm(Ds - Dp) < 1e-7)
-        assert(np.abs(bs.getitstat().ObjFun[-1] - bp.getitstat().ObjFun[-1])
-               < 1e-7)
+        assert np.linalg.norm(Ds - Dp) < 1e-7
+        assert np.abs(
+            bs.getitstat().ObjFun[-1] - bp.getitstat().ObjFun[-1] < 1e-7)
 
 
     def test_12(self):
@@ -218,7 +221,7 @@ class TestSet01(object):
             b.solve()
         except Exception as e:
             print(e)
-            assert(0)
+            assert 0
 
 
     def test_13(self):
@@ -232,7 +235,7 @@ class TestSet01(object):
             b.solve()
         except Exception as e:
             print(e)
-            assert(0)
+            assert 0
 
 
     def test_14(self):
@@ -253,7 +256,7 @@ class TestSet01(object):
             b.solve()
         except Exception as e:
             print(e)
-            assert(0)
+            assert 0
 
 
     def test_15(self):
@@ -274,7 +277,7 @@ class TestSet01(object):
             b.solve()
         except Exception as e:
             print(e)
-            assert(0)
+            assert 0
 
 
     def test_16(self):
@@ -295,9 +298,9 @@ class TestSet01(object):
         bp = prlcnscdl.ConvBPDNMaskDcplDictLearn_Consensus(self.D0,
                     self.S, lmbda, W, opt=optp, nproc=2)
         Dp = bp.solve()
-        assert(np.linalg.norm(Ds - Dp) < 1e-7)
-        assert(np.abs(bs.getitstat().ObjFun[-1] - bp.getitstat().ObjFun[-1])
-               < 1e-7)
+        assert np.linalg.norm(Ds - Dp) < 1e-7
+        assert np.abs(
+            bs.getitstat().ObjFun[-1] - bp.getitstat().ObjFun[-1] < 1e-7)
 
 
     def test_17(self):
@@ -318,9 +321,9 @@ class TestSet01(object):
         bp = prlcnscdl.ConvBPDNMaskDcplDictLearn_Consensus(self.D0,
                     self.S, lmbda, W, opt=optp, nproc=2)
         Dp = bp.solve()
-        assert(np.linalg.norm(Ds - Dp) < 1e-7)
-        assert(np.abs(bs.getitstat().ObjFun[-1] - bp.getitstat().ObjFun[-1])
-               < 1e-7)
+        assert np.linalg.norm(Ds - Dp) < 1e-7
+        assert np.abs(
+            bs.getitstat().ObjFun[-1] - bp.getitstat().ObjFun[-1] < 1e-7)
 
 
     def test_18(self):
@@ -333,14 +336,14 @@ class TestSet01(object):
              'CCMOD': {'RelaxParam': 1.8, 'AutoRho': {'Enabled': False}}},
              xmethod='admm', dmethod='cns')
         bs = cbpdndlmd.ConvBPDNMaskDictLearn(self.D0, self.S, lmbda, W,
-                    opt=opts)
+                                             opt=opts)
         Ds = bs.solve()
         optp = prlcnscdl.ConvBPDNMaskDcplDictLearn_Consensus.Options(
             {'MaxMainIter': Nit, 'CBPDN': {'RelaxParam': 1.8},
              'CCMOD': {'RelaxParam': 1.8}})
-        bp = prlcnscdl.ConvBPDNMaskDcplDictLearn_Consensus(self.D0,
-                    self.S, lmbda, W, opt=optp, nproc=2)
+        bp = prlcnscdl.ConvBPDNMaskDcplDictLearn_Consensus(
+            self.D0, self.S, lmbda, W, opt=optp, nproc=2)
         Dp = bp.solve()
-        assert(np.linalg.norm(Ds - Dp) < 1e-7)
-        assert(np.abs(bs.getitstat().ObjFun[-1] - bp.getitstat().ObjFun[-1])
-               < 1e-7)
+        assert np.linalg.norm(Ds - Dp) < 1e-7
+        assert np.abs(
+            bs.getitstat().ObjFun[-1] - bp.getitstat().ObjFun[-1] < 1e-7)

@@ -1,7 +1,6 @@
 from __future__ import division
 from builtins import object
 
-import pytest
 import numpy as np
 
 from sporco.dictlrn import cbpdndl
@@ -24,12 +23,12 @@ class TestSet01(object):
         lmbda = 1e-1
         opt = cbpdndl.ConvBPDNDictLearn.Options({'MaxMainIter': 10})
         try:
-            b = cbpdndl.ConvBPDNDictLearn(self.D0, self.S[...,0], lmbda,
+            b = cbpdndl.ConvBPDNDictLearn(self.D0, self.S[..., 0], lmbda,
                                           opt=opt, dimK=0)
             b.solve()
         except Exception as e:
             print(e)
-            assert(0)
+            assert 0
 
 
     def test_02(self):
@@ -40,7 +39,7 @@ class TestSet01(object):
             b.solve()
         except Exception as e:
             print(e)
-            assert(0)
+            assert 0
 
 
     def test_03(self):
@@ -48,12 +47,12 @@ class TestSet01(object):
         opt = cbpdndl.ConvBPDNDictLearn.Options({'MaxMainIter': 10},
                                                 dmethod='cg')
         try:
-            b = cbpdndl.ConvBPDNDictLearn(self.D0, self.S,
-                                lmbda, opt=opt, dmethod='cg')
+            b = cbpdndl.ConvBPDNDictLearn(self.D0, self.S, lmbda,
+                                          opt=opt, dmethod='cg')
             b.solve()
         except Exception as e:
             print(e)
-            assert(0)
+            assert 0
 
 
     def test_04(self):
@@ -66,7 +65,7 @@ class TestSet01(object):
             b.solve()
         except Exception as e:
             print(e)
-            assert(0)
+            assert 0
 
 
     def test_05(self):
@@ -84,7 +83,7 @@ class TestSet01(object):
             b.solve()
         except Exception as e:
             print(e)
-            assert(0)
+            assert 0
 
 
     def test_06(self):
@@ -96,7 +95,7 @@ class TestSet01(object):
             b.solve()
         except Exception as e:
             print(e)
-            assert(0)
+            assert 0
 
 
     def test_07(self):
@@ -109,7 +108,7 @@ class TestSet01(object):
             b.solve()
         except Exception as e:
             print(e)
-            assert(0)
+            assert 0
 
 
 
@@ -123,7 +122,7 @@ class TestSet01(object):
             b.solve()
         except Exception as e:
             print(e)
-            assert(0)
+            assert 0
 
 
 
@@ -137,4 +136,4 @@ class TestSet01(object):
             b.solve()
         except Exception as e:
             print(e)
-            assert(0)
+            assert 0

@@ -11,10 +11,9 @@ problem with Total Variation regularisation terms"""
 from __future__ import division
 from __future__ import print_function
 from builtins import range
-from builtins import object
 
-import numpy as np
 import copy
+import numpy as np
 
 from sporco.admm import admm
 import sporco.cnvrep as cr
@@ -193,7 +192,7 @@ class ConvBPDNScalarTV(admm.ADMM):
         self.cri = cr.CSC_ConvRepIndexing(D, S, dimK=dimK, dimN=dimN)
 
         # Call parent class __init__
-        Nx = np.product(self.cri.shpX)
+        Nx = np.product(np.array(self.cri.shpX))
         yshape = self.cri.shpX + (len(self.cri.axisN)+1,)
         super(ConvBPDNScalarTV, self).__init__(Nx, yshape, yshape,
                                                S.dtype, opt)
@@ -205,11 +204,11 @@ class ConvBPDNScalarTV(admm.ADMM):
 
         self.mu = self.dtype.type(mu)
         if hasattr(opt['TVWeight'], 'ndim') and opt['TVWeight'].ndim > 0:
-            self.Wtv = np.asarray(opt['TVWeight'].reshape((1,)*(dimN+2) +
-                                  opt['TVWeight'].shape), dtype=self.dtype)
+            self.Wtv = np.asarray(opt['TVWeight'].reshape(
+                (1,)*(dimN + 2) + opt['TVWeight'].shape), dtype=self.dtype)
         else:
             # Wtv is a scalar: no need to change shape
-            self.Wtv = self.dtype.type(opt['TVWeight'])
+            self.Wtv = np.asarray(opt['TVWeight'], dtype=self.dtype)
 
         # Set penalty parameter
         self.set_attr('rho', opt['rho'], dval=(50.0*self.lmbda + 1.0),
@@ -233,7 +232,7 @@ class ConvBPDNScalarTV(admm.ADMM):
         # Initialise byte-aligned arrays for pyfftw
         self.YU = sl.pyfftw_empty_aligned(self.Y.shape, dtype=self.dtype)
         self.Xf = sl.pyfftw_rfftn_empty_aligned(self.cri.shpX, self.cri.axisN,
-                                             self.dtype)
+                                                self.dtype)
 
         self.setdict()
 
@@ -250,8 +249,9 @@ class ConvBPDNScalarTV(admm.ADMM):
         if self.cri.Cd > 1:
             self.DSf = np.sum(self.DSf, axis=self.cri.axisC, keepdims=True)
         if self.opt['HighMemSolve'] and self.cri.Cd == 1:
-            self.c = sl.solvedbi_sm_c(self.Df, np.conj(self.Df),
-                        self.rho*self.GHGf + self.rho, self.cri.axisM)
+            self.c = sl.solvedbi_sm_c(
+                self.Df, np.conj(self.Df), self.rho*self.GHGf + self.rho,
+                self.cri.axisM)
         else:
             self.c = None
 
@@ -261,8 +261,9 @@ class ConvBPDNScalarTV(admm.ADMM):
         """Updated cached c array when rho changes."""
 
         if self.opt['HighMemSolve'] and self.cri.Cd == 1:
-            self.c = sl.solvedbi_sm_c(self.Df, np.conj(self.Df),
-                        self.rho*self.GHGf + self.rho, self.cri.axisM)
+            self.c = sl.solvedbi_sm_c(
+                self.Df, np.conj(self.Df), self.rho*self.GHGf + self.rho,
+                self.cri.axisM)
 
 
 
@@ -279,11 +280,13 @@ class ConvBPDNScalarTV(admm.ADMM):
             np.conj(self.Gf) * YUf[..., 0:-1], axis=-1))
 
         if self.cri.Cd == 1:
-            self.Xf[:] = sl.solvedbi_sm(self.Df, self.rho*self.GHGf +
-                                        self.rho, b, self.c, self.cri.axisM)
+            self.Xf[:] = sl.solvedbi_sm(
+                self.Df, self.rho*self.GHGf + self.rho, b, self.c,
+                self.cri.axisM)
         else:
-            self.Xf[:] = sl.solvemdbi_ism(self.Df, self.rho*self.GHGf +
-                                self.rho, b, self.cri.axisM, self.cri.axisC)
+            self.Xf[:] = sl.solvemdbi_ism(
+                self.Df, self.rho*self.GHGf + self.rho, b, self.cri.axisM,
+                self.cri.axisC)
 
         self.X = sl.irfftn(self.Xf, self.cri.Nv, self.cri.axisN)
 
@@ -452,8 +455,8 @@ class ConvBPDNScalarTV(admm.ADMM):
 
         if Xf is None:
             Xf = sl.rfftn(X, axes=self.cri.axisN)
-        return self.Wtv[..., np.newaxis] * sl.irfftn(self.Gf *
-                    Xf[..., np.newaxis], self.cri.Nv, axes=self.cri.axisN)
+        return self.Wtv[..., np.newaxis] * sl.irfftn(
+            self.Gf * Xf[..., np.newaxis], self.cri.Nv, axes=self.cri.axisN)
 
 
 
@@ -465,8 +468,8 @@ class ConvBPDNScalarTV(admm.ADMM):
         """
 
         Xf = sl.rfftn(X, axes=self.cri.axisN)
-        return self.Wtv[..., np.newaxis] * sl.irfftn(np.conj(self.Gf) *
-                    Xf[..., 0:-1], self.cri.Nv, axes=self.cri.axisN)
+        return self.Wtv[..., np.newaxis] * sl.irfftn(
+            np.conj(self.Gf) * Xf[..., 0:-1], self.cri.Nv, axes=self.cri.axisN)
 
 
 
@@ -546,7 +549,7 @@ class ConvBPDNScalarTV(admm.ADMM):
             # Compute relaxed version of AX
             alpha = self.rlx
             self.AX = alpha*self.AXnr - (1-alpha)*(self.cnst_B(self.Y) -
-                                self._cnst_c)
+                                                   self._cnst_c)
 
 
 
@@ -908,8 +911,8 @@ class ConvBPDNRecTV(admm.ADMM):
 
         self.mu = self.dtype.type(mu)
         if hasattr(opt['TVWeight'], 'ndim') and opt['TVWeight'].ndim > 0:
-            self.Wtv = np.asarray(opt['TVWeight'].reshape((1,)*(dimN+2) +
-                                  opt['TVWeight'].shape), dtype=self.dtype)
+            self.Wtv = np.asarray(opt['TVWeight'].reshape(
+                (1,)*(dimN + 2) + opt['TVWeight'].shape), dtype=self.dtype)
         else:
             # Wtv is a scalar: no need to change shape
             self.Wtv = self.dtype.type(opt['TVWeight'])
@@ -935,7 +938,7 @@ class ConvBPDNRecTV(admm.ADMM):
         # Initialise byte-aligned arrays for pyfftw
         self.YU = sl.pyfftw_empty_aligned(self.Y.shape, dtype=self.dtype)
         self.Xf = sl.pyfftw_rfftn_empty_aligned(self.cri.shpX, self.cri.axisN,
-                                             self.dtype)
+                                                self.dtype)
 
         self.setdict()
 
@@ -1044,9 +1047,10 @@ class ConvBPDNRecTV(admm.ADMM):
             # sl.solvemdbi_ism has to solve a linear system of rank dimN+1
             # (corresponding to the dictionary and a gradient operator per
             # spatial dimension)
-            DfGDf = np.concatenate([self.Df[..., np.newaxis],] +
-                    [np.sqrt(self.rho)*self.GDf[..., k, np.newaxis] for k
-                     in range(self.GDf.shape[-1])], axis=-1)
+            DfGDf = np.concatenate(
+                [self.Df[..., np.newaxis],] +
+                [np.sqrt(self.rho)*self.GDf[..., k, np.newaxis] for k
+                 in range(self.GDf.shape[-1])], axis=-1)
             self.Xf[:] = sl.solvemdbi_ism(DfGDf, self.rho, b[..., np.newaxis],
                                           self.cri.axisM, -1)[..., 0]
         else:
@@ -1055,9 +1059,10 @@ class ConvBPDNRecTV(admm.ADMM):
             # to solve a linear system of rank C.d (dimN+1) (corresponding to
             # the dictionary and a gradient operator per spatial dimension
             # for each channel) plus an identity.
-            DfGDf = np.concatenate([self.Df,] +
-                    [np.sqrt(self.rho)*self.GDf[..., k] for k
-                     in range(self.GDf.shape[-1])], axis=self.cri.axisC)
+            DfGDf = np.concatenate(
+                [self.Df,] + [np.sqrt(self.rho)*self.GDf[..., k] for k
+                              in range(self.GDf.shape[-1])],
+                axis=self.cri.axisC)
             self.Xf[:] = sl.solvemdbi_ism(DfGDf, self.rho, b, self.cri.axisM,
                                           self.cri.axisC)
 
@@ -1085,10 +1090,10 @@ class ConvBPDNRecTV(admm.ADMM):
         :math:`\mathbf{y}`."""
 
         AXU = self.AX + self.U
-        self.block_sep0(self.Y)[:] = sl.shrink1(self.block_sep0(AXU),
-                                        (self.lmbda/self.rho) * self.Wl1)
-        self.block_sep1(self.Y)[:] = sl.shrink2(self.block_sep1(AXU),
-                                self.mu/self.rho, axis=(self.cri.axisC, -1))
+        self.block_sep0(self.Y)[:] = sl.shrink1(
+            self.block_sep0(AXU), (self.lmbda/self.rho) * self.Wl1)
+        self.block_sep1(self.Y)[:] = sl.shrink2(
+            self.block_sep1(AXU), self.mu/self.rho, axis=(self.cri.axisC, -1))
 
 
 
@@ -1251,8 +1256,9 @@ class ConvBPDNRecTV(admm.ADMM):
 
         if Xf is None:
             Xf = sl.rfftn(X, axes=self.cri.axisN)
-        return sl.irfftn(sl.inner(self.GDf, Xf[..., np.newaxis],
-                    axis=self.cri.axisM), self.cri.Nv, self.cri.axisN)
+        return sl.irfftn(sl.inner(
+            self.GDf, Xf[..., np.newaxis], axis=self.cri.axisM), self.cri.Nv,
+                         self.cri.axisN)
 
 
 
@@ -1324,7 +1330,7 @@ class ConvBPDNRecTV(admm.ADMM):
             # Compute relaxed version of AX
             alpha = self.rlx
             self.AX = alpha*self.AXnr - (1-alpha)*(self.cnst_B(self.Y) -
-                                self._cnst_c)
+                                                   self._cnst_c)
 
 
 

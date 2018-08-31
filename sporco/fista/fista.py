@@ -11,10 +11,9 @@
 from __future__ import division
 from __future__ import print_function
 from builtins import range
-from builtins import object
 
 import copy
-import collections
+import functools
 import numpy as np
 
 from sporco import cdict

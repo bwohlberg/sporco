@@ -101,7 +101,7 @@ def ndto2d(x, axis=-1):
     if isinstance(axis, int):
         axis = (axis,)
     # Handle negative axis indices
-    axis = tuple([k if k >= 0 else x.ndim+k for k in axis])
+    axis = tuple([k if k >= 0 else x.ndim + k for k in axis])
     # Complement of axis set on full set of axes of input v
     caxis = tuple(set(range(x.ndim)) - set(axis))
     # Permute axes of x (generalised transpose) so that axes over
@@ -216,7 +216,7 @@ def prox_l0(v, alpha):
       Output array
     """
 
-    return (np.abs(v) >= np.sqrt(2.0*alpha)) * v
+    return (np.abs(v) >= np.sqrt(2.0 * alpha)) * v
 
 
 
@@ -412,13 +412,13 @@ def _proj_l1_sortsum(v, gamma, axis=None):
     vs = np.sort(av, axis=axis)
     if axis is None:
         N = v.size
-        c = 1.0 / np.arange(1, N+1, dtype=v.dtype).reshape(v.shape)
+        c = 1.0 / np.arange(1, N + 1, dtype=v.dtype).reshape(v.shape)
         vs = vs[::-1].reshape(v.shape)
     else:
         N = v.shape[axis]
         ns = [v.shape[k] if k == axis else 1 for k in range(v.ndim)]
-        c = 1.0 / np.arange(1, N+1, dtype=v.dtype).reshape(ns)
-        vs = vs[(slice(None),)*axis + (slice(None, None, -1),)]
+        c = 1.0 / np.arange(1, N + 1, dtype=v.dtype).reshape(ns)
+        vs = vs[(slice(None),) * axis + (slice(None, None, -1),)]
     t = c * (np.cumsum(vs, axis=axis).reshape(v.shape) - gamma)
     K = np.sum(vs >= t, axis=axis, keepdims=True)
     t = (np.sum(vs * (vs >= t), axis=axis, keepdims=True) - gamma) / K
@@ -554,7 +554,7 @@ def prox_l2(v, alpha, axis=None):
     a = np.sqrt(np.sum(v**2, axis=axis, keepdims=True))
     b = np.maximum(0, a - alpha)
     b = sl.zdivide(b, a)
-    return b*v
+    return b * v
 
 
 
@@ -591,7 +591,7 @@ def proj_l2(v, gamma, axis=None):
     """
 
     d = np.sqrt(np.sum(v**2, axis=axis, keepdims=True))
-    return (d <= gamma)*v + (d > gamma)*(gamma*sl.zdivide(v, d))
+    return (d <= gamma) * v + (d > gamma) * (gamma * sl.zdivide(v, d))
 
 
 
