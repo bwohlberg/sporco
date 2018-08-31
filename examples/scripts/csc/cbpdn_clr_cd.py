@@ -8,7 +8,7 @@
 Multi-channel CSC
 =================
 
-This example demonstrates solving a convolutional sparse coding problem with a colour dictionary and a colour signal :cite:`wohlberg-2017-sporco`
+This example demonstrates solving a convolutional sparse coding problem with a colour dictionary and a colour signal :cite:`wohlberg-2016-convolutional`
 
   $$\mathrm{argmin}_\mathbf{x} \; (1/2) \sum_c \left\| \sum_m \mathbf{d}_{c,m} * \mathbf{x}_m -\mathbf{s}_c \right\|_2^2 + \lambda \sum_m \| \mathbf{x}_m \|_1 \;,$$
 
