@@ -147,9 +147,10 @@ def ConvCnstrMODOptionsDefaults(method='fista'):
         dflt.update({'MaxMainIter': 1, 'BackTrack': {'Eta': 1.2,
                      'MaxIter': 50}})
     else:
-        dflt.update({'MaxMainIter': 1, 'AutoRho': {'Period': 10,
-                     'AutoScaling': False, 'RsdlRatio': 10.0,
-                     'Scaling': 2.0, 'RsdlTarget': 1.0}})
+        dflt.update({'MaxMainIter': 1, 'AutoRho':
+                     {'Period': 10, 'AutoScaling': False,
+                      'RsdlRatio': 10.0, 'Scaling': 2.0,
+                      'RsdlTarget': 1.0}})
     return dflt
 
 
