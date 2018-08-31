@@ -7,13 +7,13 @@ include LICENSE
 include CHANGES.rst
 include requirements.txt
 
+recursive-include tests *.py
 recursive-include examples *.rst *.py
 recursive-include docs Makefile *.py *.rst *.bib *.css
 
 include sporco/data/*.npz
 include sporco/data/*.png
 include sporco/data/README.rst
-include sporco/tests/*.py
-include sporco/admm/tests/*.py
+include sporco/cuda/__init__.py
 
 prune docs/build

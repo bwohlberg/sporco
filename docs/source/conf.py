@@ -469,24 +469,14 @@ def run_apidoc(_):
     from distutils.version import LooseVersion
     if LooseVersion(sphinx.__version__) < LooseVersion('1.7.0'):
         sphinx.apidoc.main(['sphinx-apidoc', '-e', '-d', '2', '-o', opath,
-                               module, os.path.join(module, 'tests'),
-                               os.path.join(module, 'cupy/tests'),
-                               os.path.join(module, 'cupy/admm'),
+                               module, os.path.join(module, 'cupy/admm'),
                                os.path.join(module, 'cupy/dictlrn'),
-                               os.path.join(module, 'cupy/fista'),
-                               os.path.join(module, 'admm/tests'),
-                               os.path.join(module, 'fista/tests'),
-                               os.path.join(module, 'dictlrn/tests')])
+                               os.path.join(module, 'cupy/fista')])
     else:
         sphinx.ext.apidoc.main(['-o', opath, '-e', '-d', '2', module,
-                               os.path.join(module, 'tests'),
-                               os.path.join(module, 'cupy/tests'),
                                os.path.join(module, 'cupy/admm'),
                                os.path.join(module, 'cupy/dictlrn'),
-                               os.path.join(module, 'cupy/fista'),
-                               os.path.join(module, 'admm/tests'),
-                               os.path.join(module, 'fista/tests'),
-                               os.path.join(module, 'dictlrn/tests')])
+                               os.path.join(module, 'cupy/fista')])
 
     # Remove "Module contents" sections from specified autodoc generated files
     rmmodlst = ['sporco.rst', 'sporco.admm.rst', 'sporco.fista.rst',
