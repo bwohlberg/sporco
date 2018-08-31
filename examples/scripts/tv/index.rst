@@ -10,6 +10,9 @@ tvl1dcn_den.py
 tvl1den_clr.py
   Salt & pepper noise restoration via ℓ1-TV denoising (colour image)
 
+tvl1den_clr_cupy.py
+  Salt & pepper noise restoration via ℓ1-TV denoising (colour image, cupy accelerated solver)
+
 tvl2den_gry.py
   Gaussian white noise restoration via ℓ2-TV denoising (greyscale image)
 

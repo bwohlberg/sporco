@@ -1,0 +1,105 @@
+.. _cupy_package:
+
+sporco.cupy package
+===================
+
+This subpackage provides GPU acceleration for selected SPORCO modules via copies of these modules that are patched to replace `NumPy <http://www.numpy.org/>`__ arrays and operations with the equivalent ones provided by `CuPy <https://cupy.chainer.org/>`__. The boolean value of attribute ``sporco.cupy.have_cupy`` indicates whether `CuPy <https://cupy.chainer.org/>`__ is installed and a GPU device is available. The modules within the ``sporco.cupy`` subpackage can still be used when ``sporco.cupy.have_cupy`` is ``False``, but they will not be GPU accelerated.
+
+
+
+Installation and Configuration
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To use `CuPy <https://cupy.chainer.org/>`_, first `install CUDA <http://docs.nvidia.com/cuda/index.html#installation-guides>`_ and then `install CuPy <https://docs-cupy.chainer.org/en/stable/install.html#install-cupy/>`_. Note that it may be necessary to set the environment variables as in (substitute the appropriate path to the CUDA installation)
+
+::
+
+   export CUDAHOME=/usr/local/cuda-9.2
+   export PATH=${CUDAHOME}/bin:${PATH}
+
+to avoid a ``cupy.cuda.compiler.CompileException`` when using `CuPy <https://cupy.chainer.org/>`_. If this does not rectify the problem, the following may also be necessary:
+
+::
+
+   export LD_LIBRARY_PATH=${CUDAHOME}/lib64:$LD_LIBRARY_PATH
+
+
+
+Utility Functions
+~~~~~~~~~~~~~~~~~
+
+Since it is necessary to explicitly convert between `NumPy <http://www.numpy.org/>`__ arrays and `CuPy <https://cupy.chainer.org/>`__ arrays, a number of utility functions in ``sporco.cupy`` support this conversion in a way that behaves correctly independent of the value of ``sporco.cupy.have_cupy``, in that conversion is performed when the value is ``True``, and no conversion is perfomed when it is ``False``.
+
+
+.. np:function:: array_module(*args)
+
+   Get the array module (``numpy`` or ``cupy``) of the array argument. This
+   function is an alias for :func:`cupy.get_array_module`.
+
+
+.. np:function:: np2cp(u)
+
+   Convert a ``numpy`` ndarray to a ``cupy`` array. This function is an alias
+   for :func:`cupy.asarray`
+
+
+.. np:function:: cp2np(u)
+
+   Convert a ``cupy`` array to a ``numpy`` ndarray. This function is an alias
+   for :func:`cupy.asnumpy`
+
+
+.. np:function:: cupy_wrapper(func)
+
+   A wrapper function that converts ``numpy`` ndarray arguments to ``cupy``
+   arrays, and convert any ``cupy`` arrays returned by the wrapped function
+   into ``numpy`` ndarrays.
+
+
+.. np:function:: available_gpu(*args, **kwargs)
+
+   Get the device id for an available GPU when multiple GPUs are installed.
+   This function is an alias for ``GPUtil.getAvailable``. If
+   `GPUtil <https://github.com/anderskm/gputil>`_ is not installed, it returns
+   0 as a default GPU ID.
+
+|
+
+The current GPU device can be selected using :meth:`cupy.cuda.Device.use`, e.g. to select device id 1
+
+::
+
+   cp.cuda.Device(1).use()
+
+`CuPy <https://docs-cupy.chainer.org/en/stable/index.html>`__ also provides a `context manager for GPU device selection <https://docs-cupy.chainer.org/en/stable/tutorial/basic.html#current-device>`__.
+
+
+
+Supported Modules
+~~~~~~~~~~~~~~~~~
+
+The ``sporco.cupy`` subpackage currently provides `CuPy <https://cupy.chainer.org/>`_ acceleration of the following standard ``sporco`` modules:
+
+=================================  ===============================
+``sporco.cupy`` module             ``sporco`` module
+=================================  ===============================
+``sporco.cupy.cnvrep``             :mod:`sporco.cnvrep`
+``sporco.cupy.common``             :mod:`sporco.common`
+``sporco.cupy.linalg``             :mod:`sporco.linalg`
+``sporco.cupy.metric``             :mod:`sporco.metric`
+``sporco.cupy.prox``               :mod:`sporco.prox`
+``sporco.cupy.util``               :mod:`sporco.util`
+``sporco.cupy.admm.admm``          :mod:`sporco.admm.admm`
+``sporco.cupy.admm.cbpdn``         :mod:`sporco.admm.cbpdn`
+``sporco.cupy.admm.cbpdntv``       :mod:`sporco.admm.cbpdntv`
+``sporco.cupy.admm.tvl1``          :mod:`sporco.admm.tvl1`
+``sporco.cupy.admm.tvl2``          :mod:`sporco.admm.tvl2`
+``sporco.cupy.fista.cbpdn``        :mod:`sporco.fista.cbpdn`
+``sporco.cupy.dictlrn.onlinecdl``  :mod:`sporco.dictlrn.onlinecdl`
+=================================  ===============================
+
+
+Usage Examples
+~~~~~~~~~~~~~~
+
+Usage examples are available for :ref:`sporco.cupy.admm.tvl1 <example_tv_tvl1den_clr_cupy>` and :ref:`sporco.cupy.dictlrn.onlinecdl <example_cdl_onlinecdl_clr_cupy>`.

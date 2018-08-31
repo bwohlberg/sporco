@@ -22,6 +22,9 @@ onlinecdl_msk_gry.py
 onlinecdl_clr.py
   Learn a convolutional dictionary (online method, colour images)
 
+onlinecdl_clr_cupy.py
+  Learn a convolutional dictionary (online method, colour images, cupy accelerated solver)
+
 cbpdndl_video.py
   Learn a convolutional dictionary (consensus method, video data)
 

@@ -383,7 +383,7 @@ class FISTA(common.IterativeSolver):
 
         # Update t step
         tprv = self.t
-        self.t = 0.5 * (1. + np.sqrt(1. + 4. * tprv**2))
+        self.t = 0.5 * float(1. + np.sqrt(1. + 4. * tprv**2))
 
         # Update Y
         if not self.opt['FastSolve']:
@@ -718,7 +718,7 @@ class FISTADFT(FISTA):
 
         if opt is None:
             opt = FISTADFT.Options()
-        Nx = np.product(xshape)
+        Nx = np.product(np.array(xshape))
         super(FISTADFT, self).__init__(Nx, xshape, dtype, opt)
 
 
@@ -745,7 +745,7 @@ class FISTADFT(FISTA):
 
         # Update t step
         tprv = self.t
-        self.t = 0.5 * (1. + np.sqrt(1. + 4. * tprv**2))
+        self.t = 0.5 * float(1. + np.sqrt(1. + 4. * tprv**2))
 
         # Update Y
         if not self.opt['FastSolve']:

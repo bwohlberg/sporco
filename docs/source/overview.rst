@@ -6,6 +6,12 @@ SParse Optimization Research COde (SPORCO) is a Python package for solving optim
 In addition to this documentation, an overview of the design and functionality of SPORCO is also available in :cite:`wohlberg-2017-sporco`.
 
 
+GPU Acceleration
+----------------
+
+GPU accelerated versions of some of the SPORCO solvers are provided within the :ref:`sporco.cuda <cuda_package>` and :ref:`sporco.cupy <cupy_package>` subpackages. Use of the former requires installation of the `SPORCO-CUDA <https://github.com/bwohlberg/sporco-cuda>`__ extension package, while the latter requires installation of `CuPy <https://cupy.chainer.org/>`__. The :ref:`sporco.cupy <cupy_package>` subpackage supports a much wider range of problems than :ref:`sporco.cuda <cuda_package>`, which only supports four different variants of convolutional sparse coding. However, the :ref:`sporco.cuda <cuda_package>` functions are substantially faster than the corresponding functions in :ref:`sporco.cupy <cupy_package>` since those in :ref:`sporco.cuda <cuda_package>` are implemented directly in CUDA, while those in :ref:`sporco.cupy <cupy_package>` use `CuPy <https://cupy.chainer.org/>`__ as a replacement for `NumPy <http://www.numpy.org/>`__.
+
+
 .. _usage-section:
 
 Usage Examples

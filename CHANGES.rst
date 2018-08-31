@@ -9,6 +9,8 @@ Version 0.1.10   (not yet released)
 - Significant changes to online CDL module, including addition of
   support for masked online CDL problem, and optional use of CUDA
   accelerated CBPDN solver
+- Added support for GPU acceleration of selected solvers via the
+  CuPy package
 
 
 Version 0.1.9   (2018-07-15)

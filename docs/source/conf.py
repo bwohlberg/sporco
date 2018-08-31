@@ -273,7 +273,8 @@ intersphinx_mapping = {'http://docs.python.org/': None,
                        'http://docs.scipy.org/doc/numpy/': None,
                        'http://docs.scipy.org/doc/scipy/reference/': None,
                        'http://matplotlib.org/': None,
-                       'http://hgomersall.github.io/pyFFTW/': None
+                       'http://hgomersall.github.io/pyFFTW/': None,
+                       'http://docs-cupy.chainer.org/en/stable': None
                       }
 # Added timeout due to periodic scipy.org down time
 #intersphinx_timeout = 30
@@ -373,6 +374,7 @@ elif sys.version[0] == '2':
 else:
     raise ImportError("Can't determine how to import mock.")
 sys.modules['sporco.cuda'] = mock.Mock()
+sys.modules['sporco.cupy'] = mock.Mock()
 
 
 # Ensure that the __init__ method gets documented.
@@ -424,8 +426,9 @@ def options_name_fix(modname):
                                                 'Options')):
                 optcls = getattr(cls, 'Options')
                 if optcls.__name__ != 'Options':
-                    delattr(mod, optcls.__name__)
-                    optcls.__name__ = 'Options'
+                    if hasattr(mod, optcls.__name__):
+                        delattr(mod, optcls.__name__)
+                        optcls.__name__ = 'Options'
 
 
 # See https://github.com/rtfd/readthedocs.org/issues/1139
@@ -466,11 +469,21 @@ def run_apidoc(_):
     from distutils.version import LooseVersion
     if LooseVersion(sphinx.__version__) < LooseVersion('1.7.0'):
         sphinx.apidoc.main(['sphinx-apidoc', '-e', '-d', '2', '-o', opath,
-                               module, os.path.join(module, 'admm/tests'),
+                               module, os.path.join(module, 'tests'),
+                               os.path.join(module, 'cupy/tests'),
+                               os.path.join(module, 'cupy/admm'),
+                               os.path.join(module, 'cupy/dictlrn'),
+                               os.path.join(module, 'cupy/fista'),
+                               os.path.join(module, 'admm/tests'),
                                os.path.join(module, 'fista/tests'),
                                os.path.join(module, 'dictlrn/tests')])
     else:
         sphinx.ext.apidoc.main(['-o', opath, '-e', '-d', '2', module,
+                               os.path.join(module, 'tests'),
+                               os.path.join(module, 'cupy/tests'),
+                               os.path.join(module, 'cupy/admm'),
+                               os.path.join(module, 'cupy/dictlrn'),
+                               os.path.join(module, 'cupy/fista'),
                                os.path.join(module, 'admm/tests'),
                                os.path.join(module, 'fista/tests'),
                                os.path.join(module, 'dictlrn/tests')])
