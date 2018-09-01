@@ -20,7 +20,7 @@ import numpy as np
 
 from sporco import util
 from sporco import plot
-from sporco.cupy import np2cp, cp2np
+from sporco.cupy import cupy_enabled, np2cp, cp2np
 from sporco.cupy import cp
 from sporco.cupy.dictlrn import onlinecdl
 
@@ -71,6 +71,9 @@ opt = onlinecdl.OnlineConvBPDNDictLearn.Options({
 """
 Create solver object and solve.
 """
+
+if not cupy_enabled():
+    print('CuPy/GPU device not available: running without GPU acceleration\n')
 
 d = onlinecdl.OnlineConvBPDNDictLearn(np2cp(D0), lmbda, opt)
 

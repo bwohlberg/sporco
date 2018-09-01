@@ -21,7 +21,7 @@ import numpy as np
 from sporco import util
 from sporco import metric
 from sporco import plot
-from sporco.cupy import np2cp, cp2np
+from sporco.cupy import cupy_enabled, np2cp, cp2np
 from sporco.cupy import cp
 from sporco.cupy.admm import tvl1
 
@@ -57,6 +57,9 @@ opt = tvl1.TVL1Denoise.Options({'Verbose': True, 'MaxMainIter': 200,
 """
 Create solver object and solve, returning the the denoised image ``imgr``.
 """
+
+if not cupy_enabled():
+    print('CuPy/GPU device not available: running without GPU acceleration\n')
 
 b = tvl1.TVL1Denoise(np2cp(imgn), lmbda, opt)
 imgr = cp2np(b.solve())
