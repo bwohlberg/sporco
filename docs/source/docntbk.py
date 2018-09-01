@@ -617,6 +617,7 @@ class IntersphinxInventory(object):
             pstfx = url[n:]
         else:
             pstfx = url
+
         # Look up the cross-reference role and referenced object
         # name via the postfix to the base url
         role, name = self.revinv[pstfx]
@@ -698,7 +699,7 @@ class CrossReferenceLookup(object):
             self.invlst.append(IntersphinxInventory(
                 env.intersphinx_cache[b][2], b))
 
-        self.btxcch = env.bibtex_cache
+        self.env = env
 
 
 
@@ -712,9 +713,15 @@ class CrossReferenceLookup(object):
             # the cite key is in the sphinx environment bibtex cache.
             # If it is, construct the url from the cite key, otherwise
             # raise an exception
-            if name not in self.btxcch.get_all_cited_keys():
+            if name not in self.env.bibtex_cache.get_all_cited_keys():
                 raise KeyError('cite key %s not found' % name, 'cite', 0)
             url = self.baseurl + 'zreferences.html#' + name
+        elif role == 'ref':
+            try:
+                reftpl = self.env.domaindata['std']['labels'][name]
+            except:
+                raise KeyError('ref label %s not found' % name, 'ref', 0)
+            url = self.baseurl + reftpl[0] + '.html#' + reftpl[1]
         else:
             # If the  cross-reference is not a citation, try to look it
             # up in each of the IntersphinxInventory objects in our list
@@ -747,10 +754,19 @@ class CrossReferenceLookup(object):
 
         if role == 'cite':
             # Get the string used as the citation label in the text
-            cstr = self.btxcch.get_label_from_key(name)
+            try:
+                cstr = self.env.bibtex_cache.get_label_from_key(name)
+            except:
+                raise KeyError('cite key %s not found' % name, 'cite', 0)
             # The link label is the citation label (number) enclosed
             # in square brackets
             return '[%s]' % cstr
+        elif role == 'ref':
+            try:
+                reftpl = self.env.domaindata['std']['labels'][name]
+            except:
+                raise KeyError('ref label %s not found' % name, 'ref', 0)
+            return reftpl[2]
         else:
             # Use the object name as a label, omiting any initial '.'
             if name[0] == '.':
@@ -814,12 +830,21 @@ class CrossReferenceLookup(object):
                 role = mo.group(1)
                 name = mo.group(2)
 
+                # If role is 'ref', the name component is in the form
+                # label <name>
+                if role == 'ref':
+                    ma = re.match(r'\s*([^\s<]+)\s*<([^>]+)+>', name)
+                    if ma:
+                        name = ma.group(2)
+                        lbl = ma.group(1)
+
                 # Try to look up the current cross-reference. Issue a
                 # warning if the lookup fails, and do the substitution if
                 # it succeeds.
                 try:
                     url = self.get_docs_url(role, name)
-                    lbl = self.get_docs_label(role, name)
+                    if role != 'ref':
+                        lbl = self.get_docs_label(role, name)
                 except KeyError as ex:
                     if len(ex.args) == 1 or ex.args[1] != 'role':
                         print('Warning: %s' % ex.args[0])
