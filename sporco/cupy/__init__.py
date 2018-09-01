@@ -49,6 +49,15 @@ if not hasattr(cp, 'product'):
 
 
 
+def cupy_enabled():
+    """Return ``True`` if CuPy is installed and a GPU device is available,
+    otherwise return ``False``.
+    """
+
+    return have_cupy
+
+
+
 def rgetattr(obj, name):
     """Recursive version of :func:`getattr`."""
 
@@ -116,8 +125,6 @@ def sporco_cupy_patch_module(name, attrib=None):
 
 
 
-
-
 def _list2array(lst):
     if lst and isinstance(lst[0], cp.ndarray):
         return cp.hstack(lst)
@@ -176,7 +183,7 @@ if have_cupy:
         return div
 else:
     def _zdivide(x, y):
-        np.divide(x, y, out=np.zeros_like(x), where=(y != 0))
+        return np.divide(x, y, out=np.zeros_like(x), where=(y != 0))
 
 
 linalg = sporco_cupy_patch_module(
