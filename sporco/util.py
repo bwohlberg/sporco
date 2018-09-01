@@ -732,7 +732,7 @@ def notebook_system_output():
     if in_notebook():
         try:
             from wurlitzer import sys_pipes
-        except:
+        except ImportError:
             sys_pipes = null_context_manager
     else:
         sys_pipes = null_context_manager

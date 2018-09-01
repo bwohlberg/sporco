@@ -3,5 +3,5 @@ mpl.use('Agg')
 
 try:
     import importlib.util
-except:
+except ImportError:
     collect_ignore = ['cupy']

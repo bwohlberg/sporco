@@ -457,7 +457,7 @@ def imview(img, title=None, copy=True, fltscl=False, intrp='nearest',
     if int(mplv[0]) >= 2 and int(mplv[1]) >= 2:
         try:
             ax.set_adjustable('box')
-        except:
+        except Exception:
             ax.set_adjustable('datalim')
     else:
         ax.set_adjustable('box-forced')

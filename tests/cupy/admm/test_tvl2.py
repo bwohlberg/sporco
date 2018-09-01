@@ -6,10 +6,13 @@ import pytest
 import numpy as np
 try:
     import cupy as cp
-    cp.cuda.Device(0).compute_capability
-except:
-    pytest.skip("cupy not installed or device GPU inaccessible",
-                allow_module_level=True)
+    try:
+        cp.cuda.Device(0).compute_capability
+    except cp.cuda.runtime.CUDARuntimeError:
+        pytest.skip("GPU device inaccessible", allow_module_level=True)
+except ImportError:
+    pytest.skip("cupy not installed", allow_module_level=True)
+
 
 from sporco.cupy.admm import tvl2
 import sporco.cupy.metric as sm

@@ -34,7 +34,7 @@ try:
         GPUtil = None
     # Import appropriate versions of helper functions
     from ._cp_util import *
-except:
+except Exception:
     # If cupy import or device access fails, import numpy to the same alias
     import numpy as cp
     # Flag indicating unsuccessful import
@@ -197,4 +197,4 @@ linalg = sporco_cupy_patch_module(
      'fftconv': _fftconv, 'inner': _inner, 'zdivide': _zdivide})
 
 prox = sporco_cupy_patch_module('sporco.prox', {'have_numexpr': False,
-                                'sl': linalg})
+                                                'sl': linalg})
