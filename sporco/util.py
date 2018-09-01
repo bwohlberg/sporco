@@ -36,13 +36,13 @@ import scipy.ndimage.interpolation as sni
 
 import sporco.linalg as sla
 
+
 __author__ = """Brendt Wohlberg <brendt@ieee.org>"""
 
 
 
 # Python 2/3 unicode literal compatibility
 if PY2:
-    import codecs
     def u(x):
         """Python 2/3 compatible definition of utf8 literals"""
         return x.decode('utf8')
