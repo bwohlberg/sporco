@@ -20,8 +20,8 @@ class TestSet01(object):
         xe = np.abs(x[0])
         e1 = metric.mae(x, y)
         e2 = metric.mse(x, y)
-        assert np.abs(e1 - xe/N) < 1e-12
-        assert np.abs(e2 - (xe**2)/N) < 1e-12
+        assert np.abs(e1 - xe / N) < 1e-12
+        assert np.abs(e2 - (xe**2) / N) < 1e-12
 
 
     def test_02(self):
