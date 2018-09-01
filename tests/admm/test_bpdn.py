@@ -71,8 +71,9 @@ class TestSet01(object):
         D = np.random.randn(N, M)
         s = np.random.randn(N, 1)
         try:
-            opt = bpdn.BPDN.Options({'FastSolve': True, 'Verbose': False,
-                'MaxMainIter': 10, 'AutoRho': {'Enabled': False}})
+            opt = bpdn.BPDN.Options(
+                {'FastSolve': True, 'Verbose': False, 'MaxMainIter': 10,
+                 'AutoRho': {'Enabled': False}})
             b = bpdn.BPDN(D, s, lmbda=1.0, opt=opt)
             b.solve()
         except Exception as e:
@@ -130,12 +131,12 @@ class TestSet01(object):
 
     def test_08(self):
         N = 64
-        M = 2*N
+        M = 2 * N
         L = 4
         np.random.seed(12345)
         D = np.random.randn(N, M)
         x0 = np.zeros((M, 1))
-        si = np.random.permutation(list(range(0, M-1)))
+        si = np.random.permutation(list(range(0, M - 1)))
         x0[si[0:L]] = np.random.randn(L, 1)
         s0 = D.dot(x0)
         lmbda = 5e-3
@@ -172,8 +173,8 @@ class TestSet01(object):
         s = np.random.randn(N, 1)
         dt = np.float16
         opt = bpdn.BPDNJoint.Options({'Verbose': False, 'MaxMainIter': 20,
-                                 'AutoRho': {'Enabled': True},
-                                 'DataType': dt})
+                                      'AutoRho': {'Enabled': True},
+                                      'DataType': dt})
         b = bpdn.BPDNJoint(D, s, lmbda=1.0, mu=0.1, opt=opt)
         b.solve()
         assert b.X.dtype == dt
@@ -204,9 +205,9 @@ class TestSet01(object):
         lmbda = 1e-1
         mu = 1e-2
         try:
-            opt = bpdn.ElasticNet.Options({'Verbose': False,
-                                'MaxMainIter': 20, 'LinSolveCheck': True,
-                                'AutoRho': {'StdResiduals': True}})
+            opt = bpdn.ElasticNet.Options(
+                {'Verbose': False, 'MaxMainIter': 20, 'LinSolveCheck': True,
+                 'AutoRho': {'StdResiduals': True}})
             b = bpdn.ElasticNet(D, s, lmbda, mu, opt=opt)
             b.solve()
         except Exception as e:
@@ -222,8 +223,8 @@ class TestSet01(object):
         s = np.random.randn(N, 1)
         dt = np.float16
         opt = bpdn.ElasticNet.Options({'Verbose': False, 'MaxMainIter': 20,
-                                 'AutoRho': {'Enabled': True},
-                                 'DataType': dt})
+                                       'AutoRho': {'Enabled': True},
+                                       'DataType': dt})
         b = bpdn.ElasticNet(D, s, lmbda=1.0, mu=0.1, opt=opt)
         b.solve()
         assert b.X.dtype == dt
@@ -252,8 +253,8 @@ class TestSet01(object):
         s = np.random.randn(N, 1)
         dt = np.float16
         opt = bpdn.BPDNProjL1.Options({'Verbose': False, 'MaxMainIter': 20,
-                                 'AutoRho': {'Enabled': True},
-                                 'DataType': dt})
+                                       'AutoRho': {'Enabled': True},
+                                       'DataType': dt})
         b = bpdn.BPDNProjL1(D, s, gamma=1.0, opt=opt)
         b.solve()
         assert b.X.dtype == dt
@@ -282,8 +283,8 @@ class TestSet01(object):
         s = np.random.randn(N, 1)
         dt = np.float16
         opt = bpdn.MinL1InL2Ball.Options({'Verbose': False, 'MaxMainIter': 20,
-                                 'AutoRho': {'Enabled': True},
-                                 'DataType': dt})
+                                          'AutoRho': {'Enabled': True},
+                                          'DataType': dt})
         b = bpdn.MinL1InL2Ball(D, s, epsilon=1.0, opt=opt)
         b.solve()
         assert b.X.dtype == dt
@@ -293,26 +294,27 @@ class TestSet01(object):
 
     def test_18(self):
         N = 64
-        M = 2*N
+        M = 2 * N
         L = 8
         np.random.seed(12345)
         D = np.random.randn(N, M)
         x0 = np.zeros((M, 1))
-        si = np.random.permutation(list(range(0, M-1)))
+        si = np.random.permutation(list(range(0, M - 1)))
         x0[si[0:L]] = np.random.randn(L, 1)
         s = D.dot(x0)
         lmbda = 5e-2
         opt = bpdn.BPDN.Options({'Verbose': False, 'MaxMainIter': 300,
-                    'RelStopTol': 1e-5, 'AutoRho': {'Enabled': False}})
+                                 'RelStopTol': 1e-5, 'AutoRho':
+                                 {'Enabled': False}})
         bp = bpdn.BPDN(D, s, lmbda=lmbda, opt=opt)
         Xp = bp.solve()
         epsilon = np.linalg.norm(D.dot(Xp) - s)
-        opt = bpdn.MinL1InL2Ball.Options({'Verbose': False,
-                    'MaxMainIter': 300, 'RelStopTol': 1e-5, 'rho': 2e1,
-                    'AutoRho': {'Enabled': False}})
+        opt = bpdn.MinL1InL2Ball.Options(
+            {'Verbose': False, 'MaxMainIter': 300, 'RelStopTol': 1e-5,
+             'rho': 2e1, 'AutoRho': {'Enabled': False}})
         bc = bpdn.MinL1InL2Ball(D, s, epsilon=epsilon, opt=opt)
         Xc = bc.solve()
-        assert np.linalg.norm(Xp - Xc)/np.linalg.norm(Xp) < 1e-3
+        assert np.linalg.norm(Xp - Xc) / np.linalg.norm(Xp) < 1e-3
         assert np.abs(np.linalg.norm(Xp, 1) - np.linalg.norm(Xc, 1)) < 1e-3
 
 
