@@ -21,13 +21,17 @@ from sporco.cupy import prox
 from sporco.cupy import cnvrep
 
 
+# Construct sporco.cupy.fista
 fista = sporco_cupy_patch_module('sporco.fista')
 
+# Construct sporco.cupy.fista.fista
 fista.fista = sporco_cupy_patch_module('sporco.fista.fista',
                                        {'util': util, 'common': common,
                                         'sl': linalg})
 
 
+# Record current entries in sys.modules and then replace them with
+# patched versions of the modules
 sysmod = {}
 for mod in ('sporco.common', 'sporco.fista', 'sporco.fista.fista'):
     if mod in sys.modules:
@@ -37,12 +41,14 @@ sys.modules['sporco.fista'] = fista
 sys.modules['sporco.fista.fista'] = fista.fista
 
 
+# Construct sporco.cupy.fista.cbpdn
 fista.cbpdn = sporco_cupy_patch_module('sporco.fista.cbpdn',
                                        {'fista': fista.fista,
                                         'cr': cnvrep, 'sl': linalg,
                                         'sp': prox})
 
 
+# Restore original entries in sys.modules
 for mod in ('sporco.common', 'sporco.fista', 'sporco.fista.fista'):
     if mod in sysmod:
         sys.modules[mod] = sysmod[mod]
@@ -50,6 +56,8 @@ for mod in ('sporco.common', 'sporco.fista', 'sporco.fista.fista'):
         del sys.modules[mod]
 
 
+# In sporco.cupy.fista module, replace original module source path with
+# corresponding path in 'sporco/cupy' directory tree
 for n, pth in enumerate(sys.modules['sporco.cupy.fista'].__path__):
     pth = re.sub('sporco/', 'sporco/cupy/', pth)
     sys.modules['sporco.cupy.fista'].__path__[n] = pth

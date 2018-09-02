@@ -5,11 +5,13 @@
 # and user license can be found in the 'LICENSE.txt' file distributed
 # with the package.
 
-"""Helper functions for cupy module that are active when cupy is not
-available"""
+"""Utility functions for cupy module that are active when cupy is not
+available
+"""
 
 
 import numpy as np
+
 
 def array_module(*args):
     """When ``cupy`` is available, this function is an alias for
@@ -20,12 +22,10 @@ def array_module(*args):
     return np
 
 
-
 def np2cp(u):
     """Identity function."""
 
     return u
-
 
 
 def cp2np(u):
@@ -34,12 +34,10 @@ def cp2np(u):
     return u
 
 
-
 def cupy_wrapper(func):
     """Identity wrapper function."""
 
     return func
-
 
 
 def available_gpu(*args, **kwargs):

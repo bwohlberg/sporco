@@ -21,32 +21,38 @@ from sporco.cupy import prox
 from sporco.cupy import cnvrep
 
 
+# Construct sporco.cupy.admm
 admm = sporco_cupy_patch_module('sporco.admm')
 
+# Construct sporco.cupy.admm.admm
 admm.admm = sporco_cupy_patch_module('sporco.admm.admm',
                                      {'util': util, 'common': common})
 
 
 def _update_rho(self, k, r, s):
+    """
+    Patched version of :func:`sporco.admm.admm.ADMM.update_rho`."""
+
     if self.opt['AutoRho', 'Enabled']:
         tau = self.rho_tau
         mu = self.rho_mu
         xi = self.rho_xi
-        if k != 0 and cp.mod(k+1, self.opt['AutoRho', 'Period']) == 0:
+        if k != 0 and cp.mod(k + 1, self.opt['AutoRho', 'Period']) == 0:
             if self.opt['AutoRho', 'AutoScaling']:
                 if s == 0.0 or r == 0.0:
                     rhomlt = tau
                 else:
-                    rhomlt = cp.sqrt(r/(s*xi) if r > s*xi else (s*xi)/r)
+                    rhomlt = cp.sqrt(r / (s * xi) if r > s * xi
+                                     else (s * xi) / r)
                     if rhomlt > tau:
                         rhomlt = tau
             else:
                 rhomlt = tau
             rsf = 1.0
-            if r > xi*mu*s:
+            if r > xi * mu * s:
                 rsf = rhomlt
-            elif s > (mu/xi)*r:
-                rsf = 1.0/rhomlt
+            elif s > (mu / xi) * r:
+                rsf = 1.0 / rhomlt
             self.rho *= float(rsf)
             self.U /= rsf
             if rsf != 1.0:
@@ -59,11 +65,13 @@ admm.admm.ADMM.update_rho = _update_rho
 def _cnst0(self):
     return cp.array(0.0, dtype=self.dtype)
 
+
 admm.admm.ADMMTwoBlockCnstrnt.cnst_c0 = _cnst0
 admm.admm.ADMMTwoBlockCnstrnt.cnst_c1 = _cnst0
 
 
-
+# Record current entries in sys.modules and then replace them with
+# patched versions of the modules
 sysmod = {}
 for mod in ('sporco.common', 'sporco.admm', 'sporco.admm.admm'):
     if mod in sys.modules:
@@ -73,32 +81,39 @@ sys.modules['sporco.admm'] = admm
 sys.modules['sporco.admm.admm'] = admm.admm
 
 
-
+# Construct sporco.cupy.admm.tvl1
 admm.tvl1 = sporco_cupy_patch_module('sporco.admm.tvl1', {'admm': admm.admm,
                                                           'sl': linalg})
 
+# Construct sporco.cupy.admm.tvl2
 admm.tvl2 = sporco_cupy_patch_module('sporco.admm.tvl2', {'admm': admm.admm,
                                                           'sl': linalg})
 
+# Construct sporco.cupy.admm.cbpdn
 admm.cbpdn = sporco_cupy_patch_module('sporco.admm.cbpdn',
                                       {'admm': admm.admm, 'cr': cnvrep,
                                        'sl': linalg, 'sp': prox})
 
+
 def _index_primary(self):
     return (Ellipsis, slice(0, -self.cri.Cd, None))
 
+
 def _index_addmsk(self):
     return (Ellipsis, slice(-self.cri.Cd, None, None))
+
 
 admm.cbpdn.AddMaskSim.index_primary = _index_primary
 admm.cbpdn.AddMaskSim.index_addmsk = _index_addmsk
 
 
+# Construct sporco.cupy.admm.cbpdntv
 admm.cbpdntv = sporco_cupy_patch_module('sporco.admm.cbpdntv',
                                         {'admm': admm.admm, 'cr': cnvrep,
                                          'cbpdn': admm.cbpdn, 'sl': linalg})
 
 
+# Restore original entries in sys.modules
 for mod in ('sporco.common', 'sporco.admm', 'sporco.admm.admm'):
     if mod in sysmod:
         sys.modules[mod] = sysmod[mod]
@@ -106,6 +121,8 @@ for mod in ('sporco.common', 'sporco.admm', 'sporco.admm.admm'):
         del sys.modules[mod]
 
 
+# In sporco.cupy.admm module, replace original module source path with
+# corresponding path in 'sporco/cupy' directory tree
 for n, pth in enumerate(sys.modules['sporco.cupy.admm'].__path__):
     pth = re.sub('sporco/', 'sporco/cupy/', pth)
     sys.modules['sporco.cupy.admm'].__path__[n] = pth

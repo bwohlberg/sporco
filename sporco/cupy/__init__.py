@@ -27,11 +27,6 @@ try:
     cp.cuda.Device(0).compute_capability
     # Flag indicating successful import
     have_cupy = True
-    try:
-        # Try to import GPUtil
-        import GPUtil
-    except ImportError:
-        GPUtil = None
     # Import appropriate versions of helper functions
     from ._cp_util import *
 except Exception:
@@ -44,9 +39,9 @@ except Exception:
 
 import numpy as np
 
+# Unlike numpy, cupy has a prod function but no product function
 if not hasattr(cp, 'product'):
     cp.product = cp.prod
-
 
 
 def cupy_enabled():
@@ -57,12 +52,10 @@ def cupy_enabled():
     return have_cupy
 
 
-
 def rgetattr(obj, name):
     """Recursive version of :func:`getattr`."""
 
     return reduce(getattr, name.split('.'), obj)
-
 
 
 def rsetattr(obj, name, value):
@@ -73,9 +66,18 @@ def rsetattr(obj, name, value):
     setattr(reduce(getattr, path[:-1], obj), path[-1], value)
 
 
-
 def load_module(name):
     """Load the named module without registering it in ``sys.modules``.
+
+    Parameters
+    ----------
+    name : string
+      Module name
+
+    Returns
+    -------
+    mod : module
+      Loaded module
     """
 
     spec = importlib.util.find_spec(name)
@@ -86,10 +88,25 @@ def load_module(name):
     return mod
 
 
-
 def patch_module(name, pname, pfile=None, attrib=None):
     """Create a patched copy of the named module and register it in
     ``sys.modules``.
+
+    Parameters
+    ----------
+    name : string
+      Name of source module
+    pname : string
+      Name of patched copy of module
+    pfile : string or None, optional (default None)
+      Value to assign as source file name of patched module
+    attrib : dict or None, optional (default None)
+      Dict of attribute names and values to assign to patched module
+
+    Returns
+    -------
+    mod : module
+      Patched module
     """
 
     if attrib is None:
@@ -109,35 +126,62 @@ def patch_module(name, pname, pfile=None, attrib=None):
     return mod
 
 
-
 def sporco_cupy_patch_module(name, attrib=None):
     """Create a copy of the named sporco module, patch it to replace
     numpy with cupy, and register it in ``sys.modules``.
+
+    Parameters
+    ----------
+    name : string
+      Name of source module
+    attrib : dict or None, optional (default None)
+      Dict of attribute names and values to assign to patched module
+
+    Returns
+    -------
+    mod : module
+      Patched module
     """
 
+    # Patched module name is constructed from source module name
+    # by replacing 'sporco.' with 'sporco.cupy.'
     pname = re.sub('^sporco.', 'sporco.cupy.', name)
+    # Attribute dict always maps cupy module to 'np' attribute in
+    # patched module
     if attrib is None:
         attrib = {}
     attrib.update({'np': cp})
+    # Create patched module
     mod = patch_module(name, pname, pfile='patched', attrib=attrib)
     mod.__spec__.has_location = False
     return mod
 
 
-
 def _list2array(lst):
+    """Convert a list to a numpy array."""
+
     if lst and isinstance(lst[0], cp.ndarray):
         return cp.hstack(lst)
     else:
         return cp.asarray(lst)
 
+
+# Construct sporco.cupy.util
 util = sporco_cupy_patch_module('sporco.util', {'list2array': _list2array})
 
+# Construct sporco.cupy.metric
 metric = sporco_cupy_patch_module('sporco.metric')
+
+# Construct sporco.cupy.common
 common = sporco_cupy_patch_module('sporco.common')
+
+# Construct sporco.cupy.cnvrep
 cnvrep = sporco_cupy_patch_module('sporco.cnvrep')
 
+
 def _complex_dtype(dtype):
+    """Patched version of :func:`sporco.linalg.complex_dtype`."""
+
     dt = cp.dtype(dtype)
     if dt == cp.dtype('float128'):
         return cp.dtype('complex256')
@@ -146,20 +190,33 @@ def _complex_dtype(dtype):
     else:
         return cp.dtype('complex64')
 
+
 def _pyfftw_byte_aligned(array, dtype=None, n=None):
+    """Patched version of :func:`sporco.linalg.pyfftw_byte_aligned`."""
+
     return array
 
+
 def _pyfftw_empty_aligned(shape, dtype, order='C', n=None):
+    """Patched version of :func:`sporco.linalg.`."""
+
     return cp.empty(shape, dtype, order)
 
+
 def _pyfftw_rfftn_empty_aligned(shape, axes, dtype, order='C', n=None):
+    """Patched version of :func:`sporco.linalg.pyfftw_rfftn_empty_aligned`.
+    """
+
     ashp = list(shape)
     raxis = axes[-1]
-    ashp[raxis] = ashp[raxis]//2 + 1
+    ashp[raxis] = ashp[raxis] // 2 + 1
     cdtype = _complex_dtype(dtype)
     return cp.empty(ashp, cdtype, order)
 
+
 def _fftconv(a, b, axes=(0, 1)):
+    """Patched version of :func:`sporco.linalg.fftconv`."""
+
     if cp.isrealobj(a) and cp.isrealobj(b):
         fft = cp.fft.rfftn
         ifft = cp.fft.irfftn
@@ -171,13 +228,19 @@ def _fftconv(a, b, axes=(0, 1)):
     dims = [int(d) for d in dims]
     af = fft(a, dims, axes)
     bf = fft(b, dims, axes)
-    return ifft(af*bf, dims, axes)
+    return ifft(af * bf, dims, axes)
+
 
 def _inner(x, y, axis=-1):
+    """Patched version of :func:`sporco.linalg.inner`."""
+
     return cp.sum(x * y, axis=axis, keepdims=True)
+
 
 if have_cupy:
     def _zdivide(x, y):
+        """Patched version of :func:`sporco.linalg.zdivide`."""
+
         div = x / y
         div[cp.logical_or(cp.isnan(div), cp.isinf(div))] = 0
         return div
@@ -186,6 +249,7 @@ else:
         return np.divide(x, y, out=np.zeros_like(x), where=(y != 0))
 
 
+# Construct sporco.cupy.linalg
 linalg = sporco_cupy_patch_module(
     'sporco.linalg',
     {'have_numexpr': False, 'fftn': cp.fft.fftn, 'ifftn': cp.fft.ifftn,
@@ -196,5 +260,7 @@ linalg = sporco_cupy_patch_module(
      'pyfftw_rfftn_empty_aligned': _pyfftw_rfftn_empty_aligned,
      'fftconv': _fftconv, 'inner': _inner, 'zdivide': _zdivide})
 
+
+# Construct sporco.cupy.prox
 prox = sporco_cupy_patch_module('sporco.prox', {'have_numexpr': False,
                                                 'sl': linalg})

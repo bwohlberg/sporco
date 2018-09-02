@@ -5,16 +5,26 @@
 # and user license can be found in the 'LICENSE.txt' file distributed
 # with the package.
 
-"""Helper functions for cupy module that are active when cupy is available"""
+"""Utility functions for cupy module that are active when cupy is
+available
+"""
 
 
+import functools
+import numpy as np
 from sporco.cupy import cp
+
+try:
+    # Try to import GPUtil
+    import GPUtil
+except ImportError:
+    GPUtil = None
+
 
 def array_module(*args):
     """An alias for :func:`cupy.get_array_module`."""
 
     return cp.get_array_module(*args)
-
 
 
 def np2cp(u):
@@ -25,14 +35,12 @@ def np2cp(u):
     return cp.asarray(u)
 
 
-
 def cp2np(u):
     """Convert a cupy array to a numpy ndarray. This function is an
     alias for :func:`cupy.asnumpy`.
     """
 
     return cp.asnumpy(u)
-
 
 
 def cupy_wrapper(func):
@@ -60,7 +68,6 @@ def cupy_wrapper(func):
                 rtn = cp.asnumpy(rtn)
         return rtn
     return wrapped
-
 
 
 def available_gpu(*args, **kwargs):

@@ -19,11 +19,16 @@ from sporco.cupy import cnvrep
 from sporco.cupy.admm import cbpdn
 
 
+# Construct sporco.cupy.dictlrn
 dictlrn = sporco_cupy_patch_module('sporco.dictlrn')
 
+# Construct sporco.cupy.dictlrn.onlinecdl
 dictlrn.onlinecdl = sporco_cupy_patch_module(
     'sporco.dictlrn.onlinecdl', {'sl': linalg, 'cr': cnvrep, 'cbpdn': cbpdn})
 
+
+# In sporco.cupy.dictlrn module, replace original module source path with
+# corresponding path in 'sporco/cupy' directory tree
 for n, pth in enumerate(sys.modules['sporco.cupy.dictlrn'].__path__):
     pth = re.sub('sporco/', 'sporco/cupy/', pth)
     sys.modules['sporco.cupy.dictlrn'].__path__[n] = pth
