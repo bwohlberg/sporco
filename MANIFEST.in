@@ -15,5 +15,6 @@ include sporco/data/*.npz
 include sporco/data/*.png
 include sporco/data/README.rst
 include sporco/cuda/__init__.py
+recursive-include sporco/cupy *.py
 
 prune docs/build
