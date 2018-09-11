@@ -14,12 +14,6 @@ import functools
 import numpy as np
 from sporco.cupy import cp
 
-try:
-    # Try to import GPUtil
-    import GPUtil
-except ImportError:
-    GPUtil = None
-
 
 def array_module(*args):
     """An alias for :func:`cupy.get_array_module`."""
@@ -68,13 +62,3 @@ def cupy_wrapper(func):
                 rtn = cp.asnumpy(rtn)
         return rtn
     return wrapped
-
-
-def available_gpu(*args, **kwargs):
-    """This function is an alias for ``GPUtil.getAvailable``. If
-    ``GPUtil`` is not installed, it returns 0 as a default GPU ID."""
-
-    if GPUtil is None:
-        return 0
-    else:
-        return GPUtil.getAvailable(*args, **kwargs)

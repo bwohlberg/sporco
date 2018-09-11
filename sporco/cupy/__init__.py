@@ -27,15 +27,25 @@ try:
     cp.cuda.Device(0).compute_capability
     # Flag indicating successful import
     have_cupy = True
-    # Import appropriate versions of helper functions
+    # Import appropriate versions of utility functions
     from ._cp_util import *
+    try:
+        # Try to import GPUtil
+        import GPUtil
+        have_gputil = True
+        from ._gputil import *
+    except ImportError:
+        have_gputil = False
+        from ._nogputil import *
 except Exception:
     # If cupy import or device access fails, import numpy to the same alias
     import numpy as cp
     # Flag indicating unsuccessful import
     have_cupy = False
-    # Import appropriate versions of helper functions
+    # Import appropriate versions of utility functions
     from ._np_util import *
+    # Import appropriate versions of utility functions
+    from ._nogputil import *
 
 import numpy as np
 

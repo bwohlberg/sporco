@@ -57,16 +57,54 @@ Since it is necessary to explicitly convert between `NumPy <http://www.numpy.org
    into ``numpy`` ndarrays.
 
 
-.. np:function:: available_gpu(*args, **kwargs)
 
-   Get the device id for an available GPU when multiple GPUs are installed.
-   This function is an alias for ``GPUtil.getAvailable``. If
-   `GPUtil <https://github.com/anderskm/gputil>`_ is not installed, it returns
-   0 as a default GPU ID.
 
 |
 
-The current GPU device can be selected using :meth:`cupy.cuda.Device.use`, e.g. to select device id 1
+Some additional utility functions provide useful functionality when package `GPUtil <https://github.com/anderskm/gputil>`__ is installed, and return fixed default return values when it is not installed:
+
+
+.. np:function:: gpu_info()
+
+   Return a list of namedtuples representing attributes of each GPU
+   device. Returns an empty list if
+   `GPUtil <https://github.com/anderskm/gputil>`_ is not installed.
+
+
+.. np:function:: gpu_load(wproc=0.5, wmem=0.5)
+
+   Return a list of namedtuples representing the current load for
+   each GPU device. The processor and memory loads are fractions
+   between 0 and 1. The weighted load represents a weighted average
+   of processor and memory loads using the parameters `wproc` and
+   `wmem` respectively. Returns an empty list if
+   `GPUtil <https://github.com/anderskm/gputil>`_ is not installed.
+
+
+.. np:function:: device_by_load(wproc=0.5, wmem=0.5)
+
+   Get a list of GPU device ids ordered by increasing weighted
+   average of processor and memory load. Returns an empty list if
+   `GPUtil <https://github.com/anderskm/gputil>`_ is not installed.
+
+
+.. np:function:: select_device_by_load(wproc=0.5, wmem=0.5)
+
+   Set the current device for cupy as the device with the lowest
+   weighted average of processor and memory load. Returns 0 if
+   `GPUtil <https://github.com/anderskm/gputil>`_ is not installed.
+
+
+.. np:function:: available_gpu(*args, **kwargs)
+
+   Get the device id for an available GPU when multiple GPUs are installed.
+   This function is an alias for ``GPUtil.getAvailable``. Returns 0 if
+   `GPUtil <https://github.com/anderskm/gputil>`_ is not installed.
+
+
+|
+
+The current GPU device can be also selected using :meth:`cupy.cuda.Device.use`, e.g. to select device id 1
 
 ::
 
