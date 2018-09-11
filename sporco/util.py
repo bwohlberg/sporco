@@ -218,7 +218,7 @@ def extractblocks(img, blksz, stpsz=None):
         img = np.stack(img, axis=-1)
 
     if stpsz is None:
-        stpsz = tuple(1 for _ in blksz)
+        stpsz = (1,) * len(blksz)
 
     imgsz = img.shape
 
