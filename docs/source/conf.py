@@ -20,6 +20,13 @@ from ast import parse
 import re, shutil, tempfile
 import inspect
 
+if sys.version[0] == '3':
+    from unittest.mock import MagicMock
+elif sys.version[0] == '2':
+    from mock import Mock as MagicMock
+else:
+    raise ImportError("Can't determine how to import MagicMock.")
+
 sys.path.append(os.path.dirname(__file__))
 import callgraph
 import docntbk
@@ -326,6 +333,8 @@ texinfo_documents = [
 #texinfo_no_detailmenu = False
 
 
+MOCK_MODULES = ['sporco.cuda', 'sporco.cupy']
+
 on_rtd = os.environ.get('READTHEDOCS') == 'True'
 
 if on_rtd:
@@ -333,25 +342,19 @@ if on_rtd:
     print
     print("Current working directory: {}" . format(os.path.abspath(os.curdir)))
 
-if on_rtd:
-
     import matplotlib
     matplotlib.use('agg')
 
-    if sys.version[0] == '3':
-        from unittest.mock import MagicMock
-    elif sys.version[0] == '2':
-        from mock import Mock as MagicMock
-    else:
-        raise ImportError("Can't determine how to import MagicMock.")
+    MOCK_MODULES += ['pyfftw']
 
-    class Mock(MagicMock):
-        @classmethod
-        def __getattr__(cls, name):
-            return MagicMock()
 
-    MOCK_MODULES = ['pyfftw']
-    sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
+class Mock(MagicMock):
+    @classmethod
+    def __getattr__(cls, name):
+        return MagicMock()
+
+sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
+
 
 # See https://developer.ridgerun.com/wiki/index.php/How_to_generate_sphinx_documentation_for_python_code_running_in_an_embedded_system
 
@@ -364,17 +367,6 @@ autodoc_member_order = 'bysource'
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 #exclude_patterns = ['_build', '**tests**', '**spi**']
-
-
-# Avoid errors when extension module sporco_cuda is not installed
-if sys.version[0] == '3':
-    import unittest.mock as mock
-elif sys.version[0] == '2':
-    import mock
-else:
-    raise ImportError("Can't determine how to import mock.")
-sys.modules['sporco.cuda'] = mock.Mock()
-sys.modules['sporco.cupy'] = mock.Mock()
 
 
 # Ensure that the __init__ method gets documented.
