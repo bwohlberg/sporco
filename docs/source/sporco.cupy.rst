@@ -1,3 +1,5 @@
+.. py:module:: sporco.cupy
+
 .. _cupy_package:
 
 sporco.cupy package

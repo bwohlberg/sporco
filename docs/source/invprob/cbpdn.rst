@@ -13,8 +13,7 @@ Module :mod:`.admm.cbpdn` includes the following classes:
      \frac{1}{2} \left \|  \sum_m \mathbf{d}_m * \mathbf{x}_m - \mathbf{s}
      \right \|_2^2 + \lambda \sum_m \| \mathbf{x}_m \|_1
 
-  The function :ref:`cbpdn <cuda_cbpdn>` in the
-  :ref:`sporco.cuda <cuda_package>` package provides a GPU accelerated
+  The function :func:`sporco.cuda.cbpdn` provides a GPU accelerated
   solver for this problem if the
   `sporco-cuda  <https://github.com/bwohlberg/sporco-cuda>`__ extension
   package is installed.
@@ -60,8 +59,7 @@ Module :mod:`.admm.cbpdn` includes the following classes:
   where :math:`G_i` is an operator computing the derivative along index
   :math:`i`.
 
-  The function :ref:`cbpdngrd <cuda_cbpdngrd>` in the
-  :ref:`sporco.cuda <cuda_package>` package provides a GPU accelerated
+  The function :func:`sporco.cuda.cbpdngrd` provides a GPU accelerated
   solver for this problem if the
   `sporco-cuda  <https://github.com/bwohlberg/sporco-cuda>`__ extension
   package is installed.
@@ -110,10 +108,9 @@ Module :mod:`.admm.cbpdn` includes the following classes:
   other :mod:`.admm.cbpdn` classes.
 
   If the `sporco-cuda <https://github.com/bwohlberg/sporco-cuda>`__
-  extension package is installed, functions :ref:`cbpdnmsk <cuda_cbpdnmsk>`
-  and :ref:`cbpdngrdmsk <cuda_cbpdngrdmsk>` in the :ref:`sporco.cuda
-  <cuda_package>` package provide GPU accelerated solvers for AMS variants
-  of the ``ConvBPDN`` and ``ConvBPDNGradReg`` problems.
+  extension package is installed, functions :func:`sporco.cuda.cbpdnmsk`
+  and :func:`sporco.cuda.cbpdngrdmsk` provide GPU accelerated solvers for
+  AMS variants of the ``ConvBPDN`` and ``ConvBPDNGradReg`` problems.
 
 
 |

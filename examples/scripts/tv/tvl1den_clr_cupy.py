@@ -8,7 +8,7 @@
 Colour ℓ1-TV Denoising (CuPy Version)
 =====================================
 
-This example demonstrates the use of class :class:`.tvl1.TVL1Denoise` for removing salt & pepper noise from a colour image using Total Variation regularization with an ℓ1 data fidelity term (ℓ1-TV denoising). This variant of the example uses the GPU accelerated version of :mod:`.tvl1` within the :ref:`sporco.cupy <cupy_package>` subpackage.
+This example demonstrates the use of class :class:`.tvl1.TVL1Denoise` for removing salt & pepper noise from a colour image using Total Variation regularization with an ℓ1 data fidelity term (ℓ1-TV denoising). This variant of the example uses the GPU accelerated version of :mod:`.tvl1` within the :mod:`sporco.cupy` subpackage.
 """
 
 

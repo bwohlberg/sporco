@@ -1,3 +1,5 @@
+.. py:module:: sporco.cuda
+
 .. _cuda_package:
 
 sporco.cuda package
@@ -106,7 +108,6 @@ Only available if ``have_cuda`` is `True`
 
 
 
-.. _cuda_cbpdn:
 .. np:function:: cbpdn(D, S, lmbda, opt, dev=0)
 
    A GPU-accelerated version of :class:`.admm.cbpdn.ConvBPDN`. Multiple
@@ -135,7 +136,6 @@ Only available if ``have_cuda`` is `True`
 
 
 
-.. _cuda_cbpdngrd:
 .. np:function:: cbpdngrd(D, S, lmbda, mu, opt, dev=0)
 
    A GPU-accelerated version of :class:`.admm.cbpdn.ConvBPDNGradReg`.
@@ -166,7 +166,6 @@ Only available if ``have_cuda`` is `True`
 
 
 
-.. _cuda_cbpdnmsk:
 .. np:function:: cbpdnmsk(D, s, w, lmbda, opt, dev=0)
 
    A GPU-accelerated version of :class:`.admm.cbpdn.AddMaskSim` used
@@ -209,7 +208,6 @@ Only available if ``have_cuda`` is `True`
 
 
 
-.. _cuda_cbpdngrdmsk:
 .. np:function:: cbpdngrdmsk(D, s, w, lmbda, mu, opt, dev=0)
 
    A GPU-accelerated version of of :class:`.admm.cbpdn.AddMaskSim`

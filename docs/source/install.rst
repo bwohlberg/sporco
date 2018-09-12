@@ -84,14 +84,7 @@ The primary requirements are Python itself, and modules `future
 <http://python-future.org>`_, `numpy
 <http://www.numpy.org>`_, `scipy <https://www.scipy.org>`_, `pyfftw
 <https://hgomersall.github.io/pyFFTW>`_, and `matplotlib
-<http://matplotlib.org>`_. Module `numexpr
-<https://github.com/pydata/numexpr>`_ is not required, but some
-functions will be faster if it is installed. If module `mpldatacursor
-<https://github.com/joferkington/mpldatacursor>`_ is installed, functions
-:func:`.plot.plot` and :func:`.plot.imview` will support the data cursor that it provides.
-
-
-Installation of these requirements is system dependent.
+<http://matplotlib.org>`_. Installation of these requirements is system dependent:
 
 .. tabs::
 
@@ -231,3 +224,22 @@ Installation of these requirements is system dependent.
       ::
 
 	set PATH=%PATH%;"C:\Program Files (x86)\Graphviz2.38\bin"
+
+
+In addition to the required packages, a number of optional packages enable additional features when installed:
+
+
+.. |numexpr| replace:: `numexpr <https://github.com/pydata/numexpr>`__
+.. |mpldatacursor| replace:: `mpldatacursor <https://github.com/joferkington/mpldatacursor>`__
+.. |cupy| replace:: `cupy <https://github.com/cupy/cupy>`__
+.. |gputil| replace:: `GPUtil <https://github.com/anderskm/gputil>`__
+
+================  ======================================================
+Optional Package  Features Supported
+================  ======================================================
+|numexpr|         Acceleration of some functions in :mod:`sporco.linalg`
+|mpldatacursor|   Data cursor enabled for :func:`.plot.plot`,
+		  :func:`.plot.contour`, and :func:`.plot.imview`
+|cupy|            GPU acceleration of modules in :mod:`sporco.cupy`
+|gputil|          Additional utility functions in :mod:`sporco.cupy`
+================  ======================================================

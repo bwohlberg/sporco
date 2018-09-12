@@ -8,7 +8,7 @@
 Online Convolutional Dictionary Learning (CuPy Version)
 =======================================================
 
-This example demonstrates the use of :class:`.onlinecdl.OnlineConvBPDNDictLearn` for learning a convolutional dictionary from a set of training images. The dictionary is learned using the online dictionary learning algorithm proposed in :cite:`liu-2018-first`. This variant of the example uses the GPU accelerated version of :mod:`.onlinecdl` within the :ref:`sporco.cupy <cupy_package>` subpackage.
+This example demonstrates the use of :class:`.onlinecdl.OnlineConvBPDNDictLearn` for learning a convolutional dictionary from a set of training images. The dictionary is learned using the online dictionary learning algorithm proposed in :cite:`liu-2018-first`. This variant of the example uses the GPU accelerated version of :mod:`.onlinecdl` within the :mod:`sporco.cupy` subpackage.
 """
 
 
