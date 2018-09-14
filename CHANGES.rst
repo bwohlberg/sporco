@@ -11,6 +11,9 @@ Version 0.1.10   (not yet released)
   accelerated CBPDN solver
 - Added support for GPU acceleration of selected solvers via the
   CuPy package
+- Fixed a bug in iteration statistics constructions in cbpdndl and
+  cbpdndlmd modules
+
 
 
 Version 0.1.9   (2018-07-15)
