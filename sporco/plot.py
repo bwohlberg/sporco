@@ -154,6 +154,9 @@ def plot(y, x=None, ptyp='plot', xlbl=None, ylbl=None, title=None,
     else:
         pltln = pltmth(x, y, **kwargs)
 
+    ax.fmt_xdata = lambda x: "{: .2f}".format(x)
+    ax.fmt_ydata = lambda x: "{: .2f}".format(x)
+
     if title is not None:
         ax.set_title(title)
     if xlbl is not None:
@@ -263,6 +266,10 @@ def surf(z, x=None, y=None, elev=None, azim=None, xlbl=None, ylbl=None,
                    linestyles="solid", offset=offset)
         ax.set_zlim(offset, ax.get_zlim()[1])
 
+    ax.fmt_xdata = lambda x: "{: .2f}".format(x)
+    ax.fmt_ydata = lambda x: "{: .2f}".format(x)
+    ax.fmt_zdata = lambda x: "{: .2f}".format(x)
+
     if title is not None:
         ax.set_title(title)
     if xlbl is not None:
@@ -366,6 +373,9 @@ def contour(z, x=None, y=None, v=5, xlbl=None, ylbl=None, title=None,
     im = ax.imshow(z, origin='lower', interpolation=intrp, aspect='auto',
                    extent=[x.min(), x.max(), y.min(), y.max()], cmap=cmap,
                    vmin=vmin, vmax=vmax, alpha=alpha)
+
+    ax.fmt_xdata = lambda x: "{: .2f}".format(x)
+    ax.fmt_ydata = lambda x: "{: .2f}".format(x)
 
     if title is not None:
         ax.set_title(title)
