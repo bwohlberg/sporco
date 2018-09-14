@@ -81,7 +81,7 @@ def isfld(xmethod, dmethod, opt):
                         'D_Rsdl'])
         else:
             fld.extend(['D_L', 'D_Rsdl'])
-    fld.extend('Time')
+    fld.append('Time')
     return fld
 
 
