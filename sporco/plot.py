@@ -58,7 +58,7 @@ def attach_keypress(fig):
         elif event.key == 'c':
             fig.set_size_inches(fig.get_size_inches() / a, forward=True)
 
-    # Avoid multiple even handlers attached to the same figure
+    # Avoid multiple event handlers attached to the same figure
     if not hasattr(fig, '_sporco_keypress_cid'):
         cid = fig.canvas.mpl_connect('key_press_event', press)
         fig._sporco_keypress_cid = cid
@@ -653,34 +653,44 @@ def config_notebook_plotting():
         # are duplicated if the return value from the original function is
         # not assigned to a variable)
         plot_original = module.plot
+
         def plot_wrap(*args, **kwargs):
             plot_original(*args, **kwargs)
+
         module.plot = plot_wrap
 
         # Replace surf function with a wrapper function that discards
         # its return value (see comment for plot function)
         surf_original = module.surf
+
         def surf_wrap(*args, **kwargs):
             surf_original(*args, **kwargs)
+
         module.surf = surf_wrap
 
         # Replace contour function with a wrapper function that discards
         # its return value (see comment for plot function)
         contour_original = module.contour
+
         def contour_wrap(*args, **kwargs):
             contour_original(*args, **kwargs)
+
         module.contour = contour_wrap
 
         # Replace imview function with a wrapper function that discards
         # its return value (see comment for plot function)
         imview_original = module.imview
+
         def imview_wrap(*args, **kwargs):
             imview_original(*args, **kwargs)
+
         module.imview = imview_wrap
 
         # Disable figure show method (results in a warning if used within
         # a notebook with inline plotting)
         import matplotlib.figure
+
         def show_disable(self):
             pass
+
         matplotlib.figure.Figure.show = show_disable
