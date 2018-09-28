@@ -27,7 +27,8 @@ try:
     import skvideo.datasets
     import skvideo.io
 except ImportError:
-    print('Package sk-video is required by this demo script', file=sys.stderr)
+    print('Package scikit-video is required by this demo script',
+          file=sys.stderr)
     raise
 
 from sporco.dictlrn import cbpdndl
