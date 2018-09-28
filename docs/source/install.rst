@@ -233,13 +233,17 @@ In addition to the required packages, a number of optional packages enable addit
 .. |mpldatacursor| replace:: `mpldatacursor <https://github.com/joferkington/mpldatacursor>`__
 .. |cupy| replace:: `cupy <https://github.com/cupy/cupy>`__
 .. |gputil| replace:: `GPUtil <https://github.com/anderskm/gputil>`__
+.. |skvideo| replace:: `scikit-video <http://www.scikit-video.org>`__
 
-================  ======================================================
-Optional Package  Features Supported
-================  ======================================================
-|numexpr|         Acceleration of some functions in :mod:`sporco.linalg`
-|mpldatacursor|   Data cursor enabled for :func:`.plot.plot`,
-		  :func:`.plot.contour`, and :func:`.plot.imview`
-|cupy|            GPU acceleration of modules in :mod:`sporco.cupy`
-|gputil|          Additional utility functions in :mod:`sporco.cupy`
-================  ======================================================
+
+=================  ======================================================
+Optional Package   Features Supported
+=================  ======================================================
+|numexpr|          Acceleration of some functions in :mod:`sporco.linalg`
+|mpldatacursor|    Data cursor enabled for :func:`.plot.plot`,
+		   :func:`.plot.contour`, and :func:`.plot.imview`
+|cupy|             GPU acceleration of modules in :mod:`sporco.cupy`
+|gputil|           Additional utility functions in :mod:`sporco.cupy`
+|skvideo|          Required by example script
+		   :ref:`cbpdndl_video.py <example_cdl_cbpdndl_video>`
+=================  ======================================================
