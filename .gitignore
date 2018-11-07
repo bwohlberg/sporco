@@ -67,7 +67,6 @@ coverage.xml
 docs/_build/
 docs/source/modules
 docs/source/_static/jonga
-docs/Makefile
 
 # Example notebooks and derived docs
 examples/notebooks
