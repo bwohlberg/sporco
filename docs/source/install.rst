@@ -90,7 +90,7 @@ The primary requirements are Python itself, and modules `future
 
    .. group-tab:: :fa:`linux` Linux
 
-      Under Ubuntu Linux 16.04, the following commands should be sufficient for Python 2
+      Under Ubuntu Linux 18.04, the following commands should be sufficient for Python 2
 
       ::
 
@@ -115,12 +115,12 @@ The primary requirements are Python itself, and modules `future
 
       Some additional dependencies are required for building the
       documentation from the package source, for which Python 3.3 or
-      later is required. For example, under Ubuntu Linux 16.04, the
+      later is required. For example, under Ubuntu Linux 18.04, the
       following commands should be sufficient
 
       ::
 
-	sudo apt-get -y install python3-sphinx python3-numpydoc python3-pygraphviz
+	sudo apt-get -y install python3-sphinx python3-numpydoc python3-pygraphviz pandoc
 	sudo -H pip3 install sphinxcontrib-bibtex sphinx_tabs sphinx_fontawesome jonga \
 			     jupyter git+https://github.com/leonardt/py2nb#egg=py2nb
 
@@ -232,6 +232,7 @@ In addition to the required packages, a number of optional packages enable addit
 .. |numexpr| replace:: `numexpr <https://github.com/pydata/numexpr>`__
 .. |mpldatacursor| replace:: `mpldatacursor <https://github.com/joferkington/mpldatacursor>`__
 .. |cupy| replace:: `cupy <https://github.com/cupy/cupy>`__
+.. |wrltzr| replace:: `wurlitzer <https://github.com/minrk/wurlitzer>`__
 .. |gputil| replace:: `GPUtil <https://github.com/anderskm/gputil>`__
 .. |skvideo| replace:: `scikit-video <http://www.scikit-video.org>`__
 
@@ -243,6 +244,8 @@ Optional Package   Features Supported
 |mpldatacursor|    Data cursor enabled for :func:`.plot.plot`,
 		   :func:`.plot.contour`, and :func:`.plot.imview`
 |cupy|             GPU acceleration of modules in :mod:`sporco.cupy`
+|wrltzr|           Utility that supports capture of :mod:`sporco.cuda`
+		   function output within Jupyter notebooks
 |gputil|           Additional utility functions in :mod:`sporco.cupy`
 |skvideo|          Required by example script
 		   :ref:`cbpdndl_video.py <example_cdl_cbpdndl_video>`
