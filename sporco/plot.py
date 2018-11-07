@@ -72,6 +72,106 @@ def attach_keypress(fig, scaling=1.1):
     return press
 
 
+
+def attach_zoom(ax, scaling=2.0):
+    """
+    Attach an event handler that supports zooming within a plot using
+    the mouse scroll wheel.
+
+    Parameters
+    ----------
+    ax : :class:`matplotlib.axes.Axes` object
+      Axes to which event handling is to be attached
+    scaling : float, optional (default 2.0)
+      Scaling factor for zooming in and out
+
+    Returns
+    -------
+    zoom : function
+      Mouse scroll wheel event handler function
+    """
+
+    # See https://stackoverflow.com/questions/11551049
+    def zoom(event):
+        # Get the current x and y limits
+        cur_xlim = ax.get_xlim()
+        cur_ylim = ax.get_ylim()
+        # Get event location
+        xdata = event.xdata
+        ydata = event.ydata
+        # Return if cursor is not over valid region of plot
+        if xdata is None or ydata is None:
+            return
+
+        if event.button == 'up':
+            # Deal with zoom in
+            scale_factor = 1.0 / scaling
+        elif event.button == 'down':
+            # Deal with zoom out
+            scale_factor = scaling
+
+        # Get distance from the cursor to the edge of the figure frame
+        x_left = xdata - cur_xlim[0]
+        x_right = cur_xlim[1] - xdata
+        y_top = ydata - cur_ylim[0]
+        y_bottom = cur_ylim[1] - ydata
+
+        # Calculate new x and y limits
+        new_xlim = (xdata - x_left * scale_factor,
+                    xdata + x_right * scale_factor)
+        new_ylim = (ydata - y_top * scale_factor,
+                    ydata + y_bottom * scale_factor)
+
+        # Ensure that x limit range is no larger than that of the reference
+        if np.diff(new_xlim) > np.diff(zoom.xlim_ref):
+            new_xlim *= np.diff(zoom.xlim_ref) / np.diff(new_xlim)
+        # Ensure that lower x limit is not less than that of the reference
+        if new_xlim[0] < zoom.xlim_ref[0]:
+            new_xlim += np.array(zoom.xlim_ref[0] - new_xlim[0])
+        # Ensure that upper x limit is not greater than that of the reference
+        if new_xlim[1] > zoom.xlim_ref[1]:
+            new_xlim -= np.array(new_xlim[1] - zoom.xlim_ref[1])
+
+        # Ensure that ylim tuple has the smallest value first
+        if zoom.ylim_ref[1] < zoom.ylim_ref[0]:
+            ylim_ref = zoom.ylim_ref[::-1]
+            new_ylim = new_ylim[::-1]
+        else:
+            ylim_ref = zoom.ylim_ref
+
+        # Ensure that y limit range is no larger than that of the reference
+        if np.diff(new_ylim) > np.diff(ylim_ref):
+            new_ylim *= np.diff(ylim_ref) / np.diff(new_ylim)
+        # Ensure that lower y limit is not less than that of the reference
+        if new_ylim[0] < ylim_ref[0]:
+            new_ylim += np.array(ylim_ref[0] - new_ylim[0])
+        # Ensure that upper y limit is not greater than that of the reference
+        if new_ylim[1] > ylim_ref[1]:
+            new_ylim -= np.array(new_ylim[1] - ylim_ref[1])
+
+        # Return the ylim tuple to its original order
+        if zoom.ylim_ref[1] < zoom.ylim_ref[0]:
+            new_ylim = new_ylim[::-1]
+
+        # Set new x and y limits
+        ax.set_xlim(new_xlim)
+        ax.set_ylim(new_ylim)
+
+        # Force redraw
+        ax.figure.canvas.draw()
+
+    # Record reference x and y limits prior to any zooming
+    zoom.xlim_ref = ax.get_xlim()
+    zoom.ylim_ref = ax.get_ylim()
+
+    # Get figure for specified axes and attach the event handler
+    fig = ax.get_figure()
+    fig.canvas.mpl_connect('scroll_event', zoom)
+
+    return zoom
+
+
+
 def plot(y, x=None, ptyp='plot', xlbl=None, ylbl=None, title=None,
          lgnd=None, lglc=None, **kwargs):
     """
@@ -174,6 +274,7 @@ def plot(y, x=None, ptyp='plot', xlbl=None, ylbl=None, title=None,
         ax.legend(lgnd, loc=lglc)
 
     attach_keypress(fig)
+    attach_zoom(ax)
 
     if have_mpldc:
         mpldc.datacursor(pltln)
@@ -396,6 +497,7 @@ def contour(z, x=None, y=None, v=5, xlbl=None, ylbl=None, title=None,
     plt.colorbar(im, ax=ax, cax=cax)
 
     attach_keypress(fig)
+    attach_zoom(ax)
 
     if have_mpldc:
         mpldc.datacursor()
@@ -562,6 +664,7 @@ def imview(img, title=None, copy=True, fltscl=False, intrp='nearest',
 
 
     attach_keypress(fig)
+    attach_zoom(ax)
 
     if have_mpldc:
         mpldc.datacursor(display='single')
