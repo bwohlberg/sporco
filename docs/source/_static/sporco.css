@@ -1,176 +1,214 @@
-/*
-@import url('css/theme.css');
-*/
+/* -*- css -*-
+ *
+ * Sphinx haiku theme CSS customization for SPORCO docs.
+ *
+ */
 
 @import url("haiku.css");
 
-
 body {
-    line-height: 1.4;
-    font-size: 90%;
+  line-height: 1.4;
+  font-size: 90%;
 }
-
-/*
-.field-list {
-  margin-bottom: 0px;
-  padding: 1px;
-  line-height: 11px;
-}
-
-.field-body {
-  margin-bottom: 0px;
-}
-*/
-
 h2 {
-    padding-bottom: 5px;
-    border-bottom: 1px solid #d0d0d0;
-    margin-bottom: 16px;
+  padding-bottom: 5px;
+  border-bottom: 1px solid #d0d0d0;
+  margin-bottom: 16px;
+}
+h3 {
+  padding-bottom: 5px;
+  border-bottom: none;
+  margin-bottom: 16px;
+  font-size: 1.05em;
+}
+h4, h5, h6 {
+  padding-bottom: 5px;
+  border-bottom: none;
+  margin-bottom: 16px;
 }
 
-h3, h4, h5, h6 {
-    padding-bottom: 5px;
-    border-bottom: none;
-    margin-bottom: 16px;
-}
 
 /*
-div > h3 {
-    margin-right: 0px;
-    padding-right: 0px;
-    border-right: 0px;
-}
-*/
-
-h3 {
-    font-size: 1.05em;
-    /* border-bottom: 1px solid #d0d0d0;
-    display: inline-block; */
-}
-
-/* Some definitions copied from scipy.css */
-
+ * Style for function parameters/returns description tables (field list).
+ * Copied from scipy.css, with modifications.
+ */
 table.field-list {
-    border-collapse: collapse;
-    border-spacing: 5px;
-    margin-left: 1px;
-    border-left: 5px solid #e9e9e9 !important;
+  border-collapse: collapse;
+  border-spacing: 5px;
+  margin-left: 1px;
+  margin-top: 0.5em;
 }
-
 table.field-list th.field-name {
-    display: inline-block;
-    padding: 1px 8px 1px 5px;
-    white-space: nowrap;
-    background-color: #e9e9e9;
+  text-align: left;
+  padding: 1px 8px 1px 5px;
+  white-space: nowrap;
+  background-color: #ebebeb;
+  width: 7em;
 }
-
 table.field-list td.field-body {
-    border-left: none !important;
+  padding-left: 10px;
+  border-left: none !important;
 }
-
 table.field-list td.field-body > p {
-    font-style: italic;
+  font-style: italic;
 }
-
 table.field-list td.field-body > p > strong {
-    font-style: normal;
+  font-style: normal;
 }
-
 td.field-body blockquote {
-    border-left: none;
-    margin: 0;
-    padding-left: 30px;
+  border-left: none;
+  margin: 0;
+  padding-left: 30px;
 }
 
+
+/*
+ * Style for custom class kwargs for documenting **kwargs parameters
+ * (see sporco.plot.plot).
+ */
 table.kwargs {
-    border: 1px solid black;
-    border-collapse: collapse;
+  border: 1px solid black;
+  border-collapse: collapse;
 }
-
 table.kwargs tbody {
-    border: 1px solid black;
+  border: 1px solid black;
 }
-
 table.kwargs th {
-    border: 1px solid black;
-    background-color: #d5d5d5;
+  border: 1px solid black;
+  background-color: #d5d5d5;
 }
-
 table.kwargs td {
-    border: 1px solid black;
+  border: 1px solid black;
+}
+table.kwargs.docutils {
+  margin-top: 0.5em;
 }
 
+
+/*
+ * Style for class, method, function, and exception docs.
+ */
 .class, .function, .exception {
   margin-bottom: 4em;
   background-color: #f8f8f8;
   padding: 5px 10px;
-  border-radius: 10px;
+  border-radius: 4px;
 }
-
 dl.class {
   margin-top: 3em;
   margin-bottom: 2em;
   border-style: solid;
-  border-width: 1px;
-  border-color: #909090;
+  border-width: 3px;
+  border-color: #f7f7f7;
 }
-
+dl.class dl.class {
+  background-color: #f4f4f4;
+  border-color: #f3f3f3;
+}
+dl.function > dt:first-child, dl.class > dt:first-child,
+dl.exception > dt:first-child  {
+  background-color: #ebebeb;
+  padding: 2px 5px 2px 5px;
+  border-radius: 3px;
+}
+dl.class > dt:first-child + dd > p:first-child {
+  margin-bottom: 0.8em;
+}
+dl.method > dt:first-child, dl.staticmethod > dt:first-child,
+dl.classmethod > dt:first-child {
+  background-color: #ebebeb;
+  padding: 2px 5px 2px 5px;
+  border-radius: 3px;
+}
 dl.function {
-  margin-top: 0em;
+  margin-top: 0;
   margin-bottom: 1em;
   border-style: solid;
-  border-width: 1px;
-  border-color: #909090;
+  border-width: 3px;
+  border-color: #f7f7f7;
 }
-
 dl.exception {
   margin-top: 1em;
   margin-bottom: 1em;
   border-style: solid;
-  border-width: 1px;
-  border-color: #909090;
+  border-width: 3px;
+  border-color: #f7f7f7;
+}
+dl.exception > dt:first-child + dd > p:first-child {
+  margin-bottom: 0.8em;
 }
 
 
+/*
+ * Style for autosummary-like tables of modules, functions, etc.
+ */
+table.longtable.docutils, table.longtable.docutils td {
+  border-style: solid;
+  border-width: 1px;
+  border-color: #808080;
+  background-color: #fbfbfb;
+}
+div.module-table table, div.module-table td {
+  border-style: solid;
+  border-width: 1px;
+  border-color: #808080;
+  background-color: #fbfbfb;
+}
+div.module-table table {
+  width: 100%;
+}
+
+
+/*
+ * Modify font weight of link text.
+ */
+a.external {
+  font-weight: normal;
+}
+a.reference.internal span.doc {
+  font-weight: 500;
+}
+a.reference.internal {
+  font-size: 95%;
+  font-weight: 500;
+}
+span.std.std-ref {
+  font-weight: 500;
+}
+div.topnav a, div.bottomnav a {
+  font-weight: 500;
+}
+
+
+/*
+ * Miscellaneous.
+ */
 div.highlight pre {
   border-radius: 4px;
-  margin-bottom: 2em;
+  margin-top: 1em;
+  margin-bottom: 1em;
+  
 }
-
 .pre {
   background-color: #f8f8f8;
 }
-
-/*
-:not(td) blockquote {
-  margin-top: 1px;
-  margin-bottom: 31px;
-}
-*/
-
-
 ul {
-    padding-left: 1em;
-    margin-top: 3px;
+  padding-left: 1em;
+  margin-top: 3px;
 }
-
 div.content ul > li {
-    -moz-background-clip:border;
-    -moz-background-inline-policy:continuous;
-    -moz-background-origin:padding;
-    background: none;
-    list-style-image: none;
-    list-style-type: square;
-    /*padding: 0 0 0 1.666em;*/
-    padding: 0 0 0 0.5em;
-    /*margin-bottom: 3px;*/
+  -moz-background-clip:border;
+  -moz-background-inline-policy:continuous;
+  -moz-background-origin:padding;
+  background: none;
+  list-style-image: none;
+  list-style-type: square;
+  padding: 0 0 0 0.5em;
 }
-
 blockquote div p {
   margin: 2px;
 }
-
 code, .rst-content tt, .linenodiv pre, div[class^="highlight"] pre {
-    font-family: 'Inconsolata', 'Monaco', 'Consolas', monospace;
-    font-size: 85%;
+  font-family: 'Inconsolata', 'Monaco', 'Consolas', monospace;
+  font-size: 85%;
 }

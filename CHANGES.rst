@@ -13,6 +13,9 @@ Version 0.1.10   (not yet released)
   package
 - Fixed a bug in iteration statistics constructions in cbpdndl and
   cbpdndlmd modules
+- Added support for mouse scroll wheel zooming in plot.plot, plot.contour,
+  and plot.imview
+- Major changes to docs structure and API documentation build mechanism
 
 
 
