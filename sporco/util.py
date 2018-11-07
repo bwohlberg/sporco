@@ -453,7 +453,6 @@ def tikhonov_filter(s, lmbda, npd=16):
     lowpass component :math:`\mathbf{x}` has been computed, the highpass
     component is just :math:`\mathbf{s} - \mathbf{x}`.
 
-
     Parameters
     ----------
     s : array_like
@@ -708,7 +707,7 @@ def in_notebook():
 
 def notebook_system_output():
     """Get a context manager that attempts to use `wurlitzer
-    <https://github.com/minrk/wurlitzer>`_ to capture system-level
+    <https://github.com/minrk/wurlitzer>`__ to capture system-level
     stdout/stderr within a Jupyter Notebook shell, without affecting normal
     operation when run as a Python script. For example:
 
@@ -746,8 +745,7 @@ class ExampleImages(object):
 
     def __init__(self, scaled=False, dtype=None, zoom=None, gray=False,
                  pth=None):
-        """Initialise an ExampleImages object.
-
+        """
         Parameters
         ----------
         scaled : bool, optional (default False)
@@ -931,8 +929,7 @@ class Timer(object):
     """
 
     def __init__(self, labels=None, dfltlbl='main', alllbl='all'):
-        """Initialise timer object.
-
+        """
         Parameters
         ----------
         labels : string or list, optional (default None)
@@ -1178,8 +1175,7 @@ class ContextTimer(object):
     """
 
     def __init__(self, timer=None, label=None, action='StartStop'):
-        """Initialise context manager timer wrapper.
-
+        """
         Parameters
         ----------
         timer : class:`Timer` object, optional (default None)
