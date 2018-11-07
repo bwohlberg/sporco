@@ -35,6 +35,10 @@ import automodule
 import callgraph
 import docntbk
 
+
+on_rtd = os.environ.get('READTHEDOCS') == 'True'
+
+
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
@@ -365,8 +369,6 @@ texinfo_documents = [
 
 
 MOCK_MODULES = ['sporco.cuda', 'sporco.cupy', 'mpi4py']
-
-on_rtd = os.environ.get('READTHEDOCS') == 'True'
 
 if on_rtd:
     print('Building on ReadTheDocs')
