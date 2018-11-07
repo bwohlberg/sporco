@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+"""Generate notebooks and documentation from python scripts."""
+
+
 from __future__ import print_function
 
 import os
@@ -9,6 +12,7 @@ import tempfile
 import re
 import pickle
 from timeit import default_timer as timer
+import warnings
 
 import py2nb.tools
 import nbformat
@@ -300,7 +304,7 @@ def same_notebook_code(nb1, nb2):
 
 
 
-def execute_notebook(npth, dpth, timeout=800, kernel='python3'):
+def execute_notebook(npth, dpth, timeout=1200, kernel='python3'):
     """
     Execute the notebook at `npth` using `dpth` as the execution directory.
     The execution timeout and kernel are `timeout` and `kernel`
@@ -609,8 +613,8 @@ class IntersphinxInventory(object):
         # the base url for this object
         n = len(self.baseurl)
         if url[0:n] != self.baseurl:
-           raise KeyError('base of url %s does not match base url %s' %
-                        (url, self.baseurl))
+            raise KeyError('base of url %s does not match base url %s' %
+                           (url, self.baseurl))
         # The reverse lookup key is either the full url or the postfix
         # to the base url, depending on flag addbase
         if self.addbase:
