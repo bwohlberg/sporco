@@ -433,6 +433,42 @@ def rndmask(shp, frc, dtype=None):
 
 
 
+def pca(U, centre=False):
+    """Compute the PCA basis for columns of input array `U`.
+
+    Parameters
+    ----------
+    U : array_like
+      2D data array with rows corresponding to different variables and
+      columns corresponding to different observations
+    center : bool, optional (default False)
+      Flag indicating whether to centre data
+
+    Returns
+    -------
+    B : ndarray
+      A 2D array representing the PCA basis; each column is a PCA
+      component.
+      B.T is the analysis transform into the PCA representation, and B
+      is the corresponding synthesis transform
+    S : ndarray
+      The eigenvalues of the PCA components
+    C : ndarray or None
+      None if centering is disabled, otherwise the mean of the data
+      matrix subtracted in performing the centering
+    """
+
+    if centre:
+        C = np.mean(U, axis=1, keepdims=True)
+        U = U - C
+    else:
+        C = None
+
+    B, S, _ = np.linalg.svd(U, full_matrices=False, compute_uv=True)
+    return B, S**2, C
+
+
+
 def tikhonov_filter(s, lmbda, npd=16):
     r"""Lowpass filter based on Tikhonov regularization.
 

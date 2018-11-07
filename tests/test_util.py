@@ -225,3 +225,15 @@ class TestSet01(object):
         A_combine_recon = util.combineblocks(A_blocks + noise, A.shape,
                                              stpsz, np.mean)
         assert np.allclose(A_combine_recon, A_average_recon, equal_nan=True)
+
+
+    def test_33(self):
+        U = np.random.randn(5, 10)
+        B, S, C = util.pca(U, centre=False)
+        assert np.linalg.norm(B.dot(B.T) - np.eye(U.shape[0])) < 1e-10
+
+
+    def test_34(self):
+        U = np.random.randn(5, 10)
+        B, S, C = util.pca(U, centre=True)
+        assert np.linalg.norm(B.dot(B.T) - np.eye(U.shape[0])) < 1e-10
