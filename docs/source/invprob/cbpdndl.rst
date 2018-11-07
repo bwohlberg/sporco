@@ -1,7 +1,7 @@
 Modules cbpdndl, cbpdndlmd, prlcnscdl, and onlinecdl
 ====================================================
 
-These modules includes classes :class:`.dictlrn.cbpdndl.ConvBPDNDictLearn`, :class:`.dictlrn.prlcnscdl.ConvBPDNDictLearn_Consensus`, and :class:`.dictlrn.onlinecdl.OnlineConvBPDNDictLearn` for solving the problem
+These modules includes classes :class:`.cbpdndl.ConvBPDNDictLearn`, :class:`.prlcnscdl.ConvBPDNDictLearn_Consensus`, and :class:`.onlinecdl.OnlineConvBPDNDictLearn` for solving the problem
 
 .. math::
    \mathrm{argmin}_{\mathbf{d}, \mathbf{x}} \;
@@ -12,7 +12,7 @@ These modules includes classes :class:`.dictlrn.cbpdndl.ConvBPDNDictLearn`, :cla
 where :math:`C` is the feasible set consisting of filters with unit norm
 and constrained support.
 
-In addition classes :class:`.dictlrn.cbpdndlmd.ConvBPDNMaskDictLearn`, :class:`.dictlrn.prlcnscdl.ConvBPDNMaskDcplDictLearn_Consensus`, and :class:`.dictlrn.onlinecdl.OnlineConvBPDNMaskDictLearn` support solving
+In addition classes :class:`.cbpdndlmd.ConvBPDNMaskDictLearn`, :class:`.prlcnscdl.ConvBPDNMaskDcplDictLearn_Consensus`, and :class:`.onlinecdl.OnlineConvBPDNMaskDictLearn` support solving
 the problem
 
 .. math::
@@ -24,9 +24,9 @@ the problem
 
 where :math:`W` is a mask array.
 
-On a multi-core host, :class:`.dictlrn.prlcnscdl.ConvBPDNDictLearn_Consensus` and :class:`.dictlrn.prlcnscdl.ConvBPDNMaskDcplDictLearn_Consensus` can be
-substantially faster than :class:`.dictlrn.cbpdndl.ConvBPDNDictLearn` and
-:class:`.dictlrn.cbpdndlmd.ConvBPDNMaskDictLearn` respectively. For large training datasets, the online CDL classes :class:`.dictlrn.onlinecdl.OnlineConvBPDNDictLearn` and :class:`.dictlrn.onlinecdl.OnlineConvBPDNMaskDictLearn` may be the best option, particularly for use on a host without very large amounts of main memory, and  with a GPU (see :ref:`cuda_package`).
+On a multi-core host, :class:`.prlcnscdl.ConvBPDNDictLearn_Consensus` and :class:`.prlcnscdl.ConvBPDNMaskDcplDictLearn_Consensus` can be
+substantially faster than :class:`.cbpdndl.ConvBPDNDictLearn` and
+:class:`.cbpdndlmd.ConvBPDNMaskDictLearn` respectively. For large training datasets, the online CDL classes :class:`.onlinecdl.OnlineConvBPDNDictLearn` and :class:`.onlinecdl.OnlineConvBPDNMaskDictLearn` may be the best option, particularly for use on a host without very large amounts of main memory, and  with a GPU (see :ref:`cuda_package`).
 
 
 :ref:`Usage examples <example_convolutional_dictionary_learning_index>` are available.
