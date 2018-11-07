@@ -13,7 +13,7 @@ Notes
   <https://bwohlberg.github.io/jonga/>`_, for the ``__init__`` and
   ``solve`` methods.
 * Given the number of usage examples for the :doc:`inverse problems
-  <invprob>`, it has not been feasible to optimise the algorithm
+  <../invprob/index>`, it has not been feasible to optimise the algorithm
   options in all cases. While these examples should contain reasonable
   choices, they should not be assumed to be optimal.
 * The calculation of functional values and ADMM residuals can represent
@@ -33,9 +33,9 @@ Notes
       sporco.linalg.pyfftw_threads = 1
 
 * When run with option `Verbose` enabled, the :doc:`inverse problems
-  <invprob>` generate output in utf8 encoding, which may result in an
-  error when piping the output to a file. The simplest solution is to
-  define the environment variable ``PYTHONIOENCODING`` to ``utf-8``.
+  <../invprob/index>` generate output in utf8 encoding, which may result
+  in an error when piping the output to a file. The simplest solution is
+  to define the environment variable ``PYTHONIOENCODING`` to ``utf-8``.
   For example, in a ``bash`` shell::
 
       export PYTHONIOENCODING=utf-8

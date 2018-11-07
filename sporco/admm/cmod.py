@@ -20,16 +20,17 @@ __author__ = """Brendt Wohlberg <brendt@ieee.org>"""
 
 
 class CnstrMOD(admm.ADMMEqual):
-    r"""**Class inheritance structure**
+    r"""
+    ADMM algorithm for a constrained variant of the Method of Optimal
+    Directions (MOD) :cite:`engan-1999-method` problem, referred to here
+    as Constrained MOD (CMOD).
+
+    |
 
     .. inheritance-diagram:: CnstrMOD
        :parts: 2
 
     |
-
-    ADMM algorithm for a constrained variant of the Method of Optimal
-    Directions (MOD) :cite:`engan-1999-method` problem, referred to here
-    as Constrained MOD (CMOD).
 
     Solve the optimisation problem
 
@@ -105,7 +106,12 @@ class CnstrMOD(admm.ADMMEqual):
 
 
         def __init__(self, opt=None):
-            """Initialise CMOD algorithm options object."""
+            """
+            Parameters
+            ----------
+            opt : dict or None, optional (default None)
+              CMOD algorithm options
+            """
 
             if opt is None:
                 opt = {}
@@ -141,15 +147,14 @@ class CnstrMOD(admm.ADMMEqual):
 
     def __init__(self, Z, S, dsz=None, opt=None):
         """
-        Initialise a CnstrMOD object with problem parameters.
 
         |
 
         **Call graph**
 
-        .. image:: _static/jonga/cmod_init.svg
+        .. image:: ../_static/jonga/cmod_init.svg
            :width: 20%
-           :target: _static/jonga/cmod_init.svg
+           :target: ../_static/jonga/cmod_init.svg
 
         |
 

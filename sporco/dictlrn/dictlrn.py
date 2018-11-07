@@ -40,8 +40,7 @@ class IterStatsConfig(object):
 
     def __init__(self, isfld, isxmap, isdmap, evlmap, hdrtxt, hdrmap,
                  fmtmap=None):
-        """Initialise configuration object.
-
+        """
         Parameters
         ----------
         isfld : list
@@ -218,7 +217,12 @@ class DictLearn(with_metaclass(_DictLearn_Meta, object)):
 
 
         def __init__(self, opt=None):
-            """Initialise flexible dictionary learning algorithm options."""
+            """
+            Parameters
+            ----------
+            opt : dict or None, optional (default None)
+              DictLearn algorithm options
+            """
 
             if opt is None:
                 opt = {}
@@ -238,8 +242,6 @@ class DictLearn(with_metaclass(_DictLearn_Meta, object)):
 
     def __init__(self, xstep, dstep, opt=None, isc=None):
         """
-        Initialise a DictLearn object with problem size and options.
-
         Parameters
         ----------
         xstep : bpdn (or similar interface) object

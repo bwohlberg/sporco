@@ -102,7 +102,12 @@ class SplineL1(admm.ADMM):
 
 
         def __init__(self, opt=None):
-            """Initialise SplineL1 algorithm options object."""
+            """
+            Parameters
+            ----------
+            opt : dict or None, optional (default None)
+              SplineL1 algorithm options
+            """
 
             if opt is None:
                 opt = {}
@@ -122,8 +127,6 @@ class SplineL1(admm.ADMM):
 
     def __init__(self, S, lmbda, opt=None, axes=(0, 1)):
         """
-        Initialise a SplineL1 object with problem parameters.
-
         Parameters
         ----------
         S : array_like

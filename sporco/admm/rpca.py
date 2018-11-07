@@ -91,7 +91,12 @@ class RobustPCA(admm.ADMM):
 
 
         def __init__(self, opt=None):
-            """Initialise RobustPCA algorithm options object."""
+            """
+            Parameters
+            ----------
+            opt : dict or None, optional (default None)
+              RobustPCA algorithm options
+            """
 
             if opt is None:
                 opt = {}
@@ -111,8 +116,6 @@ class RobustPCA(admm.ADMM):
 
     def __init__(self, S, lmbda=None, opt=None):
         """
-        Initialise a RobustPCA object with problem parameters.
-
         Parameters
         ----------
         S : array_like

@@ -33,10 +33,10 @@ sections.
 Initialisation
 --------------
 
-The ``__init__`` method of the derived class should call
-:meth:`.ADMMTwoBlockCnstrnt.__init__` to ensure proper
-initialisation. The interface is similar to that of
-:meth:`.ADMM.__init__` except for the introduction of parameters
+The ``__init__`` method of the derived class should call the
+:class:`.ADMMTwoBlockCnstrnt` ``__init__`` method to ensure proper
+initialisation. The interface is similar to that of :class:`.ADMM`
+``__init__`` method except for the introduction of parameters
 ``blkaxis`` and ``blkidx`` that specify how the blocks of
 :math:`\mathbf{y}` are concatenated into a single array.
 

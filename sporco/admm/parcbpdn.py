@@ -1,3 +1,13 @@
+# -*- coding: utf-8 -*-
+# Copyright (C) 2018 by Erik Skau <ewskau@gmail.com>
+#                       Brendt Wohlberg <brendt@ieee.org>
+# All rights reserved. BSD 3-clause License.
+# This file is part of the SPORCO package. Details of the copyright
+# and user license can be found in the 'LICENSE.txt' file distributed
+# with the package.
+
+"""Parallel ADMM algorithm for Convolutional BPDN"""
+
 from __future__ import division
 from __future__ import absolute_import
 from __future__ import print_function
@@ -13,6 +23,10 @@ from sporco.admm.cbpdn import GenericConvBPDN
 import sporco.cnvrep as cr
 # Required due to pyFFTW bug #135 - see "Notes" section of SPORCO docs.
 sl.pyfftw_threads = 1
+
+
+
+__all__ = ['ParConvBPDN']
 
 
 # Initialise global variables required and used my multiprocessing
@@ -332,15 +346,16 @@ def par_compute_residuals(i):
 
 
 class ParConvBPDN(GenericConvBPDN):
-    r"""**Class inheritance structure**
-
-    .. inheritance-diagram:: GenericConvBPDN
-       :parts: 2
+    r"""
+    Parallel ADMM algorithm for Convolutional BPDN (CBPDN) with or
+    without a spatial mask :cite:`skau-2018-fast`.
 
     |
 
-    Parallel ADMM algorithm for Convolutional BPDN (CBPDN) with or
-    without a spatial mask :cite:`skau-2018-fast`.
+    .. inheritance-diagram:: ParConvBPDN
+       :parts: 2
+
+    |
 
     Solve the optimisation problem
 
@@ -468,7 +483,12 @@ class ParConvBPDN(GenericConvBPDN):
                          'U1': None})
 
         def __init__(self, opt=None):
-            """Initialise ConvBPDN algorithm options object."""
+            """
+            Parameters
+            ----------
+            opt : dict or None, optional (default None)
+               ParConvBPDN algorithm options
+            """
 
             if opt is None:
                 opt = {}
@@ -482,8 +502,7 @@ class ParConvBPDN(GenericConvBPDN):
 
     def __init__(self, D, S, lmbda=None, W=None, opt=None, nproc=None,
                  ngrp=None, dimK=None, dimN=2):
-        """Initialise a ParConvBPDN object with problem parameters.
-
+        """
         Parameters
         ----------
         D : array_like

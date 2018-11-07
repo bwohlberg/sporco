@@ -13,7 +13,6 @@ from __future__ import print_function
 from builtins import range
 
 import copy
-import functools
 import numpy as np
 
 from sporco import cdict
@@ -136,7 +135,12 @@ class FISTA(common.IterativeSolver):
                     'AutoStop': {'Enabled': False, 'Tau0': 1e-2}}
 
         def __init__(self, opt=None):
-            """Initialise FISTA algorithm options object."""
+            """
+            Parameters
+            ----------
+            opt : dict or None, optional (default None)
+              FISTA algorithm options
+            """
 
             if opt is None:
                 opt = {}
@@ -180,8 +184,6 @@ class FISTA(common.IterativeSolver):
 
     def __init__(self, Nx, xshape, dtype, opt=None):
         r"""
-        Initialise a FISTA object with problem size and options.
-
         Parameters
         ----------
         Nx : int
@@ -661,15 +663,16 @@ class FISTA(common.IterativeSolver):
 
 
 class FISTADFT(FISTA):
-    r"""**Class inheritance structure**
+    r"""
+    Base class for FISTA algorithms with gradients and updates computed
+    in the frequency domain.
+
+    |
 
     .. inheritance-diagram:: FISTADFT
        :parts: 2
 
     |
-
-    Base class for FISTA algorithms with gradients and updates computed
-    in the frequency domain.
 
     Solve optimisation problems of the form
 
@@ -693,7 +696,12 @@ class FISTADFT(FISTA):
         defaults = copy.deepcopy(FISTA.Options.defaults)
 
         def __init__(self, opt=None):
-            """Initialise FISTADFT algorithm options object."""
+            """
+            Parameters
+            ----------
+            opt : dict or None, optional (default None)
+              FISTADFT algorithm options
+            """
 
             if opt is None:
                 opt = {}
@@ -704,8 +712,6 @@ class FISTADFT(FISTA):
 
     def __init__(self, xshape, dtype, opt=None):
         """
-        Initialise an FISTADFT object with problem size and options.
-
         Parameters
         ----------
         xshape : tuple of ints

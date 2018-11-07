@@ -5,8 +5,8 @@
 # and user license can be found in the 'LICENSE.txt' file distributed
 # with the package.
 
-"""Classes for ADMM algorithm for the variants of the Convolutional BPDN
-problem with Total Variation regularisation terms"""
+"""Classes for ADMM algorithms for convolutional sparse coding with
+Total Variation regularisation terms"""
 
 from __future__ import division
 from __future__ import print_function
@@ -26,16 +26,17 @@ __author__ = """Brendt Wohlberg <brendt@ieee.org>"""
 
 
 class ConvBPDNScalarTV(admm.ADMM):
-    r"""**Class inheritance structure**
+    r"""
+    ADMM algorithm for an extension of Convolutional BPDN including
+    terms penalising the total variation of each coefficient map
+    :cite:`wohlberg-2017-convolutional`.
+
+    |
 
     .. inheritance-diagram:: ConvBPDNScalarTV
        :parts: 2
 
     |
-
-    ADMM algorithm for an extension of Convolutional BPDN including
-    terms penalising the total variation of each coefficient map
-    :cite:`wohlberg-2017-convolutional`.
 
     Solve the optimisation problem
 
@@ -135,7 +136,12 @@ class ConvBPDNScalarTV(admm.ADMM):
 
 
         def __init__(self, opt=None):
-            """Initialise ConvBPDNScalarTV algorithm options object"""
+            """
+            Parameters
+            ----------
+            opt : dict or None, optional (default None)
+              ConvBPDNScalarTV algorithm options
+            """
 
             if opt is None:
                 opt = {}
@@ -152,16 +158,14 @@ class ConvBPDNScalarTV(admm.ADMM):
 
     def __init__(self, D, S, lmbda, mu=0.0, opt=None, dimK=None, dimN=2):
         """
-        Initialise a ConvBPDNScalarTV object with problem parameters.
-
 
         |
 
         **Call graph**
 
-        .. image:: _static/jonga/cbpdnstv_init.svg
+        .. image:: ../_static/jonga/cbpdnstv_init.svg
            :width: 20%
-           :target: _static/jonga/cbpdnstv_init.svg
+           :target: ../_static/jonga/cbpdnstv_init.svg
 
         |
 
@@ -568,16 +572,17 @@ class ConvBPDNScalarTV(admm.ADMM):
 
 
 class ConvBPDNVectorTV(ConvBPDNScalarTV):
-    r"""**Class inheritance structure**
+    r"""
+    ADMM algorithm for an extension of Convolutional BPDN including
+    a term penalising the vector total variation of the coefficient maps
+    :cite:`wohlberg-2017-convolutional`.
+
+    |
 
     .. inheritance-diagram:: ConvBPDNVectorTV
        :parts: 2
 
     |
-
-    ADMM algorithm for an extension of Convolutional BPDN including
-    a term penalising the vector total variation of the coefficient maps
-    :cite:`wohlberg-2017-convolutional`.
 
     Solve the optimisation problem
 
@@ -660,16 +665,14 @@ class ConvBPDNVectorTV(ConvBPDNScalarTV):
 
     def __init__(self, D, S, lmbda, mu=0.0, opt=None, dimK=None, dimN=2):
         """
-        Initialise a ConvBPDNVectorTV object with problem parameters.
-
 
         |
 
         **Call graph**
 
-        .. image:: _static/jonga/cbpdnvtv_init.svg
+        .. image:: ../_static/jonga/cbpdnvtv_init.svg
            :width: 20%
-           :target: _static/jonga/cbpdnvtv_init.svg
+           :target: ../_static/jonga/cbpdnvtv_init.svg
 
         |
 
@@ -725,16 +728,17 @@ class ConvBPDNVectorTV(ConvBPDNScalarTV):
 
 
 class ConvBPDNRecTV(admm.ADMM):
-    r"""**Class inheritance structure**
+    r"""
+    ADMM algorithm for an extension of Convolutional BPDN including
+    terms penalising the total variation of the reconstruction from the
+    sparse representation :cite:`wohlberg-2017-convolutional`.
+
+    |
 
     .. inheritance-diagram:: ConvBPDNRecTV
        :parts: 2
 
     |
-
-    ADMM algorithm for an extension of Convolutional BPDN including
-    terms penalising the total variation of the reconstruction from the
-    sparse representation :cite:`wohlberg-2017-convolutional`.
 
     Solve the optimisation problem
 
@@ -820,7 +824,7 @@ class ConvBPDNRecTV(admm.ADMM):
 
 
     class Options(cbpdn.ConvBPDN.Options):
-        r"""ConvBPDNScalarTV algorithm options
+        r"""ConvBPDNRecTV algorithm options
 
         Options include all of those defined in
         :class:`.admm.cbpdn.ConvBPDN.Options`, together with additional
@@ -841,7 +845,12 @@ class ConvBPDNRecTV(admm.ADMM):
 
 
         def __init__(self, opt=None):
-            """Initialise ConvBPDNRecTV algorithm options object"""
+            """
+            Parameters
+            ----------
+            opt : dict or None, optional (default None)
+              ConvBPDNRecTV algorithm options
+            """
 
             if opt is None:
                 opt = {}
@@ -858,16 +867,14 @@ class ConvBPDNRecTV(admm.ADMM):
 
     def __init__(self, D, S, lmbda, mu=0.0, opt=None, dimK=None, dimN=2):
         """
-        Initialise a ConvBPDNRecTV object with problem parameters.
-
 
         |
 
         **Call graph**
 
-        .. image:: _static/jonga/cbpdnrtv_init.svg
+        .. image:: ../_static/jonga/cbpdnrtv_init.svg
            :width: 20%
-           :target: _static/jonga/cbpdnrtv_init.svg
+           :target: ../_static/jonga/cbpdnrtv_init.svg
 
         |
 

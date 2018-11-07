@@ -21,8 +21,8 @@ methods and attributes in the following sections.
 Initialisation
 --------------
 
-The ``__init__`` method of the derived class should call
-:meth:`.FISTA.__init__` to ensure proper initialisation.
+The ``__init__`` method of the derived class should call the
+:class:`.FISTA` ``__init__`` method to ensure proper initialisation.
 
 State variable :math:`\mathbf{x}` is initialised to zero by
 :meth:`.FISTA.xinit`. This method should be overridden if a different

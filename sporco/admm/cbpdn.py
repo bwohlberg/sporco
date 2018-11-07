@@ -27,17 +27,18 @@ __author__ = """Brendt Wohlberg <brendt@ieee.org>"""
 
 
 class GenericConvBPDN(admm.ADMMEqual):
-    r"""**Class inheritance structure**
+    r"""
+    Base class for ADMM algorithm for solving variants of the
+    Convolutional BPDN (CBPDN) :cite:`wohlberg-2014-efficient`
+    :cite:`wohlberg-2016-efficient` :cite:`wohlberg-2016-convolutional`
+    problem.
+
+    |
 
     .. inheritance-diagram:: GenericConvBPDN
        :parts: 2
 
     |
-
-    Base class for ADMM algorithm for solving variants of the
-    Convolutional BPDN (CBPDN) :cite:`wohlberg-2014-efficient`
-    :cite:`wohlberg-2016-efficient` :cite:`wohlberg-2016-convolutional`
-    problem.
 
     The generic problem form is
 
@@ -133,7 +134,12 @@ class GenericConvBPDN(admm.ADMMEqual):
 
 
         def __init__(self, opt=None):
-            """Initialise GenericConvBPDN algorithm options object."""
+            """
+            Parameters
+            ----------
+            opt : dict or None, optional (default None)
+              GenericConvBPDN algorithm options
+            """
 
             if opt is None:
                 opt = {}
@@ -167,8 +173,6 @@ class GenericConvBPDN(admm.ADMMEqual):
 
     def __init__(self, D, S, opt=None, dimK=None, dimN=2):
         """
-        Initialise a GenericConvBPDN object with problem parameters.
-
         This class supports an arbitrary number of spatial dimensions,
         `dimN`, with a default of 2. The input dictionary `D` is either
         `dimN` + 1 dimensional, in which case each spatial component
@@ -370,16 +374,17 @@ class GenericConvBPDN(admm.ADMMEqual):
 
 
 class ConvBPDN(GenericConvBPDN):
-    r"""**Class inheritance structure**
+    r"""
+    ADMM algorithm for the Convolutional BPDN (CBPDN)
+    :cite:`wohlberg-2014-efficient` :cite:`wohlberg-2016-efficient`
+    :cite:`wohlberg-2016-convolutional` problem.
+
+    |
 
     .. inheritance-diagram:: ConvBPDN
        :parts: 2
 
     |
-
-    ADMM algorithm for the Convolutional BPDN (CBPDN)
-    :cite:`wohlberg-2014-efficient` :cite:`wohlberg-2016-efficient`
-    :cite:`wohlberg-2016-convolutional` problem.
 
     Solve the optimisation problem
 
@@ -481,7 +486,12 @@ class ConvBPDN(GenericConvBPDN):
 
 
         def __init__(self, opt=None):
-            """Initialise ConvBPDN algorithm options object."""
+            """
+            Parameters
+            ----------
+            opt : dict or None, optional (default None)
+              ConvBPDN algorithm options
+            """
 
             if opt is None:
                 opt = {}
@@ -497,8 +507,6 @@ class ConvBPDN(GenericConvBPDN):
 
     def __init__(self, D, S, lmbda=None, opt=None, dimK=None, dimN=2):
         """
-        Initialise a ConvBPDN object with problem parameters.
-
         This class supports an arbitrary number of spatial dimensions,
         `dimN`, with a default of 2. The input dictionary `D` is either
         `dimN` + 1 dimensional, in which case each spatial component
@@ -506,10 +514,10 @@ class ConvBPDN(GenericConvBPDN):
         channel, or `dimN` + 2 dimensional, in which case the final
         dimension is assumed to contain the channels (e.g. colour
         channels in the case of images). The input signal set `S` is
-        either `dimN` dimensional (no channels, only one signal), `dimN` + 1
-        dimensional (either multiple channels or multiple signals), or
-        `dimN` + 2 dimensional (multiple channels and multiple signals).
-        Determination of problem dimensions is handled by
+        either `dimN` dimensional (no channels, only one signal), `dimN`
+        + 1 dimensional (either multiple channels or multiple signals),
+        or `dimN` + 2 dimensional (multiple channels and multiple
+        signals). Determination of problem dimensions is handled by
         :class:`.cnvrep.CSC_ConvRepIndexing`.
 
 
@@ -517,9 +525,9 @@ class ConvBPDN(GenericConvBPDN):
 
         **Call graph**
 
-        .. image:: _static/jonga/cbpdn_init.svg
+        .. image:: ../_static/jonga/cbpdn_init.svg
            :width: 20%
-           :target: _static/jonga/cbpdn_init.svg
+           :target: ../_static/jonga/cbpdn_init.svg
 
         |
 
@@ -616,16 +624,17 @@ class ConvBPDN(GenericConvBPDN):
 
 
 class ConvBPDNJoint(ConvBPDN):
-    r"""**Class inheritance structure**
+    r"""
+    ADMM algorithm for Convolutional BPDN with joint sparsity via an
+    :math:`\ell_{2,1}` norm term :cite:`wohlberg-2016-convolutional`
+    (the :math:`\ell_2` norms are computed over the channel index).
+
+    |
 
     .. inheritance-diagram:: ConvBPDNJoint
        :parts: 2
 
     |
-
-    ADMM algorithm for Convolutional BPDN with joint sparsity via an
-    :math:`\ell_{2,1}` norm term :cite:`wohlberg-2016-convolutional`
-    (the :math:`\ell_2` norms are computed over the channel index).
 
     Solve the optimisation problem
 
@@ -702,7 +711,12 @@ class ConvBPDNJoint(ConvBPDN):
 
 
         def __init__(self, opt=None):
-            """Initialise ConvBPDNJoint algorithm options object."""
+            """
+            Parameters
+            ----------
+            opt : dict or None, optional (default None)
+              ConvBPDNJoint algorithm options
+            """
 
             if opt is None:
                 opt = {}
@@ -719,15 +733,13 @@ class ConvBPDNJoint(ConvBPDN):
 
     def __init__(self, D, S, lmbda=None, mu=0.0, opt=None, dimK=None, dimN=2):
         """
-        Initialise a ConvBPDNJoint object with problem parameters.
-
         |
 
         **Call graph**
 
-        .. image:: _static/jonga/cbpdnjnt_init.svg
+        .. image:: ../_static/jonga/cbpdnjnt_init.svg
            :width: 20%
-           :target: _static/jonga/cbpdnjnt_init.svg
+           :target: ../_static/jonga/cbpdnjnt_init.svg
 
         |
 
@@ -787,15 +799,16 @@ class ConvBPDNJoint(ConvBPDN):
 
 
 class ConvElasticNet(ConvBPDN):
-    r"""**Class inheritance structure**
+    r"""
+    ADMM algorithm for a convolutional form of the elastic net problem
+    :cite:`zou-2005-regularization`.
+
+    |
 
     .. inheritance-diagram:: ConvElasticNet
        :parts: 2
 
     |
-
-    ADMM algorithm for a convolutional form of the elastic net problem
-    :cite:`zou-2005-regularization`.
 
     Solve the optimisation problem
 
@@ -859,15 +872,13 @@ class ConvElasticNet(ConvBPDN):
 
     def __init__(self, D, S, lmbda=None, mu=0.0, opt=None, dimK=None, dimN=2):
         """
-        Initialise a ConvElasticNet object with problem parameters.
-
         |
 
         **Call graph**
 
-        .. image:: _static/jonga/celnet_init.svg
+        .. image:: ../_static/jonga/celnet_init.svg
            :width: 20%
-           :target: _static/jonga/celnet_init.svg
+           :target: ../_static/jonga/celnet_init.svg
 
         |
 
@@ -967,16 +978,17 @@ class ConvElasticNet(ConvBPDN):
 
 
 class ConvBPDNGradReg(ConvBPDN):
-    r"""**Class inheritance structure**
+    r"""
+    ADMM algorithm for an extension of Convolutional BPDN including a
+    term penalising the gradient of the coefficient maps
+    :cite:`wohlberg-2016-convolutional2`.
+
+    |
 
     .. inheritance-diagram:: ConvBPDNGradReg
        :parts: 2
 
     |
-
-    ADMM algorithm for an extension of Convolutional BPDN including a
-    term penalising the gradient of the coefficient maps
-    :cite:`wohlberg-2016-convolutional2`.
 
     Solve the optimisation problem
 
@@ -1051,7 +1063,12 @@ class ConvBPDNGradReg(ConvBPDN):
 
 
         def __init__(self, opt=None):
-            """Initialise ConvBPDNGradReg algorithm options object"""
+            """
+            Parameters
+            ----------
+            opt : dict or None, optional (default None)
+              ConvBPDNGradReg algorithm options
+            """
 
             if opt is None:
                 opt = {}
@@ -1068,15 +1085,13 @@ class ConvBPDNGradReg(ConvBPDN):
 
     def __init__(self, D, S, lmbda=None, mu=0.0, opt=None, dimK=None, dimN=2):
         """
-        Initialise a ConvBPDNGradReg object with problem parameters.
-
         |
 
         **Call graph**
 
-        .. image:: _static/jonga/cbpdngrd_init.svg
+        .. image:: ../_static/jonga/cbpdngrd_init.svg
            :width: 20%
-           :target: _static/jonga/cbpdngrd_init.svg
+           :target: ../_static/jonga/cbpdngrd_init.svg
 
         |
 
@@ -1191,15 +1206,16 @@ class ConvBPDNGradReg(ConvBPDN):
 
 
 class ConvBPDNProjL1(GenericConvBPDN):
-    r"""**Class inheritance structure**
+    r"""
+    ADMM algorithm for a ConvBPDN variant with projection onto the
+    :math:`\ell_1` ball instead of an :math:`\ell_1` penalty.
+
+    |
 
     .. inheritance-diagram:: ConvBPDNProjL1
        :parts: 2
 
     |
-
-    ADMM algorithm for a ConvBPDN variant with projection onto the
-    :math:`\ell_1` ball instead of an :math:`\ell_1` penalty.
 
     Solve the optimisation problem
 
@@ -1269,7 +1285,12 @@ class ConvBPDNProjL1(GenericConvBPDN):
 
 
         def __init__(self, opt=None):
-            """Initialise ConvBPDNProjL1 algorithm options object."""
+            """
+            Parameters
+            ----------
+            opt : dict or None, optional (default None)
+              ConvBPDNProjL1 algorithm options
+            """
 
             if opt is None:
                 opt = {}
@@ -1285,16 +1306,13 @@ class ConvBPDNProjL1(GenericConvBPDN):
 
     def __init__(self, D, S, gamma, opt=None, dimK=None, dimN=2):
         """
-        Initialise a ConvBPDNProjL1 object with problem parameters.
-
-
         |
 
         **Call graph**
 
-        .. image:: _static/jonga/cbpdnprjl1_init.svg
+        .. image:: ../_static/jonga/cbpdnprjl1_init.svg
            :width: 20%
-           :target: _static/jonga/cbpdnprjl1_init.svg
+           :target: ../_static/jonga/cbpdnprjl1_init.svg
 
         |
 
@@ -1369,21 +1387,23 @@ class ConvBPDNProjL1(GenericConvBPDN):
 
 
 class ConvTwoBlockCnstrnt(admm.ADMMTwoBlockCnstrnt):
-    r"""**Class inheritance structure**
-
-    .. inheritance-diagram:: ConvTwoBlockCnstrnt
-       :parts: 2
-
-    |
-
+    r"""
     Base class for ADMM algorithms for problems of the form
 
     .. math::
        \mathrm{argmin}_\mathbf{x} \;
        g_0(D \mathbf{x} - \mathbf{s}) + g_1(\mathbf{x}) \;\;,
 
-    where :math:`D \mathbf{x} = \sum_m \mathbf{d}_m * \mathbf{x}_m`,
-    via an ADMM problem of the form
+    where :math:`D \mathbf{x} = \sum_m \mathbf{d}_m * \mathbf{x}_m`.
+
+    |
+
+    .. inheritance-diagram:: ConvTwoBlockCnstrnt
+       :parts: 2
+
+    |
+
+    The problem is solved via an ADMM problem of the form
 
     .. math::
        \mathrm{argmin}_{\mathbf{x},\mathbf{y}_0,\mathbf{y}_1} \;
@@ -1480,7 +1500,12 @@ class ConvTwoBlockCnstrnt(admm.ADMMTwoBlockCnstrnt):
 
 
         def __init__(self, opt=None):
-            """Initialise ConvTwoBlockCnstrnt algorithm options object."""
+            """
+            Parameters
+            ----------
+            opt : dict or None, optional (default None)
+              ConvTwoBlockCnstrnt algorithm options
+            """
 
             if opt is None:
                 opt = {}
@@ -1497,8 +1522,6 @@ class ConvTwoBlockCnstrnt(admm.ADMMTwoBlockCnstrnt):
 
     def __init__(self, D, S, opt=None, dimK=None, dimN=2):
         """
-        Initialise a ConvTwoBlockCnstrnt object with problem size and options.
-
         Parameters
         ----------
         D : array_like
@@ -1770,35 +1793,38 @@ class ConvTwoBlockCnstrnt(admm.ADMMTwoBlockCnstrnt):
     def rsdl_s(self, Yprev, Y):
         """Compute dual residual vector."""
 
-        return self.rho*np.linalg.norm(self.cnst_AT(self.U))
+        return self.rho * self.cnst_AT(self.U)
 
 
 
     def rsdl_sn(self, U):
         """Compute dual residual normalisation term."""
 
-        return self.rho*np.linalg.norm(U)
+        return self.rho * np.linalg.norm(U)
 
 
 
 
 
 class ConvMinL1InL2Ball(ConvTwoBlockCnstrnt):
-    r"""**Class inheritance structure**
+    r"""
+    ADMM algorithm for the problem with an :math:`\ell_1` objective and
+    an :math:`\ell_2` constraint, following the general approach proposed
+    in :cite:`afonso-2011-augmented`.
+
+    |
 
     .. inheritance-diagram:: ConvMinL1InL2Ball
        :parts: 2
 
     |
 
-    ADMM algorithm for the problem with an :math:`\ell_1` objective and
-    an :math:`\ell_2` constraint, following the general approach proposed
-    in :cite:`afonso-2011-augmented`. The :math:`\mathbf{y}` step is
-    essentially the same as that of :class:`.admm.bpdn.MinL1InL2Ball`
-    (with the trivial difference of a swap between the roles of
-    :math:`\mathbf{y}_0` and :math:`\mathbf{y}_1`). The :math:`\mathbf{x}`
-    step uses the solver from :cite:`wohlberg-2014-efficient` for
-    single-channel dictionaries, and the solver from
+    The :math:`\mathbf{y}` step is essentially the same as that of
+    :class:`.admm.bpdn.MinL1InL2Ball` (with the trivial difference of a
+    swap between the roles of :math:`\mathbf{y}_0` and
+    :math:`\mathbf{y}_1`). The :math:`\mathbf{x}` step uses the solver
+    from :cite:`wohlberg-2014-efficient` for single-channel
+    dictionaries, and the solver from
     :cite:`wohlberg-2016-convolutional` for multi-channel dictionaries.
 
     Solve the Single Measurement Vector (SMV) problem
@@ -1887,7 +1913,12 @@ class ConvMinL1InL2Ball(ConvTwoBlockCnstrnt):
                                     'RsdlRatio': 1.2, 'RsdlTarget': 1.0})
 
         def __init__(self, opt=None):
-            """Initialise ConvMinL1InL2Ball algorithm options object."""
+            """
+            Parameters
+            ----------
+            opt : dict or None, optional (default None)
+              ConvMinL1InL2Ball algorithm options
+            """
 
             if opt is None:
                 opt = {}
@@ -1903,16 +1934,14 @@ class ConvMinL1InL2Ball(ConvTwoBlockCnstrnt):
 
     def __init__(self, D, S, epsilon, opt=None, dimK=None, dimN=2):
         r"""
-        Initialise an ConvMinL1InL2Ball object with problem parameters.
-
 
         |
 
         **Call graph**
 
-        .. image:: _static/jonga/cbpdnml1l2_init.svg
+        .. image:: ../_static/jonga/cbpdnml1l2_init.svg
            :width: 20%
-           :target: _static/jonga/cbpdnml1l2_init.svg
+           :target: ../_static/jonga/cbpdnml1l2_init.svg
 
         |
 
@@ -2014,15 +2043,16 @@ class ConvMinL1InL2Ball(ConvTwoBlockCnstrnt):
 
 
 class ConvBPDNMaskDcpl(ConvTwoBlockCnstrnt):
-    r"""**Class inheritance structure**
+    r"""
+    ADMM algorithm for Convolutional BPDN with Mask Decoupling
+    :cite:`heide-2015-fast`.
+
+    |
 
     .. inheritance-diagram:: ConvBPDNMaskDcpl
        :parts: 2
 
     |
-
-    ADMM algorithm for Convolutional BPDN with Mask Decoupling
-    :cite:`heide-2015-fast`.
 
     Solve the optimisation problem
 
@@ -2098,7 +2128,12 @@ class ConvBPDNMaskDcpl(ConvTwoBlockCnstrnt):
 
 
         def __init__(self, opt=None):
-            """Initialise ConvTwoBlockCnstrnt algorithm options object"""
+            """
+            Parameters
+            ----------
+            opt : dict or None, optional (default None)
+              ConvBPDNMaskDcpl algorithm options
+            """
 
             if opt is None:
                 opt = {}
@@ -2113,15 +2148,15 @@ class ConvBPDNMaskDcpl(ConvTwoBlockCnstrnt):
 
 
     def __init__(self, D, S, lmbda, W=None, opt=None, dimK=None, dimN=2):
-        """Initialise a ConvBPDNMaskDcpl object with problem parameters.
+        """
 
         |
 
         **Call graph**
 
-        .. image:: _static/jonga/cbpdnmd_init.svg
+        .. image:: ../_static/jonga/cbpdnmd_init.svg
            :width: 20%
-           :target: _static/jonga/cbpdnmd_init.svg
+           :target: ../_static/jonga/cbpdnmd_init.svg
 
         |
 
@@ -2238,8 +2273,7 @@ class AddMaskSim(object):
     """
 
     def __init__(self, cbpdnclass, D, S, W, *args, **kwargs):
-        """Initialise an AddMaskSim object with problem parameters.
-
+        """
         Parameters
         ----------
         cbpdnclass : class name

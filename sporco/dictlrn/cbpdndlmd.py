@@ -236,15 +236,18 @@ def ConvCnstrMODMask(*args, **kwargs):
 
 
 class ConvBPDNMaskDictLearn(dictlrn.DictLearn):
-    r"""**Class inheritance structure**
+    r"""
+    Dictionary learning by alternating between sparse coding and dictionary
+    update stages.
+
+    |
 
     .. inheritance-diagram:: ConvBPDNMaskDictLearn
        :parts: 2
 
     |
 
-    Dictionary learning by alternating between sparse coding and dictionary
-    update stages. The sparse coding is performed using
+    The sparse coding is performed using
     :class:`.admm.cbpdn.ConvBPDNMaskDcpl` (see :cite:`heide-2015-fast`) or
     :class:`.fista.cbpdn.ConvBPDNMask` (see :cite:`chalasani-2013-fast` and
     :cite:`wohlberg-2016-efficient`), and the dictionary update is computed
@@ -353,9 +356,7 @@ class ConvBPDNMaskDictLearn(dictlrn.DictLearn):
 
 
         def __init__(self, opt=None, xmethod=None, dmethod=None):
-            """Initialise ConvBPDNMaskDcpl dictionary learning algorithm
-            options.
-
+            """
             Valid values for parameters ``xmethod`` and ``dmethod`` are
             documented in functions :func:`.ConvBPDNMask` and
             :func:`.ConvCnstrMODMask` respectively.
@@ -392,16 +393,14 @@ class ConvBPDNMaskDictLearn(dictlrn.DictLearn):
     def __init__(self, D0, S, lmbda, W, opt=None, xmethod=None,
                  dmethod=None, dimK=1, dimN=2):
         """
-        Initialise a ConvBPDNMaskDictLearn object with problem size and
-        options.
 
         |
 
         **Call graph**
 
-        .. image:: _static/jonga/cbpdnmddl_init.svg
+        .. image:: ../_static/jonga/cbpdnmddl_init.svg
            :width: 20%
-           :target: _static/jonga/cbpdnmddl_init.svg
+           :target: ../_static/jonga/cbpdnmddl_init.svg
 
         |
 

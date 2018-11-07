@@ -25,16 +25,15 @@ __author__ = """Brendt Wohlberg <brendt@ieee.org>"""
 
 class GenericBPDN(admm.ADMMEqual):
     r"""
-    **Class inheritance structure**
+    Base class for ADMM algorithm for solving variants of the
+    Basis Pursuit DeNoising (BPDN) :cite:`chen-1998-atomic` problem.
+
+    |
 
     .. inheritance-diagram:: GenericBPDN
        :parts: 2
 
     |
-
-
-    Base class for ADMM algorithm for solving variants of the
-    Basis Pursuit DeNoising (BPDN) :cite:`chen-1998-atomic` problem.
 
     The generic problem form is
 
@@ -114,7 +113,12 @@ class GenericBPDN(admm.ADMMEqual):
                                     'RsdlRatio': 1.2})
 
         def __init__(self, opt=None):
-            """Initialise GenericBPDN algorithm options object."""
+            """
+            Parameters
+            ----------
+            opt : dict or None, optional (default None)
+              GenericBPDN algorithm options
+            """
 
             if opt is None:
                 opt = {}
@@ -148,8 +152,6 @@ class GenericBPDN(admm.ADMMEqual):
 
     def __init__(self, D, S, opt=None):
         """
-        Initialise a GenericBPDN object with problem parameters.
-
         Parameters
         ----------
         D : array_like, shape (N, M)
@@ -269,15 +271,17 @@ class GenericBPDN(admm.ADMMEqual):
 
 
 class BPDN(GenericBPDN):
-    r"""**Class inheritance structure**
+    r"""
+    ADMM algorithm for the Basis Pursuit DeNoising (BPDN)
+    :cite:`chen-1998-atomic` problem.
+
+    |
 
     .. inheritance-diagram:: BPDN
        :parts: 2
 
     |
 
-    ADMM algorithm for the Basis Pursuit DeNoising (BPDN)
-    :cite:`chen-1998-atomic` problem.
 
     Solve the Single Measurement Vector (SMV) BPDN problem
 
@@ -353,7 +357,12 @@ class BPDN(GenericBPDN):
 
 
         def __init__(self, opt=None):
-            """Initialise BPDN algorithm options object."""
+            """
+            Parameters
+            ----------
+            opt : dict or None, optional (default None)
+              BPDN algorithm options
+            """
 
             if opt is None:
                 opt = {}
@@ -369,15 +378,13 @@ class BPDN(GenericBPDN):
 
     def __init__(self, D, S, lmbda=None, opt=None):
         """
-        Initialise a BPDN object with problem parameters.
-
         |
 
         **Call graph**
 
-        .. image:: _static/jonga/bpdn_init.svg
+        .. image:: ../_static/jonga/bpdn_init.svg
            :width: 20%
-           :target: _static/jonga/bpdn_init.svg
+           :target: ../_static/jonga/bpdn_init.svg
 
         |
 
@@ -463,16 +470,16 @@ class BPDN(GenericBPDN):
 
 class BPDNJoint(BPDN):
     r"""
-    **Class inheritance structure**
+    ADMM algorithm for BPDN with joint sparsity via an :math:`\ell_{2,1}`
+    norm term.
+
+    |
 
     .. inheritance-diagram:: BPDNJoint
        :parts: 2
 
     |
 
-
-    ADMM algorithm for BPDN with joint sparsity via an :math:`\ell_{2,1}`
-    norm term.
 
     Solve the optimisation problem
 
@@ -528,15 +535,13 @@ class BPDNJoint(BPDN):
 
     def __init__(self, D, S, lmbda=None, mu=0.0, opt=None):
         """
-        Initialise a BPDNJoint object with problem parameters.
-
         |
 
         **Call graph**
 
-        .. image:: _static/jonga/bpdnjnt_init.svg
+        .. image:: ../_static/jonga/bpdnjnt_init.svg
            :width: 20%
-           :target: _static/jonga/bpdnjnt_init.svg
+           :target: ../_static/jonga/bpdnjnt_init.svg
 
         |
 
@@ -587,15 +592,16 @@ class BPDNJoint(BPDN):
 
 
 class ElasticNet(BPDN):
-    r"""**Class inheritance structure**
+    r"""
+    ADMM algorithm for the elastic net :cite:`zou-2005-regularization`
+    problem.
+
+    |
 
     .. inheritance-diagram:: ElasticNet
        :parts: 2
 
     |
-
-    ADMM algorithm for the elastic net :cite:`zou-2005-regularization`
-    problem.
 
     Solve the optimisation problem
 
@@ -655,15 +661,13 @@ class ElasticNet(BPDN):
 
     def __init__(self, D, S, lmbda=None, mu=0.0, opt=None):
         """
-        Initialise an ElasticNet object with problem parameters.
-
         |
 
         **Call graph**
 
-        .. image:: _static/jonga/elnet_init.svg
+        .. image:: ../_static/jonga/elnet_init.svg
            :width: 20%
-           :target: _static/jonga/elnet_init.svg
+           :target: ../_static/jonga/elnet_init.svg
 
         |
 
@@ -746,18 +750,19 @@ class ElasticNet(BPDN):
 
 
 class BPDNProjL1(GenericBPDN):
-    r"""**Class inheritance structure**
+    r"""
+    ADMM algorithm for a BPDN variant with projection onto the
+    :math:`\ell_1` ball instead of an :math:`\ell_1` penalty.
+
+    |
 
     .. inheritance-diagram:: BPDNProjL1
        :parts: 2
 
     |
 
-
-    ADMM algorithm for a BPDN variant with projection onto the
-    :math:`\ell_1` ball instead of an :math:`\ell_1` penalty. This
-    variant of the BPDN problem was originally referred to as the lasso
-    :cite:`tibshirani-1996-regression`, but that name is now also
+    This variant of the BPDN problem was originally referred to as the
+    lasso :cite:`tibshirani-1996-regression`, but that name is now also
     frequently applied to the penalised form that is referred to here as
     the BPDN problem.
 
@@ -822,7 +827,12 @@ class BPDNProjL1(GenericBPDN):
 
 
         def __init__(self, opt=None):
-            """Initialise BPDNProjL1 algorithm options object."""
+            """
+            Parameters
+            ----------
+            opt : dict or None, optional (default None)
+              BPDNProjL1 algorithm options
+            """
 
             if opt is None:
                 opt = {}
@@ -838,15 +848,13 @@ class BPDNProjL1(GenericBPDN):
 
     def __init__(self, D, S, gamma, opt=None):
         """
-        Initialise a BPDNProjL1 object with problem parameters.
-
         |
 
         **Call graph**
 
-        .. image:: _static/jonga/bpdnprjl1_init.svg
+        .. image:: ../_static/jonga/bpdnprjl1_init.svg
            :width: 20%
-           :target: _static/jonga/bpdnprjl1_init.svg
+           :target: ../_static/jonga/bpdnprjl1_init.svg
 
         |
 
@@ -913,16 +921,17 @@ class BPDNProjL1(GenericBPDN):
 
 class MinL1InL2Ball(admm.ADMMTwoBlockCnstrnt):
     r"""
-    **Class inheritance structure**
+    ADMM algorithm for the problem with an :math:`\ell_1` objective and
+    an :math:`\ell_2` constraint.
+
+    |
 
     .. inheritance-diagram:: MinL1InL2Ball
        :parts: 2
 
     |
 
-
-    ADMM algorithm for the problem with an :math:`\ell_1` objective and
-    an :math:`\ell_2` constraint, following the approach proposed in
+    The solution is computed following the approach proposed in
     :cite:`afonso-2011-augmented`.
 
     Solve the Single Measurement Vector (SMV) problem
@@ -1006,7 +1015,12 @@ class MinL1InL2Ball(admm.ADMMTwoBlockCnstrnt):
                                     'RsdlRatio': 1.2, 'RsdlTarget': 1.0})
 
         def __init__(self, opt=None):
-            """Initialise MinL1InL2Ball algorithm options object."""
+            """
+            Parameters
+            ----------
+            opt : dict or None, optional (default None)
+              MinL1InL2Ball algorithm options
+            """
 
             if opt is None:
                 opt = {}
@@ -1022,15 +1036,13 @@ class MinL1InL2Ball(admm.ADMMTwoBlockCnstrnt):
 
     def __init__(self, D, S, epsilon, opt=None):
         r"""
-        Initialise an MinL1InL2Ball object with problem parameters.
-
         |
 
         **Call graph**
 
-        .. image:: _static/jonga/bpdnml1l2_init.svg
+        .. image:: ../_static/jonga/bpdnml1l2_init.svg
            :width: 20%
-           :target: _static/jonga/bpdnml1l2_init.svg
+           :target: ../_static/jonga/bpdnml1l2_init.svg
 
         |
 

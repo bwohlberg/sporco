@@ -26,15 +26,16 @@ __author__ = """Cristina Garcia-Cardona <cgarciac@lanl.gov>"""
 
 
 class ConvBPDN(fista.FISTADFT):
-    r"""**Class inheritance structure**
+    r"""
+    Base class for FISTA algorithm for the Convolutional BPDN (CBPDN)
+    :cite:`garcia-2017-convolutional` problem.
+
+    |
 
     .. inheritance-diagram:: ConvBPDN
        :parts: 2
 
     |
-
-    Base class for FISTA algorithm for the Convolutional BPDN (CBPDN)
-    :cite:`garcia-2017-convolutional` problem.
 
     The generic problem form is
 
@@ -117,7 +118,12 @@ class ConvBPDN(fista.FISTADFT):
 
 
         def __init__(self, opt=None):
-            """Initialise ConvBPDN algorithm options object."""
+            """
+            Parameters
+            ----------
+            opt : dict or None, optional (default None)
+              ConvBPDN algorithm options
+            """
 
             if opt is None:
                 opt = {}
@@ -138,8 +144,6 @@ class ConvBPDN(fista.FISTADFT):
 
     def __init__(self, D, S, lmbda=None, opt=None, dimK=None, dimN=2):
         """
-        Initialise a ConvBPDN object with problem parameters.
-
         This class supports an arbitrary number of spatial dimensions,
         `dimN`, with a default of 2. The input dictionary `D` is either
         `dimN` + 1 dimensional, in which case each spatial component
@@ -158,9 +162,9 @@ class ConvBPDN(fista.FISTADFT):
 
         **Call graph**
 
-        .. image:: _static/jonga/fista_cbpdn_init.svg
+        .. image:: ../_static/jonga/fista_cbpdn_init.svg
            :width: 20%
-           :target: _static/jonga/fista_cbpdn_init.svg
+           :target: ../_static/jonga/fista_cbpdn_init.svg
 
         |
 
@@ -338,14 +342,15 @@ class ConvBPDN(fista.FISTADFT):
 
 
 class ConvBPDNMask(ConvBPDN):
-    r"""**Class inheritance structure**
+    r"""
+    FISTA algorithm for Convolutional BPDN with a spatial mask.
+
+    |
 
     .. inheritance-diagram:: ConvBPDNMask
        :parts: 2
 
     |
-
-    FISTA algorithm for Convolutional BPDN with a spatial mask.
 
     Solve the optimisation problem
 
@@ -362,7 +367,7 @@ class ConvBPDNMask(ConvBPDN):
 
 
     def __init__(self, D, S, lmbda, W=None, opt=None, dimK=None, dimN=2):
-        """Initialise a ConvBPDNMask object with problem parameters.
+        """
 
         |
 

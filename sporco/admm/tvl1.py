@@ -112,7 +112,12 @@ class TVL1Denoise(admm.ADMM):
 
 
         def __init__(self, opt=None):
-            """Initialise TVL1Denoise algorithm options object."""
+            """
+            Parameters
+            ----------
+            opt : dict or None, optional (default None)
+              TVL1Denoise algorithm options
+            """
 
             if opt is None:
                 opt = {}
@@ -132,16 +137,14 @@ class TVL1Denoise(admm.ADMM):
 
     def __init__(self, S, lmbda, opt=None, axes=(0, 1), caxis=None):
         """
-        Initialise a TVL1Denoise object with problem parameters.
-
 
         |
 
         **Call graph**
 
-        .. image:: _static/jonga/tvl1den_init.svg
+        .. image:: ../_static/jonga/tvl1den_init.svg
            :width: 20%
-           :target: _static/jonga/tvl1den_init.svg
+           :target: ../_static/jonga/tvl1den_init.svg
 
         |
 
@@ -461,7 +464,12 @@ class TVL1Deconv(admm.ADMM):
 
 
         def __init__(self, opt=None):
-            """Initialise TVL1Deconv algorithm options object."""
+            """
+            Parameters
+            ----------
+            opt : dict or None, optional (default None)
+              TVL1Deconv algorithm options
+            """
 
             if opt is None:
                 opt = {}
@@ -481,16 +489,14 @@ class TVL1Deconv(admm.ADMM):
 
     def __init__(self, A, S, lmbda, opt=None, axes=(0, 1), caxis=None):
         """
-        Initialise a TVL1Deconv object with problem parameters.
-
 
         |
 
         **Call graph**
 
-        .. image:: _static/jonga/tvl1dcn_init.svg
+        .. image:: ../_static/jonga/tvl1dcn_init.svg
            :width: 20%
-           :target: _static/jonga/tvl1dcn_init.svg
+           :target: ../_static/jonga/tvl1dcn_init.svg
 
         |
 

@@ -25,15 +25,16 @@ __author__ = """Cristina Garcia-Cardona <cgarciac@lanl.gov>"""
 
 
 class ConvCnstrMOD(fista.FISTADFT):
-    r"""**Class inheritance structure**
+    r"""
+    Base class for FISTA algorithm for Convolutional Constrained MOD
+    problem :cite:`garcia-2017-convolutional`.
+
+    |
 
     .. inheritance-diagram:: ConvCnstrMOD
        :parts: 2
 
     |
-
-    Base class for FISTA algorithm for Convolutional Constrained MOD
-    problem :cite:`garcia-2017-convolutional`.
 
     Solve the optimisation problem
 
@@ -110,7 +111,12 @@ class ConvCnstrMOD(fista.FISTADFT):
 
 
         def __init__(self, opt=None):
-            """Initialise ConvCnstrMODBase algorithm options object."""
+            """
+            Parameters
+            ----------
+            opt : dict or None, optional (default None)
+              ConvCnstrMOD algorithm options
+            """
 
             if opt is None:
                 opt = {}
@@ -131,8 +137,7 @@ class ConvCnstrMOD(fista.FISTADFT):
 
 
     def __init__(self, Z, S, dsz, opt=None, dimK=1, dimN=2):
-        """Initialise a ConvCnstrMOD object with problem parameters.
-
+        """
         This class supports an arbitrary number of spatial dimensions,
         `dimN`, with a default of 2. The input coefficient map array `Z`
         (usually labelled X, but renamed here to avoid confusion with
@@ -176,9 +181,9 @@ class ConvCnstrMOD(fista.FISTADFT):
 
         **Call graph**
 
-        .. image:: _static/jonga/ccmodfista_init.svg
+        .. image:: ../_static/jonga/ccmodfista_init.svg
            :width: 20%
-           :target: _static/jonga/ccmodfista_init.svg
+           :target: ../_static/jonga/ccmodfista_init.svg
 
         |
 
@@ -368,15 +373,16 @@ class ConvCnstrMOD(fista.FISTADFT):
 
 
 class ConvCnstrMODMask(ConvCnstrMOD):
-    r"""**Class inheritance structure**
+    r"""
+    FISTA algorithm for Convolutional Constrained MOD problem
+    with a spatial mask :cite:`garcia-2017-convolutional`.
+
+    |
 
     .. inheritance-diagram:: ConvCnstrMODMask
        :parts: 2
 
     |
-
-    FISTA algorithm for Convolutional Constrained MOD problem
-    with a spatial mask :cite:`garcia-2017-convolutional`.
 
     Solve the optimisation problem
 
@@ -415,7 +421,12 @@ class ConvCnstrMODMask(ConvCnstrMOD):
 
 
         def __init__(self, opt=None):
-            """Initialise ConvCnstrMODMasked algorithm options object."""
+            """
+            Parameters
+            ----------
+            opt : dict or None, optional (default None)
+              ConvCnstrMODMasked algorithm options
+            """
 
             if opt is None:
                 opt = {}
@@ -423,17 +434,15 @@ class ConvCnstrMODMask(ConvCnstrMOD):
 
 
     def __init__(self, Z, S, W, dsz, opt=None, dimK=None, dimN=2):
-        """Initialise a ConvCnstrMODMask object with problem
-        parameters.
-
+        """
 
         |
 
         **Call graph**
 
-        .. image:: _static/jonga/ccmodmdfista_init.svg
+        .. image:: ../_static/jonga/ccmodmdfista_init.svg
            :width: 20%
-           :target: _static/jonga/ccmodmdfista_init.svg
+           :target: ../_static/jonga/ccmodmdfista_init.svg
 
         |
 

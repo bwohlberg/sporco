@@ -28,11 +28,12 @@ the methods and attributes in the following sections.
 Initialisation
 --------------
 
-The ``__init__`` method of the derived class should call
-:meth:`.ADMMConsensus.__init__` to ensure proper initialisation. Note
-that this method assumes that the ADMM consensus component blocks in
-working variable :math:`\mathbf{x}` will be stacked on the final array
-index, and defines attribute ``self.xshape`` accordingly.
+The ``__init__`` method of the derived class should call the
+:class:`.ADMMConsensus` ``__init__`` method to ensure proper
+initialisation. Note that this method assumes that the ADMM consensus
+component blocks in working variable :math:`\mathbf{x}` will be stacked
+on the final array index, and defines attribute ``self.xshape``
+accordingly.
 
 State variables :math:`\mathbf{y}` and :math:`\mathbf{u}` are
 initialised to zero by inherited methods :meth:`.ADMM.yinit` and

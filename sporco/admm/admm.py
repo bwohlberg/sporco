@@ -29,7 +29,7 @@ class ADMM(common.IterativeSolver):
     r"""Base class for Alternating Direction Method of Multipliers (ADMM)
     algorithms :cite:`boyd-2010-distributed`.
 
-    Solve an optimisation problems of the form
+    Solve an optimisation problem of the form
 
     .. math::
        \mathrm{argmin}_{\mathbf{x},\mathbf{y}} \;
@@ -161,7 +161,12 @@ class ADMM(common.IterativeSolver):
                    }
 
         def __init__(self, opt=None):
-            """Initialise ADMM algorithm options object."""
+            """
+            Parameters
+            ----------
+            opt : dict or None, optional (default None)
+              ADMM algorithm options
+            """
 
             if opt is None:
                 opt = {}
@@ -206,8 +211,6 @@ class ADMM(common.IterativeSolver):
 
     def __init__(self, Nx, yshape, ushape, dtype, opt=None):
         r"""
-        Initialise an ADMM object with problem size and options.
-
         Parameters
         ----------
         Nx : int
@@ -785,14 +788,15 @@ class ADMM(common.IterativeSolver):
 
 
 class ADMMEqual(ADMM):
-    r"""**Class inheritance structure**
+    r"""
+    Base class for ADMM algorithms with a simple equality constraint.
+
+    |
 
     .. inheritance-diagram:: ADMMEqual
        :parts: 2
 
     |
-
-    Base class for ADMM algorithms with a simple equality constraint.
 
     Solve optimisation problems of the form
 
@@ -829,7 +833,12 @@ class ADMMEqual(ADMM):
         defaults.update({'fEvalX': True, 'gEvalY': True, 'ReturnX': True})
 
         def __init__(self, opt=None):
-            """Initialise ADMMEqual algorithm options object."""
+            """
+            Parameters
+            ----------
+            opt : dict or None, optional (default None)
+              ADMMEqual algorithm options
+            """
 
             if opt is None:
                 opt = {}
@@ -840,8 +849,6 @@ class ADMMEqual(ADMM):
 
     def __init__(self, xshape, dtype, opt=None):
         """
-        Initialise an ADMMEqual object with problem size and options.
-
         Parameters
         ----------
         xshape : tuple of ints
@@ -979,16 +986,17 @@ class ADMMEqual(ADMM):
 
 
 class ADMMTwoBlockCnstrnt(ADMM):
-    r"""**Class inheritance structure**
+    r"""
+    Base class for ADMM algorithms for problems for which
+    :math:`g(\mathbf{y}) = g_0(\mathbf{y}_0) + g_1(\mathbf{y}_1)` with
+    :math:`\mathbf{y}^T = (\mathbf{y}_0^T \; \mathbf{y}_1^T)`.
+
+    |
 
     .. inheritance-diagram:: ADMMTwoBlockCnstrnt
        :parts: 2
 
     |
-
-    Base class for ADMM algorithms for problems for which
-    :math:`g(\mathbf{y}) = g_0(\mathbf{y}_0) + g_1(\mathbf{y}_1)` with
-    :math:`\mathbf{y}^T = (\mathbf{y}_0^T \; \mathbf{y}_1^T)`.
 
     Solve optimisation problems of the form
 
@@ -1044,7 +1052,12 @@ class ADMMTwoBlockCnstrnt(ADMM):
         defaults.update({'AuxVarObj': False, 'ReturnVar': 'X'})
 
         def __init__(self, opt=None):
-            """Initialise ADMMTwoBlockCnstrnt algorithm options object."""
+            """
+            Parameters
+            ----------
+            opt : dict or None, optional (default None)
+              ADMMTwoBlockCnstrnt algorithm options
+            """
 
             if opt is None:
                 opt = {}
@@ -1068,9 +1081,6 @@ class ADMMTwoBlockCnstrnt(ADMM):
 
     def __init__(self, Nx, yshape, blkaxis, blkidx, dtype, opt=None):
         r"""
-        Initialise an ADMMTwoBlockCnstrnt object with problem size and
-        options.
-
         Parameters
         ----------
         Nx : int
@@ -1431,15 +1441,16 @@ class ADMMTwoBlockCnstrnt(ADMM):
 
 
 class ADMMConsensus(ADMM):
-    r"""**Class inheritance structure**
+    r"""
+    Base class for ADMM algorithms with a global variable consensus
+    structure (see Ch. 7 of :cite:`boyd-2010-distributed`).
+
+    |
 
      .. inheritance-diagram:: ADMMConsensus
         :parts: 2
 
     |
-
-    Base class for ADMM algorithms with a global variable consensus
-    structure (see Ch. 7 of :cite:`boyd-2010-distributed`).
 
     Solve optimisation problems of the form
 
@@ -1487,7 +1498,12 @@ class ADMMConsensus(ADMM):
 
 
         def __init__(self, opt=None):
-            """Initialise ADMMConsensus algorithm options object."""
+            """
+            Parameters
+            ----------
+            opt : dict or None, optional (default None)
+              ADMMConsensus algorithm options
+            """
 
             if opt is None:
                 opt = {}
@@ -1515,8 +1531,6 @@ class ADMMConsensus(ADMM):
 
     def __init__(self, Nb, yshape, dtype, opt=None):
         r"""
-        Initialise an ADMMConsensus object with problem size and options.
-
         Parameters
         ----------
         yshape : tuple

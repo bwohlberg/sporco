@@ -23,16 +23,17 @@ __author__ = """Brendt Wohlberg <brendt@ieee.org>"""
 
 
 class ConvCnstrMODBase(admm.ADMMEqual):
-    r"""**Class inheritance structure**
+    r"""
+    Base class for the ADMM algorithms for Convolutional Constrained MOD
+    problem :cite:`wohlberg-2016-efficient`, including support for
+    multi-channel signals/images :cite:`wohlberg-2016-convolutional`.
+
+    |
 
     .. inheritance-diagram:: ConvCnstrMODBase
        :parts: 2
 
     |
-
-    Base class for the ADMM algorithms for Convolutional Constrained MOD
-    problem :cite:`wohlberg-2016-efficient`, including support for
-    multi-channel signals/images :cite:`wohlberg-2016-convolutional`.
 
     Solve the optimisation problem
 
@@ -143,7 +144,12 @@ class ConvCnstrMODBase(admm.ADMMEqual):
 
 
         def __init__(self, opt=None):
-            """Initialise ConvCnstrMODBase algorithm options object."""
+            """
+            Parameters
+            ----------
+            opt : dict or None, optional (default None)
+              ConvCnstrMODBase algorithm options
+            """
 
             if opt is None:
                 opt = {}
@@ -179,8 +185,7 @@ class ConvCnstrMODBase(admm.ADMMEqual):
 
 
     def __init__(self, Z, S, dsz, opt=None, dimK=1, dimN=2):
-        """Initialise a ConvCnstrMODBase object with problem parameters.
-
+        """
         This class supports an arbitrary number of spatial dimensions,
         `dimN`, with a default of 2. The input coefficient map array `Z`
         (usually labelled X, but renamed here to avoid confusion with
@@ -417,16 +422,17 @@ class ConvCnstrMODBase(admm.ADMMEqual):
 
 class ConvCnstrMOD_IterSM(ConvCnstrMODBase):
     r"""
-    **Class inheritance structure**
+    ADMM algorithm for Convolutional Constrained MOD problem with the
+    :math:`\mathbf{x}` step solved via iterated application of the
+    Sherman-Morrison equation :cite:`wohlberg-2016-efficient`.
+
+    |
 
     .. inheritance-diagram:: ConvCnstrMOD_IterSM
        :parts: 2
 
     |
 
-    ADMM algorithm for Convolutional Constrained MOD problem with the
-    :math:`\mathbf{x}` step solved via iterated application of the
-    Sherman-Morrison equation :cite:`wohlberg-2016-efficient`.
     Multi-channel signals/images are supported
     :cite:`wohlberg-2016-convolutional`. See :class:`.ConvCnstrMODBase`
     for interface details.
@@ -444,7 +450,12 @@ class ConvCnstrMOD_IterSM(ConvCnstrMODBase):
 
 
         def __init__(self, opt=None):
-            """Initialise ConvCnstrMOD_IterSM algorithm options object."""
+            """
+            Parameters
+            ----------
+            opt : dict or None, optional (default None)
+              ConvCnstrMOD_IterSM algorithm options
+            """
 
             if opt is None:
                 opt = {}
@@ -453,16 +464,15 @@ class ConvCnstrMOD_IterSM(ConvCnstrMODBase):
 
 
     def __init__(self, Z, S, dsz, opt=None, dimK=1, dimN=2):
-        """Initialise a ConvCnstrMOD_IterSM object with problem parameters.
-        See :meth:`.ConvCnstrMODBase.__init__` for interface details.
+        """
 
         |
 
         **Call graph**
 
-        .. image:: _static/jonga/ccmodism_init.svg
+        .. image:: ../_static/jonga/ccmodism_init.svg
            :width: 20%
-           :target: _static/jonga/ccmodism_init.svg
+           :target: ../_static/jonga/ccmodism_init.svg
         """
 
         # Set default options if none specified
@@ -490,17 +500,19 @@ class ConvCnstrMOD_IterSM(ConvCnstrMODBase):
 
 class ConvCnstrMOD_CG(ConvCnstrMODBase):
     r"""
-    **Class inheritance structure**
+    ADMM algorithm for the Convolutional Constrained MOD problem with the
+    :math:`\mathbf{x}` step solved via Conjugate Gradient (CG)
+    :cite:`wohlberg-2016-efficient`.
+
+    |
 
     .. inheritance-diagram:: ConvCnstrMOD_CG
        :parts: 2
 
     |
 
-    ADMM algorithm for the Convolutional Constrained MOD problem with the
-    :math:`\mathbf{x}` step solved via Conjugate Gradient (CG)
-    :cite:`wohlberg-2016-efficient`. Multi-channel signals/images are
-    supported :cite:`wohlberg-2016-convolutional`. See
+    Multi-channel signals/images are supported
+    :cite:`wohlberg-2016-convolutional`. See
     :class:`.ConvCnstrMODBase` for interface details.
     """
 
@@ -524,7 +536,12 @@ class ConvCnstrMOD_CG(ConvCnstrMODBase):
 
 
         def __init__(self, opt=None):
-            """Initialise ConvCnstrMOD_CG algorithm options object."""
+            """
+            Parameters
+            ----------
+            opt : dict or None, optional (default None)
+              ConvCnstrMOD_CG algorithm options
+            """
 
             if opt is None:
                 opt = {}
@@ -537,16 +554,15 @@ class ConvCnstrMOD_CG(ConvCnstrMODBase):
 
 
     def __init__(self, Z, S, dsz, opt=None, dimK=1, dimN=2):
-        """Initialise a ConvCnstrMOD_CG object with problem parameters.
-        See :meth:`.ConvCnstrMODBase.__init__` for interface details.
+        """
 
         |
 
         **Call graph**
 
-        .. image:: _static/jonga/ccmodcg_init.svg
+        .. image:: ../_static/jonga/ccmodcg_init.svg
            :width: 20%
-           :target: _static/jonga/ccmodcg_init.svg
+           :target: ../_static/jonga/ccmodcg_init.svg
         """
 
         # Set default options if none specified
@@ -586,16 +602,17 @@ class ConvCnstrMOD_CG(ConvCnstrMODBase):
 
 class ConvCnstrMOD_Consensus(admm.ADMMConsensus):
     r"""
-    **Class inheritance structure**
+    ADMM algorithm for the Convolutional Constrained MOD problem
+    with the :math:`\mathbf{x}` step solved via an ADMM consensus problem
+    :cite:`boyd-2010-distributed` (Ch. 7), :cite:`sorel-2016-fast`.
+
+    |
 
     .. inheritance-diagram:: ConvCnstrMOD_Consensus
        :parts: 2
 
     |
 
-    ADMM algorithm for the Convolutional Constrained MOD problem
-    with the :math:`\mathbf{x}` step solved via an ADMM consensus problem
-    :cite:`boyd-2010-distributed` (Ch. 7), :cite:`sorel-2016-fast`.
     Multi-channel signals/images are supported
     :cite:`wohlberg-2016-convolutional`. See :class:`.ConvCnstrMODBase`
     for interface details.
@@ -615,7 +632,12 @@ class ConvCnstrMOD_Consensus(admm.ADMMConsensus):
 
 
         def __init__(self, opt=None):
-            """Initialise ConvCnstrMOD_Consensus algorithm options object."""
+            """
+            Parameters
+            ----------
+            opt : dict or None, optional (default None)
+              ConvCnstrMOD_Consensus algorithm options
+            """
 
             if opt is None:
                 opt = {}
@@ -632,17 +654,15 @@ class ConvCnstrMOD_Consensus(admm.ADMMConsensus):
 
 
     def __init__(self, Z, S, dsz, opt=None, dimK=1, dimN=2):
-        """Initialise a ConvCnstrMOD_Consensus object with problem
-        parameters.  See :meth:`.ConvCnstrMODBase.__init__` for
-        interface details.
+        """
 
         |
 
         **Call graph**
 
-        .. image:: _static/jonga/ccmodcnsns_init.svg
+        .. image:: ../_static/jonga/ccmodcnsns_init.svg
            :width: 20%
-           :target: _static/jonga/ccmodcnsns_init.svg
+           :target: ../_static/jonga/ccmodcnsns_init.svg
         """
 
         # Set default options if none specified

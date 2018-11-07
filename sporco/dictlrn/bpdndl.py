@@ -22,14 +22,15 @@ __author__ = """Brendt Wohlberg <brendt@ieee.org>"""
 
 
 class BPDNDictLearn(dictlrn.DictLearn):
-    r"""**Class inheritance structure**
+    r"""
+    Dictionary learning based on BPDN and CnstrMOD
+
+    |
 
     .. inheritance-diagram:: BPDNDictLearn
        :parts: 2
 
     |
-
-    Dictionary learning based on BPDN and CnstrMOD
 
     Solve the optimisation problem
 
@@ -95,7 +96,12 @@ class BPDNDictLearn(dictlrn.DictLearn):
 
 
         def __init__(self, opt=None):
-            """Initialise BPDN dictionary learning algorithm options."""
+            """
+            Parameters
+            ----------
+            opt : dict or None, optional (default None)
+              BPDNDictLearn algorithm options
+            """
 
             dictlrn.DictLearn.Options.__init__(
                 self, {'BPDN': bpdn.BPDN.Options(
@@ -115,15 +121,14 @@ class BPDNDictLearn(dictlrn.DictLearn):
 
     def __init__(self, D0, S, lmbda=None, opt=None):
         """
-        Initialise a BPDNDictLearn object with problem size and options.
 
         |
 
         **Call graph**
 
-        .. image:: _static/jonga/bpdndl_init.svg
+        .. image:: ../_static/jonga/bpdndl_init.svg
            :width: 20%
-           :target: _static/jonga/bpdndl_init.svg
+           :target: ../_static/jonga/bpdndl_init.svg
 
         |
 

@@ -33,8 +33,9 @@ sections.
 Initialisation
 --------------
 
-The ``__init__`` method of the derived class should call
-:meth:`.ConvTwoBlockCnstrnt.__init__` to ensure proper initialisation.
+The ``__init__`` method of the derived class should call the
+:class:`.ConvTwoBlockCnstrnt` ``__init__`` method to ensure proper
+initialisation.
 
 
 

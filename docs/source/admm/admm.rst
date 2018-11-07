@@ -24,8 +24,8 @@ and attributes in the following sections.
 Initialisation
 --------------
 
-The ``__init__`` method of the derived class should call
-:meth:`.ADMM.__init__` to ensure proper initialisation.
+The ``__init__`` method of the derived class should call the
+:class:`.ADMM` ``__init__`` method to ensure proper initialisation.
 
 State variables :math:`\mathbf{y}` and :math:`\mathbf{u}` are
 initialised to zero by :meth:`.ADMM.yinit` and :meth:`.ADMM.uinit`

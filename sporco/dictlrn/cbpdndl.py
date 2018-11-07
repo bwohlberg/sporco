@@ -231,15 +231,18 @@ def ConvCnstrMOD(*args, **kwargs):
 
 
 class ConvBPDNDictLearn(dictlrn.DictLearn):
-    r"""**Class inheritance structure**
+    r"""
+    Dictionary learning by alternating between sparse coding and dictionary
+    update stages.
+
+    |
 
     .. inheritance-diagram:: ConvBPDNDictLearn
        :parts: 2
 
     |
 
-    Dictionary learning by alternating between sparse coding and dictionary
-    update stages. The sparse coding is performed using
+    The sparse coding is performed using
     :class:`.admm.cbpdn.ConvBPDN` (see :cite:`wohlberg-2014-efficient`) or
     :class:`.fista.cbpdn.ConvBPDN` (see :cite:`chalasani-2013-fast` and
     :cite:`wohlberg-2016-efficient`), and the dictionary update is computed
@@ -347,8 +350,7 @@ class ConvBPDNDictLearn(dictlrn.DictLearn):
 
 
         def __init__(self, opt=None, xmethod=None, dmethod=None):
-            """Initialise ConvBPDN dictionary learning algorithm options.
-
+            """
             Valid values for parameters ``xmethod`` and ``dmethod`` are
             documented in functions :func:`.ConvBPDN` and
             :func:`.ConvCnstrMOD` respectively.
@@ -385,15 +387,14 @@ class ConvBPDNDictLearn(dictlrn.DictLearn):
     def __init__(self, D0, S, lmbda=None, opt=None, xmethod=None,
                  dmethod=None, dimK=1, dimN=2):
         """
-        Initialise a ConvBPDNDictLearn object with problem size and options.
 
         |
 
         **Call graph**
 
-        .. image:: _static/jonga/cbpdndl_init.svg
+        .. image:: ../_static/jonga/cbpdndl_init.svg
            :width: 20%
-           :target: _static/jonga/cbpdndl_init.svg
+           :target: ../_static/jonga/cbpdndl_init.svg
 
         |
 

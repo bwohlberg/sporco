@@ -30,15 +30,16 @@ __author__ = """\n""".join(['Cristina Garcia-Cardona <cgarciac@lanl.gov>',
 
 
 class OnlineConvBPDNDictLearn(common.IterativeSolver):
-    r"""**Class inheritance structure**
+    r"""
+    Stochastic gradient descent (SGD) based online convolutional
+    dictionary learning, as proposed in :cite:`liu-2018-first`.
+
+    |
 
     .. inheritance-diagram:: OnlineConvBPDNDictLearn
        :parts: 2
 
     |
-
-    Stochastic gradient descent (SGD) based online convolutional
-    dictionary learning, as proposed in :cite:`liu-2018-first`.
     """
 
 
@@ -83,8 +84,11 @@ class OnlineConvBPDNDictLearn(common.IterativeSolver):
 
 
         def __init__(self, opt=None):
-            """Initialise online CBPDN dictionary learning algorithm
-            options.
+            """
+            Parameters
+            ----------
+            opt : dict or None, optional (default None)
+              OnlineConvBPDNDictLearn algorithm options
             """
 
             dictlrn.DictLearn.Options.__init__(self, {
@@ -127,9 +131,7 @@ class OnlineConvBPDNDictLearn(common.IterativeSolver):
 
 
     def __init__(self, D0, lmbda=None, opt=None, dimK=None, dimN=2):
-        """Initialise an OnlineConvBPDNDictLearn object with problem
-        size and options.
-
+        """
         Parameters
         ----------
         D0 : array_like
@@ -456,16 +458,17 @@ class OnlineConvBPDNDictLearn(common.IterativeSolver):
 
 
 class OnlineConvBPDNMaskDictLearn(OnlineConvBPDNDictLearn):
-    r"""**Class inheritance structure**
+    r"""
+    Stochastic gradient descent (SGD) based online convolutional
+    dictionary learning with a spatial mask, as proposed in
+    :cite:`liu-2018-first`.
+
+    |
 
     .. inheritance-diagram:: OnlineConvBPDNMaskDictLearn
        :parts: 2
 
     |
-
-    Stochastic gradient descent (SGD) based online convolutional
-    dictionary learning with a spatial mask, as proposed in
-    :cite:`liu-2018-first`.
     """
 
     class Options(OnlineConvBPDNDictLearn.Options):
@@ -483,8 +486,11 @@ class OnlineConvBPDNMaskDictLearn(OnlineConvBPDNDictLearn):
 
 
         def __init__(self, opt=None):
-            """Initialise online masked CBPDN dictionary learning
-            algorithm options.
+            """
+            Parameters
+            ----------
+            opt : dict or None, optional (default None)
+              OnlineConvBPDNMaskDictLearn algorithm options
             """
 
             OnlineConvBPDNDictLearn.Options.__init__(self, {

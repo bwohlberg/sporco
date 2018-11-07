@@ -27,15 +27,16 @@ __author__ = """Cristina Garcia-Cardona <cgarciac@lanl.gov>"""
 
 
 class BPDN(fista.FISTA):
-    r"""**Class inheritance structure**
+    r"""
+    Base class for FISTA algorithm for the Basis Pursuit DeNoising (BPDN)
+    :cite:`chen-1998-atomic` problem.
+
+    |
 
     .. inheritance-diagram:: BPDN
        :parts: 2
 
     |
-
-    Base class for FISTA algorithm for the Basis Pursuit DeNoising (BPDN)
-    :cite:`chen-1998-atomic` problem.
 
     The generic problem form is
 
@@ -87,7 +88,7 @@ class BPDN(fista.FISTA):
 
 
     class Options(fista.FISTA.Options):
-        r"""ConvBPDN algorithm options
+        r"""BPDN algorithm options
 
         Options include all of those defined in
         :class:`.fista.FISTA.Options`, together with
@@ -108,7 +109,12 @@ class BPDN(fista.FISTA):
 
 
         def __init__(self, opt=None):
-            """Initialise ConvBPDN algorithm options object."""
+            """
+            Parameters
+            ----------
+            opt : dict or None, optional (default None)
+              BPDN algorithm options
+            """
 
             if opt is None:
                 opt = {}
@@ -129,8 +135,6 @@ class BPDN(fista.FISTA):
 
     def __init__(self, D, S, lmbda=None, opt=None):
         """
-        Initialise a ConvBPDN object with problem parameters.
-
         This class supports an arbitrary number of spatial dimensions,
         `dimN`, with a default of 2. The input dictionary `D` is either
         `dimN` + 1 dimensional, in which case each spatial component

@@ -26,15 +26,15 @@ __author__ = """Brendt Wohlberg <brendt@ieee.org>"""
 
 class ConvCnstrMODMaskDcplBase(admm.ADMMTwoBlockCnstrnt):
     r"""
-    **Class inheritance structure**
+    Base class for ADMM algorithms for Convolutional Constrained MOD
+    with Mask Decoupling :cite:`heide-2015-fast`.
+
+    |
 
     .. inheritance-diagram:: ConvCnstrMODMaskDcplBase
        :parts: 2
 
     |
-
-    Base class for ADMM algorithms for Convolutional Constrained MOD
-    with Mask Decoupling :cite:`heide-2015-fast`.
 
     Solve the optimisation problem
 
@@ -170,7 +170,12 @@ class ConvCnstrMODMaskDcplBase(admm.ADMMTwoBlockCnstrnt):
 
 
         def __init__(self, opt=None):
-            """Initialise ConvCnstrMODMaskDcpl algorithm options object."""
+            """
+            Parameters
+            ----------
+            opt : dict or None, optional (default None)
+              ConvCnstrMODMaskDcpl algorithm options
+            """
 
             if opt is None:
                 opt = {}
@@ -204,9 +209,6 @@ class ConvCnstrMODMaskDcplBase(admm.ADMMTwoBlockCnstrnt):
 
     def __init__(self, Z, S, W, dsz, opt=None, dimK=None, dimN=2):
         """
-        Initialise a ConvCnstrMODMaskDcplBase object with problem size
-        and options.
-
         Parameters
         ----------
         Z : array_like
@@ -567,18 +569,20 @@ class ConvCnstrMODMaskDcplBase(admm.ADMMTwoBlockCnstrnt):
 
 class ConvCnstrMODMaskDcpl_IterSM(ConvCnstrMODMaskDcplBase):
     r"""
-    **Class inheritance structure**
+    ADMM algorithm for Convolutional Constrained MOD with Mask Decoupling
+    :cite:`heide-2015-fast` with the :math:`\mathbf{x}` step solved via
+    iterated application of the Sherman-Morrison equation
+    :cite:`wohlberg-2016-efficient`.
+
+    |
 
     .. inheritance-diagram:: ConvCnstrMODMaskDcpl_IterSM
        :parts: 2
 
     |
 
-    ADMM algorithm for Convolutional Constrained MOD with Mask Decoupling
-    :cite:`heide-2015-fast` with the :math:`\mathbf{x}` step solved via
-    iterated application of the Sherman-Morrison equation
-    :cite:`wohlberg-2016-efficient`. Multi-channel signals/images are
-    supported :cite:`wohlberg-2016-convolutional`. See
+    Multi-channel signals/images are supported
+    :cite:`wohlberg-2016-convolutional`. See
     :class:`.ConvCnstrMODMaskDcplBase` for interface details.
     """
 
@@ -594,8 +598,12 @@ class ConvCnstrMODMaskDcpl_IterSM(ConvCnstrMODMaskDcplBase):
 
 
         def __init__(self, opt=None):
-            """Initialise ConvCnstrMODMaskDcpl_IterSM algorithm options
-            object."""
+            """
+            Parameters
+            ----------
+            opt : dict or None, optional (default None)
+              ConvCnstrMODMaskDcpl_IterSM algorithm options
+            """
 
             if opt is None:
                 opt = {}
@@ -604,17 +612,15 @@ class ConvCnstrMODMaskDcpl_IterSM(ConvCnstrMODMaskDcplBase):
 
 
     def __init__(self, Z, S, W, dsz, opt=None, dimK=1, dimN=2):
-        """Initialise a ConvCnstrMODMaskDcpl_IterSM object with problem
-        parameters. See :meth:`.ConvCnstrMODMaskDcplBase.__init__` for
-        interface details.
+        """
 
         |
 
         **Call graph**
 
-        .. image:: _static/jonga/ccmodmdism_init.svg
+        .. image:: ../_static/jonga/ccmodmdism_init.svg
            :width: 20%
-           :target: _static/jonga/ccmodmdism_init.svg
+           :target: ../_static/jonga/ccmodmdism_init.svg
         """
 
         # Set default options if none specified
@@ -648,17 +654,19 @@ class ConvCnstrMODMaskDcpl_IterSM(ConvCnstrMODMaskDcplBase):
 
 class ConvCnstrMODMaskDcpl_CG(ConvCnstrMODMaskDcplBase):
     r"""
-    **Class inheritance structure**
+    ADMM algorithm for Convolutional Constrained MOD with Mask Decoupling
+    :cite:`heide-2015-fast` with the :math:`\mathbf{x}` step solved via
+    Conjugate Gradient (CG) :cite:`wohlberg-2016-efficient`.
+
+    |
 
     .. inheritance-diagram:: ConvCnstrMODMaskDcpl_CG
        :parts: 2
 
     |
 
-    ADMM algorithm for Convolutional Constrained MOD with Mask Decoupling
-    :cite:`heide-2015-fast` with the :math:`\mathbf{x}` step solved via
-    Conjugate Gradient (CG) :cite:`wohlberg-2016-efficient`. Multi-channel
-    signals/images are supported :cite:`wohlberg-2016-convolutional`. See
+    Multi-channel signals/images are supported
+    :cite:`wohlberg-2016-convolutional`. See
     :class:`.ConvCnstrMODMaskDcplBase` for interface details.
     """
 
@@ -682,8 +690,12 @@ class ConvCnstrMODMaskDcpl_CG(ConvCnstrMODMaskDcplBase):
 
 
         def __init__(self, opt=None):
-            """Initialise ConvCnstrMODMaskDcpl_CG algorithm options
-            object."""
+            """
+            Parameters
+            ----------
+            opt : dict or None, optional (default None)
+              ConvCnstrMODMaskDcpl_CG algorithm options
+            """
 
             if opt is None:
                 opt = {}
@@ -696,17 +708,15 @@ class ConvCnstrMODMaskDcpl_CG(ConvCnstrMODMaskDcplBase):
 
 
     def __init__(self, Z, S, W, dsz, opt=None, dimK=1, dimN=2):
-        """Initialise a ConvCnstrMODMaskDcpl_CG object with problem
-        parameters. See :meth:`.ConvCnstrMODMaskDcplBase.__init__` for
-        interface details.
+        """
 
         |
 
         **Call graph**
 
-        .. image:: _static/jonga/ccmodmdcg_init.svg
+        .. image:: ../_static/jonga/ccmodmdcg_init.svg
            :width: 20%
-           :target: _static/jonga/ccmodmdcg_init.svg
+           :target: ../_static/jonga/ccmodmdcg_init.svg
         """
 
         # Set default options if none specified
@@ -752,15 +762,15 @@ class ConvCnstrMODMaskDcpl_CG(ConvCnstrMODMaskDcplBase):
 
 class ConvCnstrMODMaskDcpl_Consensus(ccmod.ConvCnstrMOD_Consensus):
     r"""
-    **Class inheritance structure**
+    Hybrid ADMM Consensus algorithm for Convolutional Constrained MOD with
+    Mask Decoupling :cite:`garcia-2017-convolutional`.
+
+    |
 
     .. inheritance-diagram:: ConvCnstrMODMaskDcpl_Consensus
        :parts: 2
 
     |
-
-    Hybrid ADMM Consensus algorithm for Convolutional Constrained MOD with
-    Mask Decoupling :cite:`garcia-2017-convolutional`.
 
     Solve the optimisation problem
 
@@ -782,16 +792,14 @@ class ConvCnstrMODMaskDcpl_Consensus(ccmod.ConvCnstrMOD_Consensus):
 
     def __init__(self, Z, S, W, dsz, opt=None, dimK=None, dimN=2):
         """
-        Initialise a ConvCnstrMODMaskDcpl_Consensus object with problem
-        size and options.
 
         |
 
         **Call graph**
 
-        .. image:: _static/jonga/ccmodmdcnsns_init.svg
+        .. image:: ../_static/jonga/ccmodmdcnsns_init.svg
            :width: 20%
-           :target: _static/jonga/ccmodmdcnsns_init.svg
+           :target: ../_static/jonga/ccmodmdcnsns_init.svg
 
         |
 

@@ -26,6 +26,10 @@ from sporco import common
 
 
 
+__all__ = ['ConvBPDNDictLearn_Consensus',
+           'ConvBPDNMaskDcplDictLearn_Consensus']
+
+
 # Initialise global variables required by multiprocessing mechanism
 mp_cri = None    # A cnvrep.CSC_ConvRepIndexing object describing problem
                  # dimensions
@@ -258,17 +262,19 @@ def step_group(k):
 
 
 class ConvBPDNDictLearn_Consensus(cbpdndl.ConvBPDNDictLearn):
-    r"""**Class inheritance structure**
+    r"""
+    Dictionary learning based on Convolutional BPDN
+    :cite:`wohlberg-2014-efficient` and an ADMM Consensus solution of
+    the constrained dictionary update problem :cite:`sorel-2016-fast`.
+
+    |
 
     .. inheritance-diagram:: ConvBPDNDictLearn_Consensus
        :parts: 2
 
     |
 
-    Dictionary learning based on Convolutional BPDN
-    :cite:`wohlberg-2014-efficient` and an ADMM Consensus solution of the
-    constrained dictionary update problem :cite:`sorel-2016-fast`. The
-    dictionary learning algorithm itself is as described in
+    The dictionary learning algorithm itself is as described in
     :cite:`garcia-2017-convolutional`. The sparse coding of each training
     image and the individual consensus problem components are computed in
     parallel, giving a substantial computational advantage, on a multi-core
@@ -326,8 +332,11 @@ class ConvBPDNDictLearn_Consensus(cbpdndl.ConvBPDNDictLearn):
         """
 
         def __init__(self, opt=None):
-            """Initialise ConvBPDNDictLearn_Consensus algorithm options
-            object.
+            """
+            Parameters
+            ----------
+            opt : dict or None, optional (default None)
+              ConvBPDNDictLearn_Consensus algorithm options
             """
 
             if opt is None:
@@ -347,10 +356,6 @@ class ConvBPDNDictLearn_Consensus(cbpdndl.ConvBPDNDictLearn):
     def __init__(self, D0, S, lmbda=None, opt=None, nproc=None, dimK=1,
                  dimN=2):
         """
-        Initialise a ConvBPDNDictLearn_Consensus object with problem size
-        and options.
-
-
         Parameters
         ----------
         D0 : array_like
@@ -786,18 +791,21 @@ def md_step_group(k):
 
 
 class ConvBPDNMaskDcplDictLearn_Consensus(cbpdndlmd.ConvBPDNMaskDictLearn):
-    r"""**Class inheritance structure**
+    r"""
+    Dictionary learning based on Convolutional BPDN with Mask Decoupling
+    :cite:`heide-2015-fast` and the hybrid Mask Decoupling/Consensus
+    solution of the constrained dictionary update problem proposed in
+    :cite:`garcia-2017-convolutional`.
+
+    |
 
     .. inheritance-diagram:: ConvBPDNMaskDcplDictLearn_Consensus
        :parts: 2
 
     |
 
-    Dictionary learning based on Convolutional BPDN with Mask Decoupling
-    :cite:`heide-2015-fast` and the hybrid Mask Decoupling/Consensus
-    solution of the constrained dictionary update problem proposed in
-    :cite:`garcia-2017-convolutional`. The dictionary learning algorithm
-    itself is as described in :cite:`garcia-2017-convolutional`. The sparse
+    The dictionary learning algorithm itself is as described in
+    :cite:`garcia-2017-convolutional`. The sparse
     coding of each training image and the individual consensus problem
     components are computed in parallel, giving a substantial computational
     advantage, on a multi-core host, over
@@ -854,8 +862,11 @@ class ConvBPDNMaskDcplDictLearn_Consensus(cbpdndlmd.ConvBPDNMaskDictLearn):
         """
 
         def __init__(self, opt=None):
-            """Initialise ConvBPDNMaskDcplDictLearn_Consensus algorithm
-            options object.
+            """
+            Parameters
+            ----------
+            opt : dict or None, optional (default None)
+              ConvBPDNMaskDcplDictLearn_Consensus algorithm options
             """
 
             if opt is None:
@@ -875,10 +886,6 @@ class ConvBPDNMaskDcplDictLearn_Consensus(cbpdndlmd.ConvBPDNMaskDictLearn):
     def __init__(self, D0, S, lmbda=None, W=None, opt=None, nproc=None,
                  dimK=1, dimN=2):
         """
-        Initialise a ConvBPDNMaskDcplDictLearn_Consensus object with problem
-        size and options.
-
-
         Parameters
         ----------
         D0 : array_like
