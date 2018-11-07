@@ -80,7 +80,7 @@ optd = ccmod.ConvCnstrMODOptions({'Verbose': False, 'MaxMainIter': 1,
 
 
 """
-Normalise dictionary according to Y update options.
+Normalise dictionary according to dictionary Y update options.
 """
 
 D0n = cnvrep.Pcn(D0, D0.shape, cri.Nv, dimN=2, dimC=0, crp=True,
