@@ -59,7 +59,6 @@ API Reference
    :hidden:
 
    sporco.util
-   sporco.mpiutil
    sporco.linalg
    sporco.prox
    sporco.metric
