@@ -89,10 +89,10 @@ def _fix_dynamic_class_lookup(cls, pstfx):
 class _IterSolver_Meta(type):
     """Metaclass for iterative solver classes that handles
     intialisation of IterationStats namedtuple and applies
-    _fix_nested_class_lookup to class definitions to fix problems with
-    lookup of nested class definitions when using pickle.  It is also
-    responsible for stopping the object initialisation timer at the
-    end of initialisation.
+    :func:`_fix_nested_class_lookup` to class definitions to fix
+    problems with lookup of nested class definitions when using pickle.
+    It is also responsible for stopping the object initialisation timer
+    at the end of initialisation.
     """
 
     def __init__(cls, *args):
