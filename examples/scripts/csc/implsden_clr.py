@@ -172,7 +172,7 @@ Initialise the ``ConvRepL1L1`` object and call the ``solve`` method.
 """
 
 lmbda = 3.0e0
-b = ConvRepL1L1(D, pad(imgn) - imglp, lmbda, opt=opt, dimK=0)
+b = ConvRepL1L1(D0, pad(imgn) - imglp, lmbda, opt=opt, dimK=0)
 X = b.solve()
 
 
