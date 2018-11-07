@@ -1,14 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+"""Generate call graph images for sporco docs."""
+
 from __future__ import print_function
-from future.builtins import input
-from builtins import range
 
 import os
 import sys
-import re
-import glob
 
 import jonga
 
@@ -96,8 +94,10 @@ def gengraphs(pth, nopyfftw):
 
     fnmsub = ('^sporco.admm.', '')
     grpflt = r'^[^\.]*.[^\.]*'
-    lnksub = (r'^([^\.]*).(.*)',
-              r'../../sporco.admm.\1.html#sporco.admm.\1.\2')
+    lnkpfx = '../../modules/'
+    lnksub = (r'^([^\.]*).([^\.]*)(?:(.__init__|.__call__)|(.[^\.]*))',
+              lnkpfx + r'sporco.admm.\1.html#sporco.admm.\1.\2\4')
+
 
     fntsz = 9
     fntfm = 'Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans'
@@ -126,7 +126,7 @@ def gengraphs(pth, nopyfftw):
         def rfftn_empty(shape, axes, dtype, order='C', n=None):
             ashp = list(shape)
             raxis = axes[-1]
-            ashp[raxis] = ashp[raxis]//2 + 1
+            ashp[raxis] = ashp[raxis] // 2 + 1
             cdtype = spl.complex_dtype(dtype)
             return np.zeros(ashp, dtype=cdtype)
         spl.pyfftw_rfftn_empty_aligned = rfftn_empty
@@ -498,8 +498,8 @@ def gengraphs(pth, nopyfftw):
 
     srcmodflt = '^sporco.fista'
     fnmsub = ('^sporco.fista.', '')
-    lnksub = (r'^([^\.]*).(.*)',
-              r'../../sporco.fista.\1.html#sporco.fista.\1.\2')
+    lnksub = (r'^([^\.]*).([^\.]*)(?:(.__init__|.__call__)|(.[^\.]*))',
+              lnkpfx + r'sporco.fista.\1.html#sporco.fista.\1.\2\4')
     ct = jonga.CallTracer(srcmodflt=srcmodflt, srcqnmflt=srcqnmflt,
                           dstqnmflt=dstqnmflt, fnmsub=fnmsub,
                           grpflt=grpflt, lnksub=lnksub)
@@ -558,8 +558,8 @@ def gengraphs(pth, nopyfftw):
 
     srcmodflt = '^sporco.dictlrn'
     fnmsub = ('^sporco.dictlrn.', '')
-    lnksub = (r'^([^\.]*).(.*)',
-              r'../../sporco.dictlrn.\1.html#sporco.dictlrn.\1.\2')
+    lnksub = (r'^([^\.]*).([^\.]*)(?:(.__init__|.__call__)|(.[^\.]*))',
+              lnkpfx + r'sporco.dictlrn.\1.html#sporco.dictlrn.\1.\2\4')
     ct = jonga.CallTracer(srcmodflt=srcmodflt, srcqnmflt=srcqnmflt,
                           dstqnmflt=dstqnmflt, fnmsub=fnmsub,
                           grpflt=grpflt, lnksub=lnksub)
@@ -641,9 +641,9 @@ def make_doc_func(fnm):
 
         **Call graph**
 
-        .. image:: _static/jonga/%s
+        .. image:: ../_static/jonga/%s
            :width: 20%%
-           :target: _static/jonga/%s\n""" % (fnm, fnm)
+           :target: ../_static/jonga/%s\n""" % (fnm, fnm)
 
     return doc_fun
 
@@ -703,11 +703,11 @@ def insert_solve_docs():
         'sporco.fista.cbpdn.ConvBPDN': 'fista_cbpdn_solve.svg',
         'sporco.fista.ccmod.ConvCnstrMOD': 'ccmodfista_solve.svg',
         'sporco.fista.ccmod.ConvCnstrMODMask': 'ccmodmdfista_solve.svg'
-        }
+    }
 
     # Iterate over fully qualified class names in class/call graph image dict
     for fqclsnm in clsgrph:
-        clspth =  fqclsnm.split('.')
+        clspth = fqclsnm.split('.')
         # Name of module
         mdnm = '.'.join(clspth[0:-1])
         # Name of class
