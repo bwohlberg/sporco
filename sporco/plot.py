@@ -32,7 +32,7 @@ __author__ = """Brendt Wohlberg <brendt@ieee.org>"""
 
 
 
-def attach_keypress(fig):
+def attach_keypress(fig, scaling=1.1):
     """
     Attach a key press event handler that configures keys for closing a
     figure and changing the figure size. Keys 'e' and 'c' respectively
@@ -47,22 +47,29 @@ def attach_keypress(fig):
     ----------
     fig : :class:`matplotlib.figure.Figure` object
         Figure to which event handling is to be attached
+   scaling : float, optional (default 1.1)
+      Scaling factor for figure size changes
+
+    Returns
+    -------
+    press : function
+      Key press event handler function
     """
 
     def press(event):
-        a = 1.1
         if event.key == 'q':
             plt.close(fig)
         elif event.key == 'e':
-            fig.set_size_inches(a * fig.get_size_inches(), forward=True)
+            fig.set_size_inches(scaling * fig.get_size_inches(), forward=True)
         elif event.key == 'c':
-            fig.set_size_inches(fig.get_size_inches() / a, forward=True)
+            fig.set_size_inches(fig.get_size_inches() / scaling, forward=True)
 
     # Avoid multiple event handlers attached to the same figure
     if not hasattr(fig, '_sporco_keypress_cid'):
         cid = fig.canvas.mpl_connect('key_press_event', press)
         fig._sporco_keypress_cid = cid
 
+    return press
 
 
 def plot(y, x=None, ptyp='plot', xlbl=None, ylbl=None, title=None,
