@@ -38,7 +38,8 @@ computations"""
 def complex_dtype(dtype):
     """
     Construct the corresponding complex dtype for a given real dtype,
-    e.g. the complex dtype corresponding to np.float32 is np.complex64.
+    e.g. the complex dtype corresponding to ``np.float32`` is
+    ``np.complex64``.
 
     Parameters
     ----------
@@ -58,7 +59,7 @@ def complex_dtype(dtype):
 def pyfftw_byte_aligned(array, dtype=None, n=None):
     """
     Construct a byte-aligned array for efficient use by :mod:`pyfftw`.
-    This function is a wrapper for :func:`pyfftw.byte_aligned`
+    This function is a wrapper for :func:`pyfftw.byte_align`
 
     Parameters
     ----------
@@ -109,11 +110,13 @@ def pyfftw_empty_aligned(shape, dtype, order='C', n=None):
 def pyfftw_rfftn_empty_aligned(shape, axes, dtype, order='C', n=None):
     """
     Construct an empty byte-aligned array for efficient use by :mod:`pyfftw`
-    functions :mod:`pyfftw.rfftn` and :mod:`pyfftw.irfftn`. The shape of the
-    empty array is appropriate for the output of :mod:`pyfftw.rfftn` applied
-    to an array of the shape specified by parameter ``shape``, and for the
-    input of the corresponding :mod:`pyfftw.irfftn` call that reverses this
-    operation.
+    functions :func:`pyfftw.interfaces.numpy_fft.rfftn` and
+    :func:`pyfftw.interfaces.numpy_fft.irfftn`. The shape of the
+    empty array is appropriate for the output of
+    :func:`pyfftw.interfaces.numpy_fft.rfftn` applied
+    to an array of the shape specified by parameter `shape`, and for the
+    input of the corresponding :func:`pyfftw.interfaces.numpy_fft.irfftn`
+    call that reverses this operation.
 
     Parameters
     ----------
@@ -349,7 +352,7 @@ def fftconv(a, b, axes=(0, 1)):
 def inner(x, y, axis=-1):
     """
     Compute inner product of x and y on specified axis, equivalent to
-    np.sum(x * y, axis=axis, keepdims=True).
+    :code:`np.sum(x * y, axis=axis, keepdims=True)`.
 
     Parameters
     ----------
@@ -845,7 +848,7 @@ def lu_solve_AATI(A, rho, b, lu, piv):
 
 def zpad(x, pd, ax):
     """
-    Zero-pad array x with pd=(leading,trailing) zeros on axis ax.
+    Zero-pad array `x` with `pd = (leading, trailing)` zeros on axis `ax`.
 
     Parameters
     ----------
@@ -957,7 +960,7 @@ def GradientFilters(ndim, axes, axshp, dtype=None):
 
 def zdivide(x, y):
     """
-    Return x/y, with 0 instead of NaN where y is 0.
+    Return `x`/`y`, with 0 instead of NaN where `y` is 0.
 
     Parameters
     ----------
@@ -1113,9 +1116,9 @@ def promote16(u, fn=None, *args, **kwargs):
     Utility function for use with functions that do not support arrays
     of dtype ``np.float16``. This function has two distinct modes of
     operation. If called with only the `u` parameter specified, the
-    returned value is either `u` itself if u is not of dtype
-    np.float16, or `u` promoted to np.float32 dtype if it is. If the
-    function parameter `fn` is specified then `u` is conditionally
+    returned value is either `u` itself if `u` is not of dtype
+    ``np.float16``, or `u` promoted to ``np.float32`` dtype if it is. If
+    the function parameter `fn` is specified then `u` is conditionally
     promoted as described above, passed as the first argument to
     function `fn`, and the returned values are converted back to dtype
     ``np.float16`` if `u` is of that dtype. Note that if parameter `fn`
