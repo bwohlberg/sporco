@@ -23,6 +23,7 @@ nbexec = True
 
 # Top-level index files
 pfn = os.path.join(ppth, 'index.rst')
+docntbk.mkdir(npth)
 nfn = os.path.join(npth, 'index.ipynb')
 
 # Parse top-level index.rst file in example scripts directory
@@ -39,6 +40,7 @@ if docntbk.update_required(pfn, nfn):
 # Work through example script subdirectories
 for dir in dirlst:
     pfn = os.path.join(ppth, dir, 'index.rst')
+    docntbk.mkdir(os.path.join(npth, dir))
     nfn = os.path.join(npth, dir, 'index.ipynb')
 
     # Update notebooks index if it doesn't exist, or is older than scripts
