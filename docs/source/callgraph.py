@@ -121,7 +121,9 @@ def gengraphs(pth, nopyfftw):
 
         def empty(shape, dtype, order='C', n=None):
             return np.zeros(shape, dtype=dtype)
+        empty.__doc__ = spl.pyfftw_empty_aligned.__doc__
         spl.pyfftw_empty_aligned = empty
+
 
         def rfftn_empty(shape, axes, dtype, order='C', n=None):
             ashp = list(shape)
@@ -129,11 +131,16 @@ def gengraphs(pth, nopyfftw):
             ashp[raxis] = ashp[raxis] // 2 + 1
             cdtype = spl.complex_dtype(dtype)
             return np.zeros(ashp, dtype=cdtype)
+        rfftn_empty.__doc__ = spl.pyfftw_rfftn_empty_aligned.__doc__
         spl.pyfftw_rfftn_empty_aligned = rfftn_empty
 
+        npfft.fftn.__doc__ = spl.fftn.__doc__
         spl.fftn = npfft.fftn
+        npfft.ifftn.__doc__ = spl.ifftn.__doc__
         spl.ifftn = npfft.ifftn
+        npfft.rfftn.__doc__ = spl.rfftn.__doc__
         spl.rfftn = npfft.rfftn
+        npfft.irfftn.__doc__ = spl.irfftn.__doc__
         spl.irfftn = npfft.irfftn
 
 
