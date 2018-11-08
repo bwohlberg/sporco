@@ -10,6 +10,14 @@ This subpackage provides GPU acceleration for selected SPORCO modules via copies
 Note that the ``sporco.cupy`` subpackage is not supported under versions of Python, such as Python 2.7.x, that do not have the :mod:`importlib.util` module.
 
 
+.. seealso::
+
+   NumPy/CuPy compatibility
+      `Table
+      <https://docs-cupy.chainer.org/en/latest/reference/comparison.html>`__
+      of NumPy functions that are implemented in CuPy
+
+
 Installation and Configuration
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
