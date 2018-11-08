@@ -183,14 +183,18 @@ div.topnav a, div.bottomnav a {
 /*
  * Miscellaneous.
  */
-div.highlight pre {
+.admonition.seealso {
+  background-color: #f0f0f8;
+}
+.highlight > pre {
   border-radius: 4px;
   margin-top: 1em;
   margin-bottom: 1em;
-  
+  border-color: #f0f0f0;
+  background-color: #f0f0f8;
 }
 .pre {
-  background-color: #f8f8f8;
+  background-color: #fafafa;
 }
 ul {
   padding-left: 1em;
