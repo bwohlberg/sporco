@@ -3,8 +3,8 @@ SPORCO Release Notes
 ====================
 
 
-Version 0.1.10   (not yet released)
------------------------------------
+Version 0.1.10   (2018-11-09)
+-----------------------------
 
 - Significant changes to online CDL module, including addition of support
   for masked online CDL problem, and optional use of CUDA accelerated
