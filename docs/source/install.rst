@@ -95,7 +95,7 @@ The primary requirements are Python itself, and modules `future
       ::
 
 	sudo apt-get -y install python-numpy python-scipy python-numexpr python-matplotlib \
-				python-pip python-future libfftw3-dev python-pytest
+				python-imageio python-pip python-future libfftw3-dev python-pytest
 	sudo -H pip install pyfftw pytest-runner
 
       or Python 3
@@ -103,14 +103,8 @@ The primary requirements are Python itself, and modules `future
       ::
 
 	sudo apt-get -y install python3-numpy python3-scipy python3-numexpr python3-matplotlib \
-				python3-pip python3-future libfftw3-dev python3-pytest
+				python3-imageio python3-pip python3-future libfftw3-dev python3-pytest
 	sudo -H pip3 install pyfftw pytest-runner
-
-      For some versions of SciPy it might also be necessary to install `Pillow <https://python-pillow.org/>`_
-
-      ::
-
-	sudo -H pip3 install pillow
 
 
       Some additional dependencies are required for building the
@@ -150,7 +144,7 @@ The primary requirements are Python itself, and modules `future
 
       ::
 
-	pip install numpy scipy pillow matplotlib pyfftw
+	pip install numpy scipy imageio matplotlib pyfftw
 	pip install six future python-dateutil pyparsing cycler
 	pip install pytz pytest pytest-runner
 
@@ -203,7 +197,7 @@ The primary requirements are Python itself, and modules `future
 	pip install scipy-0.19.1-cp36-cp36m-win_amd64.whl
 	pip install matplotlib-2.0.2-cp36-cp36m-win_amd64.whl
 	pip install pyFFTW-0.10.4-cp36-cp36m-win_amd64.whl
-	pip install future pillow
+	pip install future imageio
 
 
       Some additional dependencies are required for building the

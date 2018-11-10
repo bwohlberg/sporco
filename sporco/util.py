@@ -31,7 +31,7 @@ else:
     import urllib.request as urlrequest
     import urllib.error as urlerror
 import numpy as np
-from scipy import misc
+import imageio
 import scipy.ndimage.interpolation as sni
 
 import sporco.linalg as sla
@@ -936,7 +936,7 @@ class ExampleImages(object):
             pth = os.path.join(self.bpth, group, fname)
 
         try:
-            img = np.asarray(misc.imread(pth), dtype=dtype)
+            img = np.asarray(imageio.imread(pth), dtype=dtype)
         except IOError:
             raise IOError('Could not access image %s in group %s' %
                           (fname, group))
