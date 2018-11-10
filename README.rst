@@ -24,7 +24,7 @@ SParse Optimization Research COde (SPORCO)
     :target: https://github.com/bwohlberg/sporco
     :alt: Package License
 .. image:: http://mybinder.org/badge.svg
-    :target: https://mybinder.org/v2/gh/bwohlberg/sporco-notebooks/v0.1.10?filepath=index.ipynb
+    :target: https://mybinder.org/v2/gh/bwohlberg/sporco-notebooks/master?filepath=index.ipynb
     :alt: Binder
 
 
