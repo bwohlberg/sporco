@@ -12,10 +12,10 @@ from builtins import range
 
 import multiprocessing
 import numpy as np
+import scipy
 from scipy import linalg
 from scipy import fftpack
-from scipy.sparse.linalg import LinearOperator
-from scipy.sparse.linalg import cg
+from scipy.sparse.linalg import LinearOperator, cg
 import pyfftw
 try:
     import numexpr as ne
@@ -682,6 +682,18 @@ def solvemdbi_rsm(ah, rho, b, axisK, dimN=2):
 
 
 
+# Deal with introduction of new atol parameter for scipy.sparse.linalg.cg
+# in SciPy 1.1.0
+_spv = scipy.__version__.split('.')
+if int(_spv[0]) > 1 or (int(_spv[0]) == 1 and int(_spv[1]) >= 1):
+    def _cg_wrapper(A, b, x0=None, tol=1e-5, maxiter=None):
+        return cg(A, b, x0=x0, tol=tol, maxiter=maxiter, atol=0.0)
+else:
+    def _cg_wrapper(A, b, x0=None, tol=1e-5, maxiter=None):
+        return cg(A, b, x0=x0, tol=tol, maxiter=maxiter)
+
+
+
 def solvemdbi_cg(ah, rho, b, axisM, axisK, tol=1e-5, mit=1000, isn=None):
     r"""
     Solve a multiple diagonal block linear system with a scaled
@@ -736,7 +748,7 @@ def solvemdbi_cg(ah, rho, b, axisM, axisK, tol=1e-5, mit=1000, isn=None):
     AHAop = lambda x: AHop(Aop(x))
     vAHAoprI = lambda x: AHAop(x.reshape(b.shape)).ravel() + rho * x.ravel()
     lop = LinearOperator((b.size, b.size), matvec=vAHAoprI, dtype=b.dtype)
-    vx, cgit = cg(lop, b.ravel(), isn, tol, mit)
+    vx, cgit = _cg_wrapper(lop, b.ravel(), isn, tol, mit)
     return vx.reshape(b.shape), cgit
 
 
