@@ -1227,30 +1227,6 @@ def split(u, axis=0):
 
 
 
-def roll(u, shift):
-    """
-    Apply :func:`numpy.roll` to multiple array axes.
-
-    Parameters
-    ----------
-    u : array_like
-      Input array
-    shift : array_like of int
-      Shifts to apply to axes of input `u`
-
-    Returns
-    -------
-    v : ndarray
-      Output array
-    """
-
-    v = u.copy()
-    for k in range(len(shift)):
-        v = np.roll(v, shift[k], axis=k)
-    return v
-
-
-
 def blockcirculant(A):
     """
     Construct a block circulant matrix from a tuple of arrays. This is a

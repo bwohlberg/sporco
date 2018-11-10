@@ -230,13 +230,6 @@ class TestSet01(object):
 
 
 
-    def test_14(self):
-        u = np.array([[0, 1], [2, 3]])
-        v = linalg.roll(u, [1, 1])
-        assert v[0, 0] == 3
-
-
-
     def test_15(self):
         u0 = np.array([[0, 1], [2, 3]])
         u1 = np.array([[4, 5], [6, 7]])
