@@ -49,9 +49,10 @@ the Fast Iterative Shrinkage-Thresholding Algorithm (FISTA).
 on_rtd = os.environ.get('READTHEDOCS') == 'True'
 if on_rtd:
     print("Building on ReadTheDocs")
-    install_requires = ['future', 'numpy', 'scipy', 'ipython']
+    install_requires = ['future', 'numpy', 'scipy', 'imageio', 'ipython']
 else:
-    install_requires = ['future', 'numpy', 'scipy', 'pyfftw', 'matplotlib']
+    install_requires = ['future', 'numpy', 'scipy', 'imageio', 'pyfftw',
+                        'matplotlib']
 
 
 setup(
