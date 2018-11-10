@@ -573,7 +573,7 @@ def imview(img, title=None, copy=True, fltscl=False, intrp='nearest',
 
     # Deal with removal of 'box-forced' adjustable in Matplotlib 2.2.0
     mplv = matplotlib.__version__.split('.')
-    if int(mplv[0]) >= 2 and int(mplv[1]) >= 2:
+    if int(mplv[0]) > 2 or (int(mplv[0]) == 2 and int(mplv[1]) >= 2):
         try:
             ax.set_adjustable('box')
         except Exception:
