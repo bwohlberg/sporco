@@ -77,22 +77,22 @@ from the root directory of the package.
 Requirements
 ------------
 
-The primary requirements are Python itself, and modules  `future <http://python-future.org>`_, `numpy <http://www.numpy.org>`_, `scipy <https://www.scipy.org>`_, `pyfftw <https://hgomersall.github.io/pyFFTW>`_, and `matplotlib <http://matplotlib.org>`_. Module `numexpr <https://github.com/pydata/numexpr>`_ is not required, but some functions will be faster if it is installed. If module `mpldatacursor <https://github.com/joferkington/mpldatacursor>`_ is installed, functions ``plot.plot``, ``plot.contour``, and ``plot.imview`` will support the data cursor that it provides.
+The primary requirements are Python itself, and modules  `future <http://python-future.org>`__, `numpy <http://www.numpy.org>`__, `scipy <https://www.scipy.org>`__, `imageio <https://imageio.github.io/>`__, `pyfftw <https://hgomersall.github.io/pyFFTW>`__, and `matplotlib <http://matplotlib.org>`__. Module `numexpr <https://github.com/pydata/numexpr>`__ is not required, but some functions will be faster if it is installed. If module `mpldatacursor <https://github.com/joferkington/mpldatacursor>`__ is installed, functions ``plot.plot``, ``plot.contour``, and ``plot.imview`` will support the data cursor that it provides.
 
-Instructions for installing these requirements are provided in the `Requirements <http://sporco.rtfd.io/en/latest/install.html#requirements>`_ section of the package documentation.
+Instructions for installing these requirements are provided in the `Requirements <http://sporco.rtfd.io/en/latest/install.html#requirements>`__ section of the package documentation.
 
 
 Installation
 ------------
 
-To install the most recent release of SPORCO from `PyPI <https://pypi.python.org/pypi/sporco/>`_ do
+To install the most recent release of SPORCO from `PyPI <https://pypi.python.org/pypi/sporco/>`__ do
 
 ::
 
     pip install sporco
 
 
-The `development version <https://github.com/bwohlberg/sporco>`_ on GitHub can be installed by doing
+The `development version <https://github.com/bwohlberg/sporco>`__ on GitHub can be installed by doing
 
 ::
 

@@ -36,7 +36,8 @@ followed by
    python setup.py test
    python setup.py install
 
-Please report any test failures. The install command will usually have to be performed with root permissions, e.g. on Ubuntu Linux
+Please report any test failures. The install command will usually have to be
+performed with root permissions, e.g. on Ubuntu Linux
 
 ::
 
@@ -62,18 +63,24 @@ Test Images
 -----------
 
 The :ref:`usage examples <usage-section>` make use of a number of
-standard test images, which are included with the package. Additional test images may be downloaded using the ``sporco_get_images`` script. Usage details may be obtained by doing
+standard test images, which are included with the package. Additional test images
+may be downloaded using the ``sporco_get_images`` script. Usage details may be
+obtained by doing
+
 ::
 
    bin/sporco_get_images --help
 
-from the root directory of the source distribution (i.e. prior to installation, in which case the ``PYTHONPATH`` environment variable should be set as described in :ref:`example-scripts-section`), or
+from the root directory of the source distribution (i.e. prior to installation,
+in which case the ``PYTHONPATH`` environment variable should be set as described
+in :ref:`example-scripts-section`), or
 
 ::
 
   sporco_get_images --help
 
-after installation. If the destination path is not explicitly set, the images will be downloaded into a subdirectory ``images`` of the current working directory.
+after installation. If the destination path is not explicitly set, the images will
+be downloaded into a subdirectory ``images`` of the current working directory.
 
 
 
@@ -81,10 +88,11 @@ Requirements
 ------------
 
 The primary requirements are Python itself, and modules `future
-<http://python-future.org>`_, `numpy
-<http://www.numpy.org>`_, `scipy <https://www.scipy.org>`_, `pyfftw
-<https://hgomersall.github.io/pyFFTW>`_, and `matplotlib
-<http://matplotlib.org>`_. Installation of these requirements is system dependent:
+<http://python-future.org>`__, `numpy <http://www.numpy.org>`__,
+`scipy <https://www.scipy.org>`__, `imageio <https://imageio.github.io/>`__,
+`pyfftw <https://hgomersall.github.io/pyFFTW>`__, and
+`matplotlib <http://matplotlib.org>`__. Installation of these requirements
+is system dependent:
 
 .. tabs::
 
@@ -220,7 +228,8 @@ The primary requirements are Python itself, and modules `future
 	set PATH=%PATH%;"C:\Program Files (x86)\Graphviz2.38\bin"
 
 
-In addition to the required packages, a number of optional packages enable additional features when installed:
+In addition to the required packages, a number of optional packages enable
+additional features when installed:
 
 
 .. |numexpr| replace:: `numexpr <https://github.com/pydata/numexpr>`__
