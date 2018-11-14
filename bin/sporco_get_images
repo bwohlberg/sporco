@@ -164,10 +164,10 @@ if __name__ == "__main__":
         if args.group is None:
             for gnm in ['standard', 'kodak']:
                 getgroup(groups[gnm], gnm, dstroot, args.verbose)
-            else:
-                if gnm not in groups:
-                    sys.exit("error: group %s not recognized" % gnm)
-                getgroup(groups[gnm], gnm, dstroot, args.verbose)
+        else:
+            if gnm not in groups:
+                sys.exit("error: group %s not recognized" % gnm)
+            getgroup(groups[gnm], gnm, dstroot, args.verbose)
 
 
     exit(0)
