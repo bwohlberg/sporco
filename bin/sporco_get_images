@@ -18,7 +18,7 @@ import io
 import os
 import sys
 import argparse
-import scipy.misc
+import imageio
 
 import sporco
 import sporco.util as util
@@ -60,8 +60,8 @@ def getimage(url, dst, dstroot, vrbs=False):
             # For other extensions, read the file as an image and then
             # save it as the type specified by the destination
             # extension
-            img = scipy.misc.imread(util.netgetdata(url))
-            scipy.misc.imsave(dstpth, img)
+            img = imageio.imread(util.netgetdata(url))
+            imageio.imsave(dstpth, img)
 
 
 
