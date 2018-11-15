@@ -75,7 +75,6 @@ setup(
     package_data     = {'sporco': ['data/*.png', 'data/*.jpg', 'data/*.npz']},
     data_files       = data,
     include_package_data = True,
-    scripts          = ['bin/sporco_get_images'],
     setup_requires   = ['future', 'pytest-runner', 'numpy', 'scipy'],
     tests_require    = ['pytest'],
     install_requires = install_requires,
