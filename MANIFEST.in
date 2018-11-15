@@ -17,4 +17,3 @@ include sporco/data/README.rst
 include sporco/cuda/__init__.py
 recursive-include sporco/cupy *.py
 
-prune docs/build

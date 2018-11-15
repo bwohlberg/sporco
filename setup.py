@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+"""SPORCO package configuration."""
+
 from __future__ import print_function
 from builtins import next
 from builtins import filter
@@ -8,7 +10,6 @@ from builtins import filter
 import os
 from glob import glob
 from setuptools import setup
-import io
 import os.path
 from ast import parse
 
@@ -24,7 +25,7 @@ with open(os.path.join(name, '__init__.py')) as f:
 
 packages = ['sporco', 'sporco.admm', 'sporco.fista', 'sporco.dictlrn']
 
-docdirbase  = 'share/doc/%s-%s' % (name, version)
+docdirbase = 'share/doc/%s-%s' % (name, version)
 data = [(os.path.join(docdirbase, 'examples/scripts'),
         ['examples/scripts/index.rst'])]
 for d in glob('examples/scripts/*'):
@@ -46,13 +47,13 @@ on the Alternating Direction Method of Multipliers (ADMM) or on
 the Fast Iterative Shrinkage-Thresholding Algorithm (FISTA).
 """
 
+install_requires = ['future', 'numpy', 'scipy', 'imageio', 'matplotlib',
+                    'ipython']
 on_rtd = os.environ.get('READTHEDOCS') == 'True'
 if on_rtd:
     print("Building on ReadTheDocs")
-    install_requires = ['future', 'numpy', 'scipy', 'imageio', 'ipython']
 else:
-    install_requires = ['future', 'numpy', 'scipy', 'imageio', 'pyfftw',
-                        'matplotlib']
+    install_requires.append('pyfftw')
 
 
 setup(
@@ -75,13 +76,9 @@ setup(
     package_data     = {'sporco': ['data/*.png', 'data/*.jpg', 'data/*.npz']},
     data_files       = data,
     include_package_data = True,
-    setup_requires   = ['future', 'pytest-runner', 'numpy', 'scipy'],
-    tests_require    = ['pytest'],
+    setup_requires   = ['future'],
+    tests_require    = ['pytest', 'pytest-runner'],
     install_requires = install_requires,
-    extras_require = {
-        'numexpr':  ['numexpr'],
-        'datacursor': ['mpldatacursor'],
-    },
     classifiers = [
     'License :: OSI Approved :: BSD License',
     'Development Status :: 4 - Beta',
