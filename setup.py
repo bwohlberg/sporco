@@ -47,11 +47,11 @@ on the Alternating Direction Method of Multipliers (ADMM) or on
 the Fast Iterative Shrinkage-Thresholding Algorithm (FISTA).
 """
 
-install_requires = ['future', 'numpy', 'scipy', 'imageio', 'matplotlib',
-                    'ipython']
+install_requires = ['future', 'numpy', 'scipy', 'imageio', 'matplotlib']
 on_rtd = os.environ.get('READTHEDOCS') == 'True'
 if on_rtd:
     print("Building on ReadTheDocs")
+    install_requires.append('ipython')
 else:
     install_requires.append('pyfftw')
 
