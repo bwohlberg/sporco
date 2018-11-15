@@ -12,7 +12,6 @@ from __future__ import absolute_import
 
 import copy
 import numpy as np
-from scipy import linalg
 
 from sporco.admm import admm
 import sporco.linalg as sl
@@ -240,7 +239,7 @@ class GenericBPDN(admm.ADMMEqual):
         \mathbf{s} \|_2^2`.
         """
 
-        return 0.5*linalg.norm((self.D.dot(self.obfn_fvar()) - self.S))**2
+        return 0.5*np.linalg.norm((self.D.dot(self.obfn_fvar()) - self.S))**2
 
 
 
@@ -462,7 +461,7 @@ class BPDN(GenericBPDN):
         function.
         """
 
-        rl1 = linalg.norm((self.wl1 * self.obfn_gvar()).ravel(), 1)
+        rl1 = np.linalg.norm((self.wl1 * self.obfn_gvar()).ravel(), 1)
         return (self.lmbda*rl1, rl1)
 
 
@@ -583,7 +582,7 @@ class BPDNJoint(BPDN):
         :math:`\| Y \|_{2,1}`.
         """
 
-        rl1 = linalg.norm((self.wl1 * self.obfn_gvar()).ravel(), 1)
+        rl1 = np.linalg.norm((self.wl1 * self.obfn_gvar()).ravel(), 1)
         rl21 = np.sum(np.sqrt(np.sum(self.obfn_gvar()**2, axis=1)))
         return (self.lmbda*rl1 + self.mu*rl21, rl1, rl21)
 
@@ -733,8 +732,8 @@ class ElasticNet(BPDN):
         function.
         """
 
-        rl1 = linalg.norm((self.wl1 * self.obfn_gvar()).ravel(), 1)
-        rl2 = 0.5 * linalg.norm(self.obfn_gvar())**2
+        rl1 = np.linalg.norm((self.wl1 * self.obfn_gvar()).ravel(), 1)
+        rl2 = 0.5 * np.linalg.norm(self.obfn_gvar())**2
         return (self.lmbda*rl1 + self.mu*rl2, rl1, rl2)
 
 
@@ -912,7 +911,7 @@ class BPDNProjL1(GenericBPDN):
 
         dfd = self.obfn_dfd()
         prj = sp.proj_l1(self.obfn_gvar(), self.gamma, axis=0)
-        cns = linalg.norm(prj - self.obfn_gvar())
+        cns = np.linalg.norm(prj - self.obfn_gvar())
         return (dfd, cns)
 
 
@@ -1160,8 +1159,8 @@ class MinL1InL2Ball(admm.ADMMTwoBlockCnstrnt):
         set.
         """
 
-        obj = linalg.norm((self.wl1 * self.obfn_g0var()).ravel(), 1)
-        cns = linalg.norm(sl.proj_l2ball(
+        obj = np.linalg.norm((self.wl1 * self.obfn_g0var()).ravel(), 1)
+        cns = np.linalg.norm(sl.proj_l2ball(
             self.obfn_g1var(), self.S, self.epsilon, axes=0) -
             self.obfn_g1var())
         return (obj, cns)
@@ -1171,11 +1170,11 @@ class MinL1InL2Ball(admm.ADMMTwoBlockCnstrnt):
     def rsdl_s(self, Yprev, Y):
         """Compute dual residual vector."""
 
-        return self.rho * linalg.norm(self.cnst_AT(self.U))
+        return self.rho * np.linalg.norm(self.cnst_AT(self.U))
 
 
 
     def rsdl_sn(self, U):
         """Compute dual residual normalisation term."""
 
-        return self.rho * linalg.norm(U)
+        return self.rho * np.linalg.norm(U)

@@ -13,7 +13,6 @@ from __future__ import absolute_import
 
 import copy
 import numpy as np
-from scipy import linalg
 
 from sporco.fista import fista
 import sporco.cnvrep as cr
@@ -355,7 +354,7 @@ class ConvCnstrMOD(fista.FISTADFT):
         P(\mathbf{y}) - \mathbf{y}\|_2`.
         """
 
-        return linalg.norm((self.Pcn(self.X) - self.X))
+        return np.linalg.norm((self.Pcn(self.X) - self.X))
 
 
     def reconstruct(self, D=None):

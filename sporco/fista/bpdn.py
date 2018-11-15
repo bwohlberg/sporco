@@ -14,7 +14,6 @@ from __future__ import print_function
 
 import copy
 import numpy as np
-from scipy import linalg
 
 from sporco.fista import fista
 import sporco.linalg as sl
@@ -234,7 +233,7 @@ class BPDN(fista.FISTA):
     def rsdl(self):
         """Compute fixed point residual."""
 
-        return linalg.norm((self.X - self.Yprv).ravel())
+        return np.linalg.norm((self.X - self.Yprv).ravel())
 
 
 
@@ -255,7 +254,7 @@ class BPDN(fista.FISTA):
         function.
         """
 
-        rl1 = linalg.norm((self.wl1 * self.X).ravel(), 1)
+        rl1 = np.linalg.norm((self.wl1 * self.X).ravel(), 1)
         return (self.lmbda*rl1, rl1)
 
 
@@ -267,7 +266,7 @@ class BPDN(fista.FISTA):
         if X is None:
             X = self.X
 
-        return 0.5 * linalg.norm((self.D.dot(X) - self.S).ravel())**2
+        return 0.5 * np.linalg.norm((self.D.dot(X) - self.S).ravel())**2
 
 
 

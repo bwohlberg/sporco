@@ -13,7 +13,6 @@ from __future__ import absolute_import
 
 import copy
 import numpy as np
-from scipy import linalg
 
 from sporco.admm import admm
 from sporco.admm import ccmod
@@ -518,7 +517,7 @@ class ConvCnstrMODMaskDcplBase(admm.ADMMTwoBlockCnstrnt):
         function.
         """
 
-        return (linalg.norm(self.W * Y0)**2) / 2.0
+        return (np.linalg.norm(self.W * Y0)**2) / 2.0
 
 
 
@@ -527,7 +526,7 @@ class ConvCnstrMODMaskDcplBase(admm.ADMMTwoBlockCnstrnt):
         function.
         """
 
-        return linalg.norm((self.Pcn(Y1) - Y1))
+        return np.linalg.norm((self.Pcn(Y1) - Y1))
 
 
 
@@ -554,14 +553,14 @@ class ConvCnstrMODMaskDcplBase(admm.ADMMTwoBlockCnstrnt):
     def rsdl_s(self, Yprev, Y):
         """Compute dual residual vector."""
 
-        return self.rho*linalg.norm(self.cnst_AT(self.U))
+        return self.rho*np.linalg.norm(self.cnst_AT(self.U))
 
 
 
     def rsdl_sn(self, U):
         """Compute dual residual normalisation term."""
 
-        return self.rho*linalg.norm(U)
+        return self.rho*np.linalg.norm(U)
 
 
 
@@ -971,8 +970,8 @@ class ConvCnstrMODMaskDcpl_Consensus(ccmod.ConvCnstrMOD_Consensus):
 
         Ef = sl.inner(self.Zf, self.obfn_fvarf(), axis=self.cri.axisM) \
           - self.Sf
-        return (linalg.norm(self.W * sl.irfftn(Ef, self.cri.Nv,
-                                               self.cri.axisN))**2) / 2.0
+        return (np.linalg.norm(self.W * sl.irfftn(Ef, self.cri.Nv,
+                                                  self.cri.axisN))**2) / 2.0
 
 
 
