@@ -79,6 +79,70 @@ class TestSet01(object):
 
     def test_05(self):
         rho = 1e-1
+        N = 64
+        M = 128
+        K = 32
+        D = np.random.randn(N, M)
+        X = np.random.randn(M, K)
+        S = D.dot(X)
+        Z = (D.T.dot(D).dot(X) + rho*X - D.T.dot(S)) / rho
+        c, lwr = linalg.cho_factor(D, rho)
+        Xslv = linalg.cho_solve_ATAI(D, rho, D.T.dot(S) + rho*Z, c, lwr)
+        assert(linalg.rrs(D.T.dot(D).dot(Xslv) + rho*Xslv,
+                        D.T.dot(S) + rho*Z) < 1e-11)
+
+
+
+    def test_06(self):
+        rho = 1e-1
+        N = 128
+        M = 64
+        K = 32
+        D = np.random.randn(N, M)
+        X = np.random.randn(M, K)
+        S = D.dot(X)
+        Z = (D.T.dot(D).dot(X) + rho*X - D.T.dot(S)) / rho
+        c, lwr = linalg.cho_factor(D, rho)
+        Xslv = linalg.cho_solve_ATAI(D, rho, D.T.dot(S) + rho*Z, c, lwr)
+        assert(linalg.rrs(D.T.dot(D).dot(Xslv) + rho*Xslv,
+                        D.T.dot(S) + rho*Z) < 1e-14)
+
+
+
+    def test_07(self):
+        rho = 1e-1
+        N = 64
+        M = 128
+        K = 32
+        D = np.random.randn(N, M)
+        X = np.random.randn(M, K)
+        S = D.dot(X)
+        Z = (D.dot(X).dot(X.T) + rho*D - S.dot(X.T)) / rho
+        c, lwr = linalg.cho_factor(X, rho)
+        Dslv = linalg.cho_solve_AATI(X, rho, S.dot(X.T) + rho*Z, c, lwr)
+        assert(linalg.rrs(Dslv.dot(X).dot(X.T) + rho*Dslv,
+                        S.dot(X.T) + rho*Z) < 1e-11)
+
+
+
+    def test_08(self):
+        rho = 1e-1
+        N = 128
+        M = 64
+        K = 32
+        D = np.random.randn(N, M)
+        X = np.random.randn(M, K)
+        S = D.dot(X)
+        Z = (D.dot(X).dot(X.T) + rho*D - S.dot(X.T)) / rho
+        c, lwr = linalg.cho_factor(X, rho)
+        Dslv = linalg.cho_solve_AATI(X, rho, S.dot(X.T) + rho*Z, c, lwr)
+        assert(linalg.rrs(Dslv.dot(X).dot(X.T) + rho*Dslv,
+                        S.dot(X.T) + rho*Z) < 1e-11)
+
+
+
+    def test_09(self):
+        rho = 1e-1
         N = 32
         M = 16
         K = 8
@@ -93,7 +157,7 @@ class TestSet01(object):
 
 
 
-    def test_06(self):
+    def test_10(self):
         N = 32
         M = 16
         K = 8
@@ -110,7 +174,7 @@ class TestSet01(object):
 
 
 
-    def test_07(self):
+    def test_11(self):
         rho = 1e-1
         N = 32
         M = 16
@@ -128,7 +192,7 @@ class TestSet01(object):
 
 
 
-    def test_08(self):
+    def test_12(self):
         rho = 1e-1
         N = 32
         M = 16
@@ -147,81 +211,81 @@ class TestSet01(object):
 
 
 
-    def test_09(self):
-        rho = 1e-1
-        N = 32
-        M = 16
-        K = 8
-        D = util.complex_randn(N, N, 1, 1, M)
-        X = util.complex_randn(N, N, 1, K, M)
-        S = np.sum(D*X, axis=4, keepdims=True)
-
-        Xop = lambda x: np.sum(X * x, axis=4, keepdims=True)
-        XHop = lambda x: np.sum(np.conj(X) * x, axis=3, keepdims=True)
-        Z = (XHop(Xop(D)) + rho*D - XHop(S)) / rho
-        Dslv = linalg.solvemdbi_rsm(X, rho, XHop(S) + rho*Z, 3)
-
-        assert linalg.rrs(XHop(Xop(Dslv)) + rho*Dslv, XHop(S) + rho*Z) < 1e-11
-
-
-
-    def test_10(self):
-        rho = 1e-1
-        N = 64
-        M = 32
-        C = 3
-        K = 8
-        D = util.complex_randn(N, N, C, 1, M)
-        X = util.complex_randn(N, N, 1, K, M)
-        S = np.sum(D*X, axis=4, keepdims=True)
-
-        Xop = lambda x: np.sum(X * x, axis=4, keepdims=True)
-        XHop = lambda x: np.sum(np.conj(X) * x, axis=3, keepdims=True)
-        Z = (XHop(Xop(D)) + rho*D - XHop(S)) / rho
-        Dslv = linalg.solvemdbi_rsm(X, rho, XHop(S) + rho*Z, 3)
-
-        assert linalg.rrs(XHop(Xop(Dslv)) + rho*Dslv, XHop(S) + rho*Z) < 1e-11
-
-
-
-    def test_11(self):
-        rho = 1e-1
-        N = 32
-        M = 16
-        K = 8
-        D = util.complex_randn(N, N, 1, 1, M)
-        X = util.complex_randn(N, N, 1, K, M)
-        S = np.sum(D*X, axis=4, keepdims=True)
-
-        Xop = lambda x: np.sum(X * x, axis=4, keepdims=True)
-        XHop = lambda x: np.sum(np.conj(X) * x, axis=3, keepdims=True)
-        Z = (XHop(Xop(D)) + rho*D - XHop(S)) / rho
-        Dslv, cgit = linalg.solvemdbi_cg(X, rho, XHop(S)+rho*Z, 4, 3, tol=1e-6)
-
-        assert linalg.rrs(XHop(Xop(Dslv)) + rho*Dslv, XHop(S) + rho*Z) <= 1e-6
-
-
-
-    def test_12(self):
-        rho = 1e-1
-        N = 64
-        M = 32
-        C = 3
-        K = 8
-        D = util.complex_randn(N, N, C, 1, M)
-        X = util.complex_randn(N, N, 1, K, M)
-        S = np.sum(D*X, axis=4, keepdims=True)
-
-        Xop = lambda x: np.sum(X * x, axis=4, keepdims=True)
-        XHop = lambda x: np.sum(np.conj(X) * x, axis=3, keepdims=True)
-        Z = (XHop(Xop(D)) + rho*D - XHop(S)) / rho
-        Dslv, cgit = linalg.solvemdbi_cg(X, rho, XHop(S)+rho*Z, 4, 3, tol=1e-6)
-
-        assert linalg.rrs(XHop(Xop(Dslv)) + rho*Dslv, XHop(S) + rho*Z) <= 1e-6
-
-
-
     def test_13(self):
+        rho = 1e-1
+        N = 32
+        M = 16
+        K = 8
+        D = util.complex_randn(N, N, 1, 1, M)
+        X = util.complex_randn(N, N, 1, K, M)
+        S = np.sum(D*X, axis=4, keepdims=True)
+
+        Xop = lambda x: np.sum(X * x, axis=4, keepdims=True)
+        XHop = lambda x: np.sum(np.conj(X) * x, axis=3, keepdims=True)
+        Z = (XHop(Xop(D)) + rho*D - XHop(S)) / rho
+        Dslv = linalg.solvemdbi_rsm(X, rho, XHop(S) + rho*Z, 3)
+
+        assert linalg.rrs(XHop(Xop(Dslv)) + rho*Dslv, XHop(S) + rho*Z) < 1e-11
+
+
+
+    def test_14(self):
+        rho = 1e-1
+        N = 64
+        M = 32
+        C = 3
+        K = 8
+        D = util.complex_randn(N, N, C, 1, M)
+        X = util.complex_randn(N, N, 1, K, M)
+        S = np.sum(D*X, axis=4, keepdims=True)
+
+        Xop = lambda x: np.sum(X * x, axis=4, keepdims=True)
+        XHop = lambda x: np.sum(np.conj(X) * x, axis=3, keepdims=True)
+        Z = (XHop(Xop(D)) + rho*D - XHop(S)) / rho
+        Dslv = linalg.solvemdbi_rsm(X, rho, XHop(S) + rho*Z, 3)
+
+        assert linalg.rrs(XHop(Xop(Dslv)) + rho*Dslv, XHop(S) + rho*Z) < 1e-11
+
+
+
+    def test_15(self):
+        rho = 1e-1
+        N = 32
+        M = 16
+        K = 8
+        D = util.complex_randn(N, N, 1, 1, M)
+        X = util.complex_randn(N, N, 1, K, M)
+        S = np.sum(D*X, axis=4, keepdims=True)
+
+        Xop = lambda x: np.sum(X * x, axis=4, keepdims=True)
+        XHop = lambda x: np.sum(np.conj(X) * x, axis=3, keepdims=True)
+        Z = (XHop(Xop(D)) + rho*D - XHop(S)) / rho
+        Dslv, cgit = linalg.solvemdbi_cg(X, rho, XHop(S)+rho*Z, 4, 3, tol=1e-6)
+
+        assert linalg.rrs(XHop(Xop(Dslv)) + rho*Dslv, XHop(S) + rho*Z) <= 1e-6
+
+
+
+    def test_16(self):
+        rho = 1e-1
+        N = 64
+        M = 32
+        C = 3
+        K = 8
+        D = util.complex_randn(N, N, C, 1, M)
+        X = util.complex_randn(N, N, 1, K, M)
+        S = np.sum(D*X, axis=4, keepdims=True)
+
+        Xop = lambda x: np.sum(X * x, axis=4, keepdims=True)
+        XHop = lambda x: np.sum(np.conj(X) * x, axis=3, keepdims=True)
+        Z = (XHop(Xop(D)) + rho*D - XHop(S)) / rho
+        Dslv, cgit = linalg.solvemdbi_cg(X, rho, XHop(S)+rho*Z, 4, 3, tol=1e-6)
+
+        assert linalg.rrs(XHop(Xop(Dslv)) + rho*Dslv, XHop(S) + rho*Z) <= 1e-6
+
+
+
+    def test_17(self):
         b = np.array([0.0, 0.0, 2.0])
         s = np.array([0.0, 0.0, 0.0])
         r = 1.0
@@ -230,7 +294,7 @@ class TestSet01(object):
 
 
 
-    def test_15(self):
+    def test_18(self):
         u0 = np.array([[0, 1], [2, 3]])
         u1 = np.array([[4, 5], [6, 7]])
         C = linalg.blockcirculant((u0, u1))
@@ -239,7 +303,7 @@ class TestSet01(object):
 
 
 
-    def test_16(self):
+    def test_19(self):
         x = np.random.randn(16, 8)
         xf = linalg.fftn(x, axes=(0,))
         n1 = np.linalg.norm(x)**2
@@ -248,7 +312,7 @@ class TestSet01(object):
 
 
 
-    def test_17(self):
+    def test_20(self):
         x = np.random.randn(16, )
         xf = linalg.rfftn(x, axes=(0,))
         n1 = np.linalg.norm(x)**2
@@ -257,7 +321,7 @@ class TestSet01(object):
 
 
 
-    def test_18(self):
+    def test_21(self):
         x = np.random.randn(16, 8)
         y = np.random.randn(16, 8)
         ip1 = np.sum(x * y, axis=0, keepdims=True)
@@ -266,7 +330,7 @@ class TestSet01(object):
 
 
 
-    def test_19(self):
+    def test_22(self):
         x = np.random.randn(8, 8, 3, 12)
         y = np.random.randn(8, 1, 1, 12)
         ip1 = np.sum(x * y, axis=-1, keepdims=True)
@@ -275,7 +339,7 @@ class TestSet01(object):
 
 
 
-    def test_20(self):
+    def test_23(self):
         x = np.array([[0, 1], [2, 3]])
         y = np.array([[4, 5], [6, 7]])
         xy = np.array([[38, 36], [30, 28]])
