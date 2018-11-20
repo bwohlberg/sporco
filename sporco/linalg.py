@@ -1090,7 +1090,7 @@ def GradientFilters(ndim, axes, axshp, dtype=None):
         g[(0,) * k + (slice(None),) + (0,) * (g.ndim - 2 - k) + (k,)] = \
             np.array([1, -1])
     Gf = rfftn(g, axshp, axes=axes)
-    GHGf = np.sum(np.conj(Gf) * Gf, axis=-1)
+    GHGf = np.sum(np.conj(Gf) * Gf, axis=-1).real
     return Gf, GHGf
 
 
