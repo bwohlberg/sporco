@@ -22,14 +22,8 @@ import sys
 
 import pyfftw   # See https://github.com/pyFFTW/pyFFTW/issues/40
 import numpy as np
-
-try:
-    import skvideo.datasets
-    import skvideo.io
-except ImportError:
-    print('Package scikit-video is required by this demo script',
-          file=sys.stderr)
-    raise
+from scipy.ndimage import zoom
+import imageio
 
 from sporco.dictlrn import cbpdndl
 from sporco import util
@@ -40,10 +34,15 @@ from sporco import plot
 Construct 3D training array from video data
 """
 
-vid = skvideo.io.vread(skvideo.datasets.fullreferencepair()[0],
-                       outputdict={"-pix_fmt": "gray"})[..., 0]
-vid = np.moveaxis(vid, 0, -1)
-vid = vid[0:106,40:136, 10:42].astype(np.float32)/255.0
+reader = imageio.get_reader('imageio:cockatoo.mp4')
+nfrm = reader.get_length()
+frmlst = []
+for i, frm in enumerate(reader):
+    if i >= 250:
+        frm = zoom(util.rgb2gray(frm.astype(np.float32)/255.0), 0.25)
+        frmlst.append(frm[20:-20, 70:-70])
+vid = np.stack(frmlst, axis=2)
+
 
 """
 Highpass filter video frames.

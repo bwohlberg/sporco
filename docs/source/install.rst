@@ -237,7 +237,6 @@ additional features when installed:
 .. |cupy| replace:: `cupy <https://github.com/cupy/cupy>`__
 .. |wrltzr| replace:: `wurlitzer <https://github.com/minrk/wurlitzer>`__
 .. |gputil| replace:: `GPUtil <https://github.com/anderskm/gputil>`__
-.. |skvideo| replace:: `scikit-video <http://www.scikit-video.org>`__
 
 
 =================  ======================================================
@@ -250,6 +249,4 @@ Optional Package   Features Supported
 |wrltzr|           Utility that supports capture of :mod:`sporco.cuda`
 		   function output within Jupyter notebooks
 |gputil|           Additional utility functions in :mod:`sporco.cupy`
-|skvideo|          Required by example script
-		   :ref:`cbpdndl_video.py <example_cdl_cbpdndl_video>`
 =================  ======================================================
