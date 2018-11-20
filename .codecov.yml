@@ -13,11 +13,11 @@ coverage:
     changes: no
 
 ignore:
-  - "sporco/tests"
-  - "sporco/admm/tests"
-  - "sporco/fista/tests"
-  - "sporco/dictlrn/tests"
+  - "tests"
   - "test_*.py"
+  - "sporco/cupy"
+  - "sporco/cuda"
+
 
 parsers:
   gcov:
