@@ -193,8 +193,12 @@ div.topnav a, div.bottomnav a {
   border-color: #f0f0f0;
   background-color: #f0f0f8;
 }
-.pre {
-  background-color: #fafafa;
+[class='docutils literal'] > .pre {
+  background-color: transparent;
+  color: #000080;
+}
+code {
+  background-color: transparent;
 }
 ul {
   padding-left: 1em;
