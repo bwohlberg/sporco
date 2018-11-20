@@ -753,7 +753,7 @@ def solvemdbi_cg(ah, rho, b, axisM, axisK, tol=1e-5, mit=1000, isn=None):
 
 
 
-def lu_factor(A, rho):
+def lu_factor(A, rho, check_finite=True):
     r"""
     Compute LU factorisation of either :math:`A^T A + \rho I` or
     :math:`A A^T + \rho I`, depending on which matrix is smaller.
@@ -764,6 +764,9 @@ def lu_factor(A, rho):
       Array :math:`A`
     rho : float
       Scalar :math:`\rho`
+    check_finite : bool, optional (default False)
+      Flag indicating whether the input array should be checked for Inf
+      and NaN values
 
     Returns
     -------
@@ -780,15 +783,17 @@ def lu_factor(A, rho):
     # matrix inversion lemma to compute the inverse of A^T*A + rho*I
     if N >= M:
         lu, piv = linalg.lu_factor(A.T.dot(A) +
-                                   rho * np.identity(M, dtype=A.dtype))
+                                   rho * np.identity(M, dtype=A.dtype),
+                                   check_finite=check_finite)
     else:
         lu, piv = linalg.lu_factor(A.dot(A.T) +
-                                   rho * np.identity(N, dtype=A.dtype))
+                                   rho * np.identity(N, dtype=A.dtype),
+                                   check_finite=check_finite)
     return lu, piv
 
 
 
-def lu_solve_ATAI(A, rho, b, lu, piv):
+def lu_solve_ATAI(A, rho, b, lu, piv, check_finite=True):
     r"""
     Solve the linear system :math:`(A^T A + \rho I)\mathbf{x} = \mathbf{b}`
     or :math:`(A^T A + \rho I)X = B` using :func:`scipy.linalg.lu_solve`.
@@ -807,23 +812,27 @@ def lu_solve_ATAI(A, rho, b, lu, piv):
     piv : array_like
       Pivot indices representing the permutation matrix P, as returned by
       :func:`scipy.linalg.lu_factor`
+    check_finite : bool, optional (default False)
+      Flag indicating whether the input array should be checked for Inf
+      and NaN values
 
     Returns
     -------
     x : ndarray
-      Solution to the linear system.
+      Solution to the linear system
     """
 
     N, M = A.shape
     if N >= M:
-        x = linalg.lu_solve((lu, piv), b)
+        x = linalg.lu_solve((lu, piv), b, check_finite=check_finite)
     else:
-        x = (b - A.T.dot(linalg.lu_solve((lu, piv), A.dot(b), 1))) / rho
+        x = (b - A.T.dot(linalg.lu_solve((lu, piv), A.dot(b), 1,
+                                         check_finite=check_finite))) / rho
     return x
 
 
 
-def lu_solve_AATI(A, rho, b, lu, piv):
+def lu_solve_AATI(A, rho, b, lu, piv, check_finite=True):
     r"""
     Solve the linear system :math:`(A A^T + \rho I)\mathbf{x} = \mathbf{b}`
     or :math:`(A A^T + \rho I)X = B` using :func:`scipy.linalg.lu_solve`.
@@ -842,18 +851,22 @@ def lu_solve_AATI(A, rho, b, lu, piv):
     piv : array_like
       Pivot indices representing the permutation matrix P, as returned by
       :func:`scipy.linalg.lu_factor`
+    check_finite : bool, optional (default False)
+      Flag indicating whether the input array should be checked for Inf
+      and NaN values
 
     Returns
     -------
     x : ndarray
-      Solution to the linear system.
+      Solution to the linear system
     """
 
     N, M = A.shape
     if N >= M:
-        x = (b - linalg.lu_solve((lu, piv), b.dot(A).T).T.dot(A.T)) / rho
+        x = (b - linalg.lu_solve((lu, piv), b.dot(A).T,
+                                 check_finite=check_finite).T.dot(A.T)) / rho
     else:
-        x = linalg.lu_solve((lu, piv), b.T).T
+        x = linalg.lu_solve((lu, piv), b.T, check_finite=check_finite).T
     return x
 
 
