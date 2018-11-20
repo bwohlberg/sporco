@@ -871,6 +871,118 @@ def lu_solve_AATI(A, rho, b, lu, piv, check_finite=True):
 
 
 
+def cho_factor(A, rho, lower=False, check_finite=True):
+    r"""
+    Compute Cholesky factorisation of either :math:`A^T A + \rho I` or
+    :math:`A A^T + \rho I`, depending on which matrix is smaller.
+
+    Parameters
+    ----------
+    A : array_like
+      Array :math:`A`
+    rho : float
+      Scalar :math:`\rho`
+    lower : bool, optional (default False)
+      Flag indicating whether lower or upper triangular factors are
+      computed
+    check_finite : bool, optional (default False)
+      Flag indicating whether the input array should be checked for Inf
+      and NaN values
+
+    Returns
+    -------
+    c : ndarray
+      Matrix containing lower or upper triangular Cholesky factor,
+      as returned by :func:`scipy.linalg.cho_factor`
+    lwr : bool
+      Flag indicating whether the factor is lower or upper triangular
+    """
+
+    N, M = A.shape
+    # If N < M it is cheaper to factorise A*A^T + rho*I and then use the
+    # matrix inversion lemma to compute the inverse of A^T*A + rho*I
+    if N >= M:
+        c, lwr = linalg.cho_factor(
+            A.T.dot(A) + rho * np.identity(M, dtype=A.dtype), lower=lower,
+            check_finite=check_finite)
+    else:
+        c, lwr = linalg.cho_factor(
+            A.dot(A.T) + rho * np.identity(N, dtype=A.dtype), lower=lower,
+            check_finite=check_finite)
+    return c, lwr
+
+
+
+def cho_solve_ATAI(A, rho, b, c, lwr, check_finite=True):
+    r"""
+    Solve the linear system :math:`(A^T A + \rho I)\mathbf{x} = \mathbf{b}`
+    or :math:`(A^T A + \rho I)X = B` using :func:`scipy.linalg.cho_solve`.
+
+    Parameters
+    ----------
+    A : array_like
+      Matrix :math:`A`
+    rho : float
+      Scalar :math:`\rho`
+    b : array_like
+      Vector :math:`\mathbf{b}` or matrix :math:`B`
+    c : array_like
+      Matrix containing lower or upper triangular Cholesky factor,
+      as returned by :func:`scipy.linalg.cho_factor`
+    lwr : bool
+      Flag indicating whether the factor is lower or upper triangular
+
+    Returns
+    -------
+    x : ndarray
+      Solution to the linear system
+    """
+
+    N, M = A.shape
+    if N >= M:
+        x = linalg.cho_solve((c, lwr), b, check_finite=check_finite)
+    else:
+        x = (b - A.T.dot(linalg.cho_solve((c, lwr), A.dot(b),
+                                          check_finite=check_finite))) / rho
+    return x
+
+
+
+def cho_solve_AATI(A, rho, b, c, lwr, check_finite=True):
+    r"""
+    Solve the linear system :math:`(A A^T + \rho I)\mathbf{x} = \mathbf{b}`
+    or :math:`(A A^T + \rho I)X = B` using :func:`scipy.linalg.cho_solve`.
+
+    Parameters
+    ----------
+    A : array_like
+      Matrix :math:`A`
+    rho : float
+      Scalar :math:`\rho`
+    b : array_like
+      Vector :math:`\mathbf{b}` or matrix :math:`B`
+    c : array_like
+      Matrix containing lower or upper triangular Cholesky factor,
+      as returned by :func:`scipy.linalg.cho_factor`
+    lwr : bool
+      Flag indicating whether the factor is lower or upper triangular
+
+    Returns
+    -------
+    x : ndarray
+      Solution to the linear system
+    """
+
+    N, M = A.shape
+    if N >= M:
+        x = (b - linalg.cho_solve((c, lwr), b.dot(A).T,
+            check_finite=check_finite).T.dot(A.T)) / rho
+    else:
+        x = linalg.cho_solve((c, lwr), b.T, check_finite=check_finite).T
+    return x
+
+
+
 def zpad(x, pd, ax):
     """
     Zero-pad array `x` with `pd = (leading, trailing)` zeros on axis `ax`.
