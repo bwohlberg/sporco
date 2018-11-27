@@ -23,9 +23,7 @@ from nbconvert.preprocessors import ExecutePreprocessor
 
 
 def mkdir(pth):
-    """
-    Make a directory if it doesn't exist.
-    """
+    """Make a directory if it doesn't exist."""
 
     if not os.path.exists(pth):
         os.mkdir(pth)
@@ -34,20 +32,22 @@ def mkdir(pth):
 
 def update_required(srcpth, dstpth):
     """
-    If the file at `dstpth` is generated from the file at `srcpth`, determine
-    whether an update is required. Returns True if `dstpth` does not exist,
-    or if `srcpth` has been more recently modified than `dstpth`.
+    If the file at `dstpth` is generated from the file at `srcpth`,
+    determine whether an update is required.  Returns True if `dstpth`
+    does not exist, or if `srcpth` has been more recently modified
+    than `dstpth`.
     """
 
     return not os.path.exists(dstpth) or \
-      os.stat(srcpth).st_mtime > os.stat(dstpth).st_mtime
+           os.stat(srcpth).st_mtime > os.stat(dstpth).st_mtime
 
 
 
 def fetch_intersphinx_inventory(uri):
     """
-    Fetch and read an intersphinx inventory file at a specified uri, which
-    can either be a url (e.g. http://...) or a local file system filename.
+    Fetch and read an intersphinx inventory file at a specified uri,
+    which can either be a url (e.g. http://...) or a local file system
+    filename.
     """
 
     # See https://stackoverflow.com/a/30981554
@@ -67,9 +67,7 @@ def fetch_intersphinx_inventory(uri):
 
 
 def read_sphinx_environment(pth):
-    """
-    Read the sphinx environment.pickle file at path `pth`.
-    """
+    """Read the sphinx environment.pickle file at path `pth`."""
 
     with open(pth, 'rb') as fo:
         env = pickle.load(fo)
@@ -77,13 +75,12 @@ def read_sphinx_environment(pth):
 
 
 
-
-
 def parse_rst_index(rstpth):
     """
     Parse the top-level RST index file, at `rstpth`, for the example
-    python scripts. Returns a list of subdirectories in order of appearance
-    in the index file, and a dict mapping subdirectory name to a description.
+    python scripts.  Returns a list of subdirectories in order of
+    appearance in the index file, and a dict mapping subdirectory name
+    to a description.
     """
 
     pthidx = {}
@@ -93,34 +90,33 @@ def parse_rst_index(rstpth):
     for i, l in enumerate(lines):
         if i > 0:
             if re.match(r'^  \w+', l) is not None and \
-                re.match(r'^\w+', lines[i-1]) is not None:
+               re.match(r'^\w+', lines[i - 1]) is not None:
                 # List of subdirectories in order of appearance in index.rst
-                pthlst.append(lines[i-1][:-1])
+                pthlst.append(lines[i - 1][:-1])
                 # Dict mapping subdirectory name to description
-                pthidx[lines[i-1][:-1]] = l[2:-1]
+                pthidx[lines[i - 1][:-1]] = l[2:-1]
     return pthlst, pthidx
-
-
 
 
 
 def preprocess_script_string(str):
     """
-    Process python script represented as string `str` in preparation for
-    conversion to a notebook. This processing includes removal of the header
-    comment, modification of the plotting configuration, and replacement of
-    certain sphinx cross-references with appropriate links to online docs.
+    Process python script represented as string `str` in preparation
+    for conversion to a notebook.  This processing includes removal of
+    the header comment, modification of the plotting configuration,
+    and replacement of certain sphinx cross-references with
+    appropriate links to online docs.
     """
 
     # Remove header comment
     str = re.sub(r'^(#[^#\n]+\n){5}\n*', r'', str)
     # Insert notebook plotting configuration function
     str = re.sub(r'from sporco import plot', r'from sporco import plot'
-                '\nplot.config_notebook_plotting()',
-                str, flags=re.MULTILINE)
+                 '\nplot.config_notebook_plotting()',
+                 str, flags=re.MULTILINE)
     # Remove final input statement and preceding comment
     str = re.sub(r'\n*# Wait for enter on keyboard.*\ninput().*\n*',
-                r'', str, flags=re.MULTILINE)
+                 r'', str, flags=re.MULTILINE)
 
     return str
 
@@ -182,7 +178,7 @@ def script_to_notebook(spth, npth, cr):
         if same_notebook_code(nbnew, nbold):
             try:
                 replace_markdown_cells(nbnew, nbold)
-            except:
+            except Exception:
                 script_string_to_notebook_with_links(stxt, npth, cr)
             else:
                 with open(npth, 'wt') as f:
@@ -213,13 +209,11 @@ def script_string_to_notebook_with_links(str, pth, cr=None):
 
 
 
-
-
 def parse_notebook_index(ntbkpth):
     """
-    Parse the top-level notebook index file at `ntbkpth`. Returns a list of
-    subdirectories in order of appearance in the index file, and a dict
-    mapping subdirectory name to a description.
+    Parse the top-level notebook index file at `ntbkpth`.  Returns a
+    list of subdirectories in order of appearance in the index file,
+    and a dict mapping subdirectory name to a description.
     """
 
     # Convert notebook to RST text in string
@@ -243,9 +237,9 @@ def parse_notebook_index(ntbkpth):
 
 def construct_notebook_index(title, pthlst, pthidx):
     """
-    Construct a string containing a markdown format index for the list of
-    paths in `pthlst`. The title for the index is in `title`, and `pthidx`
-    is a dict giving label text for each path.
+    Construct a string containing a markdown format index for the list
+    of paths in `pthlst`.  The title for the index is in `title`, and
+    `pthidx` is a dict giving label text for each path.
     """
 
     # Insert title text
@@ -265,9 +259,7 @@ def construct_notebook_index(title, pthlst, pthidx):
 
 
 def notebook_executed(pth):
-    """
-    Determine whether the notebook at `pth` has been executed.
-    """
+    """Determine whether the notebook at `pth` has been executed."""
 
     nb = nbformat.read(pth, as_version=4)
     for n in range(len(nb['cells'])):
@@ -280,8 +272,8 @@ def notebook_executed(pth):
 
 def same_notebook_code(nb1, nb2):
     """
-    Return true of the code cells of notebook objects `nb1` and `nb2` are
-    the same.
+    Return true of the code cells of notebook objects `nb1` and `nb2`
+    are the same.
     """
 
     # Notebooks do not match of the number of cells differ
@@ -306,9 +298,9 @@ def same_notebook_code(nb1, nb2):
 
 def execute_notebook(npth, dpth, timeout=1200, kernel='python3'):
     """
-    Execute the notebook at `npth` using `dpth` as the execution directory.
-    The execution timeout and kernel are `timeout` and `kernel`
-    respectively.
+    Execute the notebook at `npth` using `dpth` as the execution
+    directory.  The execution timeout and kernel are `timeout` and
+    `kernel` respectively.
     """
 
     ep = ExecutePreprocessor(timeout=timeout, kernel_name=kernel)
@@ -318,7 +310,7 @@ def execute_notebook(npth, dpth, timeout=1200, kernel='python3'):
     t1 = timer()
     with open(npth, 'wt') as f:
         nbformat.write(nb, f)
-    return t1-t0
+    return t1 - t0
 
 
 
@@ -339,8 +331,8 @@ def replace_markdown_cells(src, dst):
         # corresponding pair of cells have different type
         if src['cells'][n]['cell_type'] != dst['cells'][n]['cell_type']:
             raise ValueError('cell number %d of different type in src and dst')
-        # If current src cell is a markdown cell, copy the src cell to the
-        # dst cell
+        # If current src cell is a markdown cell, copy the src cell to
+        # the dst cell
         if src['cells'][n]['cell_type'] == 'markdown':
             dst['cells'][n]['source'] = src['cells'][n]['source']
 
@@ -368,10 +360,10 @@ def notebook_substitute_ref_with_url(ntbk, cr):
 
 def preprocess_notebook(ntbk, cr):
     """
-    Process notebook object `ntbk` in preparation for conversion to an rst
-    document. This processing replaces links to online docs with
-    corresponding sphinx cross-references within the local docs. Parameter
-    `cr` is a CrossReferenceLookup object.
+    Process notebook object `ntbk` in preparation for conversion to an
+    rst document.  This processing replaces links to online docs with
+    corresponding sphinx cross-references within the local docs.
+    Parameter `cr` is a CrossReferenceLookup object.
     """
 
     # Iterate over cells in notebook
@@ -389,8 +381,8 @@ def preprocess_notebook(ntbk, cr):
 
 def write_notebook_rst(txt, res, fnm, pth):
     """
-    Write the converted notebook text `txt` and resources `res` to filename
-    `fnm` in directory `pth`.
+    Write the converted notebook text `txt` and resources `res` to
+    filename `fnm` in directory `pth`.
     """
 
     # Extended filename used for output images
@@ -437,8 +429,9 @@ def notebook_to_rst(npth, rpth, rdir, cr=None):
 
 def notebook_object_to_rst(ntbk, rpth, rdir, cr=None):
     """
-    Convert notebook object `ntbk` to rst document at `rpth`, in directory
-    `rdir`. Parameter `cr` is a CrossReferenceLookup object.
+    Convert notebook object `ntbk` to rst document at `rpth`, in
+    directory `rdir`.  Parameter `cr` is a CrossReferenceLookup
+    object.
     """
 
     # Pre-process notebook prior to conversion to rst
@@ -451,7 +444,7 @@ def notebook_object_to_rst(ntbk, rpth, rdir, cr=None):
     rsttxt = re.sub(r':([^:]+):``(.*?)``', r':\1:`\2`', rsttxt)
     # Insert a cross-reference target at top of file
     reflbl = '.. _example_' + os.path.basename(rdir) + '_' + \
-            rpth.replace('-', '_') + ':\n'
+             rpth.replace('-', '_') + ':\n'
     rsttxt = reflbl + rsttxt
     # Write the converted rst to disk
     write_notebook_rst(rsttxt, rstres, rpth, rdir)
@@ -494,8 +487,9 @@ class IntersphinxInventory(object):
     """
 
     domainrole = {'py:module': 'mod', 'py:function': 'func',
-            'py:data': 'data', 'py:class': 'class', 'py:method': 'meth',
-            'py:attribute': 'attr', 'py:exception': 'exc'}
+                  'py:data': 'data', 'py:class': 'class',
+                  'py:method': 'meth', 'py:attribute': 'attr',
+                  'py:exception': 'exc'}
     """Dict providing lookup of sphinx role labels from domain labels"""
 
     roledomain = {r: d for d, r in domainrole.items()}
@@ -521,7 +515,8 @@ class IntersphinxInventory(object):
 
     def get_label_from_name(self, name):
         """
-        Convert a sphinx reference name (or partial name) into a link label.
+        Convert a sphinx reference name (or partial name) into a link
+        label.
         """
 
         if name[0] == '.':
@@ -533,15 +528,15 @@ class IntersphinxInventory(object):
 
     def get_full_name(self, role, name):
         """
-        If ``name`` is already the full name of an object, return ``name``.
-        Otherwise, if ``name`` is a partial object name, look up the full
-        name and return it.
+        If ``name`` is already the full name of an object, return
+        ``name``.  Otherwise, if ``name`` is a partial object name,
+        look up the full name and return it.
         """
 
         # An initial '.' indicates a partial name
         if name[0] == '.':
-            # Find matches for the partial name in the string containing all
-            # full names for this role
+            # Find matches for the partial name in the string
+            # containing all full names for this role
             ptrn = r'(?<= )[^,]*' + name + r'(?=,)'
             ml = re.findall(ptrn, self.rolnam[role])
             # Handle cases depending on the number of returned matches,
@@ -551,13 +546,13 @@ class IntersphinxInventory(object):
                                'name', len(ml))
             elif len(ml) > 1:
                 raise KeyError('multiple names matching %s found' % name,
-                            'name', len(ml))
+                               'name', len(ml))
             else:
                 return ml[0]
         else:
-            # The absence of an initial '.' indicates a full name. Return
-            # the name if it is present in the inventory, otherwise raise
-            # an error
+            # The absence of an initial '.' indicates a full
+            # name. Return the name if it is present in the inventory,
+            # otherwise raise an error
             try:
                 dom = IntersphinxInventory.roledomain[role]
             except KeyError:
@@ -627,9 +622,9 @@ class IntersphinxInventory(object):
         role, name = self.revinv[pstfx]
 
         # If the label string is provided and is shorter than the name
-        # string we have lookup up, assume it is a partial name for the
-        # same object: append a '.' at the front and use it as the object
-        # name in the cross-reference
+        # string we have lookup up, assume it is a partial name for
+        # the same object: append a '.' at the front and use it as the
+        # object name in the cross-reference
         if label is not None and len(label) < len(name):
             name = '.' + label
 
@@ -655,8 +650,8 @@ class IntersphinxInventory(object):
         rolnam = {}
         # Iterate over domain keys in inventory dict
         for d in inv:
-            # Since keys seem to be duplicated, ignore those not starting
-            # with 'py:'
+            # Since keys seem to be duplicated, ignore those not
+            # starting with 'py:'
             if d[0:3] == 'py:' and d in IntersphinxInventory.domainrole:
                 # Get role corresponding to current domain
                 r = IntersphinxInventory.domainrole[d]
@@ -664,14 +659,14 @@ class IntersphinxInventory(object):
                 rolnam[r] = ''
                 # Iterate over all type names for current domain
                 for n in inv[d]:
-                    # Get the url postfix string for the current domain and
-                    # type name
+                    # Get the url postfix string for the current
+                    # domain and type name
                     p = inv[d][n][2]
-                    # Allow lookup of role and object name tuple from url
-                    # postfix
+                    # Allow lookup of role and object name tuple from
+                    # url postfix
                     revinv[p] = (r, n)
-                    # Append object name to a string for this role, allowing
-                    # regex searching for partial names
+                    # Append object name to a string for this role,
+                    # allowing regex searching for partial names
                     rolnam[r] += ' ' + n + ','
         return revinv, rolnam
 
@@ -680,8 +675,8 @@ class IntersphinxInventory(object):
 
 class CrossReferenceLookup(object):
     """
-    Class supporting cross reference lookup for citations and all document
-    sets recorded by intersphinx.
+    Class supporting cross reference lookup for citations and all
+    document sets recorded by intersphinx.
     """
 
     def __init__(self, env, inv, baseurl):
@@ -723,7 +718,7 @@ class CrossReferenceLookup(object):
         elif role == 'ref':
             try:
                 reftpl = self.env.domaindata['std']['labels'][name]
-            except:
+            except Exception:
                 raise KeyError('ref label %s not found' % name, 'ref', 0)
             url = self.baseurl + reftpl[0] + '.html#' + reftpl[1]
         else:
@@ -739,9 +734,9 @@ class CrossReferenceLookup(object):
                     if ex.args[1] == 'role' or ex.args[2] > 1:
                         raise ex
                 else:
-                    # If an exception was not raised, the lookup must have
-                    # succeeded: break from the loop to terminate further
-                    # searching
+                    # If an exception was not raised, the lookup must
+                    # have succeeded: break from the loop to terminate
+                    # further searching
                     break
 
             if url is None:
@@ -760,7 +755,7 @@ class CrossReferenceLookup(object):
             # Get the string used as the citation label in the text
             try:
                 cstr = self.env.bibtex_cache.get_label_from_key(name)
-            except:
+            except Exception:
                 raise KeyError('cite key %s not found' % name, 'cite', 0)
             # The link label is the citation label (number) enclosed
             # in square brackets
@@ -768,7 +763,7 @@ class CrossReferenceLookup(object):
         elif role == 'ref':
             try:
                 reftpl = self.env.domaindata['std']['labels'][name]
-            except:
+            except Exception:
                 raise KeyError('ref label %s not found' % name, 'ref', 0)
             return reftpl[2]
         else:
@@ -815,8 +810,8 @@ class CrossReferenceLookup(object):
 
     def substitute_ref_with_url(self, txt):
         """
-        In the string `txt`, replace sphinx references with corresponding
-        links to online docs.
+        In the string `txt`, replace sphinx references with
+        corresponding links to online docs.
         """
 
         # Find sphinx cross-references
@@ -843,8 +838,8 @@ class CrossReferenceLookup(object):
                         lbl = ma.group(1)
 
                 # Try to look up the current cross-reference. Issue a
-                # warning if the lookup fails, and do the substitution if
-                # it succeeds.
+                # warning if the lookup fails, and do the substitution
+                # if it succeeds.
                 try:
                     url = self.get_docs_url(role, name)
                     if role != 'ref':
@@ -864,8 +859,8 @@ class CrossReferenceLookup(object):
 
     def substitute_url_with_ref(self, txt):
         """
-        In the string `txt`, replace links to online docs with corresponding
-        sphinx cross-references.
+        In the string `txt`, replace links to online docs with
+        corresponding sphinx cross-references.
         """
 
         # Find links
@@ -881,8 +876,8 @@ class CrossReferenceLookup(object):
                 lbl = mo.group(1)
                 url = mo.group(2)
 
-                # Try to look up the current link url. Issue a warning if the
-                # lookup fails, and do the substitution if it succeeds.
+                # Try to look up the current link url. Issue a warning if
+                # the lookup fails, and do the substitution if it succeeds.
                 try:
                     ref = self.get_sphinx_ref(url, lbl)
                 except KeyError as ex:
@@ -898,10 +893,10 @@ class CrossReferenceLookup(object):
 
 def make_example_scripts_docs(spth, npth, rpth):
     """
-    Generate rst docs from example scripts. Arguments `spth`, `npth`, and
-    `rpth` are the top-level scripts directory, the top-level notebooks
-    directory, and the top-level output directory within the docs
-    respectively.
+    Generate rst docs from example scripts.  Arguments `spth`, `npth`,
+    and `rpth` are the top-level scripts directory, the top-level
+    notebooks directory, and the top-level output directory within the
+    docs respectively.
     """
 
     # Ensure that output directory exists
@@ -911,16 +906,16 @@ def make_example_scripts_docs(spth, npth, rpth):
     nfn = os.path.join(npth, 'index.ipynb')
     rfn = os.path.join(rpth, 'index.rst')
 
-    # Parse the top-level notebook index file to extract a list of index files
-    # in subdirectories
+    # Parse the top-level notebook index file to extract a list of index
+    # files in subdirectories
     pthlst, pthidx = parse_notebook_index(nfn)
 
     # Strip index file names from index file list to obtain a list of
     # subdirectories in which index files are present
     dirlst = list(map(os.path.dirname, pthlst))
 
-    # Construct a dict mapping subdirectory names to parsed index files in
-    # that subdirectory
+    # Construct a dict mapping subdirectory names to parsed index files
+    # in that subdirectory
     diridx = {}
     for d in dirlst:
         diridx[d] = parse_notebook_index(os.path.join(npth, d, 'index.ipynb'))
@@ -955,7 +950,7 @@ def make_example_scripts_docs(spth, npth, rpth):
             with open(ifn, 'wt') as fo:
                 title = pthidx[os.path.join(d, 'index')]
                 reflbl = '.. _example_' + title.lower().replace(' ', '_') + \
-                        '_index:'
+                         '_index:'
                 print('%s\n' % reflbl, file=fo)
                 print('%s\n%s\n' % (title, '-' * len(title)), file=fo)
                 print('.. toctree::\n   :maxdepth: 1\n', file=fo)
@@ -974,11 +969,11 @@ def make_example_scripts_docs(spth, npth, rpth):
             if os.path.exists(sfn) and os.path.exists(nfn):
                 # Full path to output rst file
                 rstpth = os.path.join(rpth, d, n + '.rst')
-                # Convert notebook to rst if notebook is newer than rst file
-                # or if rst file doesn't exist
+                # Convert notebook to rst if notebook is newer than rst
+                # file or if rst file doesn't exist
                 if update_required(nfn, rstpth):
                     print('processing %s                ' % nfn, end='\r')
                     script_and_notebook_to_rst(sfn, nfn, n, rdir)
             else:
                 print('WARNING: script %s or notebook %s not found' %
-                          (sfn, nfn))
+                      (sfn, nfn))
