@@ -17,6 +17,9 @@ SParse Optimization Research COde (SPORCO)
 .. image:: https://badge.fury.io/py/sporco.svg
     :target: https://badge.fury.io/py/sporco
     :alt: PyPi Release
+.. image:: https://img.shields.io/conda/vn/conda-forge/sporco.svg
+    :target: https://anaconda.org/conda-forge/sporco
+    :alt: Conda Forge Release
 .. image:: https://img.shields.io/pypi/pyversions/sporco.svg
     :target: https://github.com/bwohlberg/sporco
     :alt: Supported Python Versions
@@ -113,6 +116,14 @@ followed by
    python setup.py install
 
 The install commands will usually have to be performed with root privileges.
+
+
+SPORCO can also be installed as a `conda <https://conda.io/docs/>`__ package from the `conda-forge <https://conda-forge.org/>`__ channel
+
+::
+
+   conda install -c conda-forge sporco
+
 
 
 A summary of the most significant changes between SPORCO releases can be found in the ``CHANGES.rst`` file. It is strongly recommended to consult this summary when updating from a previous version.
