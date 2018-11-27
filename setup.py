@@ -55,6 +55,8 @@ if on_rtd:
 else:
     install_requires.append('pyfftw')
 
+tests_require = ['pytest', 'pytest-runner']
+
 
 setup(
     name             = name,
@@ -77,7 +79,7 @@ setup(
     data_files       = data,
     include_package_data = True,
     setup_requires   = ['future'],
-    tests_require    = ['pytest', 'pytest-runner'],
+    tests_require    = tests_require,
     install_requires = install_requires,
     classifiers = [
     'License :: OSI Approved :: BSD License',
