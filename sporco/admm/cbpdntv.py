@@ -905,7 +905,7 @@ class ConvBPDNRecTV(admm.ADMM):
         self.cri = cr.CSC_ConvRepIndexing(D, S, dimK=dimK, dimN=dimN)
 
         # Call parent class __init__
-        Nx = np.product(self.cri.shpX)
+        Nx = np.product(np.array(self.cri.shpX))
         yshape = list(self.cri.shpX)
         yshape[self.cri.axisM] += len(self.cri.axisN) * self.cri.Cd
         super(ConvBPDNRecTV, self).__init__(Nx, yshape, yshape,
