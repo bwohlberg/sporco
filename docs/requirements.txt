@@ -1,6 +1,6 @@
 future
 scipy
-sphinx>=1.5.4
+sphinx>=1.6
 numpydoc
 sphinxcontrib-bibtex
 sphinx_tabs
