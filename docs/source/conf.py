@@ -206,7 +206,7 @@ html_logo = '_static/logo.png'
 # The style sheet to use for HTML and HTML Help pages. A file of that name
 # must exist either in Sphinx' static/ path, or in one of the custom paths
 # given in html_static_path.
-html_style = 'sporco.css'
+#html_style = 'sporco.css'
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
@@ -500,6 +500,7 @@ def fix_inherit_diagram(*args):
 
 def setup(app):
 
+    app.add_stylesheet("sporco.css")
     app.connect("autodoc-skip-member", skip_member)
     app.connect('builder-inited', insertsolve)
     app.connect('builder-inited', genexamples)
