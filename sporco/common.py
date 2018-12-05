@@ -158,7 +158,7 @@ class IterativeSolver(with_metaclass(_IterSolver_Meta, object)):
           Data type for working variables (overridden by 'DataType' option)
         """
 
-        # Take no action of self.dtype exists has is not None
+        # Take no action of self.dtype exists and is not None
         if not hasattr(self, 'dtype') or self.dtype is None:
             # DataType option overrides explicitly specified data type
             if opt['DataType'] is None:
