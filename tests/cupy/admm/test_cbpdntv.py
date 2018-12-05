@@ -1,6 +1,7 @@
 from __future__ import division
 from builtins import object
 
+import pytest
 try:
     import cupy as cp
     try:
