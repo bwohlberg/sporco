@@ -12,6 +12,11 @@ the following modules:
   to a set of pre-learned convolutional dictionaries, and access to a
   set of example images.
 
+* :mod:`.mpiutil`
+
+  A parallel-processing grid search for parameter optimisation that
+  distributes processes via MPI.
+
 * :mod:`.plot`
 
   Functions for plotting graphs or 3D surfaces and visualising images.

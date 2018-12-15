@@ -219,6 +219,7 @@ additional features when installed:
 .. |cupy| replace:: `cupy <https://github.com/cupy/cupy>`__
 .. |wrltzr| replace:: `wurlitzer <https://github.com/minrk/wurlitzer>`__
 .. |gputil| replace:: `GPUtil <https://github.com/anderskm/gputil>`__
+.. |mpi4py| replace:: `mpi4py <https://github.com/mpi4py/mpi4py>`__
 
 
 =================  ======================================================
@@ -231,4 +232,6 @@ Optional Package   Features Supported
 |wrltzr|           Utility that supports capture of :mod:`sporco.cuda`
 		   function output within Jupyter notebooks
 |gputil|           Additional utility functions in :mod:`sporco.cupy`
+|mpi4py|           Parallel computation of the grid search in
+		   :mod:`sporco.mpiutil`
 =================  ======================================================
