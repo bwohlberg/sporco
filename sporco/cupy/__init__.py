@@ -23,6 +23,7 @@ except ImportError:
 try:
     # Try to import cupy
     import cupy as cp
+    import cupyx.scipy.linalg as cpxl
     # Try to access a device
     cp.cuda.Device(0).compute_capability
     # Flag indicating successful import
@@ -259,6 +260,63 @@ else:
         return np.divide(x, y, out=np.zeros_like(x), where=(y != 0))
 
 
+def _cho_factor(A, lower=True, check_finite=True):
+    """Implementaton of :func:`scipy.linalg.cho_factor` using
+    a function supported in cupy."""
+
+    return cp.linalg.cholesky(A), True
+
+
+def _cho_solve(c_and_lower, b, check_finite=True):
+    """Implementaton of :func:`scipy.linalg.cho_solve` using
+    a function supported in cupy."""
+
+    L = c_and_lower[0]
+    y = cpxl.solve_triangular(L, b, trans=0, lower=True,
+                              check_finite=check_finite)
+    return cpxl.solve_triangular(L, y, trans=1, lower=True,
+                                 check_finite=check_finite)
+
+
+def _linalg_cho_factor(A, rho, lower=False, check_finite=True):
+    """Patched version of :func:`sporco.linalg.cho_factor`."""
+
+    N, M = A.shape
+    if N >= M:
+        c, lwr = _cho_factor(
+            A.T.dot(A) + rho * cp.identity(M, dtype=A.dtype), lower=lower,
+            check_finite=check_finite)
+    else:
+        c, lwr = _cho_factor(
+            A.dot(A.T) + rho * cp.identity(N, dtype=A.dtype), lower=lower,
+            check_finite=check_finite)
+    return c, lwr
+
+
+def _cho_solve_ATAI(A, rho, b, c, lwr, check_finite=True):
+    """Patched version of :func:`sporco.linalg.cho_solve_ATAI`."""
+
+    N, M = A.shape
+    if N >= M:
+        x = _cho_solve((c, lwr), b, check_finite=check_finite)
+    else:
+        x = (b - A.T.dot(_cho_solve((c, lwr), A.dot(b),
+                                          check_finite=check_finite))) / rho
+    return x
+
+
+def _cho_solve_AATI(A, rho, b, c, lwr, check_finite=True):
+    """Patched version of :func:`sporco.linalg.cho_solve_AATI`."""
+
+    N, M = A.shape
+    if N >= M:
+        x = (b - _cho_solve((c, lwr), b.dot(A).T,
+            check_finite=check_finite).T.dot(A.T)) / rho
+    else:
+        x = _cho_solve((c, lwr), b.T, check_finite=check_finite).T
+    return x
+
+
 # Construct sporco.cupy.linalg
 linalg = sporco_cupy_patch_module(
     'sporco.linalg',
@@ -268,7 +326,9 @@ linalg = sporco_cupy_patch_module(
      'pyfftw_byte_aligned': _pyfftw_byte_aligned,
      'pyfftw_empty_aligned': _pyfftw_empty_aligned,
      'pyfftw_rfftn_empty_aligned': _pyfftw_rfftn_empty_aligned,
-     'fftconv': _fftconv, 'inner': _inner, 'zdivide': _zdivide})
+     'fftconv': _fftconv, 'inner': _inner, 'zdivide': _zdivide,
+     'cho_factor': _linalg_cho_factor, 'cho_solve_ATAI': _cho_solve_ATAI,
+     'cho_solve_AATI': _cho_solve_AATI})
 
 
 # Construct sporco.cupy.prox

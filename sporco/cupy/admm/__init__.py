@@ -89,6 +89,11 @@ admm.tvl1 = sporco_cupy_patch_module('sporco.admm.tvl1', {'admm': admm.admm,
 admm.tvl2 = sporco_cupy_patch_module('sporco.admm.tvl2', {'admm': admm.admm,
                                                           'sl': linalg})
 
+# Construct sporco.cupy.admm.bpdn
+admm.bpdn = sporco_cupy_patch_module('sporco.admm.bpdn',
+                                     {'admm': admm.admm, 'sl': linalg,
+                                      'sp': prox})
+
 # Construct sporco.cupy.admm.cbpdn
 admm.cbpdn = sporco_cupy_patch_module('sporco.admm.cbpdn',
                                       {'admm': admm.admm, 'cr': cnvrep,
