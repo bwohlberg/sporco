@@ -178,7 +178,7 @@ class GenericBPDN(admm.ADMMEqual):
         self.D = np.asarray(D, dtype=self.dtype)
         self.DTS = self.D.T.dot(self.S)
         # Factorise dictionary for efficient solves
-        self.lu, self.piv = sl.lu_factor(self.D, self.rho)
+        self.lu, self.piv = sl.cho_factor(self.D, self.rho)
         self.lu = np.asarray(self.lu, dtype=self.dtype)
 
 
@@ -195,7 +195,7 @@ class GenericBPDN(admm.ADMMEqual):
         :math:`\mathbf{x}`.
         """
 
-        self.X = np.asarray(sl.lu_solve_ATAI(
+        self.X = np.asarray(sl.cho_solve_ATAI(
             self.D, self.rho, self.DTS + self.rho * (self.Y - self.U),
             self.lu, self.piv), dtype=self.dtype)
 
@@ -262,7 +262,7 @@ class GenericBPDN(admm.ADMMEqual):
     def rhochange(self):
         """Re-factorise matrix when rho changes."""
 
-        self.lu, self.piv = sl.lu_factor(self.D, self.rho)
+        self.lu, self.piv = sl.cho_factor(self.D, self.rho)
         self.lu = np.asarray(self.lu, dtype=self.dtype)
 
 
@@ -422,7 +422,7 @@ class BPDN(GenericBPDN):
 
         # Set rho_xi attribute (see Sec. VI.C of wohlberg-2015-adaptive)
         if self.lmbda != 0.0:
-            rho_xi = (1.0 + (18.3)**(np.log10(self.lmbda) + 1.0))
+            rho_xi = float((1.0 + (18.3)**(np.log10(self.lmbda) + 1.0)))
         else:
             rho_xi = 1.0
         self.set_attr('rho_xi', opt['AutoRho', 'RsdlTarget'], dval=rho_xi,
@@ -703,7 +703,7 @@ class ElasticNet(BPDN):
         self.D = np.asarray(D)
         self.DTS = self.D.T.dot(self.S)
         # Factorise dictionary for efficient solves
-        self.lu, self.piv = sl.lu_factor(self.D, self.mu + self.rho)
+        self.lu, self.piv = sl.cho_factor(self.D, self.mu + self.rho)
         self.lu = np.asarray(self.lu, dtype=self.dtype)
 
 
@@ -713,7 +713,7 @@ class ElasticNet(BPDN):
         :math:`\mathbf{x}`.
         """
 
-        self.X = np.asarray(sl.lu_solve_ATAI(
+        self.X = np.asarray(sl.cho_solve_ATAI(
             self.D, self.mu + self.rho, self.DTS +
             self.rho * (self.Y - self.U),
             self.lu, self.piv), dtype=self.dtype)
@@ -741,7 +741,7 @@ class ElasticNet(BPDN):
     def rhochange(self):
         """Re-factorise matrix when rho changes."""
 
-        self.lu, self.piv = sl.lu_factor(self.D, self.mu + self.rho)
+        self.lu, self.piv = sl.cho_factor(self.D, self.mu + self.rho)
         self.lu = np.asarray(self.lu, dtype=self.dtype)
 
 
@@ -1094,7 +1094,7 @@ class MinL1InL2Ball(admm.ADMMTwoBlockCnstrnt):
 
         self.D = np.asarray(D, dtype=self.dtype)
         # Factorise dictionary for efficient solves
-        self.lu, self.piv = sl.lu_factor(self.D, 1.0)
+        self.lu, self.piv = sl.cho_factor(self.D, 1.0)
         self.lu = np.asarray(self.lu, dtype=self.dtype)
 
 
@@ -1112,7 +1112,7 @@ class MinL1InL2Ball(admm.ADMMTwoBlockCnstrnt):
         """
 
         YU = self.Y - self.U
-        self.X = np.asarray(sl.lu_solve_ATAI(
+        self.X = np.asarray(sl.cho_solve_ATAI(
             self.D, 1.0, self.block_sep0(YU) +
             self.D.T.dot(self.block_sep1(YU)), self.lu, self.piv),
             dtype=self.dtype)
