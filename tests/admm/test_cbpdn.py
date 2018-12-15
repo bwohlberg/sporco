@@ -185,7 +185,8 @@ class TestSet01(object):
         xp = np.abs(xr) > 3
         X0[xp] = np.random.randn(X0[xp].size)
         S = np.sum(sl.ifftn(sl.fftn(D, (N, N), (0, 1)) *
-                   sl.fftn(X0, None, (0, 1)), None, (0, 1)).real, axis=2)
+                            sl.fftn(X0, None, (0, 1)), None, (0, 1)).real,
+                   axis=2)
         lmbda = 1e-4
         rho = 1e-1
         opt = cbpdn.ConvBPDN.Options({'Verbose': False, 'MaxMainIter': 500,
