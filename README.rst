@@ -2,33 +2,47 @@ SParse Optimization Research COde (SPORCO)
 ==========================================
 
 
+.. image:: https://img.shields.io/pypi/pyversions/sporco.svg
+    :target: https://github.com/bwohlberg/sporco
+    :alt: Supported Python Versions
+.. image:: https://img.shields.io/github/license/bwohlberg/sporco.svg
+    :target: https://github.com/bwohlberg/sporco/blob/master/LICENSE
+    :alt: Package License
+.. image:: https://readthedocs.org/projects/sporco/badge/?version=latest
+    :target: http://sporco.readthedocs.io/en/latest/?badge=latest
+    :alt: Documentation Status
 .. image:: https://travis-ci.org/bwohlberg/sporco.svg?branch=master
     :target: https://travis-ci.org/bwohlberg/sporco
     :alt: Build Status
 .. image:: https://landscape.io/github/bwohlberg/sporco/master/landscape.svg?style=flat
    :target: https://landscape.io/github/bwohlberg/sporco/master
    :alt: Code Health
-.. image:: https://readthedocs.org/projects/sporco/badge/?version=latest
-    :target: http://sporco.readthedocs.io/en/latest/?badge=latest
-    :alt: Documentation Status
 .. image:: https://codecov.io/gh/bwohlberg/sporco/branch/master/graph/badge.svg
     :target: https://codecov.io/gh/bwohlberg/sporco
     :alt: Test Coverage
-.. image:: https://badge.fury.io/py/sporco.svg
-    :target: https://badge.fury.io/py/sporco
-    :alt: PyPi Release
-.. image:: https://img.shields.io/conda/vn/conda-forge/sporco.svg
-    :target: https://anaconda.org/conda-forge/sporco
-    :alt: Conda Forge Release
-.. image:: https://img.shields.io/pypi/pyversions/sporco.svg
-    :target: https://github.com/bwohlberg/sporco
-    :alt: Supported Python Versions
-.. image:: https://img.shields.io/pypi/l/sporco.svg
-    :target: https://github.com/bwohlberg/sporco
-    :alt: Package License
 .. image:: http://mybinder.org/badge.svg
     :target: https://mybinder.org/v2/gh/bwohlberg/sporco-notebooks/master?filepath=index.ipynb
     :alt: Binder
+
+.. image:: https://badge.fury.io/py/sporco.svg
+    :target: https://badge.fury.io/py/sporco
+    :alt: PyPi Release
+.. image:: https://img.shields.io/pypi/dm/sporco.svg?style=flat
+    :target: https://pypi.org/project/sporco/
+    :alt: PyPi Downloads
+
+.. image:: https://img.shields.io/conda/vn/conda-forge/sporco.svg
+    :target: https://anaconda.org/conda-forge/sporco
+    :alt: Conda Forge Release
+.. image:: https://img.shields.io/conda/dn/conda-forge/sporco.svg
+    :target: https://anaconda.org/conda-forge/sporco
+    :alt:  Conda Forge Downloads
+
+.. image:: https://img.shields.io/badge/DOI-10.25080%2Fshinma--7f4c6e7--001-blue.svg
+    :target: https://dx.doi.org/10.25080/shinma-7f4c6e7-001
+    :alt: DOI
+
+|
 
 
 SPORCO is a Python package for solving optimisation problems with sparsity-inducing regularisation. These consist primarily of sparse coding and dictionary learning problems, including convolutional sparse coding and dictionary learning, but there is also support for other problems such as Total Variation regularisation and Robust PCA. The optimisation algorithms in the current version are based on the Alternating Direction Method of Multipliers (ADMM) or on the Fast Iterative Shrinkage-Thresholding Algorithm (FISTA).
