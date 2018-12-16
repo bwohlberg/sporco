@@ -1,12 +1,18 @@
 from __future__ import division
 from builtins import object
 
+import platform
+import pytest
 import numpy as np
 
 from sporco.dictlrn import prlcnscdl
 from sporco.dictlrn import cbpdndl
 from sporco.dictlrn import cbpdndlmd
 
+
+if platform.system() == 'Windows':
+    pytest.skip("Feature not supported under Windows",
+                allow_module_level=True)
 
 
 class TestSet01(object):

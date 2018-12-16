@@ -10,6 +10,9 @@
 from __future__ import print_function
 from builtins import range
 
+import platform
+if platform.system() == 'Windows':
+    raise RuntimeError('Module %s is not supported under Windows' % __name__)
 import collections
 import multiprocessing as mp
 import numpy as np
