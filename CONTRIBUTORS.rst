@@ -6,6 +6,7 @@
 
   - FISTA sub-package
   - Online CDL module
+  - MPI grid search in mpiutil module
   - MacOS installation instructions
   - Comments, suggestions, and bug reports
 
