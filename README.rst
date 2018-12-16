@@ -13,7 +13,10 @@ SParse Optimization Research COde (SPORCO)
     :alt: Documentation Status
 .. image:: https://travis-ci.org/bwohlberg/sporco.svg?branch=master
     :target: https://travis-ci.org/bwohlberg/sporco
-    :alt: Build Status
+    :alt: Linux Build Status
+.. image:: https://ci.appveyor.com/api/projects/status/evnk5t9whoh20s33?svg=true
+    :target: https://ci.appveyor.com/project/bwohlberg/sporco
+    :alt: Windows Build Status
 .. image:: https://landscape.io/github/bwohlberg/sporco/master/landscape.svg?style=flat
    :target: https://landscape.io/github/bwohlberg/sporco/master
    :alt: Code Health
