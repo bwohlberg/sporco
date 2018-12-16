@@ -2,17 +2,10 @@ from __future__ import division
 from builtins import object
 
 import pickle
-import platform
-import pytest
 import numpy as np
 
 from sporco.admm import parcbpdn
 import sporco.linalg as sl
-
-
-if platform.system() == 'Windows':
-    pytest.skip("Feature not supported under Windows",
-                allow_module_level=True)
 
 
 class TestSet01(object):
