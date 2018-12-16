@@ -206,6 +206,7 @@ class TestSet01(object):
     def test_28(self):
         assert util.idle_cpu_count() >= 1
 
+
     def test_29(self):
         A = np.random.rand(4, 5, 6, 7, 3)
         blksz = (2, 3, 2)
@@ -214,6 +215,7 @@ class TestSet01(object):
         A_recon = util.combineblocks(A_blocks, A.shape, stpsz, np.median)
         assert(np.allclose(np.where(np.isnan(A_recon), np.nan, A),
                            A_recon, equal_nan=True))
+
 
     def test_30(self):
         A = np.random.rand(4, 5, 6, 7, 3)
