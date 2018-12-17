@@ -1,3 +1,7 @@
+os:
+  - linux
+  - osx
+
 language: python
 
 python:
@@ -19,6 +23,10 @@ addons:
     - gfortran
 
 before_install:
+    - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
+         brew update;
+         brew install fftw;
+      fi
     - if [[ "$TRAVIS_PYTHON_VERSION" == "2.7" ]]; then
         wget https://repo.continuum.io/miniconda/Miniconda2-latest-Linux-x86_64.sh -O miniconda.sh;
       else
