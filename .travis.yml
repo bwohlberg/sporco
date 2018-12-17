@@ -11,7 +11,7 @@ matrix:
   include:
   - os: osx
     language: generic
-    env: PYTHON=3.3.6
+    env: PYTHON=3.6.6
 
 notifications:
   email: false
@@ -38,9 +38,9 @@ before_install:
          else
            export MCINST=Miniconda3-latest-Linux-x86_64.sh;
          fi
-      fi
+      fi;
       export MCURL=$URLROOT$MCINST;
-      wget $MCURL -O miniconda.sh;
+      wget $MCURL -O miniconda.sh
     - bash miniconda.sh -b -p $HOME/miniconda
     - export PATH="$HOME/miniconda/bin:$PATH"
     - hash -r
@@ -50,10 +50,10 @@ before_install:
 
 install:
     - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
-         export PYTHON_VERSION=3.3.6;
+         export PYTHON_VERSION=3.6.6;
       else
          export PYTHON_VERSION=$TRAVIS_PYTHON_VERSION;
-      fi
+      fi;
       conda create --yes -q -n test-env python=$PYTHON_VERSION future numpy scipy pillow matplotlib
     - source activate test-env
     - conda install -c conda-forge pytest pytest-runner pyfftw mpi4py
