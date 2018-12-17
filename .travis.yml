@@ -27,15 +27,20 @@ addons:
     - gfortran
 
 before_install:
-    - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
+    - export URLROOT=https://repo.continuum.io/miniconda/;
+      if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
          brew update;
          brew install fftw;
-      fi
-    - if [[ "$TRAVIS_PYTHON_VERSION" == "2.7" ]]; then
-        wget https://repo.continuum.io/miniconda/Miniconda2-latest-Linux-x86_64.sh -O miniconda.sh;
+         export MCINST=Miniconda3-latest-MacOSX-x86_64.sh;
       else
-        wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
+         if [[ "$TRAVIS_PYTHON_VERSION" == "2.7" ]]; then
+           export MCINST=Miniconda2-latest-Linux-x86_64.sh;
+         else
+           export MCINST=Miniconda3-latest-Linux-x86_64.sh;
+         fi
       fi
+      export MCURL=$URLROOT$MCINST;
+      wget $MCURL -O miniconda.sh;
     - bash miniconda.sh -b -p $HOME/miniconda
     - export PATH="$HOME/miniconda/bin:$PATH"
     - hash -r
@@ -44,7 +49,12 @@ before_install:
     - conda info -a
 
 install:
-    - conda create --yes -q -n test-env python=$TRAVIS_PYTHON_VERSION future numpy scipy pillow matplotlib
+    - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
+         export PYTHON_VERSION=3.3.6;
+      else
+         export PYTHON_VERSION=$TRAVIS_PYTHON_VERSION;
+      fi
+      conda create --yes -q -n test-env python=$PYTHON_VERSION future numpy scipy pillow matplotlib
     - source activate test-env
     - conda install -c conda-forge pytest pytest-runner pyfftw mpi4py
     - pip install codecov
