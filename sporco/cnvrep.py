@@ -1010,7 +1010,7 @@ def _Pcn_crp(x, dsz, Nv, dimN=2, dimC=1):
       Projection of input onto constraint set
     """
 
-    return normalise(zeromean(bcrop(x, dsz, dimN), dsz, dimN), dimN + dimC)
+    return normalise(bcrop(x, dsz, dimN), dimN + dimC)
 
 
 
@@ -1040,4 +1040,4 @@ def _Pcn_zm_crp(x, dsz, Nv, dimN=2, dimC=1):
       Projection of input onto constraint set
     """
 
-    return normalise(bcrop(x, dsz, dimN), dimN + dimC)
+    return normalise(zeromean(bcrop(x, dsz, dimN), dsz, dimN), dimN + dimC)

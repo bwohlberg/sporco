@@ -172,3 +172,53 @@ class TestSet01(object):
         u[0:10, 0:10, 2, 8:] = 1.0
         v = cnvrep.bcrop(u, dsz)
         assert v.shape == (10, 10, 3, 24)
+
+
+
+    def test_15(self):
+        dsz = (3, 3, 1)
+        Nv = (6, 6)
+        x = np.ones((6, 6, 1))
+        fn = cnvrep.getPcn(dsz, Nv)
+        y = fn(x)
+        assert np.sum(y) == 3.0
+        y[0:3, 0:3] = 0
+        assert np.sum(y) == 0.0
+
+
+
+    def test_16(self):
+        dsz = (3, 3, 1)
+        Nv = (6, 6)
+        x = np.ones((6, 6, 1))
+        fn = cnvrep.getPcn(dsz, Nv, crp=True)
+        y = fn(x)
+        assert np.sum(y) == 3.0
+        assert y.shape == (3, 3, 1)
+
+
+
+    def test_17(self):
+        dsz = (3, 3, 1)
+        Nv = (6, 6)
+        x = np.ones((6, 6, 1))
+        x[0] = 2
+        fn = cnvrep.getPcn(dsz, Nv, zm=True)
+        y = fn(x)
+        assert np.all(y[0:3, 0:3] != 0.0)
+        assert np.abs(np.sum(y)) < 1e-14
+        y[0:3, 0:3] = 0
+        assert np.sum(np.abs(y)) == 0.0
+
+
+
+    def test_18(self):
+        dsz = (3, 3, 1)
+        Nv = (6, 6)
+        x = np.ones((6, 6, 1))
+        x[0] = 2
+        fn = cnvrep.getPcn(dsz, Nv, crp=True, zm=True)
+        y = fn(x)
+        assert np.all(y != 0.0)
+        assert np.abs(np.sum(y)) < 1e-14
+        assert y.shape == (3, 3, 1)

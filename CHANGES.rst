@@ -8,7 +8,8 @@ Version 0.1.11   (not yet released)
 
 • Added mpiutil module
 • Additional solvers supported for use with CuPy
-• Switch to using imageio instead of scipy.misc for image read/write.
+• Switch to using imageio instead of scipy.misc for image read/write
+• Fixed bug in zm parameter handling in cnvrep.getPcn
 • Various minor fixes and improvements
 
 
