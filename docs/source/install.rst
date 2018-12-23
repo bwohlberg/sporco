@@ -106,7 +106,7 @@ is system dependent:
 
 	sudo apt-get -y install python3-sphinx python3-numpydoc python3-pygraphviz pandoc
 	sudo -H pip3 install sphinxcontrib-bibtex sphinx_tabs sphinx_fontawesome jonga \
-			     jupyter git+https://github.com/leonardt/py2nb#egg=py2nb
+			     jupyter py2jn
 
 
    .. group-tab:: :fa:`apple` Mac OS

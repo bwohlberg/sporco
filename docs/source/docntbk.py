@@ -14,7 +14,7 @@ import pickle
 from timeit import default_timer as timer
 import warnings
 
-import py2nb.tools
+import py2jn
 import nbformat
 from sphinx.ext import intersphinx
 from nbconvert import RSTExporter
@@ -128,14 +128,7 @@ def script_string_to_notebook_object(str):
     object.
     """
 
-    with tempfile.NamedTemporaryFile('r+t') as sf:
-        sf.write(str)
-        sf.flush()
-        with tempfile.NamedTemporaryFile('r+t') as nf:
-            py2nb.tools.python_to_notebook(sf.name, nf.name)
-            nb = nbformat.read(nf.name, as_version=4)
-
-    return nb
+    return py2jn.py_string_to_notebook(str, nbver=4)
 
 
 
@@ -145,10 +138,8 @@ def script_string_to_notebook(str, pth):
     with filename `pth`.
     """
 
-    with tempfile.NamedTemporaryFile('r+t') as f:
-        f.write(str)
-        f.flush()
-        py2nb.tools.python_to_notebook(f.name, pth)
+    nb = py2jn.py_string_to_notebook(str)
+    py2jn.write_notebook(nb, pth)
 
 
 

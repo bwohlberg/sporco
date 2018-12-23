@@ -9,5 +9,4 @@ pygraphviz
 jonga
 ipython>=6.3.1
 jupyter
-# The version of py2nb available from PyPI is apparently no longer maintained
-git+https://github.com/leonardt/py2nb#egg=py2nb
+py2jn

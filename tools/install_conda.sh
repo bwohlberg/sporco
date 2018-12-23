@@ -74,8 +74,7 @@ if [ "`which ffmpeg`" = '' ]; then
     conda install ffmpeg
 fi
 
-pip install git+https://github.com/leonardt/py2nb#egg=py2nb
-pip install sphinx_tabs sphinx_fontawesome
+pip install sphinx_tabs sphinx_fontawesome py2jn
 
 
 # Install cupy and gputil if nvcc is present (indicating that the

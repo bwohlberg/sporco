@@ -81,6 +81,13 @@ setup(
     setup_requires   = ['future'],
     tests_require    = tests_require,
     install_requires = install_requires,
+    extras_require   = {
+        'tests': tests_require,
+        'docs': ['sphinx >=1.6', 'numpydoc', 'sphinxcontrib-bibtex',
+                 'sphinx_tabs', 'sphinx_fontawesome', 'jonga',
+                 'ipython >=6.3.1', 'jupyter', 'py2jn'],
+        'gpu': ['cupy', 'gputil', 'wurlitzer'],
+        'optional': ['numexpr', 'mpldatacursor']},
     classifiers = [
     'License :: OSI Approved :: BSD License',
     'Development Status :: 4 - Beta',
