@@ -247,7 +247,7 @@ class ConvBPDNDictLearn(dictlrn.DictLearn):
     :class:`.fista.cbpdn.ConvBPDN` (see :cite:`chalasani-2013-fast` and
     :cite:`wohlberg-2016-efficient`), and the dictionary update is computed
     using :class:`.fista.ccmod.ConvCnstrMOD` (see
-    :cite:`garcia-2017-convolutional`) or one of the solver classes in
+    :cite:`garcia-2018-convolutional1`) or one of the solver classes in
     :mod:`.admm.ccmod` (see :cite:`wohlberg-2016-efficient` and
     :cite:`sorel-2016-fast`). The coupling between sparse coding and
     dictionary update stages is as in :cite:`garcia-2017-subproblem`.

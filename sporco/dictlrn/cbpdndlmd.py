@@ -252,9 +252,9 @@ class ConvBPDNMaskDictLearn(dictlrn.DictLearn):
     :class:`.fista.cbpdn.ConvBPDNMask` (see :cite:`chalasani-2013-fast` and
     :cite:`wohlberg-2016-efficient`), and the dictionary update is computed
     using :class:`.fista.ccmod.ConvCnstrMODMask` (see
-    :cite:`garcia-2017-convolutional`) or one of the solver classes in
+    :cite:`garcia-2018-convolutional1`) or one of the solver classes in
     :mod:`.admm.ccmodmd` (see :cite:`wohlberg-2016-efficient` and
-    :cite:`garcia-2017-convolutional`). The coupling between sparse coding
+    :cite:`garcia-2018-convolutional1`). The coupling between sparse coding
     and dictionary update stages is as in :cite:`garcia-2017-subproblem`.
 
     Solve the optimisation problem

@@ -28,7 +28,7 @@ __author__ = """Cristina Garcia-Cardona <cgarciac@lanl.gov>"""
 class ConvBPDN(fista.FISTADFT):
     r"""
     Base class for FISTA algorithm for the Convolutional BPDN (CBPDN)
-    :cite:`garcia-2017-convolutional` problem.
+    :cite:`garcia-2018-convolutional1` problem.
 
     |
 

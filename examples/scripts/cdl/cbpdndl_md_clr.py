@@ -8,7 +8,7 @@
 Convolutional Dictionary Learning with Spatial Mask
 ===================================================
 
-This example demonstrates the use of :class:`.cbpdndlmd.ConvBPDNMaskDictLearn` for convolutional dictionary learning with a spatial mask, from a set of colour training images :cite:`wohlberg-2016-convolutional`. The dictionary learning algorithm is based on the hybrid mask decoupling / ADMM consensus dictionary update :cite:`garcia-2017-convolutional`.
+This example demonstrates the use of :class:`.cbpdndlmd.ConvBPDNMaskDictLearn` for convolutional dictionary learning with a spatial mask, from a set of colour training images :cite:`wohlberg-2016-convolutional`. The dictionary learning algorithm is based on the hybrid mask decoupling / ADMM consensus dictionary update :cite:`garcia-2018-convolutional1`.
 """
 
 

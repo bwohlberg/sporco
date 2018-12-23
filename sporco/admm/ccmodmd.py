@@ -762,7 +762,7 @@ class ConvCnstrMODMaskDcpl_CG(ConvCnstrMODMaskDcplBase):
 class ConvCnstrMODMaskDcpl_Consensus(ccmod.ConvCnstrMOD_Consensus):
     r"""
     Hybrid ADMM Consensus algorithm for Convolutional Constrained MOD with
-    Mask Decoupling :cite:`garcia-2017-convolutional`.
+    Mask Decoupling :cite:`garcia-2018-convolutional1`.
 
     |
 

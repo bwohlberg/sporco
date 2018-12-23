@@ -26,7 +26,7 @@ __author__ = """Cristina Garcia-Cardona <cgarciac@lanl.gov>"""
 class ConvCnstrMOD(fista.FISTADFT):
     r"""
     Base class for FISTA algorithm for Convolutional Constrained MOD
-    problem :cite:`garcia-2017-convolutional`.
+    problem :cite:`garcia-2018-convolutional1`.
 
     |
 
@@ -374,7 +374,7 @@ class ConvCnstrMOD(fista.FISTADFT):
 class ConvCnstrMODMask(ConvCnstrMOD):
     r"""
     FISTA algorithm for Convolutional Constrained MOD problem
-    with a spatial mask :cite:`garcia-2017-convolutional`.
+    with a spatial mask :cite:`garcia-2018-convolutional1`.
 
     |
 

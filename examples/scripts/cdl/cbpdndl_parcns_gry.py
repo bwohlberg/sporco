@@ -8,7 +8,7 @@
 Convolutional Dictionary Learning
 =================================
 
-This example demonstrates the use of :class:`.prlcnscdl.ConvBPDNDictLearn_Consensus` for learning a convolutional dictionary from a set of training images. The dictionary learning algorithm is based on the ADMM consensus dictionary update :cite:`sorel-2016-fast` :cite:`garcia-2017-convolutional`.
+This example demonstrates the use of :class:`.prlcnscdl.ConvBPDNDictLearn_Consensus` for learning a convolutional dictionary from a set of training images. The dictionary learning algorithm is based on the ADMM consensus dictionary update :cite:`sorel-2016-fast` :cite:`garcia-2018-convolutional1`.
 """
 
 

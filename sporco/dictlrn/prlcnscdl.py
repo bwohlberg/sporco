@@ -278,7 +278,7 @@ class ConvBPDNDictLearn_Consensus(cbpdndl.ConvBPDNDictLearn):
     |
 
     The dictionary learning algorithm itself is as described in
-    :cite:`garcia-2017-convolutional`. The sparse coding of each training
+    :cite:`garcia-2018-convolutional1`. The sparse coding of each training
     image and the individual consensus problem components are computed in
     parallel, giving a substantial computational advantage, on a multi-core
     host, over :class:`.dictlrn.cbpdndl.ConvBPDNDictLearn` with the consensus
@@ -798,7 +798,7 @@ class ConvBPDNMaskDcplDictLearn_Consensus(cbpdndlmd.ConvBPDNMaskDictLearn):
     Dictionary learning based on Convolutional BPDN with Mask Decoupling
     :cite:`heide-2015-fast` and the hybrid Mask Decoupling/Consensus
     solution of the constrained dictionary update problem proposed in
-    :cite:`garcia-2017-convolutional`.
+    :cite:`garcia-2018-convolutional1`.
 
     |
 
@@ -808,7 +808,7 @@ class ConvBPDNMaskDcplDictLearn_Consensus(cbpdndlmd.ConvBPDNMaskDictLearn):
     |
 
     The dictionary learning algorithm itself is as described in
-    :cite:`garcia-2017-convolutional`. The sparse
+    :cite:`garcia-2018-convolutional1`. The sparse
     coding of each training image and the individual consensus problem
     components are computed in parallel, giving a substantial computational
     advantage, on a multi-core host, over

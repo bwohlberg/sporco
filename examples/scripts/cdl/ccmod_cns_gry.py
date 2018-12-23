@@ -8,7 +8,7 @@
 Convolutional Constained MOD
 ============================
 
-This example demonstrates the use of :class:`.ccmod.ConvCnstrMOD_Consensus` for computing a convolutional dictionary update via the convolutional constrained method of optimal directions problem :cite:`sorel-2016-fast` :cite:`garcia-2017-convolutional`. This problem is mainly useful as a component within convolutional dictionary learning, but its use is demonstrated here since a user may wish to construct such objects as part of a custom convolutional dictionary learning algorithm, using :class:`.dictlrn.DictLearn`.
+This example demonstrates the use of :class:`.ccmod.ConvCnstrMOD_Consensus` for computing a convolutional dictionary update via the convolutional constrained method of optimal directions problem :cite:`sorel-2016-fast` :cite:`garcia-2018-convolutional1`. This problem is mainly useful as a component within convolutional dictionary learning, but its use is demonstrated here since a user may wish to construct such objects as part of a custom convolutional dictionary learning algorithm, using :class:`.dictlrn.DictLearn`.
 """
 
 

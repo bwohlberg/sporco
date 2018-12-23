@@ -8,7 +8,7 @@
 Convolutional Dictionary Learning
 =================================
 
-This example demonstrates the use of :class:`.cbpdndl.ConvBPDNDictLearn` for learning a convolutional dictionary from a set of colour training images :cite:`wohlberg-2016-convolutional`, using FISTA solvers for both sparse coding :cite:`chalasani-2013-fast` :cite:`wohlberg-2016-efficient` and dictionary update steps :cite:`garcia-2017-convolutional`.
+This example demonstrates the use of :class:`.cbpdndl.ConvBPDNDictLearn` for learning a convolutional dictionary from a set of colour training images :cite:`wohlberg-2016-convolutional`, using FISTA solvers for both sparse coding :cite:`chalasani-2013-fast` :cite:`wohlberg-2016-efficient` and dictionary update steps :cite:`garcia-2018-convolutional1`.
 """
 
 
