@@ -33,10 +33,19 @@ try:
     try:
         # Try to import GPUtil
         import GPUtil
-        have_gputil = True
-        from ._gputil import *
+        # Check whether GPUtil is functional
+        gpus = GPUtil.getGPUs()
+        if gpus:
+            have_gputil = True
+        else:
+            have_gputil = False
     except ImportError:
         have_gputil = False
+    except ValueError:
+        have_gputil = False
+    if have_gputil:
+        from ._gputil import *
+    else:
         from ._nogputil import *
 except Exception:
     # If cupy import or device access fails, import numpy to the same alias
