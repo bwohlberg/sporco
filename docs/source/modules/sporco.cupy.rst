@@ -21,19 +21,59 @@ Note that the ``sporco.cupy`` subpackage is not supported under versions of Pyth
 Installation and Configuration
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-To use `CuPy <https://cupy.chainer.org/>`_, first `install CUDA <http://docs.nvidia.com/cuda/index.html#installation-guides>`_ and then `install CuPy <https://docs-cupy.chainer.org/en/stable/install.html#install-cupy/>`_. Note that it may be necessary to set the environment variables as in (substitute the appropriate path to the CUDA installation)
+To use `CuPy <https://cupy.chainer.org/>`_, first `install CUDA <http://docs.nvidia.com/cuda/index.html#installation-guides>`_ and then `install CuPy <https://docs-cupy.chainer.org/en/stable/install.html#install-cupy/>`_. Note that it may be necessary to set the environment variables as in
 
 ::
 
    export CUDAHOME=/usr/local/cuda-9.2
    export PATH=${CUDAHOME}/bin:${PATH}
 
-to avoid a ``cupy.cuda.compiler.CompileException`` when using `CuPy <https://cupy.chainer.org/>`_. If this does not rectify the problem, the following may also be necessary:
+(substitute the appropriate path to the CUDA installation) to avoid a
+``cupy.cuda.compiler.CompileException`` when using `CuPy
+<https://cupy.chainer.org/>`_. If this does not rectify the problem,
+the following may also be necessary:
 
 ::
 
    export LD_LIBRARY_PATH=${CUDAHOME}/lib64:$LD_LIBRARY_PATH
 
+
+
+Supported Modules
+~~~~~~~~~~~~~~~~~
+
+The ``sporco.cupy`` subpackage currently provides `CuPy <https://cupy.chainer.org/>`__ acceleration of the following standard ``sporco`` modules:
+
+=================================  ===============================
+``sporco.cupy`` module             ``sporco`` module
+=================================  ===============================
+``sporco.cupy.cnvrep``             :mod:`sporco.cnvrep`
+``sporco.cupy.common``             :mod:`sporco.common`
+``sporco.cupy.linalg``             :mod:`sporco.linalg`
+``sporco.cupy.metric``             :mod:`sporco.metric`
+``sporco.cupy.prox``               :mod:`sporco.prox`
+``sporco.cupy.util``               :mod:`sporco.util`
+``sporco.cupy.admm.admm``          :mod:`sporco.admm.admm`
+``sporco.cupy.admm.bpdn``          :mod:`sporco.admm.bpdn`
+``sporco.cupy.admm.cbpdn``         :mod:`sporco.admm.cbpdn`
+``sporco.cupy.admm.cbpdntv``       :mod:`sporco.admm.cbpdntv`
+``sporco.cupy.admm.tvl1``          :mod:`sporco.admm.tvl1`
+``sporco.cupy.admm.tvl2``          :mod:`sporco.admm.tvl2`
+``sporco.cupy.fista.cbpdn``        :mod:`sporco.fista.cbpdn`
+``sporco.cupy.dictlrn.onlinecdl``  :mod:`sporco.dictlrn.onlinecdl`
+=================================  ===============================
+
+
+Usage
+~~~~~
+
+To use the `CuPy <https://cupy.chainer.org/>`__ accelerated version of a SPORCO module:
+
+#. import the module from ``sporco.cupy`` instead of ``sporco``
+#. before calling functions/methods within the ``sporco.cupy`` module, convert `NumPy <http://www.numpy.org/>`__ arrays to `CuPy <https://cupy.chainer.org/>`__ arrays using :func:`np2cp`.
+#. after calling functions/methods within the ``sporco.cupy`` module, convert `CuPy <https://cupy.chainer.org/>`_ arrays to `NumPy <http://www.numpy.org/>`__ arrays using :func:`cp2np`.
+
+Usage examples are available for :ref:`sporco.cupy.admm.tvl1 <example_tv_tvl1den_clr_cupy>` and :ref:`sporco.cupy.dictlrn.onlinecdl <example_cdl_onlinecdl_clr_cupy>`.
 
 
 Utility Functions
@@ -121,34 +161,3 @@ The current GPU device can be also selected using :meth:`cupy.cuda.Device.use`, 
    cp.cuda.Device(1).use()
 
 `CuPy <https://docs-cupy.chainer.org/en/stable/index.html>`__ also provides a `context manager for GPU device selection <https://docs-cupy.chainer.org/en/stable/tutorial/basic.html#current-device>`__.
-
-
-
-Supported Modules
-~~~~~~~~~~~~~~~~~
-
-The ``sporco.cupy`` subpackage currently provides `CuPy <https://cupy.chainer.org/>`_ acceleration of the following standard ``sporco`` modules:
-
-=================================  ===============================
-``sporco.cupy`` module             ``sporco`` module
-=================================  ===============================
-``sporco.cupy.cnvrep``             :mod:`sporco.cnvrep`
-``sporco.cupy.common``             :mod:`sporco.common`
-``sporco.cupy.linalg``             :mod:`sporco.linalg`
-``sporco.cupy.metric``             :mod:`sporco.metric`
-``sporco.cupy.prox``               :mod:`sporco.prox`
-``sporco.cupy.util``               :mod:`sporco.util`
-``sporco.cupy.admm.admm``          :mod:`sporco.admm.admm`
-``sporco.cupy.admm.cbpdn``         :mod:`sporco.admm.cbpdn`
-``sporco.cupy.admm.cbpdntv``       :mod:`sporco.admm.cbpdntv`
-``sporco.cupy.admm.tvl1``          :mod:`sporco.admm.tvl1`
-``sporco.cupy.admm.tvl2``          :mod:`sporco.admm.tvl2`
-``sporco.cupy.fista.cbpdn``        :mod:`sporco.fista.cbpdn`
-``sporco.cupy.dictlrn.onlinecdl``  :mod:`sporco.dictlrn.onlinecdl`
-=================================  ===============================
-
-
-Usage Examples
-~~~~~~~~~~~~~~
-
-Usage examples are available for :ref:`sporco.cupy.admm.tvl1 <example_tv_tvl1den_clr_cupy>` and :ref:`sporco.cupy.dictlrn.onlinecdl <example_cdl_onlinecdl_clr_cupy>`.
