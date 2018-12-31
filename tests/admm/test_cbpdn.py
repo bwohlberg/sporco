@@ -550,6 +550,46 @@ class TestSet01(object):
     def test_31(self):
         N = 16
         Nd = 5
+        Cd = 3
+        K = 2
+        M = 4
+        D = np.random.randn(Nd, Nd, Cd, M)
+        s = np.random.randn(N, N, Cd, K)
+        lmbda = 1e-1
+        mu = 1e-2
+        try:
+            b = cbpdn.ConvL1L1Grd(D, s, lmbda, mu)
+            b.solve()
+        except Exception as e:
+            print(e)
+            assert 0
+
+
+    def test_32(self):
+        N = 16
+        Nd = 5
+        K = 2
+        M = 4
+        D = np.random.randn(Nd, Nd, M)
+        s = np.random.randn(N, N, K)
+        dt = np.float32
+        opt = cbpdn.ConvL1L1Grd.Options({'Verbose': False,
+                    'LinSolveCheck': True, 'MaxMainIter': 20,
+                    'AutoRho': {'Enabled': True}, 'DataType': dt})
+        lmbda = 1e-1
+        mu = 1e-2
+        b = cbpdn.ConvL1L1Grd(D, s, lmbda, mu, opt=opt)
+        b.solve()
+        assert b.X.dtype == dt
+        assert b.Y.dtype == dt
+        assert b.U.dtype == dt
+
+
+
+
+    def test_34(self):
+        N = 16
+        Nd = 5
         M = 4
         D = np.random.randn(Nd, Nd, M)
         s = np.random.randn(N, N)
@@ -563,14 +603,14 @@ class TestSet01(object):
         assert np.linalg.norm(Xb - Xc) == 0.0
 
 
-    def test_33(self):
+    def test_35(self):
         opt = cbpdn.GenericConvBPDN.Options({'AuxVarObj': False})
         assert opt['fEvalX'] is True and opt['gEvalY'] is False
         opt['AuxVarObj'] = True
         assert opt['fEvalX'] is False and opt['gEvalY'] is True
 
 
-    def test_34(self):
+    def test_36(self):
         opt = cbpdn.GenericConvBPDN.Options({'AuxVarObj': True})
         assert opt['fEvalX'] is False and opt['gEvalY'] is True
         opt['AuxVarObj'] = False

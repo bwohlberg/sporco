@@ -10,6 +10,9 @@ gwnden_clr.py
 implsden_clr.py
   Remove salt & pepper noise from a colour image using convolutional sparse coding with a colour dictionary
 
+implsden_grd_clr.py
+  Remove salt & pepper noise from a colour image using convolutional sparse coding with an l1 data fidelity term and an l2 gradient term, with a colour dictionary
+
 cbpdn_ams_gry.py
   Inpainting of randomly distributed pixel corruption with lowpass image components handled via non-linear filtering (greyscale image)
 

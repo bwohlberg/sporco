@@ -65,6 +65,24 @@ Module :mod:`.admm.cbpdn` includes the following classes:
   package is installed.
 
 
+* :class:`.ConvL1L1Grd`
+
+  Solve a Convolutional Sparse Coding problem with an :math:`\ell_1`
+  data fidelity term and both :math:`\ell_1` and :math:`\ell_2` of
+  gradient regularisation terms :cite:`wohlberg-2016-convolutional2`
+
+
+    .. math::
+       \mathrm{argmin}_\mathbf{x} \;
+       \left\|  W \left(\sum_m \mathbf{d}_m * \mathbf{x}_m -
+       \mathbf{s}\right) \right\|_1 + \lambda \sum_m
+       \| \mathbf{x}_m \|_1 + (\mu/2) \sum_i \sum_m
+       \| G_i \mathbf{x}_m \|_2^2
+
+  where :math:`W` is a mask array and :math:`G_i` is an operator
+  computing the derivative along index :math:`i`.
+
+
 * :class:`.ConvBPDNProjL1`
 
   Solve the convolutional sparse representation problem with an
