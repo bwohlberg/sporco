@@ -293,6 +293,17 @@ def gengraphs(pth, nopyfftw):
         b.solve()
 
 
+    ## ConvL1L1Grd class
+    opt = cbpdn.ConvL1L1Grd.Options({'Verbose': False, 'MaxMainIter': 1})
+    mu = 1e-2
+
+    with CallGraph(ct, mdnm, pth, 'cl1l1grd_init.svg', **kwargs):
+        b = cbpdn.ConvL1L1Grd(D, s, lmbda, mu, W, opt)
+
+    with CallGraph(ct, mdnm, pth, 'cl1l1grd_solve.svg', **kwargs):
+        b.solve()
+
+
 
 
     #### cbpdntv module
@@ -687,6 +698,7 @@ def insert_solve_docs():
         'sporco.admm.cbpdn.ConvBPDNProjL1': 'cbpdnprjl1_solve.svg',
         'sporco.admm.cbpdn.ConvMinL1InL2Ball': 'cbpdnml1l2_solve.svg',
         'sporco.admm.cbpdn.ConvBPDNMaskDcpl': 'cbpdnmd_solve.svg',
+        'sporco.admm.cbpdn.ConvL1L1Grd': 'cl1l1grd_solve.svg',
         'sporco.admm.cbpdntv.ConvBPDNScalarTV': 'cbpdnstv_solve.svg',
         'sporco.admm.cbpdntv.ConvBPDNVectorTV': 'cbpdnvtv_solve.svg',
         'sporco.admm.cbpdntv.ConvBPDNRecTV': 'cbpdnrtv_solve.svg',
