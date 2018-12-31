@@ -30,7 +30,7 @@ __author__ = """Brendt Wohlberg <brendt@ieee.org>"""
 
 __all__ = ['complex_dtype', 'pyfftw_byte_aligned', 'pyfftw_empty_aligned',
            'pyfftw_rfftn_empty_aligned', 'fftn', 'ifftn', 'rfftn', 'irfftn',
-           'dctii', 'idctii', 'fftconv', 'inner', 'solvedbi_sm',
+           'dctii', 'idctii', 'fftconv', 'inner', 'dot', 'solvedbi_sm',
            'solvedbi_sm_c', 'solvedbd_sm', 'solvedbd_sm_c', 'solvemdbi_ism',
            'solvemdbi_rsm', 'solvemdbi_cg', 'lu_factor', 'lu_solve_ATAI',
            'lu_solve_AATI', 'cho_factor', 'cho_solve_ATAI', 'cho_solve_AATI',
@@ -409,6 +409,60 @@ def inner(x, y, axis=-1):
         ip = np.rollaxis(ip, 0, axis + 1)
 
     return ip
+
+
+
+def dot(a, b, axis=-2):
+    """
+    Compute the matrix product of `a` and the specified axes of `b`,
+    with broadcasting over the remaining axes of `b`. This function is
+    a generalisation of :func:`numpy.dot`, supporting sum product over
+    an arbitrary axis instead of just over the last axis.
+
+    If `a` and `b` are both 2D arrays, `dot` gives the same result as
+    :func:`numpy.dot`. If `b` has more than 2 axes, the result is
+    obtained as follows (where `a` has shape ``(M0, M1)`` and `b` has
+    shape ``(N0, N1, ..., M1, Nn, ...)``):
+
+       #. Reshape `a` to shape ``( 1,  1, ..., M0, M1,  1, ...)``
+       #. Reshape `b` to shape ``(N0, N1, ...,  1, M1, Nn, ...)``
+       #. Take the broadcast product and sum over the specified axis (the
+          axis with dimension `M1` in this example) to give an array of
+          shape ``(N0, N1, ...,  M0,  1, Nn, ...)``
+       #. Remove the singleton axis created by the summation to give
+          an array of shape ``(N0, N1, ...,  M0, Nn, ...)``
+
+    Parameters
+    ----------
+    a : array_like, 2D
+      First component of product
+    b : array_like, 2D or greater
+      Second component of product
+    axis : integer, optional (default -2)
+      Axis of `b` over which sum is to be taken
+
+    Returns
+    -------
+    prod : ndarray
+      Matrix product of `a` and specified axes of `b`, with broadcasting
+      over the remaining axes of `b`
+    """
+
+    # Ensure axis specification is positive
+    if axis < 0:
+        axis = b.ndim + axis
+    # Insert singleton axis into b
+    bx = np.expand_dims(b, axis)
+    # Calculate index of required singleton axis in a and insert it
+    axshp = [1] * bx.ndim
+    axshp[axis:axis + 2] = a.shape
+    ax = a.reshape(axshp)
+    # Calculate indexing expression required to remove singleton axis in
+    # product
+    idxexp = [slice(None)] * bx.ndim
+    idxexp[axis + 1] = 0
+    # Compute and return product
+    return np.sum(ax * bx, axis=axis+1, keepdims=True)[tuple(idxexp)]
 
 
 

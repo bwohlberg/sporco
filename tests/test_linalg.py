@@ -340,6 +340,39 @@ class TestSet01(object):
 
 
     def test_23(self):
+        a = np.random.randn(7, 8)
+        b = np.random.randn(8, 12)
+        c1 = a.dot(b)
+        c2 = linalg.dot(a, b)
+        assert np.linalg.norm(c1 - c2) < 1e-14
+
+
+
+    def test_24(self):
+        a = np.random.randn(7, 8)
+        b = np.random.randn(3, 4, 8, 12)
+        c1 = np.zeros((3, 4, 7, 12))
+        for i0 in range(c1.shape[0]):
+            for i1 in range(c1.shape[1]):
+                c1[i0, i1] = a.dot(b[i0, i1])
+        c2 = linalg.dot(a, b)
+        assert np.linalg.norm(c1 - c2) < 2e-14
+
+
+
+    def test_25(self):
+        a = np.random.randn(7, 8)
+        b = np.random.randn(3, 8, 4, 12)
+        c1 = np.zeros((3, 7, 4, 12))
+        for i0 in range(c1.shape[0]):
+            for i1 in range(c1.shape[3]):
+                c1[i0, ..., i1] = a.dot(b[i0, ..., i1])
+        c2 = linalg.dot(a, b, axis=1)
+        assert np.linalg.norm(c1 - c2) < 2e-14
+
+
+
+    def test_26(self):
         x = np.array([[0, 1], [2, 3]])
         y = np.array([[4, 5], [6, 7]])
         xy = np.array([[38, 36], [30, 28]])
