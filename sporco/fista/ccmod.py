@@ -106,7 +106,7 @@ class ConvCnstrMOD(fista.FISTADFT):
         """
 
         defaults = copy.deepcopy(fista.FISTADFT.Options.defaults)
-        defaults.update({'ZeroMean' : False})
+        defaults.update({'ZeroMean': False})
 
 
         def __init__(self, opt=None):
@@ -123,15 +123,14 @@ class ConvCnstrMOD(fista.FISTADFT):
 
 
         def __setitem__(self, key, value):
-            """Set options.
-            """
+            """Set options."""
 
             fista.FISTADFT.Options.__setitem__(self, key, value)
 
 
     itstat_fields_objfn = ('DFid', 'Cnstr')
     hdrtxt_objfn = ('DFid', 'Cnstr')
-    hdrval_objfun = {'DFid' : 'DFid', 'Cnstr' : 'Cnstr'}
+    hdrval_objfun = {'DFid': 'DFid', 'Cnstr': 'Cnstr'}
 
 
 
@@ -215,8 +214,7 @@ class ConvCnstrMOD(fista.FISTADFT):
         super(ConvCnstrMOD, self).__init__(xshape, S.dtype, opt)
 
         # Set gradient step parameter
-        #self.set_attr('L', opt['L'], dval=self.opt['L'], dtype=self.dtype)
-        self.set_attr('L', opt['L'], dval=self.cri.K*14.0, dtype=self.dtype)
+        self.set_attr('L', opt['L'], dval=self.cri.K * 14.0, dtype=self.dtype)
 
         # Reshape S to standard layout (Z, i.e. X in cbpdn, is assumed
         # to be taken from cbpdn, and therefore already in standard
@@ -228,7 +226,7 @@ class ConvCnstrMOD(fista.FISTADFT):
         # channels also appear on the multiple image index.
         if self.cri.Cd == 1 and self.cri.C > 1:
             self.S = S.reshape(self.cri.Nv + (1,) +
-                               (self.cri.C*self.cri.K,) + (1,))
+                               (self.cri.C * self.cri.K,) + (1,))
         else:
             self.S = S.reshape(self.cri.shpS)
         self.S = np.asarray(self.S, dtype=self.dtype)
@@ -250,11 +248,13 @@ class ConvCnstrMOD(fista.FISTADFT):
         self.Vf = sl.pyfftw_rfftn_empty_aligned(self.X.shape, self.cri.axisN,
                                                 self.dtype)
 
-        self.Ryf = -self.Sf
-
         self.Xf = sl.rfftn(self.X, None, self.cri.axisN)
         self.Yf = self.Xf
         self.store_prev()
+        self.Yfprv = self.Yf.copy() + 1e5
+
+        # Initialization needed for back tracking (if selected)
+        self.postinitialization_backtracking_DFT()
 
         if Z is not None:
             self.setcoef(Z)
@@ -271,7 +271,7 @@ class ConvCnstrMOD(fista.FISTADFT):
         # simplest way to handle this is to just reshape so that the
         # channels also appear on the multiple image index.
         if self.cri.Cd == 1 and self.cri.C > 1:
-            Z = Z.reshape(self.cri.Nv + (1,) + (self.cri.Cx*self.cri.K,) +
+            Z = Z.reshape(self.cri.Nv + (1,) + (self.cri.Cx * self.cri.K,) +
                           (self.cri.M,))
         self.Z = np.asarray(Z, dtype=self.dtype)
 
@@ -291,26 +291,19 @@ class ConvCnstrMOD(fista.FISTADFT):
 
 
 
-    def eval_gradf(self):
+    def eval_grad(self):
         """Compute gradient in Fourier domain."""
 
         # Compute X D - S
-        self.Ryf = self.eval_Rf(self.Yf)
+        Ryf = self.eval_Rf(self.Yf)
 
-        gradf = sl.inner(np.conj(self.Zf), self.Ryf, axis=self.cri.axisK)
+        gradf = sl.inner(np.conj(self.Zf), Ryf, axis=self.cri.axisK)
 
         # Multiple channel signal, single channel dictionary
         if self.cri.C > 1 and self.cri.Cd == 1:
             gradf = np.sum(gradf, axis=self.cri.axisC, keepdims=True)
 
         return gradf
-
-
-
-    def eval_proxop(self, V):
-        """Compute proximal operator of :math:`g`."""
-
-        return self.Pcn(V)
 
 
 
@@ -321,11 +314,19 @@ class ConvCnstrMOD(fista.FISTADFT):
 
 
 
+    def eval_proxop(self, V):
+        """Compute proximal operator of :math:`g`."""
+
+        return self.Pcn(V)
+
+
+
     def rsdl(self):
         """Compute fixed point residual in Fourier domain."""
 
         diff = self.Xf - self.Yfprv
         return sl.rfl2norm2(diff, self.X.shape, axis=self.cri.axisN)
+
 
 
     def eval_objfn(self):
@@ -344,7 +345,7 @@ class ConvCnstrMOD(fista.FISTADFT):
         \mathbf{d}_m * \mathbf{x}_m - \mathbf{s} \|_2^2`.
         """
 
-        Ef = sl.inner(self.Zf, self.Xf, axis=self.cri.axisM) - self.Sf
+        Ef = self.eval_Rf(self.Xf)
         return sl.rfl2norm2(Ef, self.S.shape, axis=self.cri.axisN) / 2.0
 
 
@@ -355,6 +356,22 @@ class ConvCnstrMOD(fista.FISTADFT):
         """
 
         return np.linalg.norm((self.Pcn(self.X) - self.X))
+
+
+
+    def obfn_f(self, Xf=None):
+        r"""Compute data fidelity term :math:`(1/2) \| \sum_m
+        \mathbf{d}_m * \mathbf{x}_m - \mathbf{s} \|_2^2`.
+        This is used for backtracking. Since the backtracking is
+        computed in the DFT, it is important to preserve the
+        DFT scaling.
+        """
+        if Xf is None:
+            Xf = self.Xf
+
+        Rf = self.eval_Rf(Xf)
+        return 0.5 * np.linalg.norm(Rf.flatten(), 2)**2
+
 
 
     def reconstruct(self, D=None):
@@ -416,7 +433,6 @@ class ConvCnstrMODMask(ConvCnstrMOD):
         """
 
         defaults = copy.deepcopy(ConvCnstrMOD.Options.defaults)
-        #defaults.update({'L': 1000.})
 
 
         def __init__(self, opt=None):
@@ -476,12 +492,9 @@ class ConvCnstrMODMask(ConvCnstrMOD):
         # Infer problem dimensions and set relevant attributes of self
         self.cri = cr.CDU_ConvRepIndexing(dsz, S, dimK=dimK, dimN=dimN)
 
-        # Set gradient step parameter
-        #self.set_attr('L', opt['L'], dval=self.cri.K*14.0, dtype=self.dtype)
-
         # Append singleton dimensions to W if necessary
         if hasattr(W, 'ndim'):
-            W = sl.atleast_nd(self.cri.dimN+3, W)
+            W = sl.atleast_nd(self.cri.dimN + 3, W)
 
         # Reshape W if necessary (see discussion of reshape of S in
         # ccmod base class)
@@ -504,7 +517,8 @@ class ConvCnstrMODMask(ConvCnstrMOD):
                 else:
                     shpw[self.cri.axisC] = self.cri.C
                 W = np.broadcast_to(W, shpw)
-            self.W = W.reshape(W.shape[0:self.cri.dimN] +
+            self.W = W.reshape(
+                W.shape[0:self.cri.dimN] +
                 (1, W.shape[self.cri.axisC] * W.shape[self.cri.axisK], 1))
         else:
             self.W = W
@@ -517,7 +531,8 @@ class ConvCnstrMODMask(ConvCnstrMOD):
                                                  self.dtype)
 
 
-    def eval_gradf(self):
+
+    def eval_grad(self):
         """Compute gradient in Fourier domain."""
 
         # Compute X D - S
@@ -539,12 +554,32 @@ class ConvCnstrMODMask(ConvCnstrMOD):
         return gradf
 
 
+
     def obfn_dfd(self):
         r"""Compute data fidelity term :math:`(1/2) \sum_k \| W (\sum_m
         \mathbf{d}_m * \mathbf{x}_{k,m} - \mathbf{s}_k) \|_2^2`
         """
 
-        Ef = sl.inner(self.Zf, self.Xf, axis=self.cri.axisM) - self.Sf
+        Ef = self.eval_Rf(self.Xf)
         E = sl.irfftn(Ef, self.cri.Nv, self.cri.axisN)
 
-        return (np.linalg.norm(self.W * E)**2)/2.0
+        return (np.linalg.norm(self.W * E)**2) / 2.0
+
+
+
+    def obfn_f(self, Xf=None):
+        r"""Compute data fidelity term :math:`(1/2) \sum_k \| W (\sum_m
+        \mathbf{d}_m * \mathbf{x}_{k,m} - \mathbf{s}_k) \|_2^2`.
+        This is used for backtracking. Since the backtracking is
+        computed in the DFT, it is important to preserve the
+        DFT scaling.
+        """
+
+        if Xf is None:
+            Xf = self.Xf
+
+        Rf = self.eval_Rf(Xf)
+        R = sl.irfftn(Rf, self.cri.Nv, self.cri.axisN)
+        WRf = sl.rfftn(self.W * R, self.cri.Nv, self.cri.axisN)
+
+        return 0.5 * np.linalg.norm(WRf.flatten(), 2)**2

@@ -98,5 +98,46 @@ plot.plot(its.L, xlbl='Iterations',
 fig.show()
 
 
+"""
+Repeat for BPDN solver with robust FISTA backtracking.
+"""
+
+opt = bpdn.BPDN.Options({'Verbose': True, 'MaxMainIter': 50,
+            'BackTrack': {'Enabled': True, 'Robust' : True }, 'L': L_sc})
+
+
+b = bpdn.BPDN(D, s, lmbda, opt)
+x = b.solve()
+
+print("BPDN robust FISTA backtracking solve time: %.2fs" %
+      b.timer.elapsed('solve'))
+
+
+"""
+Plot comparison of reference and recovered representations.
+"""
+
+plot.plot(np.hstack((x0, x)), title='Sparse representation (robust FISTA)',
+          lgnd=['Reference', 'Reconstructed'])
+
+
+"""
+Plot lmbda error curve, functional value, residuals, and rho
+"""
+
+its = b.getitstat()
+fig = plot.figure(figsize=(21, 7))
+plot.subplot(1, 3, 1)
+plot.plot(its.ObjFun, xlbl='Iterations', ylbl='Functional', fig=fig)
+plot.subplot(1, 3, 2)
+plot.plot(its.Rsdl, ptyp='semilogy', xlbl='Iterations', ylbl='Residual',
+          fig=fig)
+plot.subplot(1, 3, 3)
+plot.plot(its.L, xlbl='Iterations',
+          ylbl='Inverse of Step Size (robust FISTA)', fig=fig)
+fig.show()
+
+
+
 # Wait for enter on keyboard
 input()

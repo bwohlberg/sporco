@@ -170,7 +170,7 @@ class BPDN(fista.FISTA):
         # Set default lambda value if not specified
         if lmbda is None:
             DTS = D.T.dot(S)
-            lmbda = 0.1*abs(DTS).max()
+            lmbda = 0.1 * abs(DTS).max()
 
         # Set l1 term scaling and weight array
         self.lmbda = self.dtype.type(lmbda)
@@ -181,7 +181,7 @@ class BPDN(fista.FISTA):
         Nm = S.shape[1]
 
         xshape = (Nc, Nm)
-        super(BPDN, self).__init__(Nc * Nm, xshape, S.dtype, opt)
+        super(BPDN, self).__init__(xshape, S.dtype, opt)
 
         self.S = np.asarray(S, dtype=self.dtype)
 
@@ -218,15 +218,8 @@ class BPDN(fista.FISTA):
     def eval_proxop(self, V):
         """Compute proximal operator of :math:`g`."""
 
-        return np.asarray(sl.shrink1(V, (self.lmbda/self.L) * self.wl1),
+        return np.asarray(sl.shrink1(V, (self.lmbda / self.L) * self.wl1),
                           dtype=self.dtype)
-
-
-
-    def eval_R(self, V):
-        """Evaluate smooth term in V."""
-
-        return self.D.dot(V) - self.S
 
 
 
@@ -255,7 +248,7 @@ class BPDN(fista.FISTA):
         """
 
         rl1 = np.linalg.norm((self.wl1 * self.X).ravel(), 1)
-        return (self.lmbda*rl1, rl1)
+        return (self.lmbda * rl1, rl1)
 
 
 

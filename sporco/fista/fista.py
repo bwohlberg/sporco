@@ -27,7 +27,8 @@ __author__ = """Cristina Garcia-Cardona <cgarciac@lanl.gov>"""
 
 class FISTA(common.IterativeSolver):
     r"""Base class for Fast Iterative Shrinkage/Thresholding algorithm
-    (FISTA) algorithms :cite:`beck-2009-fast`.
+    (FISTA) algorithms :cite:`beck-2009-fast`. A robust variant
+    :cite:`florea-2017-robust` is also supported.
 
     Solve optimisation problems of the form
 
@@ -113,13 +114,25 @@ class FISTA(common.IterativeSolver):
             (:math:`\tau_0` in :cite:`liu-2018-first`).
 
           ``BackTrack`` : Options for adaptive L strategy (backtracking,
-          see Sec. 4 of :cite:`beck-2009-fast`).
+          see Sec. 4 of :cite:`beck-2009-fast` or Robust Fista
+          in :cite:`florea-2017-robust`).
 
             ``Enabled`` : Flag determining whether adaptive inverse step
-            size parameter strategy is enabled.
+            size parameter strategy is enabled. When true, bactracking
+            in Sec. 4 of :cite:`beck-2009-fast` is used. In combination with
+            the ``Robust`` flag it enables the backtracking strategy in
+            :cite:`florea-2017-robust`.
 
-            ``Eta`` : Multiplier applied to L when updated
-            (:math:`L` in :cite:`beck-2009-fast`).
+            ``Robust`` : Flag determining if the robust FISTA update is to be
+            applied as in :cite:`florea-2017-robust`.
+
+            ``gamma_d`` : Multiplier applied to decrease L when bactracking in
+            robust FISTA (:math:`\gamma_d` in :cite:`florea-2017-robust`).
+
+            ``gamma_u`` : Multiplier applied to increase L when bactracking in
+            standard FISTA (corresponding to :math:`\eta` in
+            :cite:`beck-2009-fast`) or in robust FISTA (corresponding Total
+            :math:`\gamma_u` in :cite:`florea-2017-robust`).
 
             ``MaxIter`` : Maximum iterations of updating L when
             backtracking.
@@ -131,7 +144,8 @@ class FISTA(common.IterativeSolver):
                     'MaxMainIter': 1000, 'IterTimer': 'solve',
                     'RelStopTol': 1e-3, 'L': None,
                     'BackTrack':
-                    {'Enabled': False, 'Eta': 1.2, 'MaxIter': 100},
+                    {'Enabled': False, 'Robust': False,
+                     'gamma_d': 0.9, 'gamma_u': 1.2, 'MaxIter': 100},
                     'AutoStop': {'Enabled': False, 'Tau0': 1e-2}}
 
         def __init__(self, opt=None):
@@ -182,12 +196,10 @@ class FISTA(common.IterativeSolver):
 
 
 
-    def __init__(self, Nx, xshape, dtype, opt=None):
+    def __init__(self, xshape, dtype, opt=None):
         r"""
         Parameters
         ----------
-        Nx : int
-          Size of variable :math:`\mathbf{x}` in objective function
         xshape : tuple of ints
           Shape of working variable X
         dtype : data-type
@@ -203,7 +215,6 @@ class FISTA(common.IterativeSolver):
                             "FISTA.Options")
 
         self.opt = opt
-        self.Nx = Nx
 
         # DataType option overrides data type inferred from __init__
         # parameters of derived class
@@ -212,11 +223,15 @@ class FISTA(common.IterativeSolver):
         # Initialise attributes representing step parameter and other
         # parameters
         self.set_attr('L', opt['L'], dval=1.0, dtype=self.dtype)
-        self.set_attr('L_eta', opt['BackTrack', 'Eta'], dval=1.2,
+        dval_gamma_u = 1.2
+        if self.opt['BackTrack', 'Robust']:
+            dval_gamma_u = 2.
+        self.set_attr('L_gamma_u', opt['BackTrack', 'gamma_u'],
+                      dval=dval_gamma_u, dtype=self.dtype)
+        self.set_attr('L_gamma_d', opt['BackTrack', 'gamma_d'], dval=0.9,
                       dtype=self.dtype)
         self.set_attr('L_maxiter', opt['BackTrack', 'MaxIter'], dval=1.0,
                       dtype=self.dtype)
-        self.t = 1.
 
         # If using adaptative stop criterion, set tau0 parameter
         if self.opt['AutoStop', 'Enabled']:
@@ -233,17 +248,24 @@ class FISTA(common.IterativeSolver):
             self.F = 0.
             self.Q = 0.
             self.iterBTrack = 0
+            # Determine type of backtracking
+            if self.opt['BackTrack', 'Robust']:
+                self.Tk = 0.
+                self.zzinit()
+                self.backtracking = self.robust_backtrack
+            else:
+                self.t = 1.
+                self.backtracking = self.standard_backtrack
         else:
             self.F = None
             self.Q = None
             self.iterBTrack = None
+            self.t = 1
 
         self.Y = None
 
         self.itstat = []
         self.k = 0
-        self.last_Lchange = self.k
-        self.FBtprev = 1e15
 
 
 
@@ -251,6 +273,15 @@ class FISTA(common.IterativeSolver):
         """Return initialiser for working variable X."""
 
         return np.zeros(xshape, dtype=self.dtype)
+
+
+
+    def zzinit(self):
+        """Return initialiser for working variable ZZ (required for
+        robust FISTA).
+        """
+
+        self.ZZ = self.X.copy()
 
 
 
@@ -293,7 +324,6 @@ class FISTA(common.IterativeSolver):
         # Open status display
         fmtstr, nsep = self.display_start()
 
-
         # Start solve timer
         self.timer.start(['solve', 'solve_wo_func', 'solve_wo_rsdl',
                           'solve_wo_btrack'])
@@ -307,15 +337,14 @@ class FISTA(common.IterativeSolver):
             # Compute backtracking
             if self.opt['BackTrack', 'Enabled'] and self.k >= 0:
                 self.timer.stop('solve_wo_btrack')
-                # Computes proximal step and backtracking
-                self.compute_backtracking()
+                # Compute backtracking
+                self.backtracking()
                 self.timer.start('solve_wo_btrack')
             else:
                 # Compute just proximal step
                 self.proximal_step()
-
-            # Update by combining previous iterates
-            self.combination_step()
+                # Update by combining previous iterates
+                self.combination_step()
 
             # Compute residuals and stopping thresholds
             self.timer.stop(['solve_wo_rsdl', 'solve_wo_btrack'])
@@ -334,7 +363,6 @@ class FISTA(common.IterativeSolver):
             self.timer.start(['solve_wo_func', 'solve_wo_rsdl',
                               'solve_wo_btrack'])
 
-
             # Call callback function if defined
             if self.opt['Callback'] is not None:
                 if self.opt['Callback'](self):
@@ -344,7 +372,6 @@ class FISTA(common.IterativeSolver):
             if not self.opt['FastSolve']:
                 if frcxd < adapt_tol:
                     break
-
 
         # Increment iteration count
         self.k += 1
@@ -377,10 +404,13 @@ class FISTA(common.IterativeSolver):
 
         self.X = self.eval_proxop(V)
 
+        return grad
+
 
 
     def combination_step(self):
         """Build next update by a smart combination of previous updates.
+        (standard FISTA :cite:`beck-2009-fast`).
         """
 
         # Update t step
@@ -394,40 +424,97 @@ class FISTA(common.IterativeSolver):
 
 
 
-    def compute_backtracking(self):
+    def standard_backtrack(self):
         """Estimate step size L by computing a linesearch that
-        guarantees that F <= Q.
+        guarantees that F <= Q according to the standard FISTA
+        bactracking strategy in :cite:`beck-2009-fast`.
+        This also updates variable Y.
         """
 
-        gradY = self.eval_grad()
-        Ry = self.eval_R(self.Y)
+        gradY = self.eval_grad()  # Given Y(f), this updates computes gradY(f)
 
-        eta = self.L_eta
         maxiter = self.L_maxiter
 
         iterBTrack = 0
         linesearch = 1
         while linesearch and iterBTrack < maxiter:
 
-            self.proximal_step(gradY)
-            Rx = self.eval_Rx()
+            self.proximal_step(gradY)  # Given gradY(f), L, this updates X(f)
 
-            F = 0.5 * np.linalg.norm(Rx.flatten(), 2)**2
+            f = self.obfn_f(self.var_x())
             Dxy = self.eval_Dxy()
-            Q = 0.5 * np.linalg.norm(Ry.flatten(), 2)**2 + \
-                np.sum(Dxy * gradY) + \
-                (self.L/2.) * np.linalg.norm(Dxy.flatten(), 2)**2
+            Q = self.obfn_f(self.var_y()) + \
+                self.eval_linear_approx(Dxy, gradY) + \
+                (self.L / 2.) * np.linalg.norm(Dxy.flatten(), 2)**2
 
-            if F <= Q:
+            if f <= Q:
                 linesearch = 0
             else:
-                self.L *= eta
-                self.Lchange()
-                iterBTrack += 1
+                self.L *= self.L_gamma_u
 
-        self.F = F
+            iterBTrack += 1
+
+        self.F = f
         self.Q = Q
         self.iterBTrack = iterBTrack
+        # Update auxiliary sequence
+        self.combination_step()
+
+
+
+    def robust_backtrack(self):
+        """Estimate step size L by computing a linesearch that
+        guarantees that F <= Q according to the robust FISTA
+        bactracking strategy in :cite:`florea-2017-robust`.
+        This also updates all the supporting variables.
+        """
+
+        self.L *= self.L_gamma_d
+        maxiter = self.L_maxiter
+
+        iterBTrack = 0
+        linesearch = 1
+
+        self.store_Yprev()
+        while linesearch and iterBTrack < maxiter:
+
+            t = float(1. + np.sqrt(1. + 4. * self.L * self.Tk)) / (2. * self.L)
+            T = self.Tk + t
+            y = (self.Tk * self.var_xprv() + t * self.ZZ) / T
+            self.update_var_y(y)
+
+            gradY = self.proximal_step()  # Given Y(f), L, this updates X(f)
+
+            f = self.obfn_f(self.var_x())
+            Dxy = self.eval_Dxy()
+            Q = self.obfn_f(self.var_y()) + \
+                self.eval_linear_approx(Dxy, gradY) + \
+                (self.L / 2.) * np.linalg.norm(Dxy.flatten(), 2)**2
+
+            if f <= Q:
+                linesearch = 0
+            else:
+                self.L *= self.L_gamma_u
+
+            iterBTrack += 1
+
+        self.Tk = T
+        self.ZZ += (t * self.L * (self.var_x() - self.var_y()))
+
+        self.F = f
+        self.Q = Q
+        self.iterBTrack = iterBTrack
+
+
+
+    def eval_linear_approx(self, Dxy, gradY):
+        r"""Compute term
+        :math:`\langle \nabla f(\mathbf{y}), \mathbf{x} - \mathbf{y} \rangle`
+        that is part of the quadratic function :math:`Q_L` used
+        for backtracking.
+        """
+
+        return np.sum(Dxy * gradY)
 
 
 
@@ -451,27 +538,17 @@ class FISTA(common.IterativeSolver):
 
 
 
-    def eval_R(self, V):
-        """Evaluate smooth function :math:`f` in V.
-
-        Overriding this method is required.
-        """
-
-        raise NotImplementedError()
-
-
-
-    def eval_Rx(self):
-        """Evaluate smooth function :math:`f` in X."""
-
-        return self.eval_R(self.X)
-
-
-
     def store_prev(self):
         """Store previous X state."""
 
         self.Xprv = self.X.copy()
+
+
+
+    def store_Yprev(self):
+        """Store previous Y state."""
+
+        self.Yprv = self.Y.copy()
 
 
 
@@ -503,19 +580,18 @@ class FISTA(common.IterativeSolver):
 
 
 
-
     @classmethod
     def hdrval(cls):
         """Construct dictionary mapping display column title to
         IterationStats entries.
         """
 
-        hdrmap = {'Itn': 'Iter'}
-        hdrmap.update(cls.hdrval_objfun)
-        hdrmap.update({'Rsdl': 'Rsdl', 'F': 'F_Btrack', 'Q': 'Q_Btrack',
-                       'It_Bt': 'IterBTrack', 'L': 'L'})
+        dict = {'Itn': 'Iter'}
+        dict.update(cls.hdrval_objfun)
+        dict.update({'Rsdl': 'Rsdl', 'F': 'F_Btrack', 'Q': 'Q_Btrack',
+                     'It_Bt': 'IterBTrack', 'L': 'L'})
 
-        return hdrmap
+        return dict
 
 
 
@@ -524,8 +600,8 @@ class FISTA(common.IterativeSolver):
 
         tk = self.timer.elapsed(self.opt['IterTimer'])
         tpl = (k,) + self.eval_objfn() + \
-              (frcxd, self.F, self.Q, self.iterBTrack, self.L) + \
-              self.itstat_extra() + (tk,)
+            (frcxd, self.F, self.Q, self.iterBTrack, self.L) + \
+            self.itstat_extra() + (tk,)
         return type(self).IterationStats(*tpl)
 
 
@@ -617,12 +693,33 @@ class FISTA(common.IterativeSolver):
 
 
 
+    def var_y(self):
+        r"""Get :math:`\mathbf{y}` variable."""
+
+        return self.Y
+
+
+
+    def var_xprv(self):
+        r"""Get :math:`\mathbf{x}` variable of previous iteration."""
+
+        return self.Xprv
+
+
+
+    def update_var_y(self, y):
+        r"""Update :math:`\mathbf{y}` variable."""
+
+        self.Y = y
+
+
+
     def obfn_f(self, X):
         r"""Compute :math:`f(\mathbf{x})` component of FISTA objective
         function.
 
-        Overriding this method is required if :meth:`eval_objfun`
-        is not overridden.
+        Overriding this method is required (even if :meth:`eval_objfun`
+        is overriden, since this method is required for backtracking).
         """
 
         raise NotImplementedError()
@@ -651,15 +748,6 @@ class FISTA(common.IterativeSolver):
 
 
 
-    def Lchange(self):
-        """Action to be taken, if any, when L parameter is changed.
-
-        Overriding this method is optional.
-        """
-
-        self.last_Lchange = self.k
-
-
 
 
 class FISTADFT(FISTA):
@@ -677,8 +765,8 @@ class FISTADFT(FISTA):
     Solve optimisation problems of the form
 
     .. math::
-       \mathrm{argmin}_{\mathbf{x}} \;
-       f(\mathbf{x}) + g(\mathbf{x}) \;\;,
+       \mathrm{argmin}_{\mathbf{x}} \; f(\mathbf{x}) + g(\mathbf{x})
+       \;\;,
 
     where :math:`f, g` are convex functions and :math:`f` is smooth.
 
@@ -724,17 +812,40 @@ class FISTADFT(FISTA):
 
         if opt is None:
             opt = FISTADFT.Options()
-        Nx = np.product(np.array(xshape))
-        super(FISTADFT, self).__init__(Nx, xshape, dtype, opt)
+        super(FISTADFT, self).__init__(xshape, dtype, opt)
+
+
+
+    def postinitialization_backtracking_DFT(self):
+        r"""
+        Computes variables needed for backtracking when the updates
+        are made in the DFT. (This requires the variables in DFT to
+        have been initialized).
+        """
+
+        if self.opt['BackTrack', 'Enabled']:
+            if self.opt['BackTrack', 'Robust']:
+                self.zzfinit()
+
+
+
+    def zzfinit(self):
+        """Return initialiser for working variable ZZ in frequency
+        domain (required for robust FISTA :cite:`florea-2017-robust`).
+        """
+
+        self.ZZ = self.Xf.copy()
 
 
 
     def proximal_step(self, gradf=None):
-        """Compute proximal update (gradient descent + constraint)."""
+        """Compute proximal update (gradient descent + constraint).
+        Variables are mapped back and forth between input and
+        frequency domains.
+        """
 
         if gradf is None:
-            gradf = self.eval_gradf()
-
+            gradf = self.eval_grad()
 
         self.Vf[:] = self.Yf - (1. / self.L) * gradf
         V = sl.irfftn(self.Vf, self.cri.Nv, self.cri.axisN)
@@ -742,11 +853,14 @@ class FISTADFT(FISTA):
         self.X[:] = self.eval_proxop(V)
         self.Xf = sl.rfftn(self.X, None, self.cri.axisN)
 
+        return gradf
+
 
 
     def combination_step(self):
         """Update auxiliary state by a smart combination of previous
-        updates in the frequency domain.
+        updates in the frequency domain (standard FISTA
+        :cite:`beck-2009-fast`).
         """
 
         # Update t step
@@ -760,47 +874,6 @@ class FISTADFT(FISTA):
 
 
 
-    def compute_backtracking(self):
-        """Estimate step size L by computing a linesearch that
-        guarantees that F <= Q.
-        """
-
-        gradfYf = self.eval_gradf()
-
-        eta = self.L_eta
-        maxiter = self.L_maxiter
-        self.FBtprev = self.F
-
-        iterBTrack = 0
-        linesearch = 1
-        while linesearch and iterBTrack < maxiter:
-
-            self.proximal_step(gradfYf)
-            Rxf = self.eval_Rxf()
-
-            F = 0.5 * np.linalg.norm(Rxf.flatten(), 2)**2
-            Dxyf = self.eval_Dxyf()
-            Q = 0.5 * np.linalg.norm(self.Ryf.flatten(), 2)**2 + \
-                np.sum(np.real(Dxyf * gradfYf)) + \
-                (self.L/2.) * np.linalg.norm(Dxyf.flatten(), 2)**2
-
-            if F <= Q:
-                linesearch = 0
-            else:
-                self.L *= eta
-                self.Lchange()
-                iterBTrack += 1
-
-        self.F = F
-        self.Q = Q
-        self.iterBTrack = iterBTrack
-        if ((self.k > 100) and (self.k - self.last_Lchange) > 50) \
-                           and (self.FBtprev <= self.F):
-            self.L /= 1.01
-            self.Lchange()
-
-
-
     def store_prev(self):
         """Store previous X in frequency domain."""
 
@@ -808,35 +881,58 @@ class FISTADFT(FISTA):
 
 
 
-    def eval_Dxyf(self):
-        """Evaluate difference of state and auxiliary state."""
+    def store_Yprev(self):
+        """Store previous Y state in frequency domain."""
+
+        self.Yfprv = self.Yf.copy()
+
+
+
+    def eval_Dxy(self):
+        """Evaluate difference of state and auxiliary state in
+        frequency domain.
+        """
 
         return self.Xf - self.Yf
 
 
 
-    def eval_Rxf(self):
-        """Evaluate smooth term in X."""
+    def var_x(self):
+        r"""Get :math:`\mathbf{x}` variable in frequency domain."""
 
-        return self.eval_Rf(self.Xf)
+        return self.Xf
 
 
 
-    def eval_gradf(self):
-        """Compute gradient in Fourier domain. Also computes argument
-        of smooth function :math:`f`.
+    def var_y(self):
+        r"""Get :math:`\mathbf{y}` variable in frequency domain."""
 
-        Overriding this method is required.
+        return self.Yf
+
+
+
+    def var_xprv(self):
+        r"""Get :math:`\mathbf{x}` variable of previous iteration in
+        frequency domain.
         """
 
-        raise NotImplementedError()
+        return self.Xfprv
 
 
 
-    def eval_proxop(self, V):
-        """Compute proximal operator of :math:`g`.
+    def update_var_y(self, y):
+        r"""Update :math:`\mathbf{y}` variable in frequency domain."""
 
-        Overriding this method is required.
+        self.Yf = y
+
+
+
+    def eval_linear_approx(self, Dxy, gradY):
+        r"""Compute term :math:`\langle \nabla f(\mathbf{y}),
+        \mathbf{x} - \mathbf{y} \rangle` (in frequency domain) that is
+        part of the quadratic function :math:`Q_L` used for
+        backtracking.  Since this class computes the backtracking in
+        the DFT, it is important to preserve the DFT scaling.
         """
 
-        raise NotImplementedError()
+        return np.sum(np.real(np.conj(Dxy) * gradY))

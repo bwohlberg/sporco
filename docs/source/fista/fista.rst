@@ -75,12 +75,17 @@ The FISTA updates steps are defined by the following methods:
   starting with :math:`t^{(1)} = 1`.
 
   This method should set ``self.Y`` as a function of ``self.X`` and
-  ``self.Xprv``.
+  ``self.Xprv``. (This method is part of the standard FISTA formulation
+  :cite:`beck-2009-fast`.)
 
 
-* :meth:`.FISTA.compute_backtracking`
+* ``FISTA.backtracking``
 
-  The bactracking process is an adaptive process to find the optimal
+  This attribute is an alias for method :meth:`.FISTA.standard_backtrack`
+  or method :meth:`.FISTA.robust_backtrack`, depending whether the `BackTrack`
+  option is set to `Enabled` or `Robust`.
+
+  The backtracking process is an adaptive process to find the optimal
   step size for the gradient descent (:math:`L^{-1}`). Backtracking
   updates ``self.L`` until the condition :math:`F \leq Q_L` is
   satisfied. These are defined as
@@ -96,15 +101,19 @@ The FISTA updates steps are defined by the following methods:
      \mathbf{x} - \mathbf{y} \right\|_2^2 + g(\mathbf{x}) \;.
 
   The backtracking process is optional. It is performed when the
-  ``BackTrack`` mechanism is enabled.
+  ``BackTrack`` mechanism is enabled. There are two different backtracking
+  variants implemented: the standard FISTA variant from :cite:`beck-2009-fast`
+  (:meth:`.FISTA.standard_backtrack`) and the robust FISTA variant from
+  :cite:`florea-2017-robust` (:meth:`.FISTA.robust_backtrack`).
 
 A derived class implementing a fully-specified FISTA problem (as
 opposed to a partial specialisation) must define
-:meth:`.FISTA.eval_proxop`, :meth:`.FISTA.eval_grad` and
-:meth:`.FISTA.eval_R`. It is usually not necessary to override
-:meth:`.FISTA.compute_backtracking` since it is defined in
+:meth:`.FISTA.eval_proxop`, :meth:`.FISTA.eval_grad`,
+:meth:`.FISTA.obfn_f` and :meth:`.FISTA.obfn_g`.  It is usually not
+necessary to override :meth:`.FISTA.standard_backtrack` and
+:meth:`.FISTA.robust_backtrack` since they are defined in
 :class:`.FISTA` in terms of calls to :meth:`.FISTA.eval_grad`,
-:meth:`.FISTA.eval_R` and :meth:`.FISTA.proximal_step`.
+:meth:`.FISTA.proximal_step` and :meth:`.FISTA.obfn_f`.
 
 
 .. _sec-fista-residual-eval:

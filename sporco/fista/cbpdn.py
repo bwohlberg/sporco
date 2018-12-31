@@ -130,6 +130,7 @@ class ConvBPDN(fista.FISTADFT):
             fista.FISTADFT.Options.__init__(self, opt)
 
 
+
         def __setitem__(self, key, value):
             """Set options."""
 
@@ -203,17 +204,16 @@ class ConvBPDN(fista.FISTADFT):
             Df = sl.rfftn(D.reshape(cri.shpD), cri.Nv, axes=cri.axisN)
             Sf = sl.rfftn(S.reshape(cri.shpS), axes=cri.axisN)
             b = np.conj(Df) * Sf
-            lmbda = 0.1*abs(b).max()
+            lmbda = 0.1 * abs(b).max()
 
         # Set l1 term scaling and weight array
         self.lmbda = self.dtype.type(lmbda)
         self.wl1 = np.asarray(opt['L1Weight'], dtype=self.dtype)
 
         # Call parent class __init__
+        self.Xf = None
         xshape = self.cri.shpX
         super(ConvBPDN, self).__init__(xshape, S.dtype, opt)
-        if self.opt['BackTrack', 'Enabled']:
-            self.L /= self.lmbda
 
         # Reshape D and S to standard layout
         self.D = np.asarray(D.reshape(self.cri.shpD), dtype=self.dtype)
@@ -223,7 +223,7 @@ class ConvBPDN(fista.FISTADFT):
         self.Sf = sl.rfftn(self.S, None, self.cri.axisN)
 
         # Create byte aligned arrays for FFT calls
-        self.Y = self.X
+        self.Y = self.X.copy()
         self.X = sl.pyfftw_empty_aligned(self.Y.shape, dtype=self.dtype)
         self.X[:] = self.Y
 
@@ -232,13 +232,16 @@ class ConvBPDN(fista.FISTADFT):
         self.Vf = sl.pyfftw_rfftn_empty_aligned(self.X.shape, self.cri.axisN,
                                                 self.dtype)
 
-        self.Ryf = -self.Sf
 
         self.Xf = sl.rfftn(self.X, None, self.cri.axisN)
-        self.Yf = self.Xf
+        self.Yf = self.Xf.copy()
         self.store_prev()
+        self.Yfprv = self.Yf.copy() + 1e5
 
         self.setdict()
+
+        # Initialization needed for back tracking (if selected)
+        self.postinitialization_backtracking_DFT()
 
 
 
@@ -258,13 +261,13 @@ class ConvBPDN(fista.FISTADFT):
 
 
 
-    def eval_gradf(self):
+    def eval_grad(self):
         """Compute gradient in Fourier domain."""
 
-        # Compute X D - S
-        self.Ryf[:] = self.eval_Rf(self.Yf)
-
-        gradf = np.conj(self.Df) * self.Ryf
+        # Compute D X - S
+        Ryf = self.eval_Rf(self.Yf)
+        # Compute D^H Ryf
+        gradf = np.conj(self.Df) * Ryf
 
         # Multiple channel signal, multiple channel dictionary
         if self.cri.Cd > 1:
@@ -274,17 +277,17 @@ class ConvBPDN(fista.FISTADFT):
 
 
 
-    def eval_proxop(self, V):
-        """Compute proximal operator of :math:`g`."""
-
-        return sl.shrink1(V, (self.lmbda/self.L) * self.wl1)
-
-
-
     def eval_Rf(self, Vf):
         """Evaluate smooth term in Vf."""
 
         return sl.inner(self.Df, Vf, axis=self.cri.axisM) - self.Sf
+
+
+
+    def eval_proxop(self, V):
+        """Compute proximal operator of :math:`g`."""
+
+        return sl.shrink1(V, (self.lmbda / self.L) * self.wl1)
 
 
 
@@ -311,10 +314,14 @@ class ConvBPDN(fista.FISTADFT):
     def obfn_dfd(self):
         r"""Compute data fidelity term :math:`(1/2) \| \sum_m
         \mathbf{d}_m * \mathbf{x}_m - \mathbf{s} \|_2^2`.
+        This function takes into account the unnormalised DFT scaling,
+        i.e. given that the variables are the DFT of multi-dimensional
+        arrays computed via :func:`rfftn`, this returns the data fidelity
+        term in the original (spatial) domain.
         """
 
-        Ef = sl.inner(self.Df, self.Xf, axis=self.cri.axisM) - self.Sf
-        return sl.rfl2norm2(Ef, self.S.shape, axis=self.cri.axisN)/2.0
+        Ef = self.eval_Rf(self.Xf)
+        return sl.rfl2norm2(Ef, self.S.shape, axis=self.cri.axisN) / 2.0
 
 
 
@@ -324,7 +331,23 @@ class ConvBPDN(fista.FISTADFT):
         """
 
         rl1 = np.linalg.norm((self.wl1 * self.X).ravel(), 1)
-        return (self.lmbda*rl1, rl1)
+        return (self.lmbda * rl1, rl1)
+
+
+
+    def obfn_f(self, Xf=None):
+        r"""Compute data fidelity term :math:`(1/2) \| \sum_m
+        \mathbf{d}_m * \mathbf{x}_m - \mathbf{s} \|_2^2`
+        This is used for backtracking. Since the backtracking is
+        computed in the DFT, it is important to preserve the
+        DFT scaling.
+        """
+
+        if Xf is None:
+            Xf = self.Xf
+
+        Rf = self.eval_Rf(Xf)
+        return 0.5 * np.linalg.norm(Rf.flatten(), 2)**2
 
 
 
@@ -396,9 +419,6 @@ class ConvBPDNMask(ConvBPDN):
         super(ConvBPDNMask, self).__init__(D, S, lmbda, opt, dimK=dimK,
                                            dimN=dimN)
 
-        # Set gradient step parameter
-        #self.set_attr('L', opt['L'], dval=100.0, dtype=self.dtype)
-
         if W is None:
             W = np.array([1.0], dtype=self.dtype)
         self.W = np.asarray(W.reshape(cr.mskWshape(W, self.cri)),
@@ -410,10 +430,11 @@ class ConvBPDNMask(ConvBPDN):
                                                  self.dtype)
 
 
-    def eval_gradf(self):
+
+    def eval_grad(self):
         """Compute gradient in Fourier domain."""
 
-        # Compute X D - S
+        # Compute D X - S
         self.Ryf[:] = self.eval_Rf(self.Yf)
 
         # Map to spatial domain to multiply by mask
@@ -438,7 +459,26 @@ class ConvBPDNMask(ConvBPDN):
         \mathbf{d}_m * \mathbf{x}_{m} - \mathbf{s}) \|_2^2`
         """
 
-        Ef = sl.inner(self.Df, self.Xf, axis=self.cri.axisM) - self.Sf
+        Ef = self.eval_Rf(self.Xf)
         E = sl.irfftn(Ef, self.cri.Nv, self.cri.axisN)
 
-        return (np.linalg.norm(self.W * E)**2)/2.0
+        return (np.linalg.norm(self.W * E)**2) / 2.0
+
+
+
+    def obfn_f(self, Xf=None):
+        r"""Compute data fidelity term :math:`(1/2) \| W (\sum_m
+        \mathbf{d}_m * \mathbf{x}_{m} - \mathbf{s}) \|_2^2`.
+        This is used for backtracking. Since the backtracking is
+        computed in the DFT, it is important to preserve the
+        DFT scaling.
+        """
+
+        if Xf is None:
+            Xf = self.Xf
+
+        Rf = self.eval_Rf(Xf)
+        R = sl.irfftn(Rf, self.cri.Nv, self.cri.axisN)
+        WRf = sl.rfftn(self.W * R, self.cri.Nv, self.cri.axisN)
+
+        return 0.5 * np.linalg.norm(WRf.flatten(), 2)**2

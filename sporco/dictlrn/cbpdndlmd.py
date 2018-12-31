@@ -54,8 +54,8 @@ def ConvBPDNMaskOptionsDefaults(method='admm'):
                       'RsdlRatio': 10.0, 'Scaling': 2.0,
                       'RsdlTarget': 1.0}})
     else:
-        dflt.update({'MaxMainIter': 1, 'BackTrack': {'Eta': 1.2,
-                     'MaxIter': 50}})
+        dflt.update({'MaxMainIter': 1, 'BackTrack':
+                     {'gamma_u': 1.2, 'MaxIter': 50}})
     return dflt
 
 
@@ -146,8 +146,8 @@ def ConvCnstrMODMaskOptionsDefaults(method='fista'):
 
     dflt = copy.deepcopy(ccmodmsk_class_label_lookup(method).Options.defaults)
     if method == 'fista':
-        dflt.update({'MaxMainIter': 1, 'BackTrack': {'Eta': 1.2,
-                     'MaxIter': 50}})
+        dflt.update({'MaxMainIter': 1, 'BackTrack':
+                     {'gamma_u': 1.2, 'MaxIter': 50}})
     else:
         dflt.update({'MaxMainIter': 1, 'AutoRho':
                      {'Period': 10, 'AutoScaling': False,
