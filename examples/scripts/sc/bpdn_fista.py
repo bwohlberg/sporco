@@ -54,7 +54,7 @@ s = s0 + sigma*np.random.randn(N,1)
 
 
 """
-Set BPDN solver with standard FISTA Bactracking.
+Set BPDN solver with standard FISTA backtracking.
 """
 
 L_sc = 9.e2

@@ -118,7 +118,7 @@ class FISTA(common.IterativeSolver):
           in :cite:`florea-2017-robust`).
 
             ``Enabled`` : Flag determining whether adaptive inverse step
-            size parameter strategy is enabled. When true, bactracking
+            size parameter strategy is enabled. When true, backtracking
             in Sec. 4 of :cite:`beck-2009-fast` is used. In combination with
             the ``Robust`` flag it enables the backtracking strategy in
             :cite:`florea-2017-robust`.
@@ -126,10 +126,10 @@ class FISTA(common.IterativeSolver):
             ``Robust`` : Flag determining if the robust FISTA update is to be
             applied as in :cite:`florea-2017-robust`.
 
-            ``gamma_d`` : Multiplier applied to decrease L when bactracking in
+            ``gamma_d`` : Multiplier applied to decrease L when backtracking in
             robust FISTA (:math:`\gamma_d` in :cite:`florea-2017-robust`).
 
-            ``gamma_u`` : Multiplier applied to increase L when bactracking in
+            ``gamma_u`` : Multiplier applied to increase L when backtracking in
             standard FISTA (corresponding to :math:`\eta` in
             :cite:`beck-2009-fast`) or in robust FISTA (corresponding Total
             :math:`\gamma_u` in :cite:`florea-2017-robust`).
@@ -427,7 +427,7 @@ class FISTA(common.IterativeSolver):
     def standard_backtrack(self):
         """Estimate step size L by computing a linesearch that
         guarantees that F <= Q according to the standard FISTA
-        bactracking strategy in :cite:`beck-2009-fast`.
+        backtracking strategy in :cite:`beck-2009-fast`.
         This also updates variable Y.
         """
 
@@ -465,7 +465,7 @@ class FISTA(common.IterativeSolver):
     def robust_backtrack(self):
         """Estimate step size L by computing a linesearch that
         guarantees that F <= Q according to the robust FISTA
-        bactracking strategy in :cite:`florea-2017-robust`.
+        backtracking strategy in :cite:`florea-2017-robust`.
         This also updates all the supporting variables.
         """
 
