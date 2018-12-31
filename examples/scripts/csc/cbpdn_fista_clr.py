@@ -8,7 +8,7 @@
 FISTA CBPDN Solver
 ==================
 
-This example demonstrates use of a FISTA solver for a convolutional sparse coding problem with a colour dictionary and a colour signal :cite:`wohlberg-2016-convolutional` :cite:`garcia-2017-convolutional`
+This example demonstrates use of a FISTA solver for a convolutional sparse coding problem with a colour dictionary and a colour signal :cite:`wohlberg-2016-convolutional` :cite:`garcia-2018-convolutional1`
 
   $$\mathrm{argmin}_\mathbf{x} \; (1/2) \sum_c \left\| \sum_m \mathbf{d}_{c,m} * \mathbf{x}_m -\mathbf{s}_c \right\|_2^2 + \lambda \sum_m \| \mathbf{x}_m \|_1 \;,$$
 
