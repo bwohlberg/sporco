@@ -271,9 +271,10 @@ def rst_to_docs_rst(infile, outfile):
                     m = re.search(r'`(.*?)\s*<(.*?)(?:.py)?>`', line)
                     if m:
                         if idx == '':
-                            toc.append((m[1], m[2]))
+                            toc.append((m.group(1), m.group(2)))
                         else:
-                            toc.append((m[1], os.path.join(m[2], idx)))
+                            toc.append((m.group(1),
+                                        os.path.join(m.group(2), idx)))
         else:
             out += line
 
