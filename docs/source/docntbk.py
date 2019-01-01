@@ -247,13 +247,11 @@ def rst_to_docs_rst(infile, outfile):
     with open(infile, 'r') as fin:
         rst = fin.readlines()
 
-    ps = pathsplit(outfile)[-2:]
-    if ps[0] == 'examples':
-        ps = ps[1:]
+    ps = pathsplit(outfile)[-3:]
+    if ps[-2] == 'examples':
         idx = 'index'
     else:
         idx = ''
-
     out = '.. _' + '_'.join(ps) + ':\n\n'
     it = iter(rst)
     for line in it:
