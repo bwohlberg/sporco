@@ -23,4 +23,4 @@ This module includes the following classes:
      \lambda \left \| W_{\mathrm{tv}} \sqrt{(G_r \mathbf{x})^2 +
      (G_c \mathbf{x})^2} \right \|_1
 
-:ref:`Usage examples <example_total_variation_index>` are available.
+:ref:`Usage examples <examples_tv_index>` are available.

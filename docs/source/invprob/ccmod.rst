@@ -18,7 +18,7 @@ provide different methods of solving this problem, and
 of these classes via the ``method`` parameter specifying the solution
 method.
 
-A :ref:`usage example <example_cdl_ccmod_cns_gry>` is available.
+A :ref:`usage example <examples_cdl_ccmod_cns_gry>` is available.
 
 |
 

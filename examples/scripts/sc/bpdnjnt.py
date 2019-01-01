@@ -65,7 +65,7 @@ opt = bpdn.BPDNJoint.Options({'Verbose': False, 'MaxMainIter': 500,
 
 
 """
-Select regularization parameters $\lambda, \mu$ by evaluating the error in recovering the sparse representation over a logarithmicaly spaced grid. (The reference representation is assumed to be known, which is not realistic in a real application.) A function is defined that evalues the BPDN recovery error for a specified $\lambda, \mu$, and this function is evaluated in parallel by :func:`.util.grid_search`.
+Select regularization parameters $\lambda, \mu$ by evaluating the error in recovering the sparse representation over a logarithmicaly spaced grid. (The reference representation is assumed to be known, which is not realistic in a real application.) A function is defined that evalues the BPDN recovery error for a specified $\lambda, \mu$, and this function is evaluated in parallel by :func:`sporco.util.grid_search`.
 """
 
 # Function computing reconstruction error for (lmbda, mu) pair

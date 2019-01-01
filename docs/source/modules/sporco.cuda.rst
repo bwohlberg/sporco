@@ -114,7 +114,7 @@ Only available if ``have_cuda`` is `True`
    images and multi-channel images in input signal ``S`` are currently not
    supported.
 
-   A :ref:`usage example <example_csc_cbpdn_cuda>` is available.
+   A :ref:`usage example <examples_csc_cbpdn_cuda>` is available.
 
    Parameters
    ----------
@@ -142,7 +142,7 @@ Only available if ``have_cuda`` is `True`
    Multiple images and multi-channel images in input signal ``S`` are
    currently not supported.
 
-   A :ref:`usage example <example_csc_cbpdn_grd_cuda>` is available.
+   A :ref:`usage example <examples_csc_cbpdn_grd_cuda>` is available.
 
    Parameters
    ----------
@@ -184,7 +184,7 @@ Only available if ``have_cuda`` is `True`
    the AMS impulse filter at the start of the dictionary, while the Python
    version appends it at the end.
 
-   A :ref:`usage example <example_csc_cbpdn_ams_gry>` is available.
+   A :ref:`usage example <examples_csc_cbpdn_ams_gry>` is available.
 
    Parameters
    ----------
@@ -226,7 +226,7 @@ Only available if ``have_cuda`` is `True`
    version prepends the AMS impulse filter at the start of the dictionary,
    while the Python version appends it at the end.
 
-   A :ref:`usage example <example_csc_cbpdn_ams_grd_gry>` is available.
+   A :ref:`usage example <examples_csc_cbpdn_ams_grd_gry>` is available.
 
    Parameters
    ----------

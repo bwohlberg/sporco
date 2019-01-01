@@ -10,4 +10,4 @@ problem
    \quad \|\mathbf{d}_m\|_2 = 1
 
 
-A :ref:`usage example <example_dl_bpdndl>` is available.
+A :ref:`usage example <examples_dl_bpdndl>` is available.

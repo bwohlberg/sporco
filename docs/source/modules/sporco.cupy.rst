@@ -73,7 +73,7 @@ To use the `CuPy <https://cupy.chainer.org/>`__ accelerated version of a SPORCO 
 #. before calling functions/methods within the ``sporco.cupy`` module, convert `NumPy <http://www.numpy.org/>`__ arrays to `CuPy <https://cupy.chainer.org/>`__ arrays using :func:`np2cp`.
 #. after calling functions/methods within the ``sporco.cupy`` module, convert `CuPy <https://cupy.chainer.org/>`_ arrays to `NumPy <http://www.numpy.org/>`__ arrays using :func:`cp2np`.
 
-Usage examples are available for :ref:`sporco.cupy.admm.tvl1 <example_tv_tvl1den_clr_cupy>` and :ref:`sporco.cupy.dictlrn.onlinecdl <example_cdl_onlinecdl_clr_cupy>`.
+Usage examples are available for :ref:`sporco.cupy.admm.tvl1 <examples_tv_tvl1den_clr_cupy>` and :ref:`sporco.cupy.dictlrn.onlinecdl <examples_cdl_onlinecdl_clr_cupy>`.
 
 
 Utility Functions

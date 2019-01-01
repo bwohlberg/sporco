@@ -19,7 +19,7 @@ via an ADMM problem of the form
    I \\ I \\ \vdots \end{array} \right) \mathbf{y} \;\;.
 
 See :class:`.ConvCnstrMOD_Consensus` as an example of a class derived
-from :class:`.ADMMConsensus`, or see the simple :ref:`usage example <example_misc_admmcnsns>`.
+from :class:`.ADMMConsensus`, or see the simple :ref:`usage example <examples_misc_admmcnsns>`.
 
 Classes derived from :class:`.ADMMConsensus` should override/define
 the methods and attributes in the following sections.

@@ -85,7 +85,7 @@ setup(
         'tests': tests_require,
         'docs': ['sphinx >=1.6', 'numpydoc', 'sphinxcontrib-bibtex',
                  'sphinx_tabs', 'sphinx_fontawesome', 'jonga',
-                 'ipython >=6.3.1', 'jupyter', 'py2jn'],
+                 'ipython >=6.3.1', 'jupyter', 'py2jn', 'pypandoc'],
         'gpu': ['cupy', 'gputil', 'wurlitzer'],
         'optional': ['numexpr', 'mpldatacursor']},
     classifiers = [

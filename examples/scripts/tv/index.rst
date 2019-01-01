@@ -1,23 +1,26 @@
 Total Variation
----------------
+===============
 
-tvl1den_gry.py
-  Salt & pepper noise restoration via ℓ1-TV denoising (greyscale image)
+ℓ1-TV
+-----
 
-tvl1dcn_den.py
-  Salt & pepper noise restoration via ℓ1-TV denoising (greyscale image, deconvolution solver)
+.. toc-start
 
-tvl1den_clr.py
-  Salt & pepper noise restoration via ℓ1-TV denoising (colour image)
+* `Salt & pepper noise restoration via ℓ1-TV denoising (greyscale image) <tvl1den_gry.py>`__
+* `Salt & pepper noise restoration via ℓ1-TV denoising (greyscale image, deconvolution solver) <tvl1dcn_den.py>`__
+* `Salt & pepper noise restoration via ℓ1-TV denoising (colour image) <tvl1den_clr.py>`__
+* `Salt & pepper noise restoration via ℓ1-TV denoising (colour image, cupy accelerated solver) <tvl1den_clr_cupy.py>`__
 
-tvl1den_clr_cupy.py
-  Salt & pepper noise restoration via ℓ1-TV denoising (colour image, cupy accelerated solver)
+.. toc-end
 
-tvl2den_gry.py
-  Gaussian white noise restoration via ℓ2-TV denoising (greyscale image)
 
-tvl2dcn_den.py
-  Gaussian white noise restoration via ℓ2-TV denoising (greyscale image, deconvolution solver)
+ℓ2-TV
+-----
 
-tvl2den_clr.py
-  Gaussian white noise restoration via ℓ2-TV denoising (colour image)
+.. toc-start
+
+* `Gaussian white noise restoration via ℓ2-TV denoising (greyscale image) <tvl2den_gry.py>`__
+* `Gaussian white noise restoration via ℓ2-TV denoising (greyscale image, deconvolution solver) <tvl2dcn_den.py>`__
+* `Gaussian white noise restoration via ℓ2-TV denoising (colour image) <tvl2den_clr.py>`__
+
+.. toc-end

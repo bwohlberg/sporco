@@ -187,7 +187,7 @@ Module :mod:`.admm.cbpdntv` includes the following classes:
 
 |
 
-:ref:`Usage examples <example_convolutional_sparse_coding_index>` are available.
+:ref:`Usage examples <examples_csc_index>` are available.
 
 
 

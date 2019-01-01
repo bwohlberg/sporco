@@ -13,6 +13,7 @@ Version 0.1.11   (not yet released)
 • Added support for robust variant of FISTA [florea-2017-robust]
 • Switch to using imageio instead of scipy.misc for image read/write
 • Fixed bug in zm parameter handling in cnvrep.getPcn
+• Improved example index structure in docs
 • Various minor fixes and improvements
 
 

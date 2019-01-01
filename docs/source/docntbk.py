@@ -8,13 +8,14 @@ from __future__ import print_function
 
 import os
 import os.path
-import tempfile
+from glob import glob
 import re
 import pickle
 from timeit import default_timer as timer
 import warnings
 
 import py2jn
+import pypandoc
 import nbformat
 from sphinx.ext import intersphinx
 from nbconvert import RSTExporter
@@ -29,6 +30,20 @@ def mkdir(pth):
         os.mkdir(pth)
 
 
+def pathsplit(pth, dropext=True):
+    """Split a path into a tuple of all of its components."""
+
+    if dropext:
+        pth = os.path.splitext(pth)[0]
+    parts = os.path.split(pth)
+    if parts[0] == '':
+        return parts[1:]
+    elif len(parts[0]) == 1:
+        return parts
+    else:
+        return pathsplit(parts[0], dropext=False) + parts[1:]
+
+
 
 def update_required(srcpth, dstpth):
     """
@@ -39,7 +54,7 @@ def update_required(srcpth, dstpth):
     """
 
     return not os.path.exists(dstpth) or \
-           os.stat(srcpth).st_mtime > os.stat(dstpth).st_mtime
+        os.stat(srcpth).st_mtime > os.stat(dstpth).st_mtime
 
 
 
@@ -197,6 +212,73 @@ def script_string_to_notebook_with_links(str, pth, cr=None):
         notebook_substitute_ref_with_url(ntbk, cr)
         with open(pth, 'wt') as f:
             nbformat.write(ntbk, f)
+
+
+
+def rst_to_notebook(infile, outfile):
+    """Convert an rst file to a notebook file."""
+
+    with open(infile, 'r') as fin:
+        rststr = fin.read()
+    mdfmt = 'markdown_github+tex_math_dollars+fenced_code_attributes'
+    mdstr = pypandoc.convert_text(rststr, mdfmt, format='rst',
+                                  extra_args=['--atx-headers'])
+    mdstr = re.sub(r'\(([^\)]+).py\)', r'(\1.ipynb)', mdstr)
+    mdstr = '"""' + mdstr + '"""'
+    nb = py2jn.py_string_to_notebook(mdstr)
+    py2jn.tools.write_notebook(nb, outfile, nbver=4)
+
+
+
+def markdown_to_notebook(infile, outfile):
+    """Convert a markdown file to a notebook file."""
+
+    with open(infile, 'r') as fin:
+        str = fin.read()
+    str = '"""' + str + '"""'
+    nb = py2jn.py_string_to_notebook(str)
+    py2jn.tools.write_notebook(nb, outfile, nbver=4)
+
+
+
+def rst_to_docs_rst(infile, outfile):
+    """Convert an rst file to a sphinx docs rst file."""
+
+    with open(infile, 'r') as fin:
+        rst = fin.readlines()
+
+    ps = pathsplit(outfile)[-3:]
+    if ps[0] == 'source':
+        ps = ps[1:]
+        idx = 'index'
+    else:
+        idx = ''
+
+    out = '.. _' + '_'.join(ps) + ':\n\n'
+    it = iter(rst)
+    for line in it:
+        if line[0:12] == '.. toc-start':
+            toc = []
+            for line in it:
+                if line == '\n':
+                    continue
+                elif line[0:10] == '.. toc-end':
+                    out += '.. toctree::\n   :maxdepth: 1\n\n'
+                    for c in toc:
+                        out += '   %s <%s>\n' % c
+                    break
+                else:
+                    m = re.search(r'`(.*?)\s*<(.*?)(?:.py)?>`', line)
+                    if m:
+                        if idx == '':
+                            toc.append((m[1], m[2]))
+                        else:
+                            toc.append((m[1], os.path.join(m[2], idx)))
+        else:
+            out += line
+
+    with open(outfile, 'w') as fout:
+        fout.write(out)
 
 
 
@@ -418,12 +500,17 @@ def notebook_to_rst(npth, rpth, rdir, cr=None):
 
 
 
-def notebook_object_to_rst(ntbk, rpth, rdir, cr=None):
+def notebook_object_to_rst(ntbk, rpth, cr=None):
     """
     Convert notebook object `ntbk` to rst document at `rpth`, in
     directory `rdir`.  Parameter `cr` is a CrossReferenceLookup
     object.
     """
+
+    # Parent directory of file rpth
+    rdir = os.path.dirname(rpth)
+    # File basename
+    rb = os.path.basename(os.path.splitext(rpth)[0])
 
     # Pre-process notebook prior to conversion to rst
     if cr is not None:
@@ -434,15 +521,15 @@ def notebook_object_to_rst(ntbk, rpth, rdir, cr=None):
     # Replace `` with ` in sphinx cross-references
     rsttxt = re.sub(r':([^:]+):``(.*?)``', r':\1:`\2`', rsttxt)
     # Insert a cross-reference target at top of file
-    reflbl = '.. _example_' + os.path.basename(rdir) + '_' + \
-             rpth.replace('-', '_') + ':\n'
+    reflbl = '.. _examples_' + os.path.basename(rdir) + '_' + \
+             rb.replace('-', '_') + ':\n'
     rsttxt = reflbl + rsttxt
     # Write the converted rst to disk
-    write_notebook_rst(rsttxt, rstres, rpth, rdir)
+    write_notebook_rst(rsttxt, rstres, rb, rdir)
 
 
 
-def script_and_notebook_to_rst(spth, npth, rpth, rdir):
+def script_and_notebook_to_rst(spth, npth, rpth):
     """
     Convert a script and the corresponding executed notebook to rst.
     The script is converted to notebook format *without* replacement
@@ -463,10 +550,14 @@ def script_and_notebook_to_rst(spth, npth, rpth, rdir):
     nbn = nbformat.read(npth, as_version=4)
 
     # Overwrite markdown cells in nbn with those from nbs
-    replace_markdown_cells(nbs, nbn)
+    try:
+        replace_markdown_cells(nbs, nbn)
+    except ValueError:
+        raise ValueError('mismatch between source script %s and notebook %s' %
+                         (spth, npth))
 
     # Convert notebook object to rst
-    notebook_object_to_rst(nbn, rpth, rdir)
+    notebook_object_to_rst(nbn, rpth)
 
 
 
@@ -738,9 +829,7 @@ class CrossReferenceLookup(object):
 
 
     def get_docs_label(self, role, name):
-        """
-        Get an appropriate label to use in a link to the online docs.
-        """
+        """Get an appropriate label to use in a link to the online docs."""
 
         if role == 'cite':
             # Get the string used as the citation label in the text
@@ -893,78 +982,52 @@ def make_example_scripts_docs(spth, npth, rpth):
     # Ensure that output directory exists
     mkdir(rpth)
 
-    # Top-level index files
-    nfn = os.path.join(npth, 'index.ipynb')
-    rfn = os.path.join(rpth, 'index.rst')
+    # Iterate over index files
+    for fp in glob(os.path.join(spth, '*.rst')) + \
+              glob(os.path.join(spth, '*', '*.rst')):
+        # Index basename
+        b = os.path.basename(fp)
+        # Index dirname
+        dn = os.path.dirname(fp)
+        # Name of subdirectory of examples directory containing current index
+        sd = os.path.split(dn)
+        # Set d to the name of the subdirectory of the root directory
+        if dn == spth:  # fp is the root directory index file
+            d = ''
+        else:           # fp is a subdirectory index file
+            d = sd[-1]
+        # Path to corresponding subdirectory in docs directory
+        fd = os.path.join(rpth, d)
+        # Ensure notebook subdirectory exists
+        mkdir(fd)
+        # Filename of index file to be constructed
+        fn = os.path.join(fd, b)
+        # Process current index file if corresponding notebook file
+        # doesn't exist, or is older than index file
+        if update_required(fp, fn):
+            print('Converting %s                ' % os.path.join(d, b),
+                  end='\r')
+            # Convert script index to docs index
+            rst_to_docs_rst(fp, fn)
 
-    # Parse the top-level notebook index file to extract a list of index
-    # files in subdirectories
-    pthlst, pthidx = parse_notebook_index(nfn)
-
-    # Strip index file names from index file list to obtain a list of
-    # subdirectories in which index files are present
-    dirlst = list(map(os.path.dirname, pthlst))
-
-    # Construct a dict mapping subdirectory names to parsed index files
-    # in that subdirectory
-    diridx = {}
-    for d in dirlst:
-        diridx[d] = parse_notebook_index(os.path.join(npth, d, 'index.ipynb'))
-
-    # Construct top-level rst index
-    if update_required(nfn, rfn):
-        with open(rfn, 'wt') as fo:
-            print('Usage Examples\n--------------\n', file=fo)
-            print('.. toctree::\n   :maxdepth: 1\n', file=fo)
-            for p in pthlst:
-                print('   %s' % p, file=fo)
-            print('\n.. toctree::\n   :hidden:\n', file=fo)
-            for d in dirlst:
-                print('   %s/index' % d, file=fo)
-                for p in diridx[d][0]:
-                    print('   %s/%s' % (d, p), file=fo)
-
-    # Iterate over notebook subdirectories
-    for d in dirlst:
-        # Construct path to corresponding rst subdirectory
-        rdir = os.path.join(rpth, d)
-        # Get list of notebooks and notebook name to description
-        # mapping for current subdirectory
-        nlst, nidx = diridx[d]
-        # Make corresponding rst subdirectory if it doesn't exist
-        mkdir(rdir)
-
-        # Write rst index for current subdirectory
-        nifn = os.path.join(npth, d, 'index.ipynb')
-        ifn = os.path.join(rpth, d, 'index.rst')
-        if update_required(nifn, ifn):
-            with open(ifn, 'wt') as fo:
-                title = pthidx[os.path.join(d, 'index')]
-                reflbl = '.. _example_' + title.lower().replace(' ', '_') + \
-                         '_index:'
-                print('%s\n' % reflbl, file=fo)
-                print('%s\n%s\n' % (title, '-' * len(title)), file=fo)
-                print('.. toctree::\n   :maxdepth: 1\n', file=fo)
-                # Write notebook list into index
-                for n in nlst:
-                    text = nidx[n]
-                    print('   %s <%s>' % (text, n), file=fo)
-
-        # Iterate over notebooks in current subdirectory
-        for n in nlst:
-            # Full path of current notebook
-            nfn = os.path.join(npth, d, n + '.ipynb')
-            # Full path of correspond script
-            sfn = os.path.join(spth, d, n + '.py')
-            # Only proceed if script and notebook exist
-            if os.path.exists(sfn) and os.path.exists(nfn):
-                # Full path to output rst file
-                rstpth = os.path.join(rpth, d, n + '.rst')
-                # Convert notebook to rst if notebook is newer than rst
-                # file or if rst file doesn't exist
-                if update_required(nfn, rstpth):
-                    print('processing %s                ' % nfn, end='\r')
-                    script_and_notebook_to_rst(sfn, nfn, n, rdir)
-            else:
-                print('WARNING: script %s or notebook %s not found' %
-                      (sfn, nfn))
+    # Iterate over example scripts
+    for fp in sorted(glob(os.path.join(spth, '*', '*.py'))):
+        # Name of subdirectory of examples directory containing current script
+        d = os.path.split(os.path.dirname(fp))[1]
+        # Script basename
+        b = os.path.splitext(os.path.basename(fp))[0]
+        # Path to corresponding notebook
+        fn = os.path.join(npth, d, b + '.ipynb')
+        # Path to corresponding sphinx doc file
+        fr = os.path.join(rpth, d, b + '.rst')
+        # Only proceed if script and notebook exist
+        if os.path.exists(fp) and os.path.exists(fn):
+            # Convert notebook to rst if notebook is newer than rst
+            # file or if rst file doesn't exist
+            if update_required(fn, fr):
+                fnb = os.path.join(d, b + '.ipynb')
+                print('Processing %s                ' % fnb, end='\r')
+                script_and_notebook_to_rst(fp, fn, fr)
+        else:
+            print('WARNING: script %s or notebook %s not found' %
+                  (fp, fn))

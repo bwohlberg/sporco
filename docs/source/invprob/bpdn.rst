@@ -56,7 +56,7 @@ This module includes the following classes:
      :label: minl1inl2
 
 
-:ref:`Usage examples <example_sparse_coding_index>` are available.
+:ref:`Usage examples <examples_sc_index>` are available.
 
 
 A Note on Problem Naming

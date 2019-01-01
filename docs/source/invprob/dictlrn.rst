@@ -16,4 +16,4 @@ from :class:`.DictLearn`. These two classes provide less flexibility
 -- the sparse coding methods are fixed -- but are somewhat simpler to
 use.
 
-A :ref:`usage example <example_cdl_cbpdndl_jnt_clr>` is available.
+A :ref:`usage example <examples_cdl_cbpdndl_jnt_clr>` is available.

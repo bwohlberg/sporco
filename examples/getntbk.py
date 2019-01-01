@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+"""Get notebooks from sporco-notebooks on GitHub."""
+
 from __future__ import print_function
 
 import os

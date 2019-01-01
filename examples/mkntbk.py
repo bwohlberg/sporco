@@ -1,13 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+"""Build notebooks from example scripts."""
+
 from __future__ import print_function
 
 import os
 import os.path
 import sys
 from glob import glob
-
 
 sys.path.insert(0, '../docs/source')
 import docntbk
@@ -21,56 +22,47 @@ npth = 'notebooks'
 nbexec = True
 
 
-# Top-level index files
-pfn = os.path.join(ppth, 'index.rst')
-docntbk.mkdir(npth)
-nfn = os.path.join(npth, 'index.ipynb')
-
-# Parse top-level index.rst file in example scripts directory
-dirlst, diridx = docntbk.parse_rst_index(pfn)
-
-# Update notebooks index if it doesn't exist, or is older than scripts index
-if docntbk.update_required(pfn, nfn):
-    print('Writing %s' % nfn)
-    ptxt = docntbk.construct_notebook_index(
-        '[SPORCO](https://github.com/bwohlberg/sporco) Usage Examples',
-        dirlst, diridx)
-    docntbk.script_string_to_notebook(ptxt, nfn)
-
-# Work through example script subdirectories
-for dir in dirlst:
-    pfn = os.path.join(ppth, dir, 'index.rst')
-    docntbk.mkdir(os.path.join(npth, dir))
-    nfn = os.path.join(npth, dir, 'index.ipynb')
-
-    # Update notebooks index if it doesn't exist, or is older than scripts
-    # index
-    if docntbk.update_required(pfn, nfn):
-        print('Writing %s' % nfn)
-        # Parse index.rst file in current example scripts subdirectory
-        scrlst, scridx = docntbk.parse_rst_index(pfn)
-        # Construct index as docstrings in python script and convert
-        # to notebook
-        ptxt = docntbk.construct_notebook_index(diridx[dir], scrlst, scridx)
-        docntbk.script_string_to_notebook(ptxt, nfn)
+# Iterate over index files
+for fp in glob(os.path.join(ppth, '*.rst')) + \
+          glob(os.path.join(ppth, '*', '*.rst')):
+    # Index basename
+    b = os.path.splitext(os.path.basename(fp))[0]
+    # Name of subdirectory of examples directory containing current index
+    sd = os.path.split(os.path.dirname(fp))
+    if sd[-1] == ppth:
+        d = ''
+    else:
+        d = sd[-1]
+    # Path to corresponding subdirectory in notebooks directory
+    fd = os.path.join(npth, d)
+    # Ensure notebook subdirectory exists
+    docntbk.mkdir(fd)
+    # Filename of notebook index file to be constructed
+    fn = os.path.join(fd, b + '.ipynb')
+    # Process current index file if corresponding notebook file
+    # doesn't exist, or is older than index file
+    if docntbk.update_required(fp, fn):
+        print('Converting %s' % fp)
+        # Convert index to notebook
+        docntbk.rst_to_notebook(fp, fn)
 
 
 # Get intersphinx inventory and sphinx environment and construct cross
 # reference lookup object
 try:
     inv = docntbk.fetch_intersphinx_inventory(invpth)
-except:
+except Exception:
     inv = None
 try:
     env = docntbk.read_sphinx_environment(envpth)
-except:
+except Exception:
     env = None
 if inv is not None and env is not None:
     cr = docntbk.CrossReferenceLookup(env, inv, baseurl)
 else:
     cr = None
     print('Warning: intersphinx inventory or sphinx environment not found:'
-        ' cross-references will not be handled correctly')
+          ' cross-references will not be handled correctly')
 
 # Iterate over example scripts
 for fp in sorted(glob(os.path.join(ppth, '*', '*.py'))):

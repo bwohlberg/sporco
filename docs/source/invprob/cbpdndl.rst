@@ -29,4 +29,4 @@ substantially faster than :class:`.cbpdndl.ConvBPDNDictLearn` and
 :class:`.cbpdndlmd.ConvBPDNMaskDictLearn` respectively. For large training datasets, the online CDL classes :class:`.onlinecdl.OnlineConvBPDNDictLearn` and :class:`.onlinecdl.OnlineConvBPDNMaskDictLearn` may be the best option, particularly for use on a host without very large amounts of main memory, and  with a GPU (see :ref:`cuda_package`).
 
 
-:ref:`Usage examples <example_convolutional_dictionary_learning_index>` are available.
+:ref:`Usage examples <examples_cdl_index>` are available.

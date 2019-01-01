@@ -10,3 +10,4 @@ jonga
 ipython>=6.3.1
 jupyter
 py2jn
+pypandoc

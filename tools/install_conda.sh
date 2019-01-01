@@ -65,7 +65,7 @@ conda create -n py36 python=3.6
 source activate py36
 conda install future numpy scipy imageio pyfftw matplotlib mpldatacursor \
       pytest pytest-runner ipython jupyter sphinx pygraphviz numpydoc \
-      cython mpi4py pyhamcrest sphinxcontrib-bibtex jonga
+      cython mpi4py pyhamcrest sphinxcontrib-bibtex jonga pypandoc
 
 # ffmpeg is required by imageio for reading mp4 video files
 # it can also be installed via the system package manager, .e.g.

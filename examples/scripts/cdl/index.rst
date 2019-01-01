@@ -1,41 +1,32 @@
 Convolutional Dictionary Learning
----------------------------------
+=================================
 
-cbpdndl_cns_gry.py
-  Learn a convolutional dictionary (consensus method, greyscale images)
+Batch CDL
+---------
 
-cbpdndl_fista_clr.py
-  Learn a convolutional dictionary (FISTA method, colour images, multiscale colour dictionary)
+.. toc-start
 
-cbpdndl_parcns_gry.py
-  Learn a convolutional dictionary (parallel consensus method, greyscale images)
+* `Learn a convolutional dictionary (consensus method, greyscale images) <cbpdndl_cns_gry.py>`__
+* `Learn a convolutional dictionary (FISTA method, colour images, multiscale colour dictionary) <cbpdndl_fista_clr.py>`__
+* `Learn a convolutional dictionary (parallel consensus method, greyscale images) <cbpdndl_parcns_gry.py>`__
+* `Learn a convolutional dictionary (parallel consensus method, colour images) <cbpdndl_parcns_clr.py>`__
+* `Learn a convolutional dictionary (consensus method, video data) <cbpdndl_video.py>`__
+* `Learn a convolutional dictionary with spatial masking (consensus method, greyscale images) <cbpdndl_md_gry.py>`__
+* `Learn a convolutional dictionary with spatial masking (consensus method, colour images) <cbpdndl_md_clr.py>`__
+* `Learn a convolutional dictionary from colour images using custom sparse coding and dictionary update <cbpdndl_jnt_clr.py>`__
+* `Compute a convolutional dictionary update via the convolutional constrained MOD problem (consensus method, greyscale images) <ccmod_cns_gry.py>`__
 
-cbpdndl_parcns_clr.py
-  Learn a convolutional dictionary (parallel consensus method, colour images)
+.. toc-end
 
-onlinecdl_gry.py
-  Learn a convolutional dictionary (online method, greyscale images)
 
-onlinecdl_msk_gry.py
-  Learn a convolutional dictionary with spatial masking (online method, greyscale images)
+Online CDL
+----------
 
-onlinecdl_clr.py
-  Learn a convolutional dictionary (online method, colour images)
+.. toc-start
 
-onlinecdl_clr_cupy.py
-  Learn a convolutional dictionary (online method, colour images, cupy accelerated solver)
+* `Learn a convolutional dictionary (online method, greyscale images) <onlinecdl_gry.py>`__
+* `Learn a convolutional dictionary with spatial masking (online method, greyscale images) <onlinecdl_msk_gry.py>`__
+* `Learn a convolutional dictionary (online method, colour images) <onlinecdl_clr.py>`__
+* `Learn a convolutional dictionary (online method, colour images, cupy accelerated solver) <onlinecdl_clr_cupy.py>`__
 
-cbpdndl_video.py
-  Learn a convolutional dictionary (consensus method, video data)
-
-cbpdndl_md_gry.py
-  Learn a convolutional dictionary with spatial masking (consensus method, greyscale images)
-
-cbpdndl_md_clr.py
-  Learn a convolutional dictionary with spatial masking (consensus method, colour images)
-
-cbpdndl_jnt_clr.py
-  Learn a convolutional dictionary from colour images using custom sparse coding and dictionary update
-
-ccmod_cns_gry.py
-  Compute a convolutional dictionary update via the convolutional constrained MOD problem (consensus method, greyscale images)
+.. toc-end

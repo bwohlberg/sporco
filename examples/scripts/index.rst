@@ -1,22 +1,15 @@
 Example Scripts
----------------
+===============
 
 Scripts are organised into directories according to topic:
 
-sc
-  Sparse Coding
+.. toc-start
 
-dl
-  Dictionary Learning
+* `Sparse Coding <sc>`__
+* `Dictionary Learning <dl>`__
+* `Convolutional Sparse Coding <csc>`__
+* `Convolutional Dictionary Learning <cdl>`__
+* `Total Variation <tv>`__
+* `Miscellaneous <misc>`__
 
-csc
-  Convolutional Sparse Coding
-
-cdl
-  Convolutional Dictionary Learning
-
-tv
-  Total Variation
-
-misc
-  Miscellaneous
+.. toc-end

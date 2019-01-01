@@ -1,8 +1,9 @@
 Dictionary Learning
--------------------
+===================
 
-bpdndl.py
-  Learn a dictionary (standard, not convolutional) from a set of training images
+.. toc-start
 
-cmod.py
-  Compute a dictionary update via the constrained method of optimal directions problem
+* `Learn a dictionary (standard, not convolutional) from a set of training images <bpdndl.py>`__
+* `Compute a dictionary update via the constrained method of optimal directions problem <cmod.py>`__
+
+.. toc-end
