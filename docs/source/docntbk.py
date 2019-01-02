@@ -262,6 +262,7 @@ def rst_to_docs_rst(infile, outfile):
     # thererof
     ps = pathsplit(outfile)[-3:]
     if ps[-2] == 'examples':
+        ps = ps[-2:]
         idx = 'index'
     else:
         idx = ''
