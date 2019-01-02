@@ -30,6 +30,7 @@ def mkdir(pth):
         os.mkdir(pth)
 
 
+
 def pathsplit(pth, dropext=True):
     """Split a path into a tuple of all of its components."""
 
@@ -218,12 +219,17 @@ def script_string_to_notebook_with_links(str, pth, cr=None):
 def rst_to_notebook(infile, outfile):
     """Convert an rst file to a notebook file."""
 
+    # Read infile into a string
     with open(infile, 'r') as fin:
         rststr = fin.read()
+    # Convert string from rst to markdown
     mdfmt = 'markdown_github+tex_math_dollars+fenced_code_attributes'
     mdstr = pypandoc.convert_text(rststr, mdfmt, format='rst',
                                   extra_args=['--atx-headers'])
+    # In links, replace .py extensions with .ipynb
     mdstr = re.sub(r'\(([^\)]+).py\)', r'(\1.ipynb)', mdstr)
+    # Enclose the markdown within triple quotes and convert from
+    # python to notebook
     mdstr = '"""' + mdstr + '"""'
     nb = py2jn.py_string_to_notebook(mdstr)
     py2jn.tools.write_notebook(nb, outfile, nbver=4)
@@ -233,8 +239,11 @@ def rst_to_notebook(infile, outfile):
 def markdown_to_notebook(infile, outfile):
     """Convert a markdown file to a notebook file."""
 
+    # Read infile into a string
     with open(infile, 'r') as fin:
         str = fin.read()
+    # Enclose the markdown within triple quotes and convert from
+    # python to notebook
     str = '"""' + str + '"""'
     nb = py2jn.py_string_to_notebook(str)
     py2jn.tools.write_notebook(nb, outfile, nbver=4)
@@ -244,28 +253,42 @@ def markdown_to_notebook(infile, outfile):
 def rst_to_docs_rst(infile, outfile):
     """Convert an rst file to a sphinx docs rst file."""
 
+    # Read infile into a list of lines
     with open(infile, 'r') as fin:
         rst = fin.readlines()
 
+    # Inspect outfile path components to determine whether outfile
+    # is in the root of the examples directory or in a subdirectory
+    # thererof
     ps = pathsplit(outfile)[-3:]
     if ps[-2] == 'examples':
         idx = 'index'
     else:
         idx = ''
+
+    # Output string starts with a cross-reference anchor constructed from
+    # the file name and path
     out = '.. _' + '_'.join(ps) + ':\n\n'
+
+    # Iterate over lines from infile
     it = iter(rst)
     for line in it:
-        if line[0:12] == '.. toc-start':
+        if line[0:12] == '.. toc-start':  # Line has start of toc marker
+            # Initialise current toc array and iterate over lines until
+            # end of toc marker encountered
             toc = []
             for line in it:
-                if line == '\n':
+                if line == '\n':  # Drop newline lines
                     continue
-                elif line[0:10] == '.. toc-end':
+                elif line[0:10] == '.. toc-end':  # End of toc marker
+                    # Add toctree section to output string
                     out += '.. toctree::\n   :maxdepth: 1\n\n'
                     for c in toc:
                         out += '   %s <%s>\n' % c
                     break
-                else:
+                else:  #  Still within toc section
+                    # Extract link text and target url and append to
+                    # toc array
                     m = re.search(r'`(.*?)\s*<(.*?)(?:.py)?>`', line)
                     if m:
                         if idx == '':
@@ -273,7 +296,7 @@ def rst_to_docs_rst(infile, outfile):
                         else:
                             toc.append((m.group(1),
                                         os.path.join(m.group(2), idx)))
-        else:
+        else:  # Not within toc section
             out += line
 
     with open(outfile, 'w') as fout:
