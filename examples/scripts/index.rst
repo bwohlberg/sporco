@@ -1,7 +1,7 @@
-Example Scripts
-===============
+Usage Examples
+==============
 
-Scripts are organised into directories according to topic:
+The examples are organised into directories according to topic:
 
 .. toc-start
 
