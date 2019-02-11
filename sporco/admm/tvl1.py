@@ -685,7 +685,8 @@ class TVL1Deconv(admm.ADMM):
 
     def cnst_c(self):
         r"""Compute constant component :math:`\mathbf{c}` of ADMM problem
-        constraint. In this case :math:`\mathbf{c} = \mathbf{0}`.
+        constraint. In this case :math:`\mathbf{c} = (\mathbf{0} \;\;
+        \mathbf{0} \;\; \mathbf{s})`.
         """
 
         c = np.zeros(self.S.shape + (len(self.axes)+1,), self.dtype)
