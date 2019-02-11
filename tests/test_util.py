@@ -229,6 +229,18 @@ class TestSet01(object):
         assert np.allclose(A_combine_recon, A_average_recon, equal_nan=True)
 
 
+    def test_31(self):
+        shape = (7, 5, 6)
+        g = util.gaussian(shape)
+        assert g.shape == shape
+
+
+    def test_32(self):
+        s = np.random.rand(16, 17, 3)
+        scn, smn, snrm = util.local_contrast_normalise(s)
+        assert np.linalg.norm(snrm * scn + smn - s) < 1e-7
+
+
     def test_33(self):
         U = np.random.randn(5, 10)
         B, S, C = util.pca(U, centre=False)
@@ -239,3 +251,17 @@ class TestSet01(object):
         U = np.random.randn(5, 10)
         B, S, C = util.pca(U, centre=True)
         assert np.linalg.norm(B.dot(B.T) - np.eye(U.shape[0])) < 1e-10
+
+
+    def test_35(self):
+        x = np.arange(20).reshape((4, 5))
+        y = util.rolling_window(x, (3, 3))
+        assert y.shape == (3, 3, 2, 3)
+        assert y[-1, -1, -1, -1] == 19
+
+
+    def test_36(self):
+        x = np.arange(20).reshape((4, 5))
+        y = util.subsample_array(x, (2, 2), pad=True)
+        assert y.shape == (2, 2, 2, 3)
+        assert y[0, 0, -1, -1] == 14

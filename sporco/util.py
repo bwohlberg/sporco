@@ -193,6 +193,95 @@ def tiledict(D, sz=None):
 
 
 
+def rolling_window(x, wsz, wnm=None, pad='wrap'):
+    """
+    Use :func:`numpy.lib.stride_tricks.as_strided` to construct a view
+    of the input array that represents different positions of a rolling
+    window as additional axes of the array. If the number of shifts
+    requested is such that the window extends beyond the boundary of the
+    input array, it is padded before the view is constructed. For
+    example, if ``x`` is 4 x 5 array, the output of
+    ``y = rolling_window(x, (3, 3))`` is a 3 x 3 x 2 x 3 array, with the
+    first window position indexed as ``y[..., 0, 0]``.
+
+    Parameters
+    ----------
+    x : ndarray
+      Input array
+    wsz : tuple
+      Window size
+    wnm : tuple, optional (default None)
+      Number of shifts of window on each axis. If None, the number of
+      shifts is set so that the end sample in the array is also the end
+      sample in the final window position.
+    pad : string, optional (default 'wrap')
+      A pad mode specification for :func:`numpy.pad`
+
+    Returns
+    -------
+    xw : ndarray
+      An array of shape wsz + wnm representing all requested shifts of
+      the window within the input array
+    """
+
+    if wnm is None:
+        wnm = tuple(np.array(x.shape) - np.array(wsz) + 1)
+    else:
+        over = np.clip(np.array(wsz) + np.array(wnm) - np.array(x.shape) - 1,
+                       0, np.iinfo(int).max)
+        if np.any(over > 0):
+            psz = [(0, p) for p in over]
+            x = np.pad(x, psz, mode=pad)
+    outsz = wsz + wnm
+    outstrd = x.strides + x.strides
+    return np.lib.stride_tricks.as_strided(x, outsz, outstrd)
+
+
+
+def subsample_array(x, step, pad=False, mode='reflect'):
+    """
+    Use :func:`numpy.lib.stride_tricks.as_strided` to construct a view
+    of the input array that represents a subsampling of the array by the
+    specified step, with different offsets of the subsampling as
+    additional axes of the array. If the input array shape is not evenly
+    divisible by the subsampling step, it is padded before the view
+    is constructed. For example, if ``x`` is 6 x 6 array, the output of
+    ``y = subsample_array(x, (2, 2))`` is a 2 x 2 x 3 x 3 array, with
+    the first subsampling offset indexed as ``y[0, 0]``.
+
+    Parameters
+    ----------
+    x : ndarray
+      Input array
+    step : tuple
+      Subsampling step size
+    pad : bool, optional (default False)
+      Flag indicating whether the input array should be padded
+      when its size is not integer divisible by the step size
+    mode : string, optional (default 'reflect')
+      A pad mode specification for :func:`numpy.pad`
+
+    Returns
+    -------
+    xs : ndarray
+      An array representing different subsampling offsets in the input
+      array
+    """
+
+    if np.any(np.greater_equal(step, x.shape)):
+        raise ValueError('Step size must be less than array size on each axis')
+    sbsz, dvmd = np.divmod(x.shape, step)
+    if pad and np.any(dvmd):
+        sbsz += np.clip(dvmd, 0, 1)
+        psz = np.subtract(np.multiply(sbsz, step), x.shape)
+        pdt = [(0, p) for p in psz]
+        x = np.pad(x, pdt, mode=mode)
+    outsz = step + tuple(sbsz)
+    outstrd = x.strides + tuple(np.multiply(step, x.strides))
+    return np.lib.stride_tricks.as_strided(x, outsz, outstrd)
+
+
+
 def extractblocks(img, blksz, stpsz=None):
     """Extract blocks from an ndarray signal into an ndarray.
 
@@ -518,6 +607,89 @@ def tikhonov_filter(s, lmbda, npd=16):
     sl = slp[npd:(slp.shape[0] - npd), npd:(slp.shape[1] - npd)]
     sh = s - sl
     return sl.astype(s.dtype), sh.astype(s.dtype)
+
+
+
+def gaussian(shape, sd=1.0):
+    """Sample a multivariate Gaussian pdf, normalised to have unit sum.
+
+    Parameters
+    ----------
+    shape : tuple
+      Shape of output array.
+    sd : float, optional (default 1.0)
+      Standard deviation of Gaussian pdf.
+
+    Returns
+    -------
+    gc : ndarray
+      Sampled Gaussian pdf.
+    """
+
+    gfn = lambda x, sd: np.exp(-(x**2) / (2.0 * sd**2)) / \
+                        (np.sqrt(2.0 * np.pi) *sd)
+    gc = 1.0
+    if isinstance(shape, int):
+        shape = (shape,)
+    for k, n in enumerate(shape):
+        x = np.linspace(-3.0, 3.0, n).reshape(
+            (1,) * k + (n,) + (1,) * (len(shape) - k - 1))
+        gc = gc * gfn(x, sd)
+    gc /= np.sum(gc)
+    return gc
+
+
+
+def local_contrast_normalise(s, n=7, c=None):
+    """
+    Perform local contrast normalisation :cite:`jarret-2009-what` of
+    an image, consisting of subtraction of the local mean and division
+    by the local norm. The original image can be reconstructed from the
+    contrast normalised image as (`snrm` * `scn`) + `smn`.
+
+    Parameters
+    ----------
+    s : array_like
+      Input image or array of images.
+    n : int, optional (default 7)
+      The size of the local region used for normalisation is :math:`2n+1`.
+    c : float, optional (default None)
+      The smallest value that can be used in the divisive normalisation.
+      If `None`, this value is set to the mean of the local region norms.
+
+    Returns
+    -------
+    scn : ndarray
+      Contrast normalised image(s)
+    smn : ndarray
+      Additive normalisation correction
+    snrm : ndarray
+      Multiplicative normalisation correction
+    """
+
+    # Construct region weighting filter
+    N = 2 * n + 1
+    g = gaussian((N, N), sd=1.0)
+    # Compute required image padding
+    pd = ((n, n),) * 2
+    if s.ndim > 2:
+        g = g[..., np.newaxis]
+        pd += ((0, 0),)
+    sp = np.pad(s, pd, mode='symmetric')
+    # Compute local mean and subtract from image
+    smn = np.roll(sla.fftconv(g, sp), (-n, -n), axis=(0, 1))
+    s1 = sp - smn
+    # Compute local norm
+    snrm = np.roll(np.sqrt(np.clip(sla.fftconv(g, s1**2), 0.0, np.inf)),
+                   (-n, -n), axis=(0, 1))
+    # Set c parameter if not specified
+    if c is None:
+        c = np.mean(snrm, axis=(0, 1), keepdims=True)
+    # Divide mean-subtracted image by corrected local norm
+    snrm = np.maximum(c, snrm)
+    s2 = s1 / snrm
+    # Return contrast normalised image and normalisation components
+    return s2[n:-n, n:-n], smn[n:-n, n:-n], snrm[n:-n, n:-n]
 
 
 
