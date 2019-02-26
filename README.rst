@@ -17,9 +17,6 @@ SParse Optimization Research COde (SPORCO)
 .. image:: https://ci.appveyor.com/api/projects/status/evnk5t9whoh20s33?svg=true
     :target: https://ci.appveyor.com/project/bwohlberg/sporco
     :alt: Windows Build Status
-.. image:: https://landscape.io/github/bwohlberg/sporco/master/landscape.svg?style=flat
-   :target: https://landscape.io/github/bwohlberg/sporco/master
-   :alt: Code Health
 .. image:: https://codecov.io/gh/bwohlberg/sporco/branch/master/graph/badge.svg
     :target: https://codecov.io/gh/bwohlberg/sporco
     :alt: Test Coverage
