@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2016-2017 by Brendt Wohlberg <brendt@ieee.org>
+# Copyright (C) 2016-2019 by Brendt Wohlberg <brendt@ieee.org>
 # All rights reserved. BSD 3-clause License.
 # This file is part of the SPORCO package. Details of the copyright
 # and user license can be found in the 'LICENSE.txt' file distributed
@@ -19,6 +19,7 @@ from sporco.admm import admm
 import sporco.cnvrep as cr
 from sporco.admm import cbpdn
 import sporco.linalg as sl
+import sporco.prox as sp
 from sporco.util import u
 
 
@@ -313,8 +314,8 @@ class ConvBPDNScalarTV(admm.ADMM):
         :math:`\mathbf{y}`."""
 
         AXU = self.AX + self.U
-        self.Y[..., 0:-1] = sl.shrink2(AXU[..., 0:-1], self.mu/self.rho)
-        self.Y[..., -1] = sl.shrink1(AXU[..., -1],
+        self.Y[..., 0:-1] = sp.prox_l2(AXU[..., 0:-1], self.mu/self.rho)
+        self.Y[..., -1] = sp.prox_l1(AXU[..., -1],
                                      (self.lmbda/self.rho) * self.Wl1)
 
 
@@ -706,9 +707,9 @@ class ConvBPDNVectorTV(ConvBPDNScalarTV):
         :math:`\mathbf{y}`."""
 
         AXU = self.AX + self.U
-        self.Y[..., 0:-1] = sl.shrink2(AXU[..., 0:-1], self.mu/self.rho,
+        self.Y[..., 0:-1] = sp.prox_l2(AXU[..., 0:-1], self.mu/self.rho,
                                        axis=(self.cri.axisM, -1))
-        self.Y[..., -1] = sl.shrink1(AXU[..., -1],
+        self.Y[..., -1] = sp.prox_l1(AXU[..., -1],
                                      (self.lmbda/self.rho) * self.Wl1)
 
 
@@ -1097,9 +1098,9 @@ class ConvBPDNRecTV(admm.ADMM):
         :math:`\mathbf{y}`."""
 
         AXU = self.AX + self.U
-        self.block_sep0(self.Y)[:] = sl.shrink1(
+        self.block_sep0(self.Y)[:] = sp.prox_l1(
             self.block_sep0(AXU), (self.lmbda/self.rho) * self.Wl1)
-        self.block_sep1(self.Y)[:] = sl.shrink2(
+        self.block_sep1(self.Y)[:] = sp.prox_l2(
             self.block_sep1(AXU), self.mu/self.rho, axis=(self.cri.axisC, -1))
 
 

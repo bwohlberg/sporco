@@ -21,6 +21,7 @@ import multiprocessing as mp
 import numpy as np
 
 import sporco.linalg as sl
+import sporco.prox as sp
 from sporco.util import u
 from sporco.admm.cbpdn import GenericConvBPDN
 import sporco.cnvrep as cr
@@ -221,7 +222,7 @@ def par_y1step(i):
         gamma = mp_lmbda/(mp_alpha**2*mp_rho)*mp_wl1
     else:
         gamma = mp_lmbda/(mp_alpha**2*mp_rho)*mp_wl1[grpind]
-    Y1 = sl.shrink1(XU1, gamma)
+    Y1 = sp.prox_l1(XU1, gamma)
     if mp_NonNegCoef:
         Y1[Y1 < 0.0] = 0.0
     if mp_NoBndryCross:

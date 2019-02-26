@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2015-2018 by Brendt Wohlberg <brendt@ieee.org>
+# Copyright (C) 2015-2019 by Brendt Wohlberg <brendt@ieee.org>
 # All rights reserved. BSD 3-clause License.
 # This file is part of the SPORCO package. Details of the copyright
 # and user license can be found in the 'LICENSE.txt' file distributed
@@ -605,7 +605,7 @@ class ConvBPDN(GenericConvBPDN):
         r"""Minimise Augmented Lagrangian with respect to
         :math:`\mathbf{y}`."""
 
-        self.Y = sl.shrink1(self.AX + self.U,
+        self.Y = sp.prox_l1(self.AX + self.U,
                             (self.lmbda / self.rho) * self.wl1)
         super(ConvBPDN, self).ystep()
 
@@ -777,7 +777,7 @@ class ConvBPDNJoint(ConvBPDN):
         :math:`\mathbf{y}`.
         """
 
-        self.Y = sl.shrink12(self.AX + self.U, (self.lmbda/self.rho)*self.wl1,
+        self.Y = sp.prox_l1l2(self.AX + self.U, (self.lmbda/self.rho)*self.wl1,
                              (self.mu/self.rho)*self.wl21, axis=self.cri.axisC)
         GenericConvBPDN.ystep(self)
 
@@ -2001,9 +2001,9 @@ class ConvMinL1InL2Ball(ConvTwoBlockCnstrnt):
         """
 
         AXU = self.AX + self.U
-        Y0 = sl.proj_l2ball(self.block_sep0(AXU) - self.S, 0.0, self.epsilon,
-                            axes=self.cri.axisN)
-        Y1 = sl.shrink1(self.block_sep1(AXU), self.wl1 / self.rho)
+        Y0 = sp.proj_l2(self.block_sep0(AXU) - self.S, self.epsilon,
+                            axis=self.cri.axisN)
+        Y1 = sp.prox_l1(self.block_sep1(AXU), self.wl1 / self.rho)
         self.Y = self.block_cat(Y0, Y1)
 
         super(ConvMinL1InL2Ball, self).ystep()
@@ -2015,8 +2015,8 @@ class ConvMinL1InL2Ball(ConvTwoBlockCnstrnt):
         function.
         """
 
-        return np.linalg.norm(sl.proj_l2ball(Y0, 0.0, self.epsilon,
-                                             axes=self.cri.axisN) - Y0)
+        return np.linalg.norm(sp.proj_l2(Y0, self.epsilon,
+                                         axis=self.cri.axisN) - Y0)
 
 
 
@@ -2220,7 +2220,7 @@ class ConvBPDNMaskDcpl(ConvTwoBlockCnstrnt):
         AXU = self.AX + self.U
         Y0 = (self.rho*(self.block_sep0(AXU) - self.S)) / \
              (self.W**2 + self.rho)
-        Y1 = sl.shrink1(self.block_sep1(AXU),
+        Y1 = sp.prox_l1(self.block_sep1(AXU),
                         (self.lmbda / self.rho) * self.wl1)
         self.Y = self.block_cat(Y0, Y1)
 
@@ -2695,8 +2695,8 @@ class ConvL1L1Grd(ConvBPDNMaskDcpl):
         """
 
         AXU = self.AX + self.U
-        Y0 = sl.shrink1(self.block_sep0(AXU) - self.S, (1.0/self.rho)*self.W)
-        Y1 = sl.shrink1(self.block_sep1(AXU), (self.lmbda/self.rho)*self.wl1)
+        Y0 = sp.prox_l1(self.block_sep0(AXU) - self.S, (1.0/self.rho)*self.W)
+        Y1 = sp.prox_l1(self.block_sep1(AXU), (self.lmbda/self.rho)*self.wl1)
         self.Y = self.block_cat(Y0, Y1)
 
         super(ConvBPDNMaskDcpl, self).ystep()

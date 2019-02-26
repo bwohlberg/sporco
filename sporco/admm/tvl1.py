@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2015-2017 by Brendt Wohlberg <brendt@ieee.org>
+# Copyright (C) 2015-2019 by Brendt Wohlberg <brendt@ieee.org>
 # All rights reserved. BSD 3-clause License.
 # This file is part of the SPORCO package. Details of the copyright
 # and user license can be found in the 'LICENSE.txt' file distributed
@@ -16,6 +16,7 @@ import numpy as np
 
 from sporco.admm import admm
 import sporco.linalg as sl
+import sporco.prox as sp
 
 __author__ = """Brendt Wohlberg <brendt@ieee.org>"""
 
@@ -246,10 +247,10 @@ class TVL1Denoise(admm.ADMM):
         :math:`\mathbf{y}`.
         """
 
-        self.Y[..., 0:-1] = sl.shrink2(
+        self.Y[..., 0:-1] = sp.prox_l2(
             self.AX[..., 0:-1] + self.U[..., 0:-1],
             (self.lmbda/self.rho)*self.Wtvna, axis=self.saxes)
-        self.Y[..., -1] = sl.shrink1(
+        self.Y[..., -1] = sp.prox_l1(
             self.AX[..., -1] + self.U[..., -1] - self.S,
             (1.0/self.rho)*self.Wdf)
 
@@ -604,10 +605,10 @@ class TVL1Deconv(admm.ADMM):
         :math:`\mathbf{y}`.
         """
 
-        self.Y[..., 0:-1] = sl.shrink2(
+        self.Y[..., 0:-1] = sp.prox_l2(
             self.AX[..., 0:-1] + self.U[..., 0:-1],
             (self.lmbda/self.rho)*self.Wtvna, axis=self.saxes)
-        self.Y[..., -1] = sl.shrink1(
+        self.Y[..., -1] = sp.prox_l1(
             self.AX[..., -1] + self.U[..., -1] - self.S,
             (1.0/self.rho)*self.Wdf)
 

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2015-2018 by Brendt Wohlberg <brendt@ieee.org>
+# Copyright (C) 2015-2019 by Brendt Wohlberg <brendt@ieee.org>
 # All rights reserved. BSD 3-clause License.
 # This file is part of the SPORCO package. Details of the copyright
 # and user license can be found in the 'LICENSE.txt' file distributed
@@ -449,7 +449,7 @@ class BPDN(GenericBPDN):
         r"""Minimise Augmented Lagrangian with respect to
         :math:`\mathbf{y}`."""
 
-        self.Y = np.asarray(sl.shrink1(self.AX + self.U,
+        self.Y = np.asarray(sp.prox_l1(self.AX + self.U,
                                        (self.lmbda / self.rho) * self.wl1),
                             dtype=self.dtype)
         super(BPDN, self).ystep()
@@ -569,9 +569,9 @@ class BPDNJoint(BPDN):
         r"""Minimise Augmented Lagrangian with respect to
         :math:`\mathbf{y}`."""
 
-        self.Y = np.asarray(sl.shrink12(
+        self.Y = np.asarray(sp.prox_l1l2(
             self.AX + self.U, (self.lmbda / self.rho) * self.wl1,
-            self.mu / self.rho), dtype=self.dtype)
+            self.mu / self.rho, axis=-1), dtype=self.dtype)
         GenericBPDN.ystep(self)
 
 
@@ -1125,7 +1125,7 @@ class MinL1InL2Ball(admm.ADMMTwoBlockCnstrnt):
         """
 
         AXU = self.AX + self.U
-        Y0 = np.asarray(sl.shrink1(self.block_sep0(AXU), self.wl1 / self.rho),
+        Y0 = np.asarray(sp.prox_l1(self.block_sep0(AXU), self.wl1 / self.rho),
                         dtype=self.dtype)
         if self.opt['NonNegCoef']:
             Y0[Y0 < 0.0] = 0.0

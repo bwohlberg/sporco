@@ -34,9 +34,9 @@ __all__ = ['complex_dtype', 'pyfftw_byte_aligned', 'pyfftw_empty_aligned',
            'solvedbi_sm_c', 'solvedbd_sm', 'solvedbd_sm_c', 'solvemdbi_ism',
            'solvemdbi_rsm', 'solvemdbi_cg', 'lu_factor', 'lu_solve_ATAI',
            'lu_solve_AATI', 'cho_factor', 'cho_solve_ATAI', 'cho_solve_AATI',
-           'zpad', 'Gax', 'GTax', 'GradientFilters', 'zdivide', 'shrink1',
-           'shrink2', 'shrink12', 'proj_l2ball', 'promote16', 'atleast_nd',
-           'split', 'blockcirculant', 'fl2norm2', 'rfl2norm2', 'rrs']
+           'zpad', 'Gax', 'GTax', 'GradientFilters', 'zdivide', 'proj_l2ball',
+           'promote16', 'atleast_nd', 'split', 'blockcirculant', 'fl2norm2',
+           'rfl2norm2', 'rrs']
 
 
 
@@ -1184,113 +1184,13 @@ def zdivide(x, y):
 
 
 
-def shrink1(x, alpha):
-    r"""
-    Scalar shrinkage/soft thresholding function
-
-     .. math::
-      \mathcal{S}_{1,\alpha}(\mathbf{x}) = \mathrm{sign}(\mathbf{x}) \odot
-      \max(0, |\mathbf{x}| - \alpha) = \mathrm{prox}_f(\mathbf{x}) \;\;
-      \text{where} \;\; f(\mathbf{u}) = \alpha \|\mathbf{u}\|_1 \;\;.
-
-    Parameters
-    ----------
-    x : array_like
-      Input array :math:`\mathbf{x}`
-    alpha : float or array_like
-      Shrinkage parameter :math:`\alpha`
-
-    Returns
-    -------
-    x : ndarray
-      Output array
-    """
-
-    if have_numexpr:
-        return ne.evaluate(
-            'where(abs(x)-alpha > 0, where(x >= 0, 1, -1) * (abs(x)-alpha), 0)'
-        )
-    else:
-        return np.sign(x) * (np.clip(np.abs(x) - alpha, 0, float('Inf')))
-
-
-
-def shrink2(x, alpha, axis=-1):
-    r"""
-    Vector shrinkage/soft thresholding function
-
-     .. math::
-      \mathcal{S}_{2,\alpha}(\mathbf{x}) =
-      \frac{\mathbf{x}}{\|\mathbf{x}\|_2} \max(0, \|\mathbf{x}\|_2 - \alpha)
-      = \mathrm{prox}_f(\mathbf{x}) \;\;
-      \text{where} \;\; f(\mathbf{u}) = \alpha \|\mathbf{u}\|_2 \;\;.
-
-    The :math:`\ell_2` norm is applied over the specified axis of a
-    multi-dimensional input (the last axis by default).
-
-    Parameters
-    ----------
-    x : array_like
-      Input array :math:`\mathbf{x}`
-    alpha : float or array_like
-      Shrinkage parameter :math:`\alpha`
-    axis : int, optional (default -1)
-      Axis of x over which the :math:`\ell_2` norm
-
-    Returns
-    -------
-    x : ndarray
-      Output array
-    """
-
-    a = np.sqrt(np.sum(x**2, axis=axis, keepdims=True))
-    b = np.maximum(0, a - alpha)
-    b = zdivide(b, a)
-    return np.asarray(b * x, dtype=x.dtype)
-
-
-
-def shrink12(x, alpha, beta, axis=-1):
-    r"""
-    Compound shrinkage/soft thresholding function
-    :cite:`wohlberg-2012-local` :cite:`chartrand-2013-nonconvex`
-
-     .. math::
-      \mathcal{S}_{1,2,\alpha,\beta}(\mathbf{x}) =
-      \mathcal{S}_{2,\beta}(\mathcal{S}_{1,\alpha}(\mathbf{x}))
-      = \mathrm{prox}_f(\mathbf{x}) \;\;
-      \text{where} \;\; f(\mathbf{u}) = \alpha \|\mathbf{u}\|_1 +
-      \beta \|\mathbf{u}\|_2 \;\;.
-
-    The :math:`\ell_2` norm is applied over the specified axis of a
-    multi-dimensional input (the last axis by default).
-
-    Parameters
-    ----------
-    x : array_like
-      Input array :math:`\mathbf{x}`
-    alpha : float or array_like
-      Shrinkage parameter :math:`\alpha`
-    beta : float or array_like
-      Shrinkage parameter :math:`\beta`
-    axis : int, optional (default -1)
-      Axis of x over which the :math:`\ell_2` norm
-
-    Returns
-    -------
-    x : ndarray
-      Output array
-    """
-
-    return shrink2(shrink1(x, alpha), beta, axis)
-
-
-
 def proj_l2ball(b, s, r, axes=None):
     r"""
     Project :math:`\mathbf{b}` into the :math:`\ell_2` ball of radius
     :math:`r` about :math:`\mathbf{s}`, i.e.
     :math:`\{ \mathbf{x} : \|\mathbf{x} - \mathbf{s} \|_2 \leq r \}`.
+    Note that ``proj_l2ball(b, s, r)`` is equivalent to
+    :func:`.prox.proj_l2` ``(b - s, r) + s``.
 
     Parameters
     ----------

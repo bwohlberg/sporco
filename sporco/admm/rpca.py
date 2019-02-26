@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2015-2017 by Brendt Wohlberg <brendt@ieee.org>
+# Copyright (C) 2015-2019 by Brendt Wohlberg <brendt@ieee.org>
 # All rights reserved. BSD 3-clause License.
 # This file is part of the SPORCO package. Details of the copyright
 # and user license can be found in the 'LICENSE.txt' file distributed
@@ -14,7 +14,6 @@ import copy
 import numpy as np
 
 from sporco.admm import admm
-import sporco.linalg as sl
 import sporco.prox as sp
 from sporco.util import u
 
@@ -184,7 +183,7 @@ class RobustPCA(admm.ADMM):
         :math:`\mathbf{y}`.
         """
 
-        self.Y = np.asarray(sl.shrink1(self.S - self.AX - self.U,
+        self.Y = np.asarray(sp.prox_l1(self.S - self.AX - self.U,
                                        self.lmbda/self.rho), dtype=self.dtype)
 
 

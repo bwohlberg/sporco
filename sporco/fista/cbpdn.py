@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2016-2018 by Brendt Wohlberg <brendt@ieee.org>
+# Copyright (C) 2016-2019 by Brendt Wohlberg <brendt@ieee.org>
 #                            Cristina Garcia-Cardona <cgarciac@lanl.gov>
 # All rights reserved. BSD 3-clause License.
 # This file is part of the SPORCO package. Details of the copyright
@@ -17,6 +17,7 @@ import numpy as np
 
 import sporco.cnvrep as cr
 import sporco.linalg as sl
+import sporco.prox as sp
 from sporco.util import u
 
 from sporco.fista import fista
@@ -287,7 +288,7 @@ class ConvBPDN(fista.FISTADFT):
     def eval_proxop(self, V):
         """Compute proximal operator of :math:`g`."""
 
-        return sl.shrink1(V, (self.lmbda / self.L) * self.wl1)
+        return sp.prox_l1(V, (self.lmbda / self.L) * self.wl1)
 
 
 

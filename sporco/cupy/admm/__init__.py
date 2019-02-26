@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2018 by Brendt Wohlberg <brendt@ieee.org>
+# Copyright (C) 2018-2019 by Brendt Wohlberg <brendt@ieee.org>
 # All rights reserved. BSD 3-clause License.
 # This file is part of the SPORCO package. Details of the copyright
 # and user license can be found in the 'LICENSE.txt' file distributed
@@ -82,12 +82,14 @@ sys.modules['sporco.admm.admm'] = admm.admm
 
 
 # Construct sporco.cupy.admm.tvl1
-admm.tvl1 = sporco_cupy_patch_module('sporco.admm.tvl1', {'admm': admm.admm,
-                                                          'sl': linalg})
+admm.tvl1 = sporco_cupy_patch_module('sporco.admm.tvl1',
+                                     {'admm': admm.admm, 'sl': linalg,
+                                      'sp': prox})
 
 # Construct sporco.cupy.admm.tvl2
-admm.tvl2 = sporco_cupy_patch_module('sporco.admm.tvl2', {'admm': admm.admm,
-                                                          'sl': linalg})
+admm.tvl2 = sporco_cupy_patch_module('sporco.admm.tvl2',
+                                     {'admm': admm.admm, 'sl': linalg,
+                                      'sp': prox})
 
 # Construct sporco.cupy.admm.bpdn
 admm.bpdn = sporco_cupy_patch_module('sporco.admm.bpdn',
@@ -115,7 +117,8 @@ admm.cbpdn.AddMaskSim.index_addmsk = _index_addmsk
 # Construct sporco.cupy.admm.cbpdntv
 admm.cbpdntv = sporco_cupy_patch_module('sporco.admm.cbpdntv',
                                         {'admm': admm.admm, 'cr': cnvrep,
-                                         'cbpdn': admm.cbpdn, 'sl': linalg})
+                                         'cbpdn': admm.cbpdn, 'sl': linalg,
+                                         'sp': prox})
 
 admm.cbpdntv.ConvBPDNScalarTV.cnst_c = _cnst0
 admm.cbpdntv.ConvBPDNRecTV.cnst_c = _cnst0

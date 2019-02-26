@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2018 by Brendt Wohlberg <brendt@ieee.org>
+# Copyright (C) 2018-2019 by Brendt Wohlberg <brendt@ieee.org>
 # All rights reserved. BSD 3-clause License.
 # This file is part of the SPORCO package. Details of the copyright
 # and user license can be found in the 'LICENSE.txt' file distributed
@@ -341,5 +341,7 @@ linalg = sporco_cupy_patch_module(
 
 
 # Construct sporco.cupy.prox
+prox_lp = sporco_cupy_patch_module('sporco.prox._lp', {'have_numexpr': False,
+                                                       'sl': linalg})
 prox = sporco_cupy_patch_module('sporco.prox', {'have_numexpr': False,
                                                 'sl': linalg})

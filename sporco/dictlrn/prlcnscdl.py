@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2017-2018 by Brendt Wohlberg <brendt@ieee.org>
+# Copyright (C) 2017-2019 by Brendt Wohlberg <brendt@ieee.org>
 # All rights reserved. BSD 3-clause License.
 # This file is part of the SPORCO package. Details of the copyright
 # and user license can be found in the 'LICENSE.txt' file distributed
@@ -17,9 +17,10 @@ import collections
 import multiprocessing as mp
 import numpy as np
 
-import sporco.linalg as spl
+import sporco.linalg as sl
+import sporco.prox as sp
 # Required due to pyFFTW bug #135 - see "Notes" section of SPORCO docs.
-spl.pyfftw_threads = 1
+sl.pyfftw_threads = 1
 from sporco.dictlrn import cbpdndl
 from sporco.dictlrn import cbpdndlmd
 import sporco.cnvrep as cr
@@ -132,11 +133,11 @@ def cbpdn_setdict():
     global mp_DSf
     # Set working dictionary for cbpdn step and compute DFT of dictionary
     # D and of D^T S
-    mp_Df[:] = spl.rfftn(mp_D_Y, mp_cri.Nv, mp_cri.axisN)
+    mp_Df[:] = sl.rfftn(mp_D_Y, mp_cri.Nv, mp_cri.axisN)
     if mp_cri.Cd == 1:
         mp_DSf[:] = np.conj(mp_Df) * mp_Sf
     else:
-        mp_DSf[:] = spl.inner(np.conj(mp_Df[np.newaxis, ...]), mp_Sf,
+        mp_DSf[:] = sl.inner(np.conj(mp_Df[np.newaxis, ...]), mp_Sf,
                               axis=mp_cri.axisC+1)
 
 
@@ -148,12 +149,12 @@ def cbpdn_xstep(k):
     """
 
     YU = mp_Z_Y[k] - mp_Z_U[k]
-    b = mp_DSf[k] + mp_xrho * spl.rfftn(YU, None, mp_cri.axisN)
+    b = mp_DSf[k] + mp_xrho * sl.rfftn(YU, None, mp_cri.axisN)
     if mp_cri.Cd == 1:
-        Xf = spl.solvedbi_sm(mp_Df, mp_xrho, b, axis=mp_cri.axisM)
+        Xf = sl.solvedbi_sm(mp_Df, mp_xrho, b, axis=mp_cri.axisM)
     else:
-        Xf = spl.solvemdbi_ism(mp_Df, mp_xrho, b, mp_cri.axisM, mp_cri.axisC)
-    mp_Z_X[k] = spl.irfftn(Xf, mp_cri.Nv, mp_cri.axisN)
+        Xf = sl.solvemdbi_ism(mp_Df, mp_xrho, b, mp_cri.axisM, mp_cri.axisC)
+    mp_Z_X[k] = sl.irfftn(Xf, mp_cri.Nv, mp_cri.axisN)
 
 
 
@@ -174,7 +175,7 @@ def cbpdn_ystep(k):
     """
 
     AXU = mp_Z_X[k] + mp_Z_U[k]
-    mp_Z_Y[k] = spl.shrink1(AXU, (mp_lmbda/mp_xrho))
+    mp_Z_Y[k] = sp.prox_l1(AXU, (mp_lmbda/mp_xrho))
 
 
 
@@ -196,7 +197,7 @@ def ccmod_setcoef(k):
 
     # Set working coefficient maps for ccmod step and compute DFT of
     # coefficient maps Z and Z^T S
-    mp_Zf[k] = spl.rfftn(mp_Z_Y[k], mp_cri.Nv, mp_cri.axisN)
+    mp_Zf[k] = sl.rfftn(mp_Z_Y[k], mp_cri.Nv, mp_cri.axisN)
     mp_ZSf[k] = np.conj(mp_Zf[k]) * mp_Sf[k]
 
 
@@ -208,9 +209,9 @@ def ccmod_xstep(k):
     """
 
     YU = mp_D_Y - mp_D_U[k]
-    b = mp_ZSf[k] + mp_drho * spl.rfftn(YU, None, mp_cri.axisN)
-    Xf = spl.solvedbi_sm(mp_Zf[k], mp_drho, b, axis=mp_cri.axisM)
-    mp_D_X[k] = spl.irfftn(Xf, mp_cri.Nv, mp_cri.axisN)
+    b = mp_ZSf[k] + mp_drho * sl.rfftn(YU, None, mp_cri.axisN)
+    Xf = sl.solvedbi_sm(mp_Zf[k], mp_drho, b, axis=mp_cri.axisM)
+    mp_D_X[k] = sl.irfftn(Xf, mp_cri.Nv, mp_cri.axisN)
 
 
 
@@ -599,10 +600,10 @@ class ConvBPDNDictLearn_Consensus(cbpdndl.ConvBPDNDictLearn):
         Xf = mp_Zf
         Df = mp_Df
         Sf = mp_Sf
-        Ef = spl.inner(Df[np.newaxis, ...], Xf,
+        Ef = sl.inner(Df[np.newaxis, ...], Xf,
                        axis=self.xstep.cri.axisM+1) - Sf
         Ef = np.swapaxes(Ef, 0, self.xstep.cri.axisK+1)[0]
-        dfd = spl.rfl2norm2(Ef, self.xstep.S.shape,
+        dfd = sl.rfl2norm2(Ef, self.xstep.S.shape,
                             axis=self.xstep.cri.axisN)/2.0
         rl1 = np.sum(np.abs(X))
         obj = dfd + self.xstep.lmbda*rl1
@@ -645,7 +646,7 @@ def cbpdnmd_setdict():
     """
 
     # Set working dictionary for cbpdn step and compute DFT of dictionary D
-    mp_Df[:] = spl.rfftn(mp_D_Y0, mp_cri.Nv, mp_cri.axisN)
+    mp_Df[:] = sl.rfftn(mp_D_Y0, mp_cri.Nv, mp_cri.axisN)
 
 
 
@@ -659,16 +660,16 @@ def cbpdnmd_xstep(k):
     YU0 = mp_Z_Y0[k] + mp_S[k] - mp_Z_U0[k]
     YU1 = mp_Z_Y1[k] - mp_Z_U1[k]
     if mp_cri.Cd == 1:
-        b = np.conj(mp_Df) * spl.rfftn(YU0, None, mp_cri.axisN) + \
-            spl.rfftn(YU1, None, mp_cri.axisN)
-        Xf = spl.solvedbi_sm(mp_Df, 1.0, b, axis=mp_cri.axisM)
+        b = np.conj(mp_Df) * sl.rfftn(YU0, None, mp_cri.axisN) + \
+            sl.rfftn(YU1, None, mp_cri.axisN)
+        Xf = sl.solvedbi_sm(mp_Df, 1.0, b, axis=mp_cri.axisM)
     else:
-        b = spl.inner(np.conj(mp_Df), spl.rfftn(YU0, None, mp_cri.axisN),
+        b = sl.inner(np.conj(mp_Df), sl.rfftn(YU0, None, mp_cri.axisN),
                       axis=mp_cri.axisC) + \
-            spl.rfftn(YU1, None, mp_cri.axisN)
-        Xf = spl.solvemdbi_ism(mp_Df, 1.0, b, mp_cri.axisM, mp_cri.axisC)
-    mp_Z_X[k] = spl.irfftn(Xf, mp_cri.Nv, mp_cri.axisN)
-    mp_DX[k] = spl.irfftn(spl.inner(mp_Df, Xf), mp_cri.Nv, mp_cri.axisN)
+            sl.rfftn(YU1, None, mp_cri.axisN)
+        Xf = sl.solvemdbi_ism(mp_Df, 1.0, b, mp_cri.axisM, mp_cri.axisC)
+    mp_Z_X[k] = sl.irfftn(Xf, mp_cri.Nv, mp_cri.axisN)
+    mp_DX[k] = sl.irfftn(sl.inner(mp_Df, Xf), mp_cri.Nv, mp_cri.axisN)
 
 
 
@@ -696,7 +697,7 @@ def cbpdnmd_ystep(k):
     AXU0 = mp_DX[k] - mp_S[k] + mp_Z_U0[k]
     AXU1 = mp_Z_X[k] + mp_Z_U1[k]
     mp_Z_Y0[k] = mp_xrho*AXU0 / (W**2 + mp_xrho)
-    mp_Z_Y1[k] = spl.shrink1(AXU1, (mp_lmbda/mp_xrho))
+    mp_Z_Y1[k] = sp.prox_l1(AXU1, (mp_lmbda/mp_xrho))
 
 
 
@@ -719,7 +720,7 @@ def ccmodmd_setcoef(k):
 
     # Set working coefficient maps for ccmod step and compute DFT of
     # coefficient maps Z
-    mp_Zf[k] = spl.rfftn(mp_Z_Y1[k], mp_cri.Nv, mp_cri.axisN)
+    mp_Zf[k] = sl.rfftn(mp_Z_Y1[k], mp_cri.Nv, mp_cri.axisN)
 
 
 
@@ -731,11 +732,11 @@ def ccmodmd_xstep(k):
 
     YU0 = mp_D_Y0 - mp_D_U0[k]
     YU1 = mp_D_Y1[k] + mp_S[k] - mp_D_U1[k]
-    b = spl.rfftn(YU0, None, mp_cri.axisN) + \
-      np.conj(mp_Zf[k]) * spl.rfftn(YU1, None, mp_cri.axisN)
-    Xf = spl.solvedbi_sm(mp_Zf[k], 1.0, b, axis=mp_cri.axisM)
-    mp_D_X[k] = spl.irfftn(Xf, mp_cri.Nv, mp_cri.axisN)
-    mp_DX[k] = spl.irfftn(spl.inner(Xf, mp_Zf[k]), mp_cri.Nv, mp_cri.axisN)
+    b = sl.rfftn(YU0, None, mp_cri.axisN) + \
+      np.conj(mp_Zf[k]) * sl.rfftn(YU1, None, mp_cri.axisN)
+    Xf = sl.solvedbi_sm(mp_Zf[k], 1.0, b, axis=mp_cri.axisM)
+    mp_D_X[k] = sl.irfftn(Xf, mp_cri.Nv, mp_cri.axisN)
+    mp_DX[k] = sl.irfftn(sl.inner(Xf, mp_Zf[k]), mp_cri.Nv, mp_cri.axisN)
 
 
 
@@ -1152,7 +1153,7 @@ class ConvBPDNMaskDcplDictLearn_Consensus(cbpdndlmd.ConvBPDNMaskDictLearn):
             S = mp_S
             Xf = mp_Zf
             Df = mp_Df
-            DX = spl.irfftn(spl.inner(
+            DX = sl.irfftn(sl.inner(
                 Df[np.newaxis, ...], Xf, axis=self.xstep.cri.axisM+1),
                             self.xstep.cri.Nv,
                             np.array(self.xstep.cri.axisN) + 1)
