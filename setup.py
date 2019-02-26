@@ -23,7 +23,8 @@ with open(os.path.join(name, '__init__.py')) as f:
         lambda line: line.startswith('__version__'),
         f))).body[0].value.s
 
-packages = ['sporco', 'sporco.admm', 'sporco.fista', 'sporco.dictlrn']
+packages = ['sporco', 'sporco.prox', 'sporco.admm', 'sporco.fista',
+            'sporco.dictlrn']
 
 docdirbase = 'share/doc/%s-%s' % (name, version)
 data = [(os.path.join(docdirbase, 'examples/scripts'),
