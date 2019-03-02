@@ -271,7 +271,7 @@ class ConvProdDictBPDNJoint(ConvProdDictBPDN):
 
         self.Y = sp.prox_l1l2(self.AX + self.U, (self.lmbda/self.rho)*self.wl1,
                              (self.mu/self.rho), axis=self.cri.axisC)
-        cbpdn.ConvTwoBlockCnstrnt.ystep(self)
+        cbpdn.GenericConvBPDN.ystep(self)
 
 
 
