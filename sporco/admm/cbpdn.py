@@ -2749,3 +2749,133 @@ class ConvL1L1Grd(ConvBPDNMaskDcpl):
                 (self.mu / self.rho) * self.GHGf + 1.0, self.cri.axisM)
 
 
+
+
+
+class MultiDictConvBPDN(object):
+    r"""Solve a convolutional sparse coding problem fitting a single set of
+    coefficient maps to multiple dictionaries and signals, e.g.
+
+    .. math::
+       \mathrm{argmin}_\mathbf{x} \;
+       (1/2) \left\| D_0 \mathbf{x} - \mathbf{s}_0 \right\|_2^2 +
+       (1/2) \left\| D_1 \mathbf{x} - \mathbf{s}_1 \right\|_2^2 +
+       \lambda \| \mathbf{x} \|_1 \;\;,
+
+    for input images :math:`\mathbf{s}_0`, :math:`\mathbf{s}_1`,
+    dictionaries :math:`D_0` and :math:`D_0`, and coefficient map set
+    :math:`\mathbf{x}`, where :math:`D_0 \mathbf{x} = \sum_m
+    \mathbf{d}_{0,m} \mathbf{x}_m` and :math:`D_1 \mathbf{x} = \sum_m
+    \mathbf{d}_{1,m} \mathbf{x}_m`.
+
+    Implemented as a wrapper about a :class:`ConvBPDN` or derived object
+    (or any other object with sufficiently similar interface and
+    internals).
+    """
+
+    def __init__(self, cbpdnclass, D, S, *args, **kwargs):
+        """
+        Parameters
+        ----------
+        cbpdnclass : class name
+          Type of internal cbpdn object (e.g. cbpdn.ConvBPDN) to be
+          constructed
+        D : tuple of array_like
+          Set of dictionary arrays
+        S : tuple of array_like
+          Set of signal arrays
+        *args
+          Variable length list of arguments for constructor of internal
+          cbpdn object
+        **kwargs
+          Keyword arguments for constructor of internal
+          cbpdn object
+        """
+
+        # Number of spatial dimensions
+        if 'dimN' in kwargs:
+            dimN = kwargs['dimN']
+        else:
+            dimN = 2
+
+        # Number of channel dimensions in D[0] (should be the same for all)
+        dimC = D[0].ndim - dimN - 1
+
+        # Number of filters in D[0] (should be the same for all)
+        M = D[0].shape[-1]
+
+        # Determine spatial and channel sizes of members of dictionary set
+        if dimC == 0:
+            chn = [1,] * len(D)
+        else:
+            chn = [D[b].shape[dimN] for b in range(0, len(D))]
+        C = int(np.sum(np.asarray(chn)))
+        dsz = np.asarray((0,) * dimN)
+        for b in range(0, len(D)):
+            dsz = np.maximum(dsz, np.asarray(D[b].shape[0:dimN]))
+
+        # Construct single dictionary array with multiple dictionaries
+        # stacked on the channel index
+        Dm = np.zeros(tuple(dsz.tolist()) + (C,) + (M,))
+        chncs = np.cumsum(np.asarray([0,] + chn))
+        slc0 = (slice(None),)*dimN + (np.newaxis,)*(1-dimC)
+        for b in range(0, len(D)):
+            slc1 = tuple([slice(0, n) for n in D[b].shape[0:dimN]] +
+                         [slice(chncs[b], chncs[b+1])])
+            Dm[slc1] = D[b][slc0]
+
+        # Construct single signal array (this is simpler since all
+        # members of the signal set are assumed to be of the same
+        # size)
+        Sm = np.concatenate([S[b][slc0] for b in range(0, len(S))], dimN+dimC)
+
+        # Construct inner cbpdn object
+        self.cbpdn = cbpdnclass(Dm, Sm, *args, **kwargs)
+
+        # Record some problem parameters
+        self.dimN = dimN
+        self.chn = chn
+        self.chncs = chncs
+        self.C = C
+
+
+
+    def solve(self):
+        """Call the solve method of the inner cbpdn object and return the
+        result.
+        """
+
+        # Call solve method of inner cbpdn object
+        Xi = self.cbpdn.solve()
+        # Copy attributes from inner cbpdn object
+        self.timer = self.cbpdn.timer
+        self.itstat = self.cbpdn.itstat
+        # Return result of inner cbpdn object
+        return Xi
+
+
+
+    def getcoef(self):
+        """Call the getcoef method if the inner cbpdn object."""
+
+        return self.cbpdn.getcoef()
+
+
+
+    def getitstat(self):
+        """Get iteration stats from inner cbpdn object."""
+
+        return self.cbpdn.getitstat()
+
+
+
+    def reconstruct(self, b, X=None):
+        """Reconstruct representation of signal b in signal set."""
+
+        if X is None:
+            X = self.getcoef()
+        Xf = sl.rfftn(X, None, self.cbpdn.cri.axisN)
+        slc = (slice(None),)*self.dimN + \
+              (slice(self.chncs[b], self.chncs[b+1]),)
+        Sf = np.sum(self.cbpdn.Df[slc] * Xf, axis=self.cbpdn.cri.axisM)
+        return sl.irfftn(Sf, self.cbpdn.cri.Nv, self.cbpdn.cri.axisN)

@@ -556,6 +556,23 @@ class TestSet01(object):
         assert b.cbpdn.U.dtype == dt
 
 
+    def test_31(self):
+        N = 16
+        Nd = 5
+        M = 4
+        D0 = cp.random.randn(Nd, Nd, M)
+        D1 = cp.random.randn(Nd, Nd, M)
+        s0 = cp.random.randn(N, N)
+        s1 = cp.random.randn(N, N)
+        lmbda = 1e-1
+        try:
+            b = cbpdn.MultiDictConvBPDN(cbpdn.ConvBPDN, (D0, D1), (s0, s1),
+                                        lmbda)
+            b.solve()
+        except Exception as e:
+            print(e)
+            assert 0
+
 
     def test_32(self):
         N = 16
