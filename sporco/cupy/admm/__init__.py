@@ -124,6 +124,13 @@ admm.cbpdntv.ConvBPDNScalarTV.cnst_c = _cnst0
 admm.cbpdntv.ConvBPDNRecTV.cnst_c = _cnst0
 
 
+# Construct sporco.cupy.admm.pdcsc
+admm.pdcsc = sporco_cupy_patch_module('sporco.admm.pdcsc',
+                                      {'admm': admm.admm, 'cr': cnvrep,
+                                       'cbpdn': admm.cbpdn, 'sl': linalg,
+                                       'sp': prox})
+
+
 # Restore original entries in sys.modules
 for mod in ('sporco.common', 'sporco.admm', 'sporco.admm.admm'):
     if mod in sysmod:

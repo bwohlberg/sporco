@@ -29,6 +29,7 @@ Colour Images
 * `Convolutional sparse coding of a colour image with a colour dictionary (FISTA solver) <cbpdn_fista_clr.py>`__
 * `Convolutional sparse coding of a colour image with a greyscale dictionary <cbpdn_clr_gd.py>`__
 * `Convolutional sparse coding of a colour image with a greyscale dictionary and a joint sparsity term <cbpdn_jnt_clr.py>`__
+* `Convolutional sparse coding of a colour image with a product dictionary <cbpdn_clr_pd.py>`__
 
 .. toc-end
 
@@ -54,6 +55,9 @@ Denoising (Impulse Noise)
 
 * `Remove salt & pepper noise from a colour image using convolutional sparse coding with a colour dictionary <implsden_clr.py>`__
 * `Remove salt & pepper noise from a colour image using convolutional sparse coding with an l1 data fidelity term and an l2 gradient term, with a colour dictionary <implsden_grd_clr.py>`__
+* `Remove salt & pepper noise from a hyperspectral image using convolutional sparse coding with an l1 data fidelity term and an l2 gradient term, with a dictionary consisting of the product of a convolutional dictionary for the spatial axes and a standard dictionary for the spectral axis <implsden_grd_pd_dct.py>`__
+* `Remove salt & pepper noise from a hyperspectral image using convolutional sparse coding with an l1 data fidelity term and an l2 gradient term, with a dictionary consisting of the product of a convolutional dictionary for the spatial axes and a PCA basis for the spectral axis <implsden_grd_pd_pca.py>`__
+
 
 .. toc-end
 

@@ -6,7 +6,8 @@ SPORCO Release Notes
 Version 0.1.11   (not yet released)
 -----------------------------------
 
-• Added mpiutil module
+• Added mpiutil module (MPI utilities)
+• Added admm.pdcsc module (CSC with a product dictionary)
 • Additional solvers supported for use with CuPy
 • Added new solver class admm.cbpdn.ConvL1L1Grd for CSC with an ℓ1 data
   fidelity term
