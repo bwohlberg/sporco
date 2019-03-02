@@ -57,6 +57,7 @@ The ``sporco.cupy`` subpackage currently provides `CuPy <https://cupy.chainer.or
 ``sporco.cupy.admm.bpdn``          :mod:`sporco.admm.bpdn`
 ``sporco.cupy.admm.cbpdn``         :mod:`sporco.admm.cbpdn`
 ``sporco.cupy.admm.cbpdntv``       :mod:`sporco.admm.cbpdntv`
+``sporco.cupy.admm.pdcsc``         :mod:`sporco.admm.pdcsc`
 ``sporco.cupy.admm.tvl1``          :mod:`sporco.admm.tvl1`
 ``sporco.cupy.admm.tvl2``          :mod:`sporco.admm.tvl2`
 ``sporco.cupy.fista.cbpdn``        :mod:`sporco.fista.cbpdn`
