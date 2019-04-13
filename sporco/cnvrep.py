@@ -241,11 +241,11 @@ class DictionarySize(object):
                 if isinstance(dsz[m][0], tuple):
                     # Separate channel specification
                     for c in range(0, len(dsz[m])):
-                        mxsz = np.maximum(mxsz, dsz[m][c][0:dimN])
+                        mxsz = np.maximum(mxsz, np.asarray(dsz[m][c][0:dimN]))
                     self.nflt += dsz[m][0][-1]
                 else:
                     # Combined channel specification
-                    mxsz = np.maximum(mxsz, dsz[m][0:dimN])
+                    mxsz = np.maximum(mxsz, np.asarray(dsz[m][0:dimN]))
                     self.nflt += dsz[m][-1]
             self.mxsz = tuple(mxsz)
         else:
@@ -800,11 +800,11 @@ def bcrop(v, dsz, dimN=2):
         for mb in range(0, len(dsz)):
             if isinstance(dsz[mb][0], tuple):
                 for cb in range(0, len(dsz[mb])):
-                    maxsz = np.maximum(maxsz, dsz[mb][cb][0:dimN])
+                    maxsz = np.maximum(maxsz, np.asarray(dsz[mb][cb][0:dimN]))
             else:
-                maxsz = np.maximum(maxsz, dsz[mb][0:dimN])
+                maxsz = np.maximum(maxsz, np.asarray(dsz[mb][0:dimN]))
         # Init. cropped array
-        vc = np.zeros(tuple(maxsz) + v.shape[dimN:], dtype=v.dtype)
+        vc = np.zeros(maxsz.tolist() + list(v.shape[dimN:]), dtype=v.dtype)
         m0 = 0  # Initial index of current block of equi-sized filters
         # Iterate over distinct filter sizes
         for mb in range(0, len(dsz)):
