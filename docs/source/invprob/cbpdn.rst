@@ -131,6 +131,25 @@ Module :mod:`.admm.cbpdn` includes the following classes:
   AMS variants of the ``ConvBPDN`` and ``ConvBPDNGradReg`` problems.
 
 
+* :class:`.MultiDictConvBPDN`
+
+  A wrapper class for solving a convolutional sparse coding problem
+  fitting a single set of coefficient maps to multiple dictionaries
+  and signals, e.g. when applied to :class:`.admm.cbpdn.ConvBPDN`,
+
+    .. math::
+       \mathrm{argmin}_\mathbf{x} \;
+       (1/2) \left\| D_0 \mathbf{x} - \mathbf{s}_0 \right\|_2^2 +
+       (1/2) \left\| D_1 \mathbf{x} - \mathbf{s}_1 \right\|_2^2 +
+       \lambda \| \mathbf{x} \|_1 \;\;,
+
+  for input images :math:`\mathbf{s}_0`, :math:`\mathbf{s}_1`,
+  dictionaries :math:`D_0` and :math:`D_0`, and coefficient map set
+  :math:`\mathbf{x}`, where :math:`D_0 \mathbf{x} = \sum_m
+  \mathbf{d}_{0,m} \mathbf{x}_m` and :math:`D_1 \mathbf{x} = \sum_m
+  \mathbf{d}_{1,m} \mathbf{x}_m`.
+
+
 |
 
 
