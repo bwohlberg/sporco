@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2017-2018 by Cristina Garcia-Cardona <cgarciac@lanl.gov>
+# Copyright (C) 2017-2019 by Cristina Garcia-Cardona <cgarciac@lanl.gov>
 #                            Brendt Wohlberg <brendt@ieee.org>
 # All rights reserved. BSD 3-clause License.
 # This file is part of the SPORCO package. Details of the copyright
@@ -139,7 +139,7 @@ def grid_search(fn, grid, comm=None, mpidtype=None, fmin=True):
         # Vector for gathering all the results
         fval = np.empty([afprm.shape[0], rankfval.shape[1]])
         # Size of values to collect locally
-        sizeL = np.prod(np.array(rankfval.shape))
+        sizeL = np.array(np.prod(np.array(rankfval.shape)))
         # Number of processes to collect from
         sizeW = comm.Get_size()
         # Vector to collect the sizes from each process
