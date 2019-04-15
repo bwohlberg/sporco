@@ -3,8 +3,8 @@ SPORCO Release Notes
 ====================
 
 
-Version 0.1.11   (not yet released)
------------------------------------
+Version 0.1.11   (2019-04-14)
+-----------------------------
 
 • New module mpiutil (MPI utilities)
 • New module admm.pdcsc (CSC with a product dictionary)

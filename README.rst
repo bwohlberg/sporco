@@ -21,7 +21,7 @@ SParse Optimization Research COde (SPORCO)
     :target: https://codecov.io/gh/bwohlberg/sporco
     :alt: Test Coverage
 .. image:: http://mybinder.org/badge.svg
-    :target: https://mybinder.org/v2/gh/bwohlberg/sporco-notebooks/master?filepath=index.ipynb
+    :target: https://mybinder.org/v2/gh/bwohlberg/sporco-notebooks/v0.1.11?filepath=index.ipynb
     :alt: Binder
 
 .. image:: https://badge.fury.io/py/sporco.svg
