@@ -475,7 +475,7 @@ def genexamples(_):
 
     if not os.path.exists(npth):
         print('Notebooks required for examples section not found: '
-            'downloading from sporco-notebooks repo on GitHub')
+              'downloading from sporco-notebooks repo on GitHub')
         zipdat = netgetdata(url)
         zipobj = zipfile.ZipFile(zipdat)
         zipobj.extractall(path=epth)
@@ -488,8 +488,11 @@ def genexamples(_):
 
 def fix_inherit_diagram(*args):
 
-    buildpath = os.path.join(rootpath, 'build')
-    images = os.path.join(buildpath, 'sphinx/html/_images/inheritance-*svg')
+    if on_rtd:
+        buildpath = os.path.join(rootpath, '_build/html')
+    else:
+        buildpath = os.path.join(rootpath, 'build/sphinx/html')
+    images = os.path.join(buildpath, '_images/inheritance-*svg')
 
     for fnm in glob.glob(images):
         f = fileinput.FileInput(fnm, inplace=True)
