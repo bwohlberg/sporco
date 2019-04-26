@@ -332,7 +332,10 @@ def idctii(x, axes=None):
 
 def fftconv(a, b, axes=(0, 1)):
     """
-    Compute a multi-dimensional convolution via the Discrete Fourier Transform.
+    Compute a multi-dimensional convolution via the Discrete Fourier
+    Transform. Note that the output has a phase shift relative to the
+    output of :func:`scipy.ndimage.convolve` with the default ``origin``
+    parameter.
 
     Parameters
     ----------

@@ -377,6 +377,10 @@ class TVL2Deconv(admm.ADMM):
        \right) = \left( \begin{array}{c} \mathbf{0} \\
        \mathbf{0} \end{array} \right) \;\;.
 
+    Note that the convolution is implemented in the frequency domain, having
+    the same phase offset as :func:`.fftconv`, which differs from that of
+    :func:`scipy.ndimage.convolve` with the default ``origin`` parameter.
+
     After termination of the :meth:`solve` method, attribute :attr:`itstat` is
     a list of tuples representing statistics of each iteration. The
     fields of the named tuple ``IterationStats`` are:
