@@ -59,6 +59,9 @@ td.field-body blockquote {
   padding-left: 30px;
 }
 
+dl.field-list {
+  margin-top: 1em;
+}
 
 /*
  * Style for custom class kwargs for documenting **kwargs parameters
@@ -117,6 +120,9 @@ dl.classmethod > dt:first-child {
   background-color: #ebebeb;
   padding: 2px 5px 2px 5px;
   border-radius: 3px;
+}
+dl.function > dd {
+  margin-top: 0.8em;
 }
 dl.function {
   margin-top: 0;
