@@ -389,6 +389,14 @@ class Mock(MagicMock):
 sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
 
 
+print('rootpath: %s' % rootpath)
+print('confpath: %s' % confpath)
+
+
+print('\nrootpath ls:', os.listdir(rootpath), '\n')
+print('\nconfpath ls:', os.listdir(confpath), '\n')
+
+
 # See https://developer.ridgerun.com/wiki/index.php/How_to_generate_sphinx_documentation_for_python_code_running_in_an_embedded_system
 
 # Sort members by type
