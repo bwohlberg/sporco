@@ -393,10 +393,6 @@ print('rootpath: %s' % rootpath)
 print('confpath: %s' % confpath)
 
 
-print('\nrootpath ls:', os.listdir(rootpath), '\n')
-print('\nconfpath ls:', os.listdir(confpath), '\n')
-
-
 # See https://developer.ridgerun.com/wiki/index.php/How_to_generate_sphinx_documentation_for_python_code_running_in_an_embedded_system
 
 # Sort members by type
@@ -495,6 +491,13 @@ def genexamples(_):
 
 
 def fix_inherit_diagram(*args):
+
+
+    print('\nrootpath ls:', os.listdir(rootpath), '\n')
+    print('\nconfpath ls:', os.listdir(confpath), '\n')
+    print('\ndocspath ls:', os.listdir(os.path.join(confpath, '..')), '\n')
+    print('\nbuildpath ls:', os.listdir(os.path.join(rootpath, 'build')), '\n')
+
 
     if on_rtd:
         buildpath = os.path.join(rootpath, '_build/html')
