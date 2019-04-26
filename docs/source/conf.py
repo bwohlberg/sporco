@@ -492,15 +492,8 @@ def genexamples(_):
 
 def fix_inherit_diagram(*args):
 
-
-    print('\nrootpath ls:', os.listdir(rootpath), '\n')
-    print('\nconfpath ls:', os.listdir(confpath), '\n')
-    print('\ndocspath ls:', os.listdir(os.path.join(confpath, '..')), '\n')
-    print('\nbuildpath ls:', os.listdir(os.path.join(rootpath, 'build')), '\n')
-
-
     if on_rtd:
-        buildpath = os.path.join(rootpath, '_build/html')
+        buildpath = os.path.join(confpath, '_build/html')
     else:
         buildpath = os.path.join(rootpath, 'build/sphinx/html')
     images = os.path.join(buildpath, '_images/inheritance-*svg')
