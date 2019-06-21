@@ -9,4 +9,4 @@ problem
    \| X \|_* + \lambda \| Y \|_1 \quad \text{ such that }
    \quad X + Y = S
 
-A :ref:`usage example <examples_misc_rpca>` is available.
+:ref:`Usage examples <examples_misc_index>` are available.
