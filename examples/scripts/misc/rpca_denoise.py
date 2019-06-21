@@ -25,7 +25,7 @@ from sporco import plot
 
 
 """
-Generate example low-rank matrix. The smoothing using gaussian_filter is purely for visualization purposes: the Robust PCA recovery of the low-rank component works just as well without it, but the difference between corrupted and recovered matrices is less obvious without the smoothing.
+Generate example low-rank matrix. The smoothing using `gaussian_filter` is purely for visualization purposes: the Robust PCA recovery of the low-rank component works just as well without it, but the difference between corrupted and recovered matrices is less obvious without the smoothing.
 """
 
 N = 256
