@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2015-2018 by Brendt Wohlberg <brendt@ieee.org>
+# Copyright (C) 2015-2019 by Brendt Wohlberg <brendt@ieee.org>
 # All rights reserved. BSD 3-clause License.
 # This file is part of the SPORCO package. Details of the copyright
 # and user license can be found in the 'LICENSE.txt' file distributed
@@ -19,6 +19,7 @@ import os
 import imghdr
 import io
 import platform
+import warnings
 import multiprocessing as mp
 import itertools
 from future.moves.itertools import zip_longest
@@ -33,6 +34,7 @@ else:
 import numpy as np
 import imageio
 import scipy.ndimage.interpolation as sni
+import scipy.optimize as sco
 
 import sporco.linalg as sla
 
@@ -55,6 +57,8 @@ else:
 
 def ntpl2array(ntpl):
     """
+    Convert a namedtuple to an array.
+
     Convert a :func:`collections.namedtuple` object to a :class:`numpy.ndarray`
     object that can be saved using :func:`numpy.savez`.
 
@@ -76,6 +80,8 @@ def ntpl2array(ntpl):
 
 def array2ntpl(arr):
     """
+    Convert an array representation of a namedtuple back to a namedtuple.
+
     Convert a :class:`numpy.ndarray` object constructed by :func:`ntpl2array`
     back to the original :func:`collections.namedtuple` representation.
 
@@ -195,6 +201,8 @@ def tiledict(D, sz=None):
 
 def rolling_window(x, wsz, wnm=None, pad='wrap'):
     """
+    Construct a rolling window view of the input array.
+
     Use :func:`numpy.lib.stride_tricks.as_strided` to construct a view
     of the input array that represents different positions of a rolling
     window as additional axes of the array. If the number of shifts
@@ -240,6 +248,8 @@ def rolling_window(x, wsz, wnm=None, pad='wrap'):
 
 def subsample_array(x, step, pad=False, mode='reflect'):
     """
+    Construct a subsampled view of the input array.
+
     Use :func:`numpy.lib.stride_tricks.as_strided` to construct a view
     of the input array that represents a subsampling of the array by the
     specified step, with different offsets of the subsampling as
@@ -333,16 +343,16 @@ def averageblocks(blks, imgsz, stpsz=None):
     Parameters
     ----------
     blks : ndarray
-      nd array of blocks of a signal
+      Array of blocks of a signal
     imgsz : tuple
-      tuple of the signal size
+      Tuple of the signal size
     stpsz : tuple, optional (default None, corresponds to steps of 1)
-      tuple of step sizes between neighboring blocks
+      Tuple of step sizes between neighboring blocks
 
     Returns
     -------
     imgs : ndarray
-      reconstructed signal, unknown pixels are returned as np.nan
+      Reconstructed signal, unknown pixels are returned as np.nan
     """
 
     blksz = blks.shape[:-1]
@@ -382,18 +392,18 @@ def combineblocks(blks, imgsz, stpsz=None, fn=np.median):
     Parameters
     ----------
     blks : ndarray
-      nd array of blocks of a signal
+      Array of blocks of a signal
     imgsz : tuple
-      tuple of the signal size
+      Tuple of the signal size
     stpsz : tuple, optional (default None, corresponds to steps of 1)
-      tuple of step sizes between neighboring blocks
+      Tuple of step sizes between neighboring blocks
     fn : function, optional (default np.median)
-      the function used to resolve multivalued cells
+      Function used to resolve multivalued cells
 
     Returns
     -------
     imgs : ndarray
-      reconstructed signal, unknown pixels are returned as np.nan
+      Reconstructed signal, unknown pixels are returned as np.nan
     """
 
     # Construct a vectorized append function
@@ -537,9 +547,8 @@ def pca(U, centre=False):
     -------
     B : ndarray
       A 2D array representing the PCA basis; each column is a PCA
-      component.
-      B.T is the analysis transform into the PCA representation, and B
-      is the corresponding synthesis transform
+      component. `B.T` is the analysis transform into the PCA
+      representation, and `B` is the corresponding synthesis transform
     S : ndarray
       The eigenvalues of the PCA components
     C : ndarray or None
@@ -555,6 +564,187 @@ def pca(U, centre=False):
 
     B, S, _ = np.linalg.svd(U, full_matrices=False, compute_uv=True)
     return B, S**2, C
+
+
+
+def nkp(A, bshape, cshape):
+    r"""
+    Solve the Nearest Kronecker Product problem.
+
+    Given matrix :math:`A`, find matrices :math:`B` and :math:`C`, of the
+    specified sizes, such that :math:`B` and :math:`C` solve the problem
+    :cite:`loan-2000-ubiquitous`
+
+    .. math::
+      \mathrm{argmin}_{B, C} \| A - B \otimes C \| \;.
+
+    Parameters
+    ----------
+    A : array_like
+      2D input array
+    bshape : tuple (Mb, Nb)
+      The desired shape of returned array :math:`B`
+    cshape : tuple (Mc, Nc)
+      The desired shape of returned array :math:`C`
+
+    Returns
+    -------
+    B : ndarray
+      2D output array :math:`B`
+    C : ndarray
+      2D output array :math:`C`
+    """
+
+    ashape = A.shape
+    if ashape[0] != bshape[0] * cshape[0] or \
+       ashape[1] != bshape[1] * cshape[1]:
+        raise ValueError("Shape of A is not compatible with bshape and cshape")
+
+    atshape = (bshape[0] * bshape[1], cshape[0] * cshape[1])
+    Atilde = subsample_array(A, cshape).transpose().reshape(atshape)
+    U, S, Vt = np.linalg.svd(Atilde, full_matrices=False)
+    B = np.sqrt(S[0]) * U[:, [0]].reshape(bshape, order='F')
+    C = np.sqrt(S[0]) * Vt[[0], :].reshape(cshape, order='F')
+    return B, C
+
+
+
+def kpsvd(A, bshape, cshape):
+    r"""
+    Compute the Kronecker Product SVD.
+
+    Given matrix :math:`A`, find matrices :math:`B_i` and :math:`C_i`, of
+    the specified sizes, such that
+
+    .. math::
+      A = \sum_i \sigma_i B_i \otimes C_i
+
+    and :math:`\sum_i^n \sigma_i B_i \otimes C_i` is the best :math:`n`
+    term approximation to :math:`A` :cite:`loan-2000-ubiquitous`.
+
+    Parameters
+    ----------
+    A : array_like
+      2D input array
+    bshape : tuple (Mb, Nb)
+      The desired shape of arrays :math:`B_i`
+    cshape : tuple (Mc, Nc)
+      The desired shape of arrays :math:`C_i`
+
+    Returns
+    -------
+    S : ndarray
+      1D array of :math:`\sigma_i` values
+    B : ndarray
+      3D array of :math:`B_i` matrices with index :math:`i` on the last
+      axis
+    C : ndarray
+      3D array of :math:`C_i` matrices with index :math:`i` on the last
+      axis
+    """
+
+    ashape = A.shape
+    if ashape[0] != bshape[0] * cshape[0] or \
+       ashape[1] != bshape[1] * cshape[1]:
+        raise ValueError("Shape of A is not compatible with bshape and cshape")
+
+    atshape = (bshape[0] * bshape[1], cshape[0] * cshape[1])
+    Atilde = subsample_array(A, cshape).transpose().reshape(atshape)
+    U, S, Vt = np.linalg.svd(Atilde, full_matrices=False)
+    B = U.reshape(bshape + (U.shape[1],), order='F')
+    C = Vt.T.reshape(cshape + (Vt.shape[0],), order='F')
+    return S, B, C
+
+
+
+def lstabsdev(A, b):
+    r"""Least absolute deviations (LAD) linear regression.
+
+    Solve the linear regression problem
+
+    .. math::
+      \mathrm{argmin}_\mathbf{x} \; \left\| A \mathbf{x} - \mathbf{b}
+      \right\|_1 \;\;.
+
+    The interface is similar to that of :func:`numpy.linalg.lstsq` in
+    that `np.linalg.lstsq(A, b)` solves the same linear regression
+    problem, but with a least squares rather than a least absolute
+    deviations objective. Unlike :func:`numpy.linalg.lstsq`, `b` is
+    required to be a 1-d array. The solution is obtained via `mapping to
+    a linear program <https://stats.stackexchange.com/a/12564>`__.
+
+    Parameters
+    ----------
+    A : (M, N) array_like
+      Regression coefficient matrix.
+    b : (M,) array_like
+      Regression ordinate / dependent variable
+
+    Returns
+    -------
+    x : (N,) ndarray
+      Least absolute deviations solution
+    """
+
+    M, N = A.shape
+    c = np.zeros((M + N, 1))
+    c[0:M] = 1.0
+    I = np.identity(M)
+    one = np.ones((M, 1))
+    A_ub = np.hstack((np.vstack((-I, -I)), np.vstack((-A, A))))
+    b_ub = np.hstack((-b, b))
+    with warnings.catch_warnings():
+        warnings.filterwarnings("ignore", category=sco.OptimizeWarning)
+        res = sco.linprog(c, A_ub, b_ub)
+    if res.success is False:
+        raise ValueError('scipy.optimize.linprog failed with status %d' %
+                         res.status)
+    return res.x[M:]
+
+
+
+def lstmaxdev(A, b):
+    r"""Least maximum deviation (least maximum error) linear regression.
+
+    Solve the linear regression problem
+
+    .. math::
+      \mathrm{argmin}_\mathbf{x} \; \left\| A \mathbf{x} - \mathbf{b}
+      \right\|_{\infty} \;\;.
+
+    The interface is similar to that of :func:`numpy.linalg.lstsq` in
+    that `np.linalg.lstsq(A, b)` solves the same linear regression
+    problem, but with a least squares rather than a least maximum
+    error objective. Unlike :func:`numpy.linalg.lstsq`, `b` is required
+    to be a 1-d array. The solution is obtained via `mapping to a linear
+    program <https://stats.stackexchange.com/a/12564>`__.
+
+    Parameters
+    ----------
+    A : (M, N) array_like
+      Regression coefficient matrix.
+    b : (M,) array_like
+      Regression ordinate / dependent variable
+
+    Returns
+    -------
+    x : (N,) ndarray
+      Least maximum deviation solution
+    """
+
+    M, N = A.shape
+    c = np.zeros((N + 1, 1))
+    c[0] = 1.0
+    one = np.ones((M, 1))
+    A_ub = np.hstack((np.vstack((-one, -one)), np.vstack((-A, A))))
+    b_ub = np.hstack((-b, b))
+    with warnings.catch_warnings():
+        warnings.filterwarnings("ignore", category=sco.OptimizeWarning)
+        res = sco.linprog(c, A_ub, b_ub)
+    if res.success is False:
+        raise ValueError('scipy.optimize.linprog failed with status %d' %
+                         res.status)
+    return res.x[1:]
 
 
 
@@ -597,14 +787,17 @@ def tikhonov_filter(s, lmbda, npd=16):
 
     grv = np.array([-1.0, 1.0]).reshape([2, 1])
     gcv = np.array([-1.0, 1.0]).reshape([1, 2])
-    Gr = sla.fftn(grv, (s.shape[0] + 2*npd, s.shape[1] + 2*npd), (0, 1))
-    Gc = sla.fftn(gcv, (s.shape[0] + 2*npd, s.shape[1] + 2*npd), (0, 1))
+    Gr = sla.rfftn(grv, (s.shape[0] + 2*npd, s.shape[1] + 2*npd), (0, 1))
+    Gc = sla.rfftn(gcv, (s.shape[0] + 2*npd, s.shape[1] + 2*npd), (0, 1))
     A = 1.0 + lmbda*np.conj(Gr)*Gr + lmbda*np.conj(Gc)*Gc
     if s.ndim > 2:
         A = A[(slice(None),)*2 + (np.newaxis,)*(s.ndim-2)]
     sp = np.pad(s, ((npd, npd),)*2 + ((0, 0),)*(s.ndim-2), 'symmetric')
-    slp = np.real(sla.ifftn(sla.fftn(sp, axes=(0, 1)) / A, axes=(0, 1)))
-    sl = slp[npd:(slp.shape[0] - npd), npd:(slp.shape[1] - npd)]
+    spshp = sp.shape
+    sp = sla.rfftn(sp, axes=(0, 1))
+    sp /= A
+    sp = sla.irfftn(sp, s=spshp[0:2], axes=(0, 1))
+    sl = sp[npd:(sp.shape[0] - npd), npd:(sp.shape[1] - npd)]
     sh = s - sl
     return sl.astype(s.dtype), sh.astype(s.dtype)
 
@@ -642,6 +835,8 @@ def gaussian(shape, sd=1.0):
 
 def local_contrast_normalise(s, n=7, c=None):
     """
+    Local contrast normalisation of an image.
+
     Perform local contrast normalisation :cite:`jarret-2009-what` of
     an image, consisting of subtraction of the local mean and division
     by the local norm. The original image can be reconstructed from the
@@ -694,7 +889,10 @@ def local_contrast_normalise(s, n=7, c=None):
 
 
 def idle_cpu_count(mincpu=1):
-    """Estimate number of idle CPUs, for use by multiprocessing code
+    """
+    Estimate number of idle CPUs.
+
+    Estimate number of idle CPUs, for use by multiprocessing code
     needing to determine how many processes can be run without excessive
     load. This function uses :func:`os.getloadavg` which is only available
     under a Unix OS.
@@ -720,7 +918,10 @@ def idle_cpu_count(mincpu=1):
 
 
 def grid_search(fn, grd, fmin=True, nproc=None):
-    """Perform a grid search for optimal parameters of a specified
+    """
+    Grid search for optimal parameters of a specified function.
+
+    Perform a grid search for optimal parameters of a specified
     function.  In the simplest case the function returns a float value,
     and a single optimum value and corresponding parameter values are
     identified. If the function returns a tuple of values, each of
@@ -914,7 +1115,10 @@ def in_notebook():
 
 
 def notebook_system_output():
-    """Get a context manager that attempts to use `wurlitzer
+    """
+    Capture system-level stdout/stderr within a Jupyter Notebook shell.
+
+    Get a context manager that attempts to use `wurlitzer
     <https://github.com/minrk/wurlitzer>`__ to capture system-level
     stdout/stderr within a Jupyter Notebook shell, without affecting normal
     operation when run as a Python script. For example:

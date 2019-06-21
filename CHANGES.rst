@@ -6,6 +6,14 @@ SPORCO Release Notes
 Version 0.1.12   (not yet released)
 -----------------------------------
 
+• Improved run time and memory usage of util.tikhonov_filter
+• Minimum required SciPy version is now 0.19.1
+• New functions for Nearest Kronecker Product, Kronecker Product SVD, least
+  absolute deviations linear regression, and least maximum error linear
+  regression in util module
+• Optional mpldatacursor support in sporco.plot is disabled in Matplotlib 3.x
+  due to unresolved compatibility issues in mpldatacursor
+
 
 
 Version 0.1.11   (2019-04-14)
