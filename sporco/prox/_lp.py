@@ -202,7 +202,7 @@ def norm_2l2(x, axis=None):
     -------
     nl2 : float or ndarray
       Norm of `x`, or array of norms treating specified axes of `x`
-      as a vector.
+      as a vector
     """
 
     nl2 = np.sum(x**2, axis=axis, keepdims=True)
