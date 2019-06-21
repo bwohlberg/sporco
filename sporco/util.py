@@ -687,7 +687,7 @@ def lstabsdev(A, b):
     """
 
     M, N = A.shape
-    c = np.zeros((M + N, 1))
+    c = np.zeros((M + N,))
     c[0:M] = 1.0
     I = np.identity(M)
     one = np.ones((M, 1))
@@ -733,7 +733,7 @@ def lstmaxdev(A, b):
     """
 
     M, N = A.shape
-    c = np.zeros((N + 1, 1))
+    c = np.zeros((N + 1,))
     c[0] = 1.0
     one = np.ones((M, 1))
     A_ub = np.hstack((np.vstack((-one, -one)), np.vstack((-A, A))))
