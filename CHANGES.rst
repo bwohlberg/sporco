@@ -210,7 +210,7 @@ Version 0.1.2   (2017-02-19)
   cbpdn.AddMaskSim.getcoef
 • Modified classes in modules tvl1 and tvl2 to support Vector TV for
   multi-channel images
-• Added Jypyter Notebook versions of some example scripts
+• Added Jupyter Notebook versions of some example scripts
 • Added some new example scripts
 
 
