@@ -16,10 +16,6 @@ from __future__ import print_function
 from builtins import input
 from builtins import range
 
-import os.path
-import tempfile
-import sys
-
 import pyfftw   # See https://github.com/pyFFTW/pyFFTW/issues/40
 import numpy as np
 from scipy.ndimage import zoom
@@ -35,7 +31,6 @@ Construct 3D training array from video data
 """
 
 reader = imageio.get_reader('imageio:cockatoo.mp4')
-nfrm = reader.get_length()
 frmlst = []
 for i, frm in enumerate(reader):
     if i >= 250:
