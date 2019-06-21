@@ -1282,7 +1282,7 @@ def atleast_nd(n, u):
     Returns
     -------
     v : ndarray
-      Output array with at least n dimensions
+      Output array with at least `n` dimensions
     """
 
     if u.ndim >= n:
