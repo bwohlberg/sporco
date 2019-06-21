@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2015-2018 by Brendt Wohlberg <brendt@ieee.org>
+# Copyright (C) 2015-2019 by Brendt Wohlberg <brendt@ieee.org>
 # All rights reserved. BSD 3-clause License.
 # This file is part of the SPORCO package. Details of the copyright
 # and user license can be found in the 'LICENSE.txt' file distributed
@@ -20,12 +20,16 @@ import matplotlib.cm as cm
 from matplotlib.pyplot import figure, subplot, subplots, gcf, gca, savefig
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from mpl_toolkits.mplot3d import Axes3D
-try:
-    import mpldatacursor as mpldc
-except ImportError:
+# mpldatacursor is currently broken for matplotlib 3.x
+if int(matplotlib.__version__.split('.')[0]) >= 3:
     have_mpldc = False
 else:
-    have_mpldc = True
+    try:
+        import mpldatacursor as mpldc
+    except ImportError:
+        have_mpldc = False
+    else:
+        have_mpldc = True
 
 
 __author__ = """Brendt Wohlberg <brendt@ieee.org>"""
