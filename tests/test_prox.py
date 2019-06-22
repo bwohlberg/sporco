@@ -4,6 +4,7 @@ from builtins import object
 import numpy as np
 import scipy.optimize as optim
 from sporco import prox
+from sporco import metric
 
 
 def prox_func(x, v, f, alpha, axis=None):
@@ -110,3 +111,15 @@ class TestSet01(object):
     def test_12(self):
         assert np.sum(np.abs(prox.prox_l1l2(self.V1, 1e-2, 1e-2))) > 0
         assert prox.norm_nuclear(self.V1) > 0
+
+
+    def test_19(self):
+        V2_a2, rsi = prox.ndto2d(self.V2, axis=2)
+        V2_r = prox.ndfrom2d(V2_a2, rsi)
+        assert(metric.mse(self.V2, V2_r) < 1e-14)
+        V2_a1, rsi = prox.ndto2d(self.V2, axis=1)
+        V2_r = prox.ndfrom2d(V2_a1, rsi)
+        assert(metric.mse(self.V2, V2_r) < 1e-14)
+        V2_a0, rsi = prox.ndto2d(self.V2, axis=0)
+        V2_r = prox.ndfrom2d(V2_a0, rsi)
+        assert(metric.mse(self.V2, V2_r) < 1e-14)
