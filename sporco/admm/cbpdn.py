@@ -777,8 +777,10 @@ class ConvBPDNJoint(ConvBPDN):
         :math:`\mathbf{y}`.
         """
 
-        self.Y = sp.prox_l1l2(self.AX + self.U, (self.lmbda/self.rho)*self.wl1,
-                             (self.mu/self.rho)*self.wl21, axis=self.cri.axisC)
+        self.Y = sp.prox_sl1l2(self.AX + self.U,
+                               (self.lmbda / self.rho) * self.wl1,
+                               (self.mu / self.rho) * self.wl21,
+                               axis=self.cri.axisC)
         GenericConvBPDN.ystep(self)
 
 

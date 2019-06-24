@@ -569,7 +569,7 @@ class BPDNJoint(BPDN):
         r"""Minimise Augmented Lagrangian with respect to
         :math:`\mathbf{y}`."""
 
-        self.Y = np.asarray(sp.prox_l1l2(
+        self.Y = np.asarray(sp.prox_sl1l2(
             self.AX + self.U, (self.lmbda / self.rho) * self.wl1,
             self.mu / self.rho, axis=-1), dtype=self.dtype)
         GenericBPDN.ystep(self)

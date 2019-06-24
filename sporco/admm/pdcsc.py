@@ -269,8 +269,9 @@ class ConvProdDictBPDNJoint(ConvProdDictBPDN):
         :math:`\mathbf{y}`.
         """
 
-        self.Y = sp.prox_l1l2(self.AX + self.U, (self.lmbda/self.rho)*self.wl1,
-                             (self.mu/self.rho), axis=self.cri.axisC)
+        self.Y = sp.prox_sl1l2(self.AX + self.U,
+                               (self.lmbda / self.rho) * self.wl1,
+                               (self.mu / self.rho), axis=self.cri.axisC)
         cbpdn.GenericConvBPDN.ystep(self)
 
 
@@ -686,9 +687,9 @@ class ConvProdDictL1L1GrdJoint(ConvProdDictL1L1Grd):
 
         AXU = self.AX + self.U
         Y0 = sp.prox_l1(self.block_sep0(AXU) - self.S, (1.0/self.rho)*self.W)
-        Y1 = sp.prox_l1l2(self.block_sep1(AXU), 0.0,
-                         (self.lmbda/self.rho)*self.wl21,
-                         axis=self.cri.axisC)
+        Y1 = sp.prox_sl1l2(self.block_sep1(AXU), 0.0,
+                           (self.lmbda/self.rho)*self.wl21,
+                           axis=self.cri.axisC)
         self.Y = self.block_cat(Y0, Y1)
         cbpdn.ConvTwoBlockCnstrnt.ystep(self)
 

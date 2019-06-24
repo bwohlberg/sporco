@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2015-2018 by Brendt Wohlberg <brendt@ieee.org>
+# Copyright (C) 2015-2019 by Brendt Wohlberg <brendt@ieee.org>
 # All rights reserved. BSD 3-clause License.
 # This file is part of the SPORCO package. Details of the copyright
 # and user license can be found in the 'LICENSE.txt' file distributed
@@ -48,9 +48,9 @@ def norm_l21(x, axis=-1):
 
 
 
-def prox_l1l2(v, alpha, beta, axis=None):
-    r"""Compute the proximal operator of the :math:`\ell_1` plus
-    :math:`\ell_2` norm (compound shrinkage/soft thresholding)
+def prox_sl1l2(v, alpha, beta, axis=None):
+    r"""Compute the proximal operator of the sum of :math:`\ell_1` and
+    :math:`\ell_2` norms (compound shrinkage/soft thresholding)
     :cite:`wohlberg-2012-local` :cite:`chartrand-2013-nonconvex`
 
      .. math::
@@ -59,7 +59,8 @@ def prox_l1l2(v, alpha, beta, axis=None):
       \mathcal{S}_{2,\beta}(\mathcal{S}_{1,\alpha}(\mathbf{v}))
 
     where :math:`f(\mathbf{x}) = \alpha \|\mathbf{x}\|_1 +
-    \beta \|\mathbf{x}\|_2`.
+    \beta \|\mathbf{x}\|_2`, with :math:`\alpha \geq 0`,
+    :math:`\beta \geq 0`.
 
 
     Parameters

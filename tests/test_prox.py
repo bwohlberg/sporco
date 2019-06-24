@@ -109,7 +109,7 @@ class TestSet01(object):
 
 
     def test_12(self):
-        assert np.sum(np.abs(prox.prox_l1l2(self.V1, 1e-2, 1e-2))) > 0
+        assert np.sum(np.abs(prox.prox_sl1l2(self.V1, 1e-2, 1e-2))) > 0
         assert prox.norm_nuclear(self.V1) > 0
 
 
