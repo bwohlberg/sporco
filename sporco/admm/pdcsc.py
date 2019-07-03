@@ -364,7 +364,7 @@ class ConvProdDictL1L1Grd(cbpdn.ConvL1L1Grd):
 
         # S is an N x C matrix, D is an N x N M_D matrix, B is a C x M_B
         # matrix, and X is an N M x M_B matrix. The base class of this
-        # class expects that X is  N M x C (i.e. the same number of columns
+        # class expects that X is N M x C (i.e. the same number of columns
         # as in S), so we pass its initialiser the product S B, which is
         # a N x M_B matrix, so that it initialises arrays with the correct
         # number of channels. This is the first of many nasty hacks in
