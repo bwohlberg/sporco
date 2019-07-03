@@ -5,7 +5,7 @@
 # and user license can be found in the 'LICENSE.txt' file distributed
 # with the package.
 
-"""Utility functions"""
+"""Utility functions."""
 
 from __future__ import absolute_import
 from __future__ import division
@@ -56,11 +56,11 @@ else:
 
 
 def ntpl2array(ntpl):
-    """
-    Convert a namedtuple to an array.
+    """Convert a namedtuple to an array.
 
-    Convert a :func:`collections.namedtuple` object to a :class:`numpy.ndarray`
-    object that can be saved using :func:`numpy.savez`.
+    Convert a :func:`collections.namedtuple` object to a
+    :class:`numpy.ndarray` object that can be saved using
+    :func:`numpy.savez`.
 
     Parameters
     ----------
@@ -79,11 +79,11 @@ def ntpl2array(ntpl):
 
 
 def array2ntpl(arr):
-    """
-    Convert an array representation of a namedtuple back to a namedtuple.
+    """Convert an array representation of a namedtuple back to a namedtuple.
 
-    Convert a :class:`numpy.ndarray` object constructed by :func:`ntpl2array`
-    back to the original :func:`collections.namedtuple` representation.
+    Convert a :class:`numpy.ndarray` object constructed by
+    :func:`ntpl2array` back to the original
+    :func:`collections.namedtuple` representation.
 
     Parameters
     ----------
@@ -93,8 +93,8 @@ def array2ntpl(arr):
     Returns
     -------
     ntpl : collections.namedtuple object
-      Named tuple object with the same name and fields as the original named
-      typle object provided to :func:`ntpl2array`
+      Named tuple object with the same name and fields as the original
+      named typle object provided to :func:`ntpl2array`
     """
 
     cls = collections.namedtuple(arr[2], arr[1])
@@ -200,8 +200,7 @@ def tiledict(D, sz=None):
 
 
 def rolling_window(x, wsz, wnm=None, pad='wrap'):
-    """
-    Construct a rolling window view of the input array.
+    """Construct a rolling window view of the input array.
 
     Use :func:`numpy.lib.stride_tricks.as_strided` to construct a view
     of the input array that represents different positions of a rolling
@@ -247,8 +246,7 @@ def rolling_window(x, wsz, wnm=None, pad='wrap'):
 
 
 def subsample_array(x, step, pad=False, mode='reflect'):
-    """
-    Construct a subsampled view of the input array.
+    """Construct a subsampled view of the input array.
 
     Use :func:`numpy.lib.stride_tricks.as_strided` to construct a view
     of the input array that represents a subsampling of the array by the
@@ -568,8 +566,7 @@ def pca(U, centre=False):
 
 
 def nkp(A, bshape, cshape):
-    r"""
-    Solve the Nearest Kronecker Product problem.
+    r"""Solve the Nearest Kronecker Product problem.
 
     Given matrix :math:`A`, find matrices :math:`B` and :math:`C`, of the
     specified sizes, such that :math:`B` and :math:`C` solve the problem
@@ -610,11 +607,10 @@ def nkp(A, bshape, cshape):
 
 
 def kpsvd(A, bshape, cshape):
-    r"""
-    Compute the Kronecker Product SVD.
+    r"""Compute the Kronecker Product SVD.
 
-    Given matrix :math:`A`, find matrices :math:`B_i` and :math:`C_i`, of
-    the specified sizes, such that
+    Given matrix :math:`A`, find matrices :math:`B_i` and :math:`C_i`,
+    of the specified sizes, such that
 
     .. math::
       A = \sum_i \sigma_i B_i \otimes C_i
@@ -834,8 +830,7 @@ def gaussian(shape, sd=1.0):
 
 
 def local_contrast_normalise(s, n=7, c=None):
-    """
-    Local contrast normalisation of an image.
+    """Local contrast normalisation of an image.
 
     Perform local contrast normalisation :cite:`jarret-2009-what` of
     an image, consisting of subtraction of the local mean and division
@@ -889,8 +884,7 @@ def local_contrast_normalise(s, n=7, c=None):
 
 
 def idle_cpu_count(mincpu=1):
-    """
-    Estimate number of idle CPUs.
+    """Estimate number of idle CPUs.
 
     Estimate number of idle CPUs, for use by multiprocessing code
     needing to determine how many processes can be run without excessive
@@ -918,8 +912,7 @@ def idle_cpu_count(mincpu=1):
 
 
 def grid_search(fn, grd, fmin=True, nproc=None):
-    """
-    Grid search for optimal parameters of a specified function.
+    """Grid search for optimal parameters of a specified function.
 
     Perform a grid search for optimal parameters of a specified
     function.  In the simplest case the function returns a float value,
@@ -931,11 +924,12 @@ def grid_search(fn, grd, fmin=True, nproc=None):
     (where ``mp.Pool`` usage has some limitations), the computation
     of the function at the grid points is computed in parallel.
 
-    **Warning:** This function will hang if `fn` makes use of :mod:`pyfftw`
-    with multi-threading enabled (the
-    `bug <https://github.com/pyFFTW/pyFFTW/issues/135>`_ has been reported).
-    When using the FFT functions in :mod:`sporco.linalg`, multi-threading
-    can be disabled by including the following code::
+    **Warning:** This function will hang if `fn` makes use of
+    :mod:`pyfftw` with multi-threading enabled (the
+    `bug <https://github.com/pyFFTW/pyFFTW/issues/135>`_ has been
+    reported).
+    When using the FFT functions in :mod:`sporco.linalg`,
+    multi-threading can be disabled by including the following code::
 
       import sporco.linalg
       sporco.linalg.pyfftw_threads = 1
@@ -944,14 +938,15 @@ def grid_search(fn, grd, fmin=True, nproc=None):
     Parameters
     ----------
     fn : function
-      Function to be evaluated. It should take a tuple of parameter values as
-      an argument, and return a float value or a tuple of float values.
+      Function to be evaluated. It should take a tuple of parameter
+      values as an argument, and return a float value or a tuple of
+      float values.
     grd : tuple of array_like
-      A tuple providing an array of sample points for each axis of the grid
-      on which the search is to be performed.
+      A tuple providing an array of sample points for each axis of the
+      grid on which the search is to be performed.
     fmin : bool, optional (default True)
-      Determine whether optimal function values are selected as minima or
-      maxima. If `fmin` is True then minima are selected.
+      Determine whether optimal function values are selected as minima
+      or maxima. If `fmin` is True then minima are selected.
     nproc : int or None, optional (default None)
       Number of processes to run in parallel. If None, the number of
       CPUs of the system is used.
@@ -1007,8 +1002,8 @@ def convdicts():
     Returns
     -------
     cdd : dict
-      A dict associating description strings with dictionaries represented
-      as ndarrays
+      A dict associating description strings with dictionaries
+      represented as ndarrays
 
     Examples
     --------
@@ -1020,7 +1015,8 @@ def convdicts():
     >>> print(cd.keys())
     ['G:12x12x72', 'G:8x8x16,12x12x32,16x16x48', ...]
 
-    Select a specific example dictionary using the corresponding identifier
+    Select a specific example dictionary using the corresponding
+    identifier
 
     >>> D = cd['G:8x8x96']
     """
@@ -1035,8 +1031,7 @@ def convdicts():
 
 
 def netgetdata(url, maxtry=3, timeout=10):
-    """
-    Get content of a file via a URL.
+    """Get content of a file via a URL.
 
     Parameters
     ----------
@@ -1077,8 +1072,7 @@ def netgetdata(url, maxtry=3, timeout=10):
 
 
 def in_ipython():
-    """
-    Determine whether code is running in an ipython shell.
+    """Determine whether code is running in an ipython shell.
 
     Returns
     -------
@@ -1096,8 +1090,7 @@ def in_ipython():
 
 
 def in_notebook():
-    """
-    Determine whether code is running in a Jupyter Notebook shell.
+    """Determine whether code is running in a Jupyter Notebook shell.
 
     Returns
     -------
@@ -1115,13 +1108,12 @@ def in_notebook():
 
 
 def notebook_system_output():
-    """
-    Capture system-level stdout/stderr within a Jupyter Notebook shell.
+    """Capture system-level stdout/stderr within a Jupyter Notebook shell.
 
     Get a context manager that attempts to use `wurlitzer
     <https://github.com/minrk/wurlitzer>`__ to capture system-level
-    stdout/stderr within a Jupyter Notebook shell, without affecting normal
-    operation when run as a Python script. For example:
+    stdout/stderr within a Jupyter Notebook shell, without affecting
+    normal operation when run as a Python script. For example:
 
     >>> sys_pipes = sporco.util.notebook_system_output()
     >>> with sys_pipes():
@@ -1161,20 +1153,21 @@ class ExampleImages(object):
         Parameters
         ----------
         scaled : bool, optional (default False)
-          Flag indicating whether images should be on the range [0,...,255]
-          with np.uint8 dtype (False), or on the range [0,...,1] with
-          np.float32 dtype (True)
+          Flag indicating whether images should be on the range
+          [0,...,255] with np.uint8 dtype (False), or on the range
+          [0,...,1] with np.float32 dtype (True)
         dtype : data-type or None, optional (default None)
-          Desired data type of images. If `scaled` is True and `dtype` is an
-          integer type, the output data type is np.float32
+          Desired data type of images. If `scaled` is True and `dtype`
+          is an integer type, the output data type is np.float32
         zoom : float or None, optional (default None)
           Optional support rescaling factor to apply to the images
         gray : bool, optional (default False)
-          Flag indicating whether RGB images should be converted to grayscale
+          Flag indicating whether RGB images should be converted to
+          grayscale
         pth : string or None (default None)
-          Path to directory containing image files. If the value is None the
-          path points to a set of example images that are included with the
-          package.
+          Path to directory containing image files. If the value is None
+          the path points to a set of example images that are included
+          with the package.
         """
 
         self.scaled = scaled
@@ -1257,30 +1250,32 @@ class ExampleImages(object):
         group : string or None, optional (default None)
           Name of image group
         scaled : bool or None, optional (default None)
-          Flag indicating whether images should be on the range [0,...,255]
-          with np.uint8 dtype (False), or on the range [0,...,1] with
-          np.float32 dtype (True). If the value is None, scaling behaviour
-          is determined by the `scaling` parameter passed to the object
-          initializer, otherwise that selection is overridden.
+          Flag indicating whether images should be on the range
+          [0,...,255] with np.uint8 dtype (False), or on the range
+          [0,...,1] with np.float32 dtype (True). If the value is None,
+          scaling behaviour is determined by the `scaling` parameter
+          passed to the object initializer, otherwise that selection is
+          overridden.
         dtype : data-type or None, optional (default None)
-          Desired data type of images. If `scaled` is True and `dtype` is an
-          integer type, the output data type is np.float32. If the value is
-          None, the data type is determined by the `dtype` parameter passed to
-          the object initializer, otherwise that selection is overridden.
+          Desired data type of images. If `scaled` is True and `dtype`
+          is an integer type, the output data type is np.float32. If the
+          value is None, the data type is determined by the `dtype`
+          parameter passed to the object initializer, otherwise that
+          selection is overridden.
         idxexp :  index expression or None, optional (default None)
-          An index expression selecting, for example, a cropped region of
-          the requested image. This selection is applied *before* any
-          `zoom` rescaling so the expression does not need to be modified when
-          the zoom factor is changed.
+          An index expression selecting, for example, a cropped region
+          of the requested image. This selection is applied *before* any
+          `zoom` rescaling so the expression does not need to be
+          modified when the zoom factor is changed.
         zoom : float or None, optional (default None)
-          Optional rescaling factor to apply to the images. If the value is
-          None, support rescaling behaviour is determined by the `zoom`
-          parameter passed to the object initializer, otherwise that selection
-          is overridden.
+          Optional rescaling factor to apply to the images. If the value
+          is None, support rescaling behaviour is determined by the
+          `zoom` parameter passed to the object initializer, otherwise
+          that selection is overridden.
         gray : bool or None, optional (default None)
-          Flag indicating whether RGB images should be converted to grayscale.
-          If the value is None, behaviour is determined by the `gray`
-          parameter passed to the object initializer.
+          Flag indicating whether RGB images should be converted to
+          grayscale. If the value is None, behaviour is determined by
+          the `gray` parameter passed to the object initializer.
 
         Returns
         -------
@@ -1350,7 +1345,8 @@ class Timer(object):
           Set the default timer label to be used when methods are
           called without specifying a label
         alllbl : string, optional (default 'all')
-          Set the label string that will be used to denote all timer labels
+          Set the label string that will be used to denote all timer
+          labels
         """
 
         # Initialise current and accumulated time dictionaries
