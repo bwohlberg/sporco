@@ -377,3 +377,13 @@ class TestSet01(object):
         y = np.array([[4, 5], [6, 7]])
         xy = np.array([[38, 36], [30, 28]])
         assert np.allclose(linalg.fftconv(x, y), xy)
+
+
+
+    def test_27(self):
+        x = np.random.randn(5,)
+        y = np.zeros((12,))
+        y[4] = 1.0
+        xy0 = convolve(y, x)
+        xy1 = linalg.fftconv(x, y, axes=(0,), origin=(2,))
+        assert np.allclose(xy0, xy1)

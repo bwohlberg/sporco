@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2015-2018 by Brendt Wohlberg <brendt@ieee.org>
+# Copyright (C) 2015-2019 by Brendt Wohlberg <brendt@ieee.org>
 # All rights reserved. BSD 3-clause License.
 # This file is part of the SPORCO package. Details of the copyright
 # and user license can be found in the 'LICENSE.txt' file distributed
 # with the package.
 
-"""Linear algebra functions"""
+"""Linear algebra functions."""
 
 from __future__ import division
 from builtins import range
@@ -49,7 +49,8 @@ computations"""
 
 
 def complex_dtype(dtype):
-    """
+    """Construct the corresponding complex dtype for a given real dtype.
+
     Construct the corresponding complex dtype for a given real dtype,
     e.g. the complex dtype corresponding to ``np.float32`` is
     ``np.complex64``.
@@ -70,7 +71,8 @@ def complex_dtype(dtype):
 
 
 def pyfftw_byte_aligned(array, dtype=None, n=None):
-    """
+    """Construct a byte-aligned array for FFTs.
+
     Construct a byte-aligned array for efficient use by :mod:`pyfftw`.
     This function is a wrapper for :func:`pyfftw.byte_align`
 
@@ -94,7 +96,8 @@ def pyfftw_byte_aligned(array, dtype=None, n=None):
 
 
 def pyfftw_empty_aligned(shape, dtype, order='C', n=None):
-    """
+    """Construct an empty byte-aligned array for FFTs.
+
     Construct an empty byte-aligned array for efficient use by :mod:`pyfftw`.
     This function is a wrapper for :func:`pyfftw.empty_aligned`
 
@@ -121,7 +124,8 @@ def pyfftw_empty_aligned(shape, dtype, order='C', n=None):
 
 
 def pyfftw_rfftn_empty_aligned(shape, axes, dtype, order='C', n=None):
-    """
+    """Construct an empty byte-aligned array for real FFTs.
+
     Construct an empty byte-aligned array for efficient use by :mod:`pyfftw`
     functions :func:`pyfftw.interfaces.numpy_fft.rfftn` and
     :func:`pyfftw.interfaces.numpy_fft.irfftn`. The shape of the
@@ -160,7 +164,8 @@ def pyfftw_rfftn_empty_aligned(shape, axes, dtype, order='C', n=None):
 
 
 def fftn(a, s=None, axes=None):
-    """
+    """Multi-dimensional discrete Fourier transform.
+
     Compute the multi-dimensional discrete Fourier transform. This function
     is a wrapper for :func:`pyfftw.interfaces.numpy_fft.fftn`,
     with an interface similar to that of :func:`numpy.fft.fftn`.
@@ -188,7 +193,8 @@ def fftn(a, s=None, axes=None):
 
 
 def ifftn(a, s=None, axes=None):
-    """
+    """Multi-dimensional inverse discrete Fourier transform.
+
     Compute the multi-dimensional inverse discrete Fourier transform.
     This function is a wrapper for :func:`pyfftw.interfaces.numpy_fft.ifftn`,
     with an interface similar to that of :func:`numpy.fft.ifftn`.
@@ -198,8 +204,8 @@ def ifftn(a, s=None, axes=None):
     a : array_like
       Input array (can be complex)
     s : sequence of ints, optional (default None)
-      Shape of the output along each transformed axis (input is cropped or
-      zero-padded to match).
+      Shape of the output along each transformed axis (input is cropped
+      or zero-padded to match).
     axes : sequence of ints, optional (default None)
       Axes over which to compute the inverse DFT.
 
@@ -216,7 +222,8 @@ def ifftn(a, s=None, axes=None):
 
 
 def rfftn(a, s=None, axes=None):
-    """
+    """Multi-dimensional discrete Fourier transform for real input.
+
     Compute the multi-dimensional discrete Fourier transform for real input.
     This function is a wrapper for :func:`pyfftw.interfaces.numpy_fft.rfftn`,
     with an interface similar to that of :func:`numpy.fft.rfftn`.
@@ -226,8 +233,8 @@ def rfftn(a, s=None, axes=None):
     a : array_like
       Input array (taken to be real)
     s : sequence of ints, optional (default None)
-      Shape of the output along each transformed axis (input is cropped or
-      zero-padded to match).
+      Shape of the output along each transformed axis (input is cropped
+      or zero-padded to match).
     axes : sequence of ints, optional (default None)
       Axes over which to compute the DFT.
 
@@ -244,21 +251,22 @@ def rfftn(a, s=None, axes=None):
 
 
 def irfftn(a, s, axes=None):
-    """
-    Compute the inverse of the multi-dimensional discrete Fourier transform
-    for real input. This function is a wrapper for
-    :func:`pyfftw.interfaces.numpy_fft.irfftn`, with an interface similar to
-    that of :func:`numpy.fft.irfftn`.
+    """Multi-dimensional inverse discrete Fourier transform for real input.
+
+    Compute the inverse of the multi-dimensional discrete Fourier
+    transform for real input. This function is a wrapper for
+    :func:`pyfftw.interfaces.numpy_fft.irfftn`, with an interface similar
+    to that of :func:`numpy.fft.irfftn`.
 
     Parameters
     ----------
     a : array_like
       Input array
     s : sequence of ints
-      Shape of the output along each transformed axis (input is cropped or
-      zero-padded to match). This parameter is not optional because, unlike
-      :func:`ifftn`, the output shape cannot be uniquely determined from
-      the input shape.
+      Shape of the output along each transformed axis (input is cropped
+      or zero-padded to match). This parameter is not optional because,
+      unlike :func:`ifftn`, the output shape cannot be uniquely
+      determined from the input shape.
     axes : sequence of ints, optional (default None)
       Axes over which to compute the inverse DFT.
 
@@ -275,7 +283,8 @@ def irfftn(a, s, axes=None):
 
 
 def dctii(x, axes=None):
-    """
+    """Multi-dimensional DCT-II.
+
     Compute a multi-dimensional DCT-II over specified array axes. This
     function is implemented by calling the one-dimensional DCT-II
     :func:`scipy.fftpack.dct` with normalization mode 'ortho' for each
@@ -303,7 +312,8 @@ def dctii(x, axes=None):
 
 
 def idctii(x, axes=None):
-    """
+    """Multi-dimensional inverse DCT-II.
+
     Compute a multi-dimensional inverse DCT-II over specified array axes.
     This function is implemented by calling the one-dimensional inverse
     DCT-II :func:`scipy.fftpack.idct` with normalization mode 'ortho'
@@ -330,11 +340,12 @@ def idctii(x, axes=None):
 
 
 
-def fftconv(a, b, axes=(0, 1)):
-    """
+def fftconv(a, b, axes=(0, 1), origin=None):
+    """Multi-dimensional convolution via the Discrete Fourier Transform.
+
     Compute a multi-dimensional convolution via the Discrete Fourier
     Transform. Note that the output has a phase shift relative to the
-    output of :func:`scipy.ndimage.convolve` with the default ``origin``
+    output of :func:`scipy.ndimage.convolve` with the default `origin`
     parameter.
 
     Parameters
@@ -345,11 +356,14 @@ def fftconv(a, b, axes=(0, 1)):
       Input array
     axes : sequence of ints, optional (default (0, 1))
       Axes on which to perform convolution
+    origin : sequence of ints or None optional (default None)
+      Indices of centre of `a` filter. The default of None corresponds
+      to a centre at 0 on all axes of `a`
 
     Returns
     -------
     ab : ndarray
-      Convolution of input arrays, a and b, along specified axes
+      Convolution of input arrays, `a` and `b`, along specified `axes`
     """
 
     if np.isrealobj(a) and np.isrealobj(b):
@@ -361,13 +375,17 @@ def fftconv(a, b, axes=(0, 1)):
     dims = np.maximum([a.shape[i] for i in axes], [b.shape[i] for i in axes])
     af = fft(a, dims, axes)
     bf = fft(b, dims, axes)
-    return ifft(af * bf, dims, axes)
+    ab = ifft(af * bf, dims, axes)
+    if origin is not None:
+        ab = np.roll(ab, -np.array(origin), axis=axes)
+    return ab
 
 
 
 def inner(x, y, axis=-1):
-    """
-    Compute inner product of x and y on specified axis, equivalent to
+    """Inner product of `x` and `y` on specified axis.
+
+    Compute inner product of `x` and `y` on specified axis, equivalent to
     :code:`np.sum(x * y, axis=axis, keepdims=True)`.
 
     Parameters
@@ -416,7 +434,8 @@ def inner(x, y, axis=-1):
 
 
 def dot(a, b, axis=-2):
-    """
+    """Matrix product of `a` and the specified axes of `b`.
+
     Compute the matrix product of `a` and the specified axes of `b`,
     with broadcasting over the remaining axes of `b`. This function is
     a generalisation of :func:`numpy.dot`, supporting sum product over
@@ -470,8 +489,7 @@ def dot(a, b, axis=-2):
 
 
 def solvedbi_sm(ah, rho, b, c=None, axis=4):
-    r"""
-    Solve a diagonal block linear system with a scaled identity term
+    r"""Solve a diagonal block linear system with a scaled identity term
     using the Sherman-Morrison equation.
 
     The solution is obtained by independently solving a set of linear
@@ -516,8 +534,7 @@ def solvedbi_sm(ah, rho, b, c=None, axis=4):
 
 
 def solvedbi_sm_c(ah, a, rho, axis=4):
-    r"""
-    Compute cached component used by :func:`solvedbi_sm`.
+    r"""Compute cached component used by :func:`solvedbi_sm`.
 
     Parameters
     ----------
@@ -541,8 +558,7 @@ def solvedbi_sm_c(ah, a, rho, axis=4):
 
 
 def solvedbd_sm(ah, d, b, c=None, axis=4):
-    r"""
-    Solve a diagonal block linear system with a diagonal term
+    r"""Solve a diagonal block linear system with a diagonal term
     using the Sherman-Morrison equation.
 
     The solution is obtained by independently solving a set of linear
@@ -587,8 +603,7 @@ def solvedbd_sm(ah, d, b, c=None, axis=4):
 
 
 def solvedbd_sm_c(ah, a, d, axis=4):
-    r"""
-    Compute cached component used by :func:`solvedbd_sm`.
+    r"""Compute cached component used by :func:`solvedbd_sm`.
 
     Parameters
     ----------
@@ -612,25 +627,27 @@ def solvedbd_sm_c(ah, a, d, axis=4):
 
 
 def solvemdbi_ism(ah, rho, b, axisM, axisK):
-    r"""
-    Solve a multiple diagonal block linear system with a scaled
+    r"""Solve a multiple diagonal block linear system with a scaled
     identity term by iterated application of the Sherman-Morrison
-    equation. The computation is performed in a way that avoids
-    explictly constructing the inverse operator, leading to an
-    :math:`O(K^2)` time cost.
+    equation.
+
+    The computation is performed in a way that avoids explictly
+    constructing the inverse operator, leading to an :math:`O(K^2)`
+    time cost.
 
     The solution is obtained by independently solving a set of linear
     systems of the form (see :cite:`wohlberg-2016-efficient`)
 
     .. math::
-      (\rho I + \mathbf{a}_0 \mathbf{a}_0^H + \mathbf{a}_1 \mathbf{a}_1^H +
-       \; \ldots \; + \mathbf{a}_{K-1} \mathbf{a}_{K-1}^H) \; \mathbf{x} =
-       \mathbf{b}
+      (\rho I + \mathbf{a}_0 \mathbf{a}_0^H + \mathbf{a}_1
+       \mathbf{a}_1^H + \; \ldots \; + \mathbf{a}_{K-1}
+       \mathbf{a}_{K-1}^H) \; \mathbf{x} = \mathbf{b}
 
     where each :math:`\mathbf{a}_k` is an :math:`M`-vector.
-    The sums, inner products, and matrix products in this equation are taken
-    along the M and K axes of the corresponding multi-dimensional arrays;
-    the solutions are independent over the other axes.
+    The sums, inner products, and matrix products in this equation are
+    taken along the :math:`M` and :math:`K` axes of the corresponding
+    multi-dimensional arrays; the solutions are independent over the
+    other axes.
 
     Parameters
     ----------
@@ -688,26 +705,28 @@ def solvemdbi_ism(ah, rho, b, axisM, axisK):
 
 
 def solvemdbi_rsm(ah, rho, b, axisK, dimN=2):
-    r"""
-    Solve a multiple diagonal block linear system with a scaled
+    r"""Solve a multiple diagonal block linear system with a scaled
     identity term by repeated application of the Sherman-Morrison
-    equation. The computation is performed by explictly constructing
-    the inverse operator, leading to an :math:`O(K)` time cost and
-    :math:`O(M^2)` memory cost, where :math:`M` is the dimension of
-    the axis over which inner products are taken.
+    equation.
+
+    The computation is performed by explictly constructing the inverse
+    operator, leading to an :math:`O(K)` time cost and :math:`O(M^2)`
+    memory cost, where :math:`M` is the dimension of the axis over which
+    :math:`M` inner products are taken.
 
     The solution is obtained by independently solving a set of linear
     systems of the form (see :cite:`wohlberg-2016-efficient`)
 
     .. math::
-      (\rho I + \mathbf{a}_0 \mathbf{a}_0^H + \mathbf{a}_1 \mathbf{a}_1^H +
-       \; \ldots \; + \mathbf{a}_{K-1} \mathbf{a}_{K-1}^H) \; \mathbf{x} =
-       \mathbf{b}
+      (\rho I + \mathbf{a}_0 \mathbf{a}_0^H + \mathbf{a}_1
+       \mathbf{a}_1^H + \; \ldots \; + \mathbf{a}_{K-1}
+       \mathbf{a}_{K-1}^H) \; \mathbf{x} = \mathbf{b}
 
     where each :math:`\mathbf{a}_k` is an :math:`M`-vector.
-    The sums, inner products, and matrix products in this equation are taken
-    along the M and K axes of the corresponding multi-dimensional arrays;
-    the solutions are independent over the other axes.
+    The sums, inner products, and matrix products in this equation are
+    taken along the :math:`M` and :math:`K` axes of the corresponding
+    multi-dimensional arrays; the solutions are independent over the
+    other axes.
 
     Parameters
     ----------
@@ -720,8 +739,8 @@ def solvemdbi_rsm(ah, rho, b, axisK, dimN=2):
     axisK : int
       Axis in input corresponding to index k in linear system
     dimN : int, optional (default 2)
-      Number of spatial dimensions arranged as leading axes in input array.
-      Axis M is taken to be at dimN+2.
+      Number of spatial dimensions arranged as leading axes in input
+      array. Axis M is taken to be at dimN+2.
 
     Returns
     -------
@@ -765,7 +784,9 @@ else:
 
 
 def solvemdbi_cg(ah, rho, b, axisM, axisK, tol=1e-5, mit=1000, isn=None):
-    r"""
+    r"""Solve a multiple diagonal block linear system with a scaled
+    identity term using CG.
+
     Solve a multiple diagonal block linear system with a scaled
     identity term using Conjugate Gradient (CG) via
     :func:`scipy.sparse.linalg.cg`.
@@ -774,14 +795,14 @@ def solvemdbi_cg(ah, rho, b, axisM, axisK, tol=1e-5, mit=1000, isn=None):
     systems of the form (see :cite:`wohlberg-2016-efficient`)
 
      .. math::
-      (\rho I + \mathbf{a}_0 \mathbf{a}_0^H + \mathbf{a}_1 \mathbf{a}_1^H +
-       \; \ldots \; + \mathbf{a}_{K-1} \mathbf{a}_{K-1}^H) \; \mathbf{x} =
-       \mathbf{b}
+      (\rho I + \mathbf{a}_0 \mathbf{a}_0^H + \mathbf{a}_1
+       \mathbf{a}_1^H + \; \ldots \; + \mathbf{a}_{K-1}
+       \mathbf{a}_{K-1}^H) \; \mathbf{x} = \mathbf{b}
 
-    where each :math:`\mathbf{a}_k` is an :math:`M`-vector.
-    The inner products and matrix products in this equation are taken
-    along the M and K axes of the corresponding multi-dimensional arrays;
-    the solutions are independent over the other axes.
+    where each :math:`\mathbf{a}_k` is an :math:`M`-vector. The inner
+    products and matrix products in this equation are taken along the
+    :math:`M` and :math:`K` axes of the corresponding multi-dimensional
+    arrays; the solutions are independent over the other axes.
 
     Parameters
     ----------
@@ -824,8 +845,7 @@ def solvemdbi_cg(ah, rho, b, axisM, axisK, tol=1e-5, mit=1000, isn=None):
 
 
 def lu_factor(A, rho, check_finite=True):
-    r"""
-    Compute LU factorisation of either :math:`A^T A + \rho I` or
+    r"""Compute LU factorisation of either :math:`A^T A + \rho I` or
     :math:`A A^T + \rho I`, depending on which matrix is smaller.
 
     Parameters
@@ -841,11 +861,11 @@ def lu_factor(A, rho, check_finite=True):
     Returns
     -------
     lu : ndarray
-      Matrix containing U in its upper triangle, and L in its lower triangle,
-      as returned by :func:`scipy.linalg.lu_factor`
+      Matrix containing U in its upper triangle, and L in its lower
+      triangle, as returned by :func:`scipy.linalg.lu_factor`
     piv : ndarray
-      Pivot indices representing the permutation matrix P, as returned by
-      :func:`scipy.linalg.lu_factor`
+      Pivot indices representing the permutation matrix P, as returned
+      by :func:`scipy.linalg.lu_factor`
     """
 
     N, M = A.shape
@@ -864,8 +884,7 @@ def lu_factor(A, rho, check_finite=True):
 
 
 def lu_solve_ATAI(A, rho, b, lu, piv, check_finite=True):
-    r"""
-    Solve the linear system :math:`(A^T A + \rho I)\mathbf{x} = \mathbf{b}`
+    r"""Solve the linear system :math:`(A^T A + \rho I)\mathbf{x} = \mathbf{b}`
     or :math:`(A^T A + \rho I)X = B` using :func:`scipy.linalg.lu_solve`.
 
     Parameters
@@ -903,8 +922,7 @@ def lu_solve_ATAI(A, rho, b, lu, piv, check_finite=True):
 
 
 def lu_solve_AATI(A, rho, b, lu, piv, check_finite=True):
-    r"""
-    Solve the linear system :math:`(A A^T + \rho I)\mathbf{x} = \mathbf{b}`
+    r"""Solve the linear system :math:`(A A^T + \rho I)\mathbf{x} = \mathbf{b}`
     or :math:`(A A^T + \rho I)X = B` using :func:`scipy.linalg.lu_solve`.
 
     Parameters
@@ -942,8 +960,7 @@ def lu_solve_AATI(A, rho, b, lu, piv, check_finite=True):
 
 
 def cho_factor(A, rho, lower=False, check_finite=True):
-    r"""
-    Compute Cholesky factorisation of either :math:`A^T A + \rho I` or
+    r"""Compute Cholesky factorisation of either :math:`A^T A + \rho I` or
     :math:`A A^T + \rho I`, depending on which matrix is smaller.
 
     Parameters
@@ -984,8 +1001,7 @@ def cho_factor(A, rho, lower=False, check_finite=True):
 
 
 def cho_solve_ATAI(A, rho, b, c, lwr, check_finite=True):
-    r"""
-    Solve the linear system :math:`(A^T A + \rho I)\mathbf{x} = \mathbf{b}`
+    r"""Solve the linear system :math:`(A^T A + \rho I)\mathbf{x} = \mathbf{b}`
     or :math:`(A^T A + \rho I)X = B` using :func:`scipy.linalg.cho_solve`.
 
     Parameters
@@ -1019,8 +1035,7 @@ def cho_solve_ATAI(A, rho, b, c, lwr, check_finite=True):
 
 
 def cho_solve_AATI(A, rho, b, c, lwr, check_finite=True):
-    r"""
-    Solve the linear system :math:`(A A^T + \rho I)\mathbf{x} = \mathbf{b}`
+    r"""Solve the linear system :math:`(A A^T + \rho I)\mathbf{x} = \mathbf{b}`
     or :math:`(A A^T + \rho I)X = B` using :func:`scipy.linalg.cho_solve`.
 
     Parameters
@@ -1054,8 +1069,7 @@ def cho_solve_AATI(A, rho, b, c, lwr, check_finite=True):
 
 
 def zpad(x, pd, ax):
-    """
-    Zero-pad array `x` with `pd = (leading, trailing)` zeros on axis `ax`.
+    """Zero-pad array `x` with `pd = (leading, trailing)` zeros on axis `ax`.
 
     Parameters
     ----------
@@ -1079,8 +1093,7 @@ def zpad(x, pd, ax):
 
 
 def Gax(x, ax):
-    """
-    Compute gradient of `x` along axis `ax`.
+    """Compute gradient of `x` along axis `ax`.
 
     Parameters
     ----------
@@ -1103,8 +1116,7 @@ def Gax(x, ax):
 
 
 def GTax(x, ax):
-    """
-    Compute transpose of gradient of `x` along axis `ax`.
+    """Compute transpose of gradient of `x` along axis `ax`.
 
     Parameters
     ----------
@@ -1128,9 +1140,8 @@ def GTax(x, ax):
 
 
 def GradientFilters(ndim, axes, axshp, dtype=None):
-    r"""
-    Construct a set of filters for computing gradients in the frequency
-    domain.
+    r"""Construct a set of filters for computing gradients in the
+    frequency domain.
 
     Parameters
     ----------
@@ -1166,8 +1177,7 @@ def GradientFilters(ndim, axes, axshp, dtype=None):
 
 
 def zdivide(x, y):
-    """
-    Return `x`/`y`, with 0 instead of NaN where `y` is 0.
+    """Return `x`/`y`, with 0 instead of NaN where `y` is 0.
 
     Parameters
     ----------
@@ -1188,8 +1198,9 @@ def zdivide(x, y):
 
 
 def proj_l2ball(b, s, r, axes=None):
-    r"""
-    Project :math:`\mathbf{b}` into the :math:`\ell_2` ball of radius
+    r"""Projection onto the :math:`\ell_2` ball.
+
+    Project :math:`\mathbf{b}` onto the :math:`\ell_2` ball of radius
     :math:`r` about :math:`\mathbf{s}`, i.e.
     :math:`\{ \mathbf{x} : \|\mathbf{x} - \mathbf{s} \|_2 \leq r \}`.
     Note that ``proj_l2ball(b, s, r)`` is equivalent to
@@ -1219,7 +1230,8 @@ def proj_l2ball(b, s, r, axes=None):
 
 
 def promote16(u, fn=None, *args, **kwargs):
-    r"""
+    r"""Promote ``np.float16`` arguments to ``np.float32`` dtype.
+
     Utility function for use with functions that do not support arrays
     of dtype ``np.float16``. This function has two distinct modes of
     operation. If called with only the `u` parameter specified, the
@@ -1267,9 +1279,10 @@ def promote16(u, fn=None, *args, **kwargs):
 
 
 def atleast_nd(n, u):
-    """
-    If the input array has fewer than n dimensions, append singleton
-    dimensions so that it is n dimensional. Note that the interface
+    """Append axes to an array so that it is ``n`` dimensional.
+
+    If the input array has fewer than ``n`` dimensions, append singleton
+    dimensions so that it is ``n`` dimensional. Note that the interface
     differs substantially from that of :func:`numpy.atleast_3d` etc.
 
     Parameters
@@ -1293,11 +1306,12 @@ def atleast_nd(n, u):
 
 
 def split(u, axis=0):
-    """
-    Split an array into a list of arrays on the specified axis. The length
-    of the list is the shape of the array on the specified axis, and the
-    corresponding axis is removed from each entry in the list. This function
-    does not have the same behaviour as :func:`numpy.split`.
+    """Split an array into a list of arrays on the specified axis.
+
+    Split an array into a list of arrays on the specified axis. The
+    length of the list is the shape of the array on the specified axis,
+    and the corresponding axis is removed from each entry in the list.
+    This function does not have the same behaviour as :func:`numpy.split`.
 
     Parameters
     ----------
@@ -1323,7 +1337,8 @@ def split(u, axis=0):
 
 
 def blockcirculant(A):
-    """
+    """Construct a block circulant matrix from a tuple of arrays.
+
     Construct a block circulant matrix from a tuple of arrays. This is a
     block-matrix variant of :func:`scipy.linalg.circulant`.
 
@@ -1350,7 +1365,8 @@ def blockcirculant(A):
 
 
 def fl2norm2(xf, axis=(0, 1)):
-    r"""
+    r"""Compute the squared :math:`\ell_2` norm in the DFT domain.
+
     Compute the squared :math:`\ell_2` norm in the DFT domain, taking
     into account the unnormalised DFT scaling, i.e. given the DFT of a
     multi-dimensional array computed via :func:`fftn`, return the
@@ -1377,7 +1393,8 @@ def fl2norm2(xf, axis=(0, 1)):
 
 
 def rfl2norm2(xf, xs, axis=(0, 1)):
-    r"""
+    r"""Compute the squared :math:`\ell_2` norm in the real DFT domain.
+
     Compute the squared :math:`\ell_2` norm in the DFT domain, taking
     into account the unnormalised DFT scaling, i.e. given the DFT of a
     multi-dimensional array computed via :func:`rfftn`, return the
@@ -1415,7 +1432,8 @@ def rfl2norm2(xf, xs, axis=(0, 1)):
 
 
 def rrs(ax, b):
-    r"""
+    r"""Relative residual of the solution to a linear equation.
+
     Compute relative residual :math:`\|\mathbf{b} - A \mathbf{x}\|_2 /
     \|\mathbf{b}\|_2` of the solution to a linear equation :math:`A \mathbf{x}
     = \mathbf{b}`. Returns 1.0 if :math:`\mathbf{b} = 0`.
