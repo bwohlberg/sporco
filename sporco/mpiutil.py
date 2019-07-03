@@ -6,7 +6,7 @@
 # and user license can be found in the 'LICENSE.txt' file distributed
 # with the package.
 
-"""Utility functions that make use of MPI for parallel computing"""
+"""Utility functions that make use of MPI for parallel computing."""
 
 from __future__ import absolute_import
 from __future__ import division
@@ -65,7 +65,10 @@ def _get_rank_limits(comm, arrlen):
 
 
 def grid_search(fn, grid, comm=None, mpidtype=None, fmin=True):
-    """Perform a grid search for optimal parameters of a specified
+    """
+    Grid search for optimal parameters of a specified function.
+
+    Perform a grid search for optimal parameters of a specified
     function. In the simplest case the function returns a float value,
     and a single optimum value and corresponding parameter values are
     identified. If the function returns a tuple of values, each of

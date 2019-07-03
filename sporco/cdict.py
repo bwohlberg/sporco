@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2015-2016 by Brendt Wohlberg <brendt@ieee.org>
+# Copyright (C) 2015-2019 by Brendt Wohlberg <brendt@ieee.org>
 # All rights reserved. BSD 3-clause License.
 # This file is part of the SPORCO package. Details of the copyright
 # and user license can be found in the 'LICENSE.txt' file distributed
 # with the package.
 
-"""Constrained dictionary class"""
+"""Constrained dictionary class."""
 
 from builtins import str
 
@@ -51,11 +51,13 @@ class InvalidValueError(ValueError):
 
 
 class ConstrainedDict(dict):
-    """Base class for a dict subclass that constrains the allowed dict
+    """A dict subclass that constrains the allowed dict keys.
+
+    Base class for a dict subclass that constrains the allowed dict
     keys, including those of nested dicts, and also initialises the
     dict with default content on instantiation. The default content is
-    specified by the `defaults` class attribute, and the allowed keys are
-    determined from the same attribute.
+    specified by the `defaults` class attribute, and the allowed keys
+    are determined from the same attribute.
     """
 
 
@@ -64,14 +66,15 @@ class ConstrainedDict(dict):
 
 
     def __init__(self, d=None, pth=(), dflt=None):
-        """Initialise a ConstrainedDict object. The object is first created
-        with default content, which is then overwritten with the
-        content of parameter `d`. When a subdict is initialised via
-        this constructor, the key path from the root to this subdict
-        (i.e. the set of keys, in sequence, that select the subdict
-        starting from the top-level dict) should be passed as a tuple
-        via the `pth` parameter, and the defaults dict should be passed
-        via the `dflt` parameter.
+        """Initialise a ConstrainedDict object.
+
+        The object is first created with default content, which is then
+        overwritten with the content of parameter `d`.  When a subdict
+        is initialised via this constructor, the key path from the root
+        to this subdict (i.e. the set of keys, in sequence, that select
+        the subdict starting from the top-level dict) should be passed
+        as a tuple via the `pth` parameter, and the defaults dict
+        should be passed via the `dflt` parameter.
 
         Parameters
         ----------
@@ -108,7 +111,7 @@ class ConstrainedDict(dict):
 
 
     def update(self, d):
-        """Update the dict with the dict tree in parameter d.
+        """Update the dict with the dict tree in parameter `d`.
 
         Parameters
         ----------
@@ -123,8 +126,10 @@ class ConstrainedDict(dict):
 
 
     def __setitem__(self, key, value):
-        """Set value corresponding to key. If key is a tuple, interpret it as
-        a sequence of keys in a tree of nested dicts.
+        """Set value corresponding to key.
+
+        If key is a tuple, interpret it as a sequence of keys in a tree
+        of nested dicts.
 
         Parameters
         ----------
@@ -186,8 +191,10 @@ class ConstrainedDict(dict):
 
 
     def __getitem__(self, key):
-        """Get value corresponding to key. If key is a tuple, interpret it as
-        a sequence of keys in a tree of nested dicts.
+        """Get value corresponding to key.
+
+        If key is a tuple, interpret it as a sequence of keys in a tree
+        of nested dicts.
 
         Parameters
         ----------
@@ -218,10 +225,11 @@ class ConstrainedDict(dict):
 
 
     def check(self, key, value):
-        """Check whether key,value pair is allowed. The key is allowed if
-        there is a corresponding key in the defaults class attribute
-        dict. The value is not allowed if it is a dict in the defaults
-        dict and not a dict in value.
+        """Check whether `key`, `value` pair is allowed.
+
+        The key is allowed if there is a corresponding key in the
+        defaults class attribute dict.  The value is not allowed if it
+        is a dict in the defaults dict and not a dict in value.
 
         Parameters
         ----------
@@ -241,7 +249,7 @@ class ConstrainedDict(dict):
             if key not in a:
                 raise UnknownKeyError(self.pth + (key,))
                 # Raise InvalidValueError if the key value in the defaults
-                # tree is a dict and the value parameter is not a dict and
+                # tree is a dict and the value parameter is not a dict
             elif isinstance(a[key], dict) and not isinstance(value, dict):
                 raise InvalidValueError(self.pth + (key,))
 
@@ -249,8 +257,8 @@ class ConstrainedDict(dict):
 
     @staticmethod
     def getparent(d, pth):
-        """Get the parent node of a subdict as specified by the key path in
-        `pth`.
+        """Get the parent node of a subdict as specified by the key path
+        in `pth`.
 
         Parameters
         ----------
@@ -297,13 +305,25 @@ class ConstrainedDict(dict):
 
 
 def keycmp(a, b, pth=()):
-    """Recurse down the tree of nested dicts `b`, at each level checking
+    """Compare keys in nested dicts.
+
+    Recurse down the tree of nested dicts `b`, at each level checking
     that it does not have any keys that are not also at the same
     level in `a`. The key path is recorded in `pth`. If an unknown key
     is encountered in `b`, an `UnknownKeyError` exception is
     raised. If a non-dict value is encountered in `b` for which the
     corresponding value in `a` is a dict, an `InvalidValueError`
-    exception is raised."""
+    exception is raised.
+
+    Parameters
+    ----------
+    a : dict
+      Reference dict tree
+    a : dict
+      Compared dict tree
+    pth : str or tuple of str
+      Dict key
+    """
 
     akey = list(a.keys())
     # Iterate over all keys in b

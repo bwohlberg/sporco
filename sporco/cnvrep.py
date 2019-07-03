@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2015-2017 by Brendt Wohlberg <brendt@ieee.org>
+# Copyright (C) 2015-2019 by Brendt Wohlberg <brendt@ieee.org>
 # All rights reserved. BSD 3-clause License.
 # This file is part of the SPORCO package. Details of the copyright
 # and user license can be found in the 'LICENSE.txt' file distributed
 # with the package.
 
 """Classes and functions that support working with convolutional
-representations"""
+representations.
+"""
 
 from __future__ import division
 from __future__ import absolute_import
@@ -23,14 +24,18 @@ __author__ = """Brendt Wohlberg <brendt@ieee.org>"""
 
 
 class CSC_ConvRepIndexing(object):
-    """Manage the inference of problem dimensions and the roles of
+    """Array dimensions and indexing for CSC problems.
+
+    Manage the inference of problem dimensions and the roles of
     :class:`numpy.ndarray` indices for convolutional representations in
-    convolutional sparse coding problems (e.g. :class:`.admm.cbpdn.ConvBPDN`
-    and related classes).
+    convolutional sparse coding problems (e.g.
+    :class:`.admm.cbpdn.ConvBPDN` and related classes).
     """
 
     def __init__(self, D, S, dimK=None, dimN=2):
-        """Initialise a ConvRepIndexing object representing dimensions
+        """Initialise a ConvRepIndexing object.
+
+        Initialise a ConvRepIndexing object representing dimensions
         of S (input signal), D (dictionary), and X (coefficient array)
         in a convolutional representation.  These dimensions are
         inferred from the input `D` and `S` as well as from parameters
@@ -62,16 +67,16 @@ class CSC_ConvRepIndexing(object):
           indices (i.e. if `dimK` = 0 then dimC = 1 and if `dimK` = 1
           then dimC = 0).
         * if `dimK` is ``None`` then the number of channel dimensions is
-          determined from the number of dimensions in the input dictionary
-          `D`. Input `D` should have at least `dimN` + 1 dimensions,
-          with the final dimension indexing dictionary filters. If it
-          has exactly `dimN` + 1 dimensions then it is a single-channel
-          dictionary, and input `S` is also assumed to be single-channel,
-          with the additional index in `S` assigned as a signal index
-          (i.e. dimK = 1).
-          Conversely, if input `D` has `dimN` + 2 dimensions it is a
-          multi-channel dictionary, and the additional index in `S` is
-          assigned as a channel index (i.e. dimC = 1).
+          determined from the number of dimensions in the input
+          dictionary `D`. Input `D` should have at least `dimN` + 1
+          dimensions, with the final dimension indexing dictionary
+          filters. If it has exactly `dimN` + 1 dimensions then it is a
+          single-channel dictionary, and input `S` is also assumed to be
+          single-channel, with the additional index in `S` assigned as a
+          signal index (i.e. dimK = 1). Conversely, if input `D` has
+          `dimN` + 2 dimensions it is a multi-channel dictionary, and
+          the additional index in `S` is assigned as a channel index
+          (i.e. dimC = 1).
 
         Note that it is an error to specify `dimK` = 1 if input `S`
         has `dimN` + 1 dimensions and input `D` has `dimN` + 2
@@ -206,7 +211,9 @@ class CSC_ConvRepIndexing(object):
 
 
 class DictionarySize(object):
-    """Compute dictionary size parameters from a dictionary size
+    """Compute dictionary size parameters.
+
+    Compute dictionary size parameters from a dictionary size
     specification tuple as in the dsz argument of :func:`bcrop`."""
 
     def __init__(self, dsz, dimN=2):
@@ -270,14 +277,18 @@ class DictionarySize(object):
 
 
 class CDU_ConvRepIndexing(object):
-    """Manage the inference of problem dimensions and the roles of
+    """Array dimensions and indexing for CDU problems.
+
+    Manage the inference of problem dimensions and the roles of
     :class:`numpy.ndarray` indices for convolutional representations
     in convolutional dictionary update problems (e.g.
     :class:`.ConvCnstrMODBase` and derived classes).
     """
 
     def __init__(self, dsz, S, dimK=None, dimN=2):
-        """Initialise a ConvRepIndexing object representing dimensions
+        """Initialise a ConvRepIndexing object.
+
+        Initialise a ConvRepIndexing object representing dimensions
         of S (input signal), D (dictionary), and X (coefficient array)
         in a convolutional representation. These dimensions are inferred
         from the input `dsz` and `S` as well as from parameters `dimN`
@@ -454,7 +465,9 @@ class CDU_ConvRepIndexing(object):
 
 
 def stdformD(D, Cd, M, dimN=2):
-    """Reshape dictionary array (`D` in :mod:`.admm.cbpdn` module, `X` in
+    """Reshape dictionary array to internal standard form.
+
+    Reshape dictionary array (`D` in :mod:`.admm.cbpdn` module, `X` in
     :mod:`.admm.ccmod` module) to internal standard form.
 
     Parameters
@@ -479,7 +492,9 @@ def stdformD(D, Cd, M, dimN=2):
 
 
 def l1Wshape(W, cri):
-    r"""Get appropriate internal shape (see
+    r"""Get internal shape for an :math:`\ell_1` norm weight array.
+
+    Get appropriate internal shape (see
     :class:`CSC_ConvRepIndexing`) for an :math:`\ell_1` norm weight
     array `W`, as in option ``L1Weight`` in
     :class:`.admm.cbpdn.ConvBPDN.Options` and related options classes.
@@ -539,7 +554,9 @@ def l1Wshape(W, cri):
 
 
 def mskWshape(W, cri):
-    """Get appropriate internal shape (see
+    """Get internal shape for a data fidelity term mask array.
+
+    Get appropriate internal shape (see
     :class:`CSC_ConvRepIndexing` and :class:`CDU_ConvRepIndexing`) for
     data fidelity term mask array `W`. The external shape of `W`
     depends on the external shape of input data array `S`.  The
@@ -554,8 +571,8 @@ def mskWshape(W, cri):
     ----------
     W : array_like
       Data fidelity term weight/mask array
-    cri : :class:`CSC_ConvRepIndexing` object or :class:`CDU_ConvRepIndexing`\
-    object
+    cri : :class:`CSC_ConvRepIndexing` object or \
+    :class:`CDU_ConvRepIndexing` object
       Object specifying convolutional representation dimensions
 
     Returns
@@ -590,10 +607,11 @@ def mskWshape(W, cri):
 
 
 def zeromean(v, dsz, dimN=2):
-    """Subtract mean value from each filter in the input array v. The
-    `dsz` parameter specifies the support sizes of each filter using the
-    same format as the `dsz` parameter of :func:`bcrop`. Support sizes
-    must be taken into account to ensure that the mean values are
+    """Subtract mean value from each filter in the input array `v`.
+
+    The `dsz` parameter specifies the support sizes of each filter using
+    the same format as the `dsz` parameter of :func:`bcrop`. Support
+    sizes must be taken into account to ensure that the mean values are
     computed over the correct number of samples, ignoring the
     zero-padded region in which the filter is embedded.
 
@@ -653,7 +671,9 @@ def zeromean(v, dsz, dimN=2):
 
 
 def normalise(v, dimN=2):
-    r"""Normalise vectors, corresponding to slices along specified number
+    r"""Normalise vector components of input array.
+
+    Normalise vectors, corresponding to slices along specified number
     of initial spatial dimensions of an array, to have unit
     :math:`\ell_2` norm. The remaining axes enumerate the distinct
     vectors to be normalised.
@@ -679,8 +699,9 @@ def normalise(v, dimN=2):
 
 
 def zpad(v, Nv):
-    """Zero-pad initial axes of array to specified size. Padding is
-    applied to the right, top, etc. of the array indices.
+    """Zero-pad initial axes of array to specified size.
+
+    Padding is applied to the right, top, etc. of the array indices.
 
     Parameters
     ----------
@@ -703,7 +724,9 @@ def zpad(v, Nv):
 
 
 def bcrop(v, dsz, dimN=2):
-    """Crop specified number of initial spatial dimensions of dictionary
+    """Crop dictionary array to specified size.
+
+    Crop specified number of initial spatial dimensions of dictionary
     array to specified size. Parameter `dsz` must be a tuple having one
     of the following forms (the examples assume two spatial/temporal
     dimensions). If all filters are of the same size, then
@@ -925,7 +948,8 @@ def getPcn(dsz, Nv, dimN=2, dimC=1, crp=False, zm=False):
 
 
 def _Pcn(x, dsz, Nv, dimN=2, dimC=1):
-    """
+    """Dictionary support projection and normalisation.
+
     Projection onto dictionary update constraint set: support
     projection and normalisation. The result has the full spatial
     dimensions of the input.
@@ -955,7 +979,8 @@ def _Pcn(x, dsz, Nv, dimN=2, dimC=1):
 
 
 def _Pcn_zm(x, dsz, Nv, dimN=2, dimC=1):
-    """
+    """Dictionary support projection, mean subtraction, and normalisation.
+
     Projection onto dictionary update constraint set: support projection,
     mean subtraction, and normalisation. The result has the full spatial
     dimensions of the input.
@@ -985,7 +1010,8 @@ def _Pcn_zm(x, dsz, Nv, dimN=2, dimC=1):
 
 
 def _Pcn_crp(x, dsz, Nv, dimN=2, dimC=1):
-    """
+    """Dictionary support projection and normalisation (cropped).
+
     Projection onto dictionary update constraint set: support
     projection and normalisation. The result is cropped to the
     support of the largest filter in the dictionary.
@@ -1015,7 +1041,9 @@ def _Pcn_crp(x, dsz, Nv, dimN=2, dimC=1):
 
 
 def _Pcn_zm_crp(x, dsz, Nv, dimN=2, dimC=1):
-    """
+    """Dictionary support projection, mean subtraction, and normalisation
+    (cropped).
+
     Projection onto dictionary update constraint set: support
     projection, mean subtraction, and normalisation. The result is
     cropped to the support of the largest filter in the dictionary.
