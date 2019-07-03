@@ -532,7 +532,7 @@ class TVL1Deconv(admm.ADMM):
         self.set_dtype(opt, S.dtype)
 
         self.axes = axes
-        self.axsz = np.asarray(S.shape)[list(axes)]
+        self.axsz = tuple(np.asarray(S.shape)[list(axes)])
         if caxis is None:
             self.saxes = (-1,)
         else:
@@ -547,7 +547,7 @@ class TVL1Deconv(admm.ADMM):
         self.S = np.asarray(S, dtype=self.dtype)
         super(TVL1Deconv, self).__init__(S.size, yshape, yshape, S.dtype, opt)
 
-        self.axshp = [S.shape[k] for k in axes]
+        self.axshp = tuple([S.shape[k] for k in axes])
         self.A = sl.atleast_nd(S.ndim, A.astype(self.dtype))
         self.Af = sl.rfftn(self.A, self.axshp, axes=axes)
         self.Sf = sl.rfftn(self.S, axes=axes)
