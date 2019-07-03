@@ -2,6 +2,7 @@ from __future__ import division
 from builtins import object
 
 import numpy as np
+from scipy.ndimage import convolve
 from sporco import linalg
 from sporco import util
 
