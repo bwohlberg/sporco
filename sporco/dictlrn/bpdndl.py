@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2015-2018 by Brendt Wohlberg <brendt@ieee.org>
+# Copyright (C) 2015-2019 by Brendt Wohlberg <brendt@ieee.org>
 # All rights reserved. BSD 3-clause License.
 # This file is part of the SPORCO package. Details of the copyright
 # and user license can be found in the 'LICENSE.txt' file distributed
@@ -91,8 +91,8 @@ class BPDNDictLearn(dictlrn.DictLearn):
         defaults = copy.deepcopy(dictlrn.DictLearn.Options.defaults)
         defaults.update(
             {'AccurateDFid': False,
-             'BPDN' : copy.deepcopy(bpdn.BPDN.Options.defaults),
-             'CMOD' : copy.deepcopy(cmod.CnstrMOD.Options.defaults)})
+             'BPDN': copy.deepcopy(bpdn.BPDN.Options.defaults),
+             'CMOD': copy.deepcopy(cmod.CnstrMOD.Options.defaults)})
 
 
         def __init__(self, opt=None):
