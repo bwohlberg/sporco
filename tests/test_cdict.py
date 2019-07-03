@@ -38,14 +38,14 @@ class TestSet01(object):
         assert self.a['A'] == 'a'
 
     def test_02(self):
-        with pytest.raises(cdict.UnknownKeyError) as e:
+        with pytest.raises(cdict.UnknownKeyError) as exinf:
             self.a['Ax'] = 'a'
-        assert 'Unknown dictionary key: ' in str(e)
+        assert exinf.type is cdict.UnknownKeyError
 
     def test_03(self):
-        with pytest.raises(cdict.InvalidValueError) as e:
+        with pytest.raises(cdict.InvalidValueError) as exinf:
             self.a['C', 'CA'] = 'ca'
-        assert 'Invalid dictionary value for key: ' in str(e)
+        assert exinf.type is cdict.InvalidValueError
 
     def test_04(self):
         assert self.a['C', 'CA', 'CAA'] == 'caa'
