@@ -19,7 +19,6 @@ import sporco.cnvrep as cr
 import sporco.linalg as sl
 import sporco.prox as sp
 from sporco.util import u
-
 from sporco.fista import fista
 
 __author__ = """Cristina Garcia-Cardona <cgarciac@lanl.gov>"""
