@@ -571,7 +571,7 @@ class ParConvBPDN(GenericConvBPDN):
 
         if nproc is None:
             if ngrp is None:
-                self.nproc = min(mp.cpu_count(), self.cri.M)
+                self.nproc = min(16, mp.cpu_count(), self.cri.M)
                 self.ngrp = self.nproc
             else:
                 self.nproc = min(mp.cpu_count(), ngrp, self.cri.M)
