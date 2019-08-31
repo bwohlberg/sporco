@@ -28,7 +28,10 @@ from sporco import util
 from sporco import plot
 import sporco.linalg as spl
 import sporco.metric as sm
-from sporco.admm import cbpdn
+from sporco.cupy import cupy_enabled, np2cp, cp2np
+from sporco.cupy import select_device_by_load, gpu_info
+from sporco.cupy import cp
+from sporco.cupy.admm import cbpdn
 
 
 """
@@ -49,13 +52,13 @@ def crop(x, n=8):
 
 
 """
-Load a reference image and corrupt it with Gaussian white noise with $\sigma = 0.1$. (The call to :func:`numpy.random.seed` ensures that the pseudo-random noise is reproducible.)
+Load a reference image and corrupt it with Gaussian white noise with $\sigma = 0.1$. (The call to ``numpy.random.seed`` ensures that the pseudo-random noise is reproducible.)
 """
 
 img = util.ExampleImages().image('monarch.png', zoom=0.5, scaled=True,
                                  idxexp=np.s_[:, 160:672])
 np.random.seed(12345)
-imgn = img + np.random.normal(0.0, 0.1, img.shape)
+imgn = img + np.random.normal(0.0, 0.1, img.shape).astype(np.float32)
 
 
 """
@@ -89,22 +92,31 @@ mu = 2.7e-1
 
 opt = cbpdn.ConvBPDNJoint.Options({'Verbose': True, 'MaxMainIter': 250,
             'HighMemSolve': True, 'RelStopTol': 3e-3, 'AuxVarObj': False,
-            'L1Weight': W, 'AutoRho': {'Enabled': False}, 'rho': 1e3*lmbda})
+            'L1Weight': cp2np(W), 'AutoRho': {'Enabled': False},
+            'rho': 1e3*lmbda})
 
 
 """
-Initialise the :class:`.admm.cbpdn.ConvBPDNJoint` object and call the ``solve`` method.
+Initialise a ``sporco.cupy`` version of a :class:`.admm.cbpdn.ConvBPDNJoint` object and call the ``solve`` method.
 """
 
-b = cbpdn.ConvBPDNJoint(D, pad(imgnh), lmbda, mu, opt, dimK=0)
-X = b.solve()
+if not cupy_enabled():
+    print('CuPy/GPU device not available: running without GPU acceleration\n')
+else:
+    id = select_device_by_load()
+    info = gpu_info()
+    if info:
+        print('Running on GPU %d (%s)\n' % (id, info[id].name))
+
+b = cbpdn.ConvBPDNJoint(np2cp(D), np2cp(pad(imgnh)), lmbda, mu, opt, dimK=0)
+X = cp2np(b.solve())
 
 
 """
 The denoised estimate of the image is just the reconstruction from the coefficient maps.
 """
 
-imgdp = b.reconstruct().squeeze()
+imgdp = cp2np(b.reconstruct().squeeze())
 imgd = np.clip(crop(imgdp) + imgnl, 0, 1)
 
 
