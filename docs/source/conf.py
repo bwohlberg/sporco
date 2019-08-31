@@ -87,7 +87,7 @@ else:
 
 # generate autosummary pages
 # autosummary_generate = True
-autosummary_generate = False
+# autosummary_generate = False
 
 
 # See https://stackoverflow.com/questions/5599254
@@ -399,7 +399,8 @@ print('confpath: %s' % confpath)
 #autodoc_member_order = 'groupwise'
 autodoc_member_order = 'bysource'
 #autodoc_default_flags = ['members', 'inherited-members', 'show-inheritance']
-autodoc_default_flags = ['show-inheritance']
+#autodoc_default_flags = ['show-inheritance']
+autodoc_default_options = {'show-inheritance': True}
 autodoc_docstring_signature = True
 
 # List of patterns, relative to source directory, that match files and
