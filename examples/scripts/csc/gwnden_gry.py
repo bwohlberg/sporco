@@ -54,7 +54,7 @@ Load a reference image and corrupt it with Gaussian white noise with $\sigma = 0
 img = util.ExampleImages().image('monarch.png', zoom=0.5, scaled=True,
                                  gray=True, idxexp=np.s_[:, 160:672])
 np.random.seed(12345)
-imgn = img + np.random.normal(0.0, 0.1, img.shape)
+imgn = img + np.random.normal(0.0, 0.1, img.shape).astype(np.float32)
 
 
 """
