@@ -44,7 +44,7 @@ Extract blocks and center each channel of image patches, taking steps of size 2.
 blksz = (8, 8, 3)
 stpsz = (2, 2, 1)
 
-blocks = util.extractblocks(imgn, blksz, stpsz)
+blocks = util.extract_blocks(imgn, blksz, stpsz)
 blockmeans = np.mean(blocks, axis=(0, 1))
 blocks -= blockmeans
 blocks = blocks.reshape(np.product(blksz), -1)
@@ -80,10 +80,10 @@ X = b.solve()
 The denoised estimate of the image is by aggregating the block reconstructions from the coefficient maps.
 """
 
-imgd_mean = util.averageblocks(np.dot(D, X).reshape(blksz + (-1,))
-                               + blockmeans, img.shape, stpsz)
-imgd_median = util.combineblocks(np.dot(D, X).reshape(blksz + (-1,))
-                               + blockmeans, img.shape, stpsz, np.median)
+imgd_mean = util.average_blocks(np.dot(D, X).reshape(blksz + (-1,))
+                                + blockmeans, img.shape, stpsz)
+imgd_median = util.combine_blocks(np.dot(D, X).reshape(blksz + (-1,))
+                                  + blockmeans, img.shape, stpsz, np.median)
 
 
 """

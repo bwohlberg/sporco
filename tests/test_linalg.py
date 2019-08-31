@@ -298,7 +298,7 @@ class TestSet01(object):
     def test_18(self):
         u0 = np.array([[0, 1], [2, 3]])
         u1 = np.array([[4, 5], [6, 7]])
-        C = linalg.blockcirculant((u0, u1))
+        C = linalg.block_circulant((u0, u1))
         assert C[3, 0] == 6
         assert C[3, 3] == 3
 

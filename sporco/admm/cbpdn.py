@@ -1132,8 +1132,8 @@ class ConvBPDNGradReg(ConvBPDN):
         else:
             self.Wgrd = np.asarray(opt['GradWeight'], dtype=self.dtype)
 
-        self.Gf, GHGf = sl.GradientFilters(self.cri.dimN+3, self.cri.axisN,
-                                           self.cri.Nv, dtype=self.dtype)
+        self.Gf, GHGf = sl.gradient_filters(self.cri.dimN+3, self.cri.axisN,
+                                            self.cri.Nv, dtype=self.dtype)
         self.GHGf = self.Wgrd * GHGf
 
         super(ConvBPDNGradReg, self).__init__(D, S, lmbda, opt, dimK=dimK,
@@ -2630,8 +2630,8 @@ class ConvL1L1Grd(ConvBPDNMaskDcpl):
         else:
             self.Wgrd = np.asarray(opt['GradWeight'], dtype=self.dtype)
 
-        self.Gf, GHGf = sl.GradientFilters(self.cri.dimN+3, self.cri.axisN,
-                                           self.cri.Nv, dtype=self.dtype)
+        self.Gf, GHGf = sl.gradient_filters(self.cri.dimN+3, self.cri.axisN,
+                                            self.cri.Nv, dtype=self.dtype)
         self.GHGf = self.Wgrd * GHGf
 
 

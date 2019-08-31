@@ -16,10 +16,10 @@ from builtins import object
 
 from timeit import default_timer as timer
 import os
+import warnings
 import imghdr
 import io
 import platform
-import warnings
 import multiprocessing as mp
 import itertools
 from future.moves.itertools import zip_longest
@@ -36,7 +36,8 @@ import imageio
 import scipy.ndimage.interpolation as sni
 import scipy.optimize as sco
 
-import sporco.linalg as sla
+import sporco.linalg as sl
+from sporco.misc import renamed_function
 
 
 __author__ = """Brendt Wohlberg <brendt@ieee.org>"""
@@ -290,7 +291,8 @@ def subsample_array(x, step, pad=False, mode='reflect'):
 
 
 
-def extractblocks(img, blksz, stpsz=None):
+@renamed_function(depname='extractblocks')
+def extract_blocks(img, blksz, stpsz=None):
     """Extract blocks from an ndarray signal into an ndarray.
 
     Parameters
@@ -335,7 +337,8 @@ def extractblocks(img, blksz, stpsz=None):
 
 
 
-def averageblocks(blks, imgsz, stpsz=None):
+@renamed_function(depname='averageblocks')
+def average_blocks(blks, imgsz, stpsz=None):
     """Average blocks together from an ndarray to reconstruct ndarray signal.
 
     Parameters
@@ -384,7 +387,8 @@ def averageblocks(blks, imgsz, stpsz=None):
 
 
 
-def combineblocks(blks, imgsz, stpsz=None, fn=np.median):
+@renamed_function(depname='combineblocks')
+def combine_blocks(blks, imgsz, stpsz=None, fn=np.median):
     """Combine blocks from an ndarray to reconstruct ndarray signal.
 
     Parameters
@@ -452,8 +456,8 @@ def rgb2gray(rgb):
       Grayscale image as Nr x Nc or Nr x Nc x K array
     """
 
-    w = sla.atleast_nd(rgb.ndim, np.array([0.299, 0.587, 0.144],
-                                          dtype=rgb.dtype, ndmin=3))
+    w = sl.atleast_nd(rgb.ndim, np.array([0.299, 0.587, 0.144],
+                                         dtype=rgb.dtype, ndmin=3))
     return np.sum(w * rgb, axis=2)
 
 
@@ -775,27 +779,27 @@ def tikhonov_filter(s, lmbda, npd=16):
 
     Returns
     -------
-    sl : array_like
+    slp : array_like
       Lowpass image or array of images.
-    sh : array_like
+    shp : array_like
       Highpass image or array of images.
     """
 
     grv = np.array([-1.0, 1.0]).reshape([2, 1])
     gcv = np.array([-1.0, 1.0]).reshape([1, 2])
-    Gr = sla.rfftn(grv, (s.shape[0] + 2*npd, s.shape[1] + 2*npd), (0, 1))
-    Gc = sla.rfftn(gcv, (s.shape[0] + 2*npd, s.shape[1] + 2*npd), (0, 1))
+    Gr = sl.rfftn(grv, (s.shape[0] + 2*npd, s.shape[1] + 2*npd), (0, 1))
+    Gc = sl.rfftn(gcv, (s.shape[0] + 2*npd, s.shape[1] + 2*npd), (0, 1))
     A = 1.0 + lmbda*np.conj(Gr)*Gr + lmbda*np.conj(Gc)*Gc
     if s.ndim > 2:
         A = A[(slice(None),)*2 + (np.newaxis,)*(s.ndim-2)]
     sp = np.pad(s, ((npd, npd),)*2 + ((0, 0),)*(s.ndim-2), 'symmetric')
     spshp = sp.shape
-    sp = sla.rfftn(sp, axes=(0, 1))
+    sp = sl.rfftn(sp, axes=(0, 1))
     sp /= A
-    sp = sla.irfftn(sp, s=spshp[0:2], axes=(0, 1))
-    sl = sp[npd:(sp.shape[0] - npd), npd:(sp.shape[1] - npd)]
-    sh = s - sl
-    return sl.astype(s.dtype), sh.astype(s.dtype)
+    sp = sl.irfftn(sp, s=spshp[0:2], axes=(0, 1))
+    slp = sp[npd:(sp.shape[0] - npd), npd:(sp.shape[1] - npd)]
+    shp = s - slp
+    return slp.astype(s.dtype), shp.astype(s.dtype)
 
 
 
@@ -867,10 +871,10 @@ def local_contrast_normalise(s, n=7, c=None):
         pd += ((0, 0),)
     sp = np.pad(s, pd, mode='symmetric')
     # Compute local mean and subtract from image
-    smn = np.roll(sla.fftconv(g, sp), (-n, -n), axis=(0, 1))
+    smn = np.roll(sl.fftconv(g, sp), (-n, -n), axis=(0, 1))
     s1 = sp - smn
     # Compute local norm
-    snrm = np.roll(np.sqrt(np.clip(sla.fftconv(g, s1**2), 0.0, np.inf)),
+    snrm = np.roll(np.sqrt(np.clip(sl.fftconv(g, s1**2), 0.0, np.inf)),
                    (-n, -n), axis=(0, 1))
     # Set c parameter if not specified
     if c is None:

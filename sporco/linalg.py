@@ -24,6 +24,10 @@ except ImportError:
 else:
     have_numexpr = True
 
+from sporco.misc import renamed_function
+
+
+
 __author__ = """Brendt Wohlberg <brendt@ieee.org>"""
 
 
@@ -34,8 +38,8 @@ __all__ = ['complex_dtype', 'pyfftw_byte_aligned', 'pyfftw_empty_aligned',
            'solvedbi_sm_c', 'solvedbd_sm', 'solvedbd_sm_c', 'solvemdbi_ism',
            'solvemdbi_rsm', 'solvemdbi_cg', 'lu_factor', 'lu_solve_ATAI',
            'lu_solve_AATI', 'cho_factor', 'cho_solve_ATAI', 'cho_solve_AATI',
-           'zpad', 'Gax', 'GTax', 'GradientFilters', 'zdivide', 'proj_l2ball',
-           'promote16', 'atleast_nd', 'split', 'blockcirculant', 'fl2norm2',
+           'zpad', 'Gax', 'GTax', 'gradient_filters', 'zdivide', 'proj_l2ball',
+           'promote16', 'atleast_nd', 'split', 'block_circulant', 'fl2norm2',
            'rfl2norm2', 'rrs']
 
 
@@ -1139,7 +1143,8 @@ def GTax(x, ax):
 
 
 
-def GradientFilters(ndim, axes, axshp, dtype=None):
+@renamed_function(depname='GradientFilters')
+def gradient_filters(ndim, axes, axshp, dtype=None):
     r"""Construct a set of filters for computing gradients in the
     frequency domain.
 
@@ -1336,7 +1341,8 @@ def split(u, axis=0):
 
 
 
-def blockcirculant(A):
+@renamed_function(depname='blockcirculant')
+def block_circulant(A):
     """Construct a block circulant matrix from a tuple of arrays.
 
     Construct a block circulant matrix from a tuple of arrays. This is a

@@ -532,8 +532,8 @@ class TVL2Deconv(admm.ADMM):
             self.Wtvna = self.Wtv
 
         # Construct gradient operators in frequency domain
-        self.Gf, self.GHGf = sl.GradientFilters(S.ndim, axes, self.axshp,
-                                                dtype=self.dtype)
+        self.Gf, self.GHGf = sl.gradient_filters(S.ndim, axes, self.axshp,
+                                                 dtype=self.dtype)
 
 
 

@@ -5,6 +5,7 @@ API Reference
 
 .. autosummary::
 
+   sporco.misc
    sporco.util
    sporco.mpiutil
    sporco.linalg
@@ -60,6 +61,7 @@ API Reference
 .. toctree::
    :hidden:
 
+   sporco.misc
    sporco.util
    sporco.mpiutil
    sporco.linalg

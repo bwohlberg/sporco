@@ -70,7 +70,7 @@ class TestSet01(object):
 
     def test_07(self):
         img = np.random.randn(64, 64)
-        blk = util.extractblocks(img, (8, 8))
+        blk = util.extract_blocks(img, (8, 8))
 
 
     def test_08(self):
@@ -221,8 +221,8 @@ class TestSet01(object):
         A = np.random.rand(4, 5, 6, 7, 3)
         blksz = (2, 3, 2)
         stpsz = (2, 1, 2)
-        A_blocks = util.extractblocks(A, blksz, stpsz)
-        A_recon = util.combineblocks(A_blocks, A.shape, stpsz, np.median)
+        A_blocks = util.extract_blocks(A, blksz, stpsz)
+        A_recon = util.combine_blocks(A_blocks, A.shape, stpsz, np.median)
         assert(np.allclose(np.where(np.isnan(A_recon), np.nan, A),
                            A_recon, equal_nan=True))
 
@@ -231,11 +231,11 @@ class TestSet01(object):
         A = np.random.rand(4, 5, 6, 7, 3)
         blksz = (2, 3, 2)
         stpsz = (2, 1, 2)
-        A_blocks = util.extractblocks(A, blksz, stpsz)
+        A_blocks = util.extract_blocks(A, blksz, stpsz)
         noise = np.random.rand(*A_blocks.shape)
-        A_average_recon = util.averageblocks(A_blocks + noise, A.shape, stpsz)
-        A_combine_recon = util.combineblocks(A_blocks + noise, A.shape,
-                                             stpsz, np.mean)
+        A_average_recon = util.average_blocks(A_blocks + noise, A.shape, stpsz)
+        A_combine_recon = util.combine_blocks(A_blocks + noise, A.shape,
+                                              stpsz, np.mean)
         assert np.allclose(A_combine_recon, A_average_recon, equal_nan=True)
 
 

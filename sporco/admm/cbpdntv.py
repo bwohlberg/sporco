@@ -230,8 +230,8 @@ class ConvBPDNScalarTV(admm.ADMM):
         # Compute signal in DFT domain
         self.Sf = sl.rfftn(self.S, None, self.cri.axisN)
 
-        self.Gf, GHGf = sl.GradientFilters(self.cri.dimN+3, self.cri.axisN,
-                                           self.cri.Nv, dtype=self.dtype)
+        self.Gf, GHGf = sl.gradient_filters(self.cri.dimN+3, self.cri.axisN,
+                                            self.cri.Nv, dtype=self.dtype)
         self.GHGf = self.Wtv**2 * GHGf
 
         # Initialise byte-aligned arrays for pyfftw
@@ -940,8 +940,8 @@ class ConvBPDNRecTV(admm.ADMM):
         # Compute signal in DFT domain
         self.Sf = sl.rfftn(self.S, None, self.cri.axisN)
 
-        self.Gf, GHGf = sl.GradientFilters(self.cri.dimN+3, self.cri.axisN,
-                                           self.cri.Nv, dtype=self.dtype)
+        self.Gf, GHGf = sl.gradient_filters(self.cri.dimN+3, self.cri.axisN,
+                                            self.cri.Nv, dtype=self.dtype)
 
         # Initialise byte-aligned arrays for pyfftw
         self.YU = sl.pyfftw_empty_aligned(self.Y.shape, dtype=self.dtype)
