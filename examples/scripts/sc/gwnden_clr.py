@@ -28,7 +28,7 @@ from sporco.admm import bpdn
 
 
 """
-Load a reference image and corrupt it with Gaussian white noise with $\sigma = 0.1$. (The call to :func:`numpy.random.seed` ensures that the pseudo-random noise is reproducible.)
+Load a reference image and corrupt it with Gaussian white noise with $\sigma = 0.1$. (The call to ``numpy.random.seed`` ensures that the pseudo-random noise is reproducible.)
 """
 
 img = util.ExampleImages().image('monarch.png', zoom=0.5, scaled=True,
