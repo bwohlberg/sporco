@@ -545,7 +545,7 @@ def notebook_object_to_rst(ntbk, rpth, cr=None):
     rsttxt = re.sub(r':([^:]+):``(.*?)``', r':\1:`\2`', rsttxt)
     # Insert a cross-reference target at top of file
     reflbl = '.. _examples_' + os.path.basename(rdir) + '_' + \
-             rb.replace('-', '_') + ':\n'
+             rb.replace('-', '_') + ':\n\n'
     rsttxt = reflbl + rsttxt
     # Write the converted rst to disk
     write_notebook_rst(rsttxt, rstres, rb, rdir)
