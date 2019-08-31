@@ -14,6 +14,9 @@ Version 0.1.12   (not yet released)
   regression in util module
 • Optional mpldatacursor support in sporco.plot is disabled in Matplotlib 3.x
   due to unresolved compatibility issues in mpldatacursor
+• Renamed linalg.GradientFilters to linalg.gradient_filters, util.extractblocks
+  to util.extract_blocks, util.averageblocks to util.average_blocks, and
+  util.combineblocks to util.combine_blocks
 
 
 
@@ -60,7 +63,7 @@ Version 0.1.9   (2018-07-15)
   added new module for online CDL
 • Simplified array shape requirements for option L1Weight in modules
   admm.cbpdn and admm.cbpdntv
-• Minimum required Numpy version is now 1.11
+• Minimum required NumPy version is now 1.11
 • Added sporco.cuda interface to CUDA extension package sporco-cuda
 • Completely restructured example scripts, which are now used to generate
   example Jupyter notebooks and corresponding docs pages
@@ -96,7 +99,7 @@ Version 0.1.7   (2017-10-15)
 • Fixed bug in object initialisation timing
 • Changed problematic image URLs in bin/sporco_get_images
 • Added installation instructions for Mac OS and Windows
-• Minimum required Numpy version is now 1.10
+• Minimum required NumPy version is now 1.10
 • Fixed bugs in admm.ccmod module
 • Test images required by usage examples are now included with the package
 • Modifications to util.ExampleImages interface (these changes will break
