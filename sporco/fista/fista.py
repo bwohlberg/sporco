@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2016-2018 by Cristina Garcia-Cardona <cgarciac@lanl.gov>
+# Copyright (C) 2016-2019 by Cristina Garcia-Cardona <cgarciac@lanl.gov>
 #                            Brendt Wohlberg <brendt@ieee.org>
 # All rights reserved. BSD 3-clause License.
 # This file is part of the SPORCO package. Details of the copyright
@@ -409,7 +409,7 @@ class FISTA(common.IterativeSolver):
 
 
     def combination_step(self):
-        """Build next update by a smart combination of previous updates.
+        """Build next update by a smart combination of previous updates
         (standard FISTA :cite:`beck-2009-fast`).
         """
 
@@ -739,12 +739,10 @@ class FISTA(common.IterativeSolver):
 
 
     def rsdl(self):
-        """Compute fixed point residual.
+        """Compute fixed point residual (see Sec. 4.3 of
+        :cite:`liu-2018-first`)."""
 
-        Overriding this method is required.
-        """
-
-        raise NotImplementedError()
+        return np.linalg.norm((self.X - self.Yprv).ravel())
 
 
 
@@ -931,7 +929,7 @@ class FISTADFT(FISTA):
         r"""Compute term :math:`\langle \nabla f(\mathbf{y}),
         \mathbf{x} - \mathbf{y} \rangle` (in frequency domain) that is
         part of the quadratic function :math:`Q_L` used for
-        backtracking.  Since this class computes the backtracking in
+        backtracking. Since this class computes the backtracking in
         the DFT, it is important to preserve the DFT scaling.
         """
 

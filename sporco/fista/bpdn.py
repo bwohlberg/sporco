@@ -189,13 +189,6 @@ class BPDN(fista.FISTA):
 
 
 
-    def rsdl(self):
-        """Compute fixed point residual."""
-
-        return np.linalg.norm((self.X - self.Yprv).ravel())
-
-
-
     def eval_objfn(self):
         """Compute components of objective function as well as total
         contribution to objective function.
