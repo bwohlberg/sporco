@@ -5,7 +5,7 @@
 sporco.cupy package
 ===================
 
-This subpackage provides GPU acceleration for selected SPORCO modules via copies of these modules that are patched to replace `NumPy <http://www.numpy.org/>`__ arrays and operations with the equivalent ones provided by `CuPy <https://cupy.chainer.org/>`__. The boolean value of attribute ``sporco.cupy.have_cupy`` indicates whether `CuPy <https://cupy.chainer.org/>`__ is installed and a GPU device is available. The modules within the ``sporco.cupy`` subpackage can still be used when ``sporco.cupy.have_cupy`` is ``False``, but they will not be GPU accelerated.
+This subpackage provides GPU acceleration for selected SPORCO modules via copies of these modules that are patched to replace `NumPy <http://www.numpy.org/>`__ arrays and operations with the equivalent ones provided by `CuPy <https://cupy.chainer.org/>`__ :cite:`okuta-2017-cupy`. The boolean value of attribute ``sporco.cupy.have_cupy`` indicates whether `CuPy <https://cupy.chainer.org/>`__ is installed and a GPU device is available. The modules within the ``sporco.cupy`` subpackage can still be used when ``sporco.cupy.have_cupy`` is ``False``, but they will not be GPU accelerated.
 
 Note that the ``sporco.cupy`` subpackage is not supported under versions of Python, such as Python 2.7.x, that do not have the :mod:`importlib.util` module.
 
@@ -74,7 +74,7 @@ To use the `CuPy <https://cupy.chainer.org/>`__ accelerated version of a SPORCO 
 #. before calling functions/methods within the ``sporco.cupy`` module, convert `NumPy <http://www.numpy.org/>`__ arrays to `CuPy <https://cupy.chainer.org/>`__ arrays using :func:`np2cp`.
 #. after calling functions/methods within the ``sporco.cupy`` module, convert `CuPy <https://cupy.chainer.org/>`_ arrays to `NumPy <http://www.numpy.org/>`__ arrays using :func:`cp2np`.
 
-Usage examples are available for :ref:`sporco.cupy.admm.tvl1 <examples_tv_tvl1den_clr_cupy>` and :ref:`sporco.cupy.dictlrn.onlinecdl <examples_cdl_onlinecdl_clr_cupy>`.
+Usage examples are available for :ref:`sporco.cupy.admm.tvl1 <examples_tv_tvl1den_clr_cupy>`, :ref:`sporco.cupy.dictlrn.onlinecdl <examples_cdl_onlinecdl_clr_cupy>` and :ref:`sporco.cupy.admm.cbpdn <examples_csc_gwnden_clr>`.
 
 
 Utility Functions
