@@ -305,7 +305,7 @@ class ConvCnstrMODMaskDcplBase(admm.ADMMTwoBlockCnstrnt):
 
 
     def uinit(self, ushape):
-        """Return initialiser for working variable U"""
+        """Return initialiser for working variable U."""
 
         if self.opt['Y0'] is None:
             return np.zeros(ushape, dtype=self.dtype)
