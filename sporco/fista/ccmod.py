@@ -440,7 +440,7 @@ class ConvCnstrMODMask(ConvCnstrMOD):
             Parameters
             ----------
             opt : dict or None, optional (default None)
-              ConvCnstrMODMasked algorithm options
+              ConvCnstrMODMask algorithm options
             """
 
             if opt is None:
@@ -476,7 +476,7 @@ class ConvCnstrMODMask(ConvCnstrMOD):
             *internal* data layouts).
         dsz : tuple
             Filter support size(s)
-        opt : :class:`ConvCnstrMODMasked.Options` object
+        opt : :class:`ConvCnstrMODMask.Options` object
             Algorithm options
         dimK : 0, 1, or None, optional (default None)
             Number of dimensions in input signal corresponding to multiple
