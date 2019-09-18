@@ -38,13 +38,13 @@ __all__ = ['ParConvBPDN']
 # Conv Rep Indexing and parameter values for multiprocessing
 mp_nproc = None  # Number of processes
 mp_ngrp = None  # Number of groups in the partition of M
-mp_Nv = None  # Tupel of the signal dimensions
+mp_Nv = None  # Tuple of the signal dimensions
 mp_axisN = None  # Axis that indexes the signal
 mp_C = None  # Number of channels in the signal
 mp_Cd = None  # Number of channels in the dictionary
 mp_axisC = None  # Axis that indexes the channels
 mp_axisM = None  # Axis that indexes the filters
-mp_Dshp = None  # shape of the dictionary D
+mp_Dshp = None  # Shape of the dictionary D
 mp_NonNegCoef = None  # Flag for non neg coef option
 mp_NoBndryCross = None  # Flag for no boundary crossing
 
@@ -58,10 +58,10 @@ mp_wl1 = None  # L1Weight matrix or scalar
 # Matrices used in optimization
 mp_S = None  # Training data array
 mp_Df = None  # Dictionary variable (in DFT domain) used by X step
-mp_X = None  # sparsity variable
-mp_Xnr = None  # sparsity variable
-mp_Y0 = None  # split variable DX=Y0
-mp_Y1 = None  # split variable X=Y1
+mp_X = None  # Sparsity variable
+mp_Xnr = None  # Sparsity variable
+mp_Y0 = None  # Split variable DX=Y0
+mp_Y1 = None  # Split variable X=Y1
 mp_U0 = None  # Lagrange multiplier of DX=Y0
 mp_U1 = None  # Lagrange multiplier of X=Y1
 mp_DX = None  # DX in spatial domain
