@@ -26,7 +26,7 @@ import numpy as np
 from sporco import util
 from sporco import plot
 import sporco.metric as sm
-import sporco.linalg as sl
+import sporco.prox as sp
 from sporco.admm import cbpdn
 
 
@@ -145,8 +145,8 @@ class ConvRepL1L1(cbpdn.ConvBPDNMaskDcpl):
     def ystep(self):
 
         AXU = self.AX + self.U
-        Y0 = sl.shrink1(self.block_sep0(AXU) - self.S, (1.0/self.rho)*self.W)
-        Y1 = sl.shrink1(self.block_sep1(AXU), (self.lmbda/self.rho)*self.wl1)
+        Y0 = sp.prox_l1(self.block_sep0(AXU) - self.S, (1.0/self.rho)*self.W)
+        Y1 = sp.prox_l1(self.block_sep1(AXU), (self.lmbda/self.rho)*self.wl1)
         self.Y = self.block_cat(Y0, Y1)
 
         super(cbpdn.ConvBPDNMaskDcpl, self).ystep()

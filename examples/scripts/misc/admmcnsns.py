@@ -18,7 +18,8 @@ from builtins import range
 import numpy as np
 
 from sporco.admm import admm
-import sporco.linalg as spl
+import sporco.linalg as sl
+import sporco.prox as sp
 from sporco import plot
 
 
@@ -97,7 +98,7 @@ class ConsensusTest(admm.ADMMConsensus):
         self.lu = []
         self.piv = []
         for i in range(self.Nb):
-            lu, piv = spl.lu_factor(self.A[i], self.rho)
+            lu, piv = sl.lu_factor(self.A[i], self.rho)
             self.lu.append(lu)
             self.piv.append(piv)
 
@@ -128,7 +129,7 @@ class ConsensusTest(admm.ADMMConsensus):
         component :math:`\mathbf{x}_i`.
         """
 
-        self.X[..., i] = spl.lu_solve_ATAI(self.A[i], self.rho,
+        self.X[..., i] = sl.lu_solve_ATAI(self.A[i], self.rho,
                     self.ATS[i] + self.rho*(self.Y - self.U[..., i]),
                     self.lu[i], self.piv[i])
 
@@ -139,7 +140,7 @@ class ConsensusTest(admm.ADMMConsensus):
         Proximal operator of :math:`(\lambda/\rho) \|\cdot\|_1`.
         """
 
-        return spl.shrink1(X, (self.lmbda/rho))
+        return sp.prox_l1(X, (self.lmbda/rho))
 
 
 """
