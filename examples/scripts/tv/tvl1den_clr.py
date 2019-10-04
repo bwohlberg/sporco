@@ -44,10 +44,11 @@ imgn = util.spnoise(img, 0.2)
 Set regularization parameter and options for ℓ1-TV denoising solver. The regularization parameter used here has been manually selected for good performance.
 """
 
-lmbda = 8e-1
-opt = tvl1.TVL1Denoise.Options({'Verbose': True, 'MaxMainIter': 200,
-                                'RelStopTol': 5e-3, 'gEvalY': False,
-                                'AutoRho': {'Enabled': True}})
+lmbda = 1.0
+opt = tvl1.TVL1Denoise.Options({'Verbose': True, 'MaxMainIter': 100,
+                                'RelStopTol': 8e-3, 'gEvalY': False,
+                                'rho': 10.0, 'AutoRho': {'Enabled': True,
+                                'Period': 5}})
 
 
 
@@ -55,7 +56,7 @@ opt = tvl1.TVL1Denoise.Options({'Verbose': True, 'MaxMainIter': 200,
 Create solver object and solve, returning the the denoised image ``imgr``.
 """
 
-b = tvl1.TVL1Denoise(imgn, lmbda, opt)
+b = tvl1.TVL1Denoise(imgn, lmbda, opt, caxis=2)
 imgr = b.solve()
 
 

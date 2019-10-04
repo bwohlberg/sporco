@@ -44,16 +44,17 @@ imgn = img + np.random.normal(0.0, 0.05, img.shape)
 Set regularization parameter and options for ℓ2-TV denoising solver. The regularization parameter used here has been manually selected for good performance.
 """
 
-lmbda = 0.04
-opt = tvl2.TVL2Denoise.Options({'Verbose': True, 'MaxMainIter': 200,
-                'gEvalY': False, 'AutoRho': {'Enabled': True}})
+lmbda = 0.06
+opt = tvl2.TVL2Denoise.Options({'Verbose': True, 'MaxMainIter': 100,
+                                'RelStopTol': 2e-2, 'gEvalY': False,
+                                'AutoRho': {'Enabled': True}})
 
 
 """
 Create solver object and solve, returning the the denoised image ``imgr``.
 """
 
-b = tvl2.TVL2Denoise(imgn, lmbda, opt)
+b = tvl2.TVL2Denoise(imgn, lmbda, opt, caxis=2)
 imgr = b.solve()
 
 
