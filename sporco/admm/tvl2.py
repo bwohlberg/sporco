@@ -8,8 +8,7 @@
 r"""Classes for ADMM algorithms for Total Variation (TV) optimisation
 with an :math:`\ell_2` data fidelity term"""
 
-from __future__ import division
-from __future__ import absolute_import
+from __future__ import division, absolute_import
 
 import copy
 import numpy as np

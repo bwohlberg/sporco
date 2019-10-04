@@ -7,8 +7,7 @@
 
 r"""Classes for ADMM algorithms for :math:`\ell_1` spline optimisation"""
 
-from __future__ import division
-from __future__ import absolute_import
+from __future__ import division, absolute_import
 
 import copy
 import numpy as np

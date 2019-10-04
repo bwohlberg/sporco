@@ -8,9 +8,7 @@
 """Classes for ADMM algorithms for sparse coding with a product of
 convolutional and standard dictionaries"""
 
-from __future__ import division
-from __future__ import absolute_import
-from __future__ import print_function
+from __future__ import division, absolute_import, print_function
 from builtins import range
 
 import copy

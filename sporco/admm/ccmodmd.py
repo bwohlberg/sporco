@@ -8,8 +8,7 @@
 """ADMM algorithms for the Convolutional Constrained MOD problem with
 Mask Decoupling"""
 
-from __future__ import division
-from __future__ import absolute_import
+from __future__ import division, absolute_import
 
 import copy
 import numpy as np

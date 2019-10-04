@@ -7,8 +7,7 @@
 
 """ADMM algorithms for the Convolutional Constrained MOD problem"""
 
-from __future__ import division
-from __future__ import absolute_import
+from __future__ import division, absolute_import
 from builtins import range
 
 import copy
