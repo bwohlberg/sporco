@@ -210,6 +210,9 @@ class OnlineConvBPDNDictLearn(common.IterativeSolver):
         """Compute sparse coding and dictionary update for training
         data `S`."""
 
+        # Remove singular dimensions
+        S = S.squeeze()
+
         # Use dimK specified in __init__ as default
         if dimK is None and self.dimK is not None:
             dimK = self.dimK
