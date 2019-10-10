@@ -298,7 +298,7 @@ class OnlineConvBPDNDictLearn(common.IterativeSolver):
         # the same behaviour in the dictionary update equation: the
         # simplest way to handle this is to just reshape so that the
         # channels also appear on the multiple image index.
-        if self.cri.Cd == 1 and self.cri.C > 1:
+        if self.cri.Cd == 1 and self.cri.C > 1 and self.cri.K == 1:
             Z = Z.reshape(self.cri.Nv + (1,) + (self.cri.Cx*self.cri.K,) +
                           (self.cri.M,))
         self.Z[:] = np.asarray(Z, dtype=self.dtype)
