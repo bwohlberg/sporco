@@ -9,7 +9,7 @@ Version 0.1.12   (not yet released)
 • Improved run time and memory usage of util.tikhonov_filter
 • Minimum required SciPy version is now 0.19.1
 • Renamed prox.prox_l1l2 to prox_sl1l2
-• New functions for Nearest Kronecker Product, Kronecker Product SVD, least
+• New functions for nearest Kronecker product, Kronecker product SVD, least
   absolute deviations linear regression, and least maximum error linear
   regression in util module
 • Optional mpldatacursor support in sporco.plot is disabled in Matplotlib 3.x

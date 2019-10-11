@@ -1,8 +1,8 @@
-* Brendt Wohlberg
+• Brendt Wohlberg
 
   - Primary author
 
-* Cristina Garcia-Cardona
+• Cristina Garcia-Cardona
 
   - FISTA sub-package
   - Online CDL module
@@ -10,12 +10,12 @@
   - MacOS installation instructions
   - Comments, suggestions, and bug reports
 
-* Erik Skau
+• Erik Skau
 
   - Parallel CBPDN module and example scripts
   - Utility functions extractblocks, averageblocks, and combineblocks
   - Comments, suggestions, and bug reports
 
-* Aric Hagberg
+• Aric Hagberg
 
   - Advice on python packaging, documentation, and related issues
