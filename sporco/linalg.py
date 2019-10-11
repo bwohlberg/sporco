@@ -10,6 +10,7 @@
 from __future__ import division
 from builtins import range
 
+import warnings
 import multiprocessing
 import numpy as np
 import scipy
@@ -1211,6 +1212,10 @@ def proj_l2ball(b, s, r, axes=None):
     Note that ``proj_l2ball(b, s, r)`` is equivalent to
     :func:`.prox.proj_l2` ``(b - s, r) + s``.
 
+    **NB**: This function is to be deprecated; please use
+    :func:`.prox.proj_l2` instead (see note above about interface
+    differences).
+
     Parameters
     ----------
     b : array_like
@@ -1228,6 +1233,12 @@ def proj_l2ball(b, s, r, axes=None):
       Projection of :math:`\mathbf{b}` into ball
     """
 
+    wstr = "Function sporco.linalg.proj_l2ball is deprecated; please " \
+           "use sporco.prox.proj_l2 (noting the interface difference) " \
+           "instead."
+    warnings.simplefilter('always', DeprecationWarning)
+    warnings.warn(wstr, DeprecationWarning, stacklevel=2)
+    warnings.simplefilter('default', DeprecationWarning)
     d = np.sqrt(np.sum((b - s)**2, axis=axes, keepdims=True))
     p = zdivide(b - s, d)
     return np.asarray((d <= r) * b + (d > r) * (s + r*p), b.dtype)
