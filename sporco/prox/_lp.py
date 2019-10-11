@@ -282,17 +282,25 @@ def prox_l2(v, alpha, axis=None):
 
 
 def proj_l2(v, gamma, axis=None):
-    r"""Compute the projection operator of the :math:`\ell_2` norm.
-
-    The projection operator of the uncentered :math:`\ell_2` norm,
+    r"""Compute the projection operator of the :math:`\ell_2` norm
 
     .. math::
-      \mathrm{argmin}_{\mathbf{x}} (1/2) \| \mathbf{x} - \mathbf{v} \|_2^2 \;
-      \text{ s.t. } \; \| \mathbf{x} - \mathbf{s} \|_2 \leq \gamma
+     \mathrm{proj}_{f, \gamma}(\mathbf{v}) = \mathrm{argmin}_{\mathbf{x}}
+     (1/2) \| \mathbf{x} - \mathbf{v} \|_2^2 \;
+     \text{ s.t. } \; \| \mathbf{x} \|_2 \leq \gamma \;,
+
+    where :math:`f(\mathbf{x}) = \|\mathbf{x}\|_2`.
+
+    Note that the projection operator of the :math:`\ell_2` norm
+    centered at :math:`\mathbf{s}`,
+
+    .. math::
+      \mathrm{argmin}_{\mathbf{x}} (1/2) \| \mathbf{x} - \mathbf{v}
+      \|_2^2 \; \text{ s.t. } \; \| \mathbf{x} - \mathbf{s} \|_2 \leq
+      \gamma \;,
 
     can be computed as :math:`\mathbf{s} + \mathrm{proj}_{f,\gamma}
-    (\mathbf{v} - \mathbf{s})` where :math:`f(\mathbf{x}) =
-    \| \mathbf{x} \|_2`.
+    (\mathbf{v} - \mathbf{s})`.
 
 
     Parameters
