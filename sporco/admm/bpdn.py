@@ -1128,7 +1128,8 @@ class MinL1InL2Ball(admm.ADMMTwoBlockCnstrnt):
                         dtype=self.dtype)
         if self.opt['NonNegCoef']:
             Y0[Y0 < 0.0] = 0.0
-        Y1 = sl.proj_l2ball(self.block_sep1(AXU), self.S, self.epsilon, axes=0)
+        Y1 = self.S + sp.proj_l2(self.block_sep1(AXU) - self.S, self.epsilon,
+                                 axis=0)
         self.Y = self.block_cat(Y0, Y1)
 
 
@@ -1159,9 +1160,9 @@ class MinL1InL2Ball(admm.ADMMTwoBlockCnstrnt):
         """
 
         obj = np.linalg.norm((self.wl1 * self.obfn_g0var()).ravel(), 1)
-        cns = np.linalg.norm(sl.proj_l2ball(
-            self.obfn_g1var(), self.S, self.epsilon, axes=0) -
-            self.obfn_g1var())
+        cns = np.linalg.norm(self.S + sp.proj_l2(self.obfn_g1var() - self.S,
+                                                 self.epsilon, axis=0) -
+                             self.obfn_g1var())
         return (obj, cns)
 
 
