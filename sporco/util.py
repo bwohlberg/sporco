@@ -439,26 +439,6 @@ def combine_blocks(blks, imgsz, stpsz=None, fn=np.median):
 
 
 
-def rgb2gray(rgb):
-    """Convert an RGB image (or images) to grayscale.
-
-    Parameters
-    ----------
-    rgb : ndarray
-      RGB image as Nr x Nc x 3 or Nr x Nc x 3 x K array
-
-    Returns
-    -------
-    gry : ndarray
-      Grayscale image as Nr x Nc or Nr x Nc x K array
-    """
-
-    w = sl.atleast_nd(rgb.ndim, np.array([0.299, 0.587, 0.144],
-                                         dtype=rgb.dtype, ndmin=3))
-    return np.sum(w * rgb, axis=2)
-
-
-
 def complex_randn(*args):
     """Return a complex array of samples drawn from a standard normal
     distribution.
@@ -528,6 +508,26 @@ def rndmask(shp, frc, dtype=None):
     msk[np.abs(msk) > frc] = 1.0
     msk[np.abs(msk) < frc] = 0.0
     return msk
+
+
+
+def rgb2gray(rgb):
+    """Convert an RGB image (or images) to grayscale.
+
+    Parameters
+    ----------
+    rgb : ndarray
+      RGB image as Nr x Nc x 3 or Nr x Nc x 3 x K array
+
+    Returns
+    -------
+    gry : ndarray
+      Grayscale image as Nr x Nc or Nr x Nc x K array
+    """
+
+    w = np.array([0.299, 0.587, 0.144], dtype=rgb.dtype)[np.newaxis,
+                                                         np.newaxis]
+    return np.sum(w * rgb, axis=2)
 
 
 
