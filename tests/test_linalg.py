@@ -3,6 +3,7 @@ from builtins import object
 
 import numpy as np
 from scipy.ndimage import convolve
+import pytest
 from sporco import linalg
 from sporco import util
 
@@ -286,6 +287,7 @@ class TestSet01(object):
 
 
 
+    @pytest.mark.skip(reason="Function linalg.proj_l2ball to be deprecated")
     def test_17(self):
         b = np.array([0.0, 0.0, 2.0])
         s = np.array([0.0, 0.0, 0.0])
