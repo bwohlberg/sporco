@@ -73,7 +73,8 @@ class TestSet01(object):
         lmbda = 1e-1
         mu = 1e-2
         try:
-            opt = pdcsc.ConvProdDictL1L1Grd.Options({'LinSolveCheck': True})
+            opt = pdcsc.ConvProdDictL1L1Grd.Options(
+                {'LinSolveCheck': True, 'MaxMainIter': 200, 'rho': 5e-1})
             b = pdcsc.ConvProdDictL1L1Grd(D, B, s, lmbda, mu, opt=opt, dimK=0)
             b.solve()
         except Exception as e:
@@ -96,7 +97,7 @@ class TestSet01(object):
         mu = 1e-2
         try:
             opt = pdcsc.ConvProdDictL1L1GrdJoint.Options(
-                {'LinSolveCheck': True})
+                {'LinSolveCheck': True, 'MaxMainIter': 200})
             b = pdcsc.ConvProdDictL1L1GrdJoint(D, B, s, lmbda, mu, opt=opt,
                                                dimK=0)
             b.solve()

@@ -6,7 +6,9 @@ SPORCO Release Notes
 Version 0.1.12   (not yet released)
 -----------------------------------
 
-• Improved run time and memory usage of util.tikhonov_filter
+• Improved run time and memory usage of tikhonov_filter function
+• Fixed bug in functional value calculation in class
+  admm.pdcsc.ConvProdDictL1L1GrdJoint
 • Minimum required SciPy version is now 0.19.1
 • Renamed prox.prox_l1l2 to prox_sl1l2
 • New functions for nearest Kronecker product, Kronecker product SVD, least

@@ -9,7 +9,6 @@
 convolutional and standard dictionaries"""
 
 from __future__ import division, absolute_import, print_function
-from builtins import range
 
 import copy
 import numpy as np
@@ -693,15 +692,9 @@ class ConvProdDictL1L1GrdJoint(ConvProdDictL1L1Grd):
 
 
 
-
-    def obfn_reg(self):
-        r"""Compute regularisation terms and contribution to objective
-        function. Regularisation terms are :math:`\| Y \|_1` and
-        :math:`\| Y \|_{2,1}`.
+    def obfn_g1(self, Y1):
+        r"""Compute :math:`g_1(\mathbf{y_1})` component of ADMM objective
+        function.
         """
 
-        rl21 = np.sum(self.wl21 * np.sqrt(np.sum(self.obfn_gvar()**2,
-                                                 axis=self.cri.axisC)))
-        rgr = sl.rfl2norm2(np.sqrt(self.GHGf*np.conj(fvf)*fvf), self.cri.Nv,
-                           self.cri.axisN)/2.0
-        return (self.lmbda*rl21 + self.mu*rgr, rl21, rgr)
+        return np.sum(self.wl21 * np.sqrt(np.sum(Y1**2, axis=self.cri.axisC)))
