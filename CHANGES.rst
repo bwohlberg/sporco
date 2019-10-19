@@ -11,14 +11,15 @@ Version 0.1.12   (not yet released)
   admm.pdcsc.ConvProdDictL1L1GrdJoint
 • Minimum required SciPy version is now 0.19.1
 • Renamed prox.prox_l1l2 to prox_sl1l2
-• New functions for nearest Kronecker product, Kronecker product SVD, least
-  absolute deviations linear regression, and least maximum error linear
-  regression in util module
-• Optional mpldatacursor support in sporco.plot is disabled in Matplotlib 3.x
-  due to unresolved compatibility issues in mpldatacursor
+• New functions for nearest Kronecker product, Kronecker product SVD in linalg
+  module, and new functions for least absolute deviations linear regression,
+  and least maximum error linear regression in interp module
 • Renamed linalg.GradientFilters to linalg.gradient_filters, util.extractblocks
   to util.extract_blocks, util.averageblocks to util.average_blocks, and
   util.combineblocks to util.combine_blocks
+• Moved util.pca to linalg.pca
+• Optional mpldatacursor support in sporco.plot is disabled in Matplotlib 3.x
+  due to unresolved compatibility issues in mpldatacursor
 
 
 

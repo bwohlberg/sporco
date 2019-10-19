@@ -6,13 +6,21 @@ from scipy.ndimage import convolve
 import pytest
 from sporco import linalg
 from sporco import util
+from sporco import metric
+
+
+def kronsum(S, B, C):
+
+    A = np.zeros((B.shape[0] * C.shape[0], B.shape[1] * C.shape[1]))
+    for i in range(B.shape[2]):
+        A += S[i] * np.kron(B[..., i], C[..., i])
+    return A
 
 
 class TestSet01(object):
 
     def setup_method(self, method):
         np.random.seed(12345)
-
 
 
     def test_01(self):
@@ -30,7 +38,6 @@ class TestSet01(object):
                         D.T.dot(S) + rho*Z) < 1e-11)
 
 
-
     def test_02(self):
         rho = 1e-1
         N = 128
@@ -44,7 +51,6 @@ class TestSet01(object):
         Xslv = linalg.lu_solve_ATAI(D, rho, D.T.dot(S) + rho*Z, lu, piv)
         assert(linalg.rrs(D.T.dot(D).dot(Xslv) + rho*Xslv,
                         D.T.dot(S) + rho*Z) < 1e-14)
-
 
 
     def test_03(self):
@@ -62,7 +68,6 @@ class TestSet01(object):
                         S.dot(X.T) + rho*Z) < 1e-11)
 
 
-
     def test_04(self):
         rho = 1e-1
         N = 128
@@ -76,7 +81,6 @@ class TestSet01(object):
         Dslv = linalg.lu_solve_AATI(X, rho, S.dot(X.T) + rho*Z, lu, piv)
         assert(linalg.rrs(Dslv.dot(X).dot(X.T) + rho*Dslv,
                         S.dot(X.T) + rho*Z) < 1e-11)
-
 
 
     def test_05(self):
@@ -94,7 +98,6 @@ class TestSet01(object):
                         D.T.dot(S) + rho*Z) < 1e-11)
 
 
-
     def test_06(self):
         rho = 1e-1
         N = 128
@@ -108,7 +111,6 @@ class TestSet01(object):
         Xslv = linalg.cho_solve_ATAI(D, rho, D.T.dot(S) + rho*Z, c, lwr)
         assert(linalg.rrs(D.T.dot(D).dot(Xslv) + rho*Xslv,
                         D.T.dot(S) + rho*Z) < 1e-14)
-
 
 
     def test_07(self):
@@ -126,7 +128,6 @@ class TestSet01(object):
                         S.dot(X.T) + rho*Z) < 1e-11)
 
 
-
     def test_08(self):
         rho = 1e-1
         N = 128
@@ -142,7 +143,6 @@ class TestSet01(object):
                         S.dot(X.T) + rho*Z) < 1e-11)
 
 
-
     def test_09(self):
         rho = 1e-1
         N = 32
@@ -156,7 +156,6 @@ class TestSet01(object):
         Xslv = linalg.solvedbi_sm(D, rho, D.conj()*S + rho*Z)
         assert(linalg.rrs(D.conj()*np.sum(D*Xslv, axis=4, keepdims=True) +
                         rho*Xslv, D.conj()*S + rho*Z) < 1e-11)
-
 
 
     def test_10(self):
@@ -175,7 +174,6 @@ class TestSet01(object):
                         d*Xslv, D.conj()*S + d*Z) < 1e-11)
 
 
-
     def test_11(self):
         rho = 1e-1
         N = 32
@@ -191,7 +189,6 @@ class TestSet01(object):
         Dslv = linalg.solvemdbi_ism(X, rho, XHop(S) + rho*Z, 4, 3)
 
         assert linalg.rrs(XHop(Xop(Dslv)) + rho*Dslv, XHop(S) + rho*Z) < 1e-11
-
 
 
     def test_12(self):
@@ -212,7 +209,6 @@ class TestSet01(object):
         assert linalg.rrs(XHop(Xop(Dslv)) + rho*Dslv, XHop(S) + rho*Z) < 1e-11
 
 
-
     def test_13(self):
         rho = 1e-1
         N = 32
@@ -228,7 +224,6 @@ class TestSet01(object):
         Dslv = linalg.solvemdbi_rsm(X, rho, XHop(S) + rho*Z, 3)
 
         assert linalg.rrs(XHop(Xop(Dslv)) + rho*Dslv, XHop(S) + rho*Z) < 1e-11
-
 
 
     def test_14(self):
@@ -249,7 +244,6 @@ class TestSet01(object):
         assert linalg.rrs(XHop(Xop(Dslv)) + rho*Dslv, XHop(S) + rho*Z) < 1e-11
 
 
-
     def test_15(self):
         rho = 1e-1
         N = 32
@@ -265,7 +259,6 @@ class TestSet01(object):
         Dslv, cgit = linalg.solvemdbi_cg(X, rho, XHop(S)+rho*Z, 4, 3, tol=1e-6)
 
         assert linalg.rrs(XHop(Xop(Dslv)) + rho*Dslv, XHop(S) + rho*Z) <= 1e-6
-
 
 
     def test_16(self):
@@ -286,7 +279,6 @@ class TestSet01(object):
         assert linalg.rrs(XHop(Xop(Dslv)) + rho*Dslv, XHop(S) + rho*Z) <= 1e-6
 
 
-
     @pytest.mark.skip(reason="Function linalg.proj_l2ball to be deprecated")
     def test_17(self):
         b = np.array([0.0, 0.0, 2.0])
@@ -294,7 +286,6 @@ class TestSet01(object):
         r = 1.0
         p = linalg.proj_l2ball(b, s, r)
         assert linalg.rrs(p, np.array([0.0, 0.0, 1.0])) < 1e-14
-
 
 
     def test_18(self):
@@ -305,14 +296,12 @@ class TestSet01(object):
         assert C[3, 3] == 3
 
 
-
     def test_19(self):
         x = np.random.randn(16, 8)
         xf = linalg.fftn(x, axes=(0,))
         n1 = np.linalg.norm(x)**2
         n2 = linalg.fl2norm2(xf, axis=(0,))
         assert np.abs(n1 - n2) < 1e-12
-
 
 
     def test_20(self):
@@ -323,14 +312,12 @@ class TestSet01(object):
         assert np.abs(n1 - n2) < 1e-12
 
 
-
     def test_21(self):
         x = np.random.randn(16, 8)
         y = np.random.randn(16, 8)
         ip1 = np.sum(x * y, axis=0, keepdims=True)
         ip2 = linalg.inner(x, y, axis=0)
         assert np.linalg.norm(ip1 - ip2) < 1e-13
-
 
 
     def test_22(self):
@@ -341,14 +328,12 @@ class TestSet01(object):
         assert np.linalg.norm(ip1 - ip2) < 1e-13
 
 
-
     def test_23(self):
         a = np.random.randn(7, 8)
         b = np.random.randn(8, 12)
         c1 = a.dot(b)
         c2 = linalg.dot(a, b)
         assert np.linalg.norm(c1 - c2) < 1e-14
-
 
 
     def test_24(self):
@@ -362,7 +347,6 @@ class TestSet01(object):
         assert np.linalg.norm(c1 - c2) < 2e-14
 
 
-
     def test_25(self):
         a = np.random.randn(7, 8)
         b = np.random.randn(3, 8, 4, 12)
@@ -374,13 +358,11 @@ class TestSet01(object):
         assert np.linalg.norm(c1 - c2) < 2e-14
 
 
-
     def test_26(self):
         x = np.array([[0, 1], [2, 3]])
         y = np.array([[4, 5], [6, 7]])
         xy = np.array([[38, 36], [30, 28]])
         assert np.allclose(linalg.fftconv(x, y), xy)
-
 
 
     def test_27(self):
@@ -390,3 +372,37 @@ class TestSet01(object):
         xy0 = convolve(y, x)
         xy1 = linalg.fftconv(x, y, axes=(0,), origin=(2,))
         assert np.allclose(xy0, xy1)
+
+
+    def test_28(self):
+        U = np.random.randn(5, 10)
+        B, S, C = linalg.pca(U, centre=False)
+        assert np.linalg.norm(B.dot(B.T) - np.eye(U.shape[0])) < 1e-10
+
+
+    def test_29(self):
+        U = np.random.randn(5, 10)
+        B, S, C = linalg.pca(U, centre=True)
+        assert np.linalg.norm(B.dot(B.T) - np.eye(U.shape[0])) < 1e-10
+
+
+    def test_30(self):
+        B0 = np.arange(1, 7).reshape(3, 2)
+        C0 = np.arange(1, 5).reshape(2, 2)
+        A0 = np.kron(B0, C0)
+        B, C = linalg.nkp(A0, B0.shape, C0.shape)
+        assert(metric.mse(A0, np.kron(B, C)) < 1e-12)
+        r = B0[0, 0] / B[0, 0]
+        B *= r
+        C /= r
+        assert(metric.mse(B0, B) < 1e-12)
+        assert(metric.mse(C0, C) < 1e-12)
+
+
+    def test_31(self):
+        B0 = np.random.randn(3, 5, 2)
+        C0 = np.random.randn(4, 6, 2)
+        A0 = kronsum(np.ones((2,)), B0, C0)
+        S, B, C = linalg.kpsvd(A0, B0.shape[0:2], C0.shape[0:2])
+        A = kronsum(S, B[..., 0:2], C[..., 0:2])
+        assert(metric.mse(A0, A) < 1e-12)

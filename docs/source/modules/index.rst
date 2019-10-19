@@ -5,10 +5,10 @@ API Reference
 
 .. autosummary::
 
-   sporco.misc
    sporco.util
    sporco.mpiutil
    sporco.linalg
+   sporco.interp
    sporco.prox
    sporco.metric
    sporco.plot
@@ -61,10 +61,10 @@ API Reference
 .. toctree::
    :hidden:
 
-   sporco.misc
    sporco.util
    sporco.mpiutil
    sporco.linalg
+   sporco.interp
    sporco.prox
    sporco.metric
    sporco.plot

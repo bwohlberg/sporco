@@ -12,7 +12,7 @@ from __future__ import division
 import numpy as np
 
 from ._lp import prox_l1, prox_l2, norm_l2
-from sporco.misc import renamed_function
+from sporco._util import renamed_function
 
 
 __author__ = """Brendt Wohlberg <brendt@ieee.org>"""

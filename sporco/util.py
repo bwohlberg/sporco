@@ -13,10 +13,9 @@ from builtins import range, object
 
 from timeit import default_timer as timer
 import os
-import warnings
+import platform
 import imghdr
 import io
-import platform
 import multiprocessing as mp
 import itertools
 from future.moves.itertools import zip_longest
@@ -31,10 +30,9 @@ else:
 import numpy as np
 import imageio
 import scipy.ndimage.interpolation as sni
-import scipy.optimize as sco
 
+from sporco._util import renamed_function
 import sporco.linalg as sl
-from sporco.misc import renamed_function
 
 
 __author__ = """Brendt Wohlberg <brendt@ieee.org>"""
@@ -530,218 +528,6 @@ def rgb2gray(rgb):
     return np.sum(w * rgb, axis=2)
 
 
-
-def pca(U, centre=False):
-    """Compute the PCA basis for columns of input array `U`.
-
-    Parameters
-    ----------
-    U : array_like
-      2D data array with rows corresponding to different variables and
-      columns corresponding to different observations
-    center : bool, optional (default False)
-      Flag indicating whether to centre data
-
-    Returns
-    -------
-    B : ndarray
-      A 2D array representing the PCA basis; each column is a PCA
-      component. `B.T` is the analysis transform into the PCA
-      representation, and `B` is the corresponding synthesis transform
-    S : ndarray
-      The eigenvalues of the PCA components
-    C : ndarray or None
-      None if centering is disabled, otherwise the mean of the data
-      matrix subtracted in performing the centering
-    """
-
-    if centre:
-        C = np.mean(U, axis=1, keepdims=True)
-        U = U - C
-    else:
-        C = None
-
-    B, S, _ = np.linalg.svd(U, full_matrices=False, compute_uv=True)
-    return B, S**2, C
-
-
-
-def nkp(A, bshape, cshape):
-    r"""Solve the Nearest Kronecker Product problem.
-
-    Given matrix :math:`A`, find matrices :math:`B` and :math:`C`, of the
-    specified sizes, such that :math:`B` and :math:`C` solve the problem
-    :cite:`loan-2000-ubiquitous`
-
-    .. math::
-      \mathrm{argmin}_{B, C} \| A - B \otimes C \| \;.
-
-    Parameters
-    ----------
-    A : array_like
-      2D input array
-    bshape : tuple (Mb, Nb)
-      The desired shape of returned array :math:`B`
-    cshape : tuple (Mc, Nc)
-      The desired shape of returned array :math:`C`
-
-    Returns
-    -------
-    B : ndarray
-      2D output array :math:`B`
-    C : ndarray
-      2D output array :math:`C`
-    """
-
-    ashape = A.shape
-    if ashape[0] != bshape[0] * cshape[0] or \
-       ashape[1] != bshape[1] * cshape[1]:
-        raise ValueError("Shape of A is not compatible with bshape and cshape")
-
-    atshape = (bshape[0] * bshape[1], cshape[0] * cshape[1])
-    Atilde = subsample_array(A, cshape).transpose().reshape(atshape)
-    U, S, Vt = np.linalg.svd(Atilde, full_matrices=False)
-    B = np.sqrt(S[0]) * U[:, [0]].reshape(bshape, order='F')
-    C = np.sqrt(S[0]) * Vt[[0], :].reshape(cshape, order='F')
-    return B, C
-
-
-
-def kpsvd(A, bshape, cshape):
-    r"""Compute the Kronecker Product SVD.
-
-    Given matrix :math:`A`, find matrices :math:`B_i` and :math:`C_i`,
-    of the specified sizes, such that
-
-    .. math::
-      A = \sum_i \sigma_i B_i \otimes C_i
-
-    and :math:`\sum_i^n \sigma_i B_i \otimes C_i` is the best :math:`n`
-    term approximation to :math:`A` :cite:`loan-2000-ubiquitous`.
-
-    Parameters
-    ----------
-    A : array_like
-      2D input array
-    bshape : tuple (Mb, Nb)
-      The desired shape of arrays :math:`B_i`
-    cshape : tuple (Mc, Nc)
-      The desired shape of arrays :math:`C_i`
-
-    Returns
-    -------
-    S : ndarray
-      1D array of :math:`\sigma_i` values
-    B : ndarray
-      3D array of :math:`B_i` matrices with index :math:`i` on the last
-      axis
-    C : ndarray
-      3D array of :math:`C_i` matrices with index :math:`i` on the last
-      axis
-    """
-
-    ashape = A.shape
-    if ashape[0] != bshape[0] * cshape[0] or \
-       ashape[1] != bshape[1] * cshape[1]:
-        raise ValueError("Shape of A is not compatible with bshape and cshape")
-
-    atshape = (bshape[0] * bshape[1], cshape[0] * cshape[1])
-    Atilde = subsample_array(A, cshape).transpose().reshape(atshape)
-    U, S, Vt = np.linalg.svd(Atilde, full_matrices=False)
-    B = U.reshape(bshape + (U.shape[1],), order='F')
-    C = Vt.T.reshape(cshape + (Vt.shape[0],), order='F')
-    return S, B, C
-
-
-
-def lstabsdev(A, b):
-    r"""Least absolute deviations (LAD) linear regression.
-
-    Solve the linear regression problem
-
-    .. math::
-      \mathrm{argmin}_\mathbf{x} \; \left\| A \mathbf{x} - \mathbf{b}
-      \right\|_1 \;\;.
-
-    The interface is similar to that of :func:`numpy.linalg.lstsq` in
-    that `np.linalg.lstsq(A, b)` solves the same linear regression
-    problem, but with a least squares rather than a least absolute
-    deviations objective. Unlike :func:`numpy.linalg.lstsq`, `b` is
-    required to be a 1-d array. The solution is obtained via `mapping to
-    a linear program <https://stats.stackexchange.com/a/12564>`__.
-
-    Parameters
-    ----------
-    A : (M, N) array_like
-      Regression coefficient matrix.
-    b : (M,) array_like
-      Regression ordinate / dependent variable
-
-    Returns
-    -------
-    x : (N,) ndarray
-      Least absolute deviations solution
-    """
-
-    M, N = A.shape
-    c = np.zeros((M + N,))
-    c[0:M] = 1.0
-    I = np.identity(M)
-    one = np.ones((M, 1))
-    A_ub = np.hstack((np.vstack((-I, -I)), np.vstack((-A, A))))
-    b_ub = np.hstack((-b, b))
-    with warnings.catch_warnings():
-        warnings.filterwarnings("ignore", category=sco.OptimizeWarning)
-        res = sco.linprog(c, A_ub, b_ub)
-    if res.success is False:
-        raise ValueError('scipy.optimize.linprog failed with status %d' %
-                         res.status)
-    return res.x[M:]
-
-
-
-def lstmaxdev(A, b):
-    r"""Least maximum deviation (least maximum error) linear regression.
-
-    Solve the linear regression problem
-
-    .. math::
-      \mathrm{argmin}_\mathbf{x} \; \left\| A \mathbf{x} - \mathbf{b}
-      \right\|_{\infty} \;\;.
-
-    The interface is similar to that of :func:`numpy.linalg.lstsq` in
-    that `np.linalg.lstsq(A, b)` solves the same linear regression
-    problem, but with a least squares rather than a least maximum
-    error objective. Unlike :func:`numpy.linalg.lstsq`, `b` is required
-    to be a 1-d array. The solution is obtained via `mapping to a linear
-    program <https://stats.stackexchange.com/a/12564>`__.
-
-    Parameters
-    ----------
-    A : (M, N) array_like
-      Regression coefficient matrix.
-    b : (M,) array_like
-      Regression ordinate / dependent variable
-
-    Returns
-    -------
-    x : (N,) ndarray
-      Least maximum deviation solution
-    """
-
-    M, N = A.shape
-    c = np.zeros((N + 1,))
-    c[0] = 1.0
-    one = np.ones((M, 1))
-    A_ub = np.hstack((np.vstack((-one, -one)), np.vstack((-A, A))))
-    b_ub = np.hstack((-b, b))
-    with warnings.catch_warnings():
-        warnings.filterwarnings("ignore", category=sco.OptimizeWarning)
-        res = sco.linprog(c, A_ub, b_ub)
-    if res.success is False:
-        raise ValueError('scipy.optimize.linprog failed with status %d' %
-                         res.status)
-    return res.x[1:]
 
 
 

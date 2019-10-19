@@ -25,8 +25,7 @@ except ImportError:
 else:
     have_numexpr = True
 
-from sporco.misc import renamed_function
-
+from sporco._util import renamed_function
 
 
 __author__ = """Brendt Wohlberg <brendt@ieee.org>"""
@@ -41,7 +40,7 @@ __all__ = ['complex_dtype', 'pyfftw_byte_aligned', 'pyfftw_empty_aligned',
            'lu_solve_AATI', 'cho_factor', 'cho_solve_ATAI', 'cho_solve_AATI',
            'zpad', 'Gax', 'GTax', 'gradient_filters', 'zdivide', 'proj_l2ball',
            'promote16', 'atleast_nd', 'split', 'block_circulant', 'fl2norm2',
-           'rfl2norm2', 'rrs']
+           'rfl2norm2', 'rrs', 'pca']
 
 
 
@@ -1473,3 +1472,152 @@ def rrs(ax, b):
         return 1.0
     else:
         return np.linalg.norm((ax - b).ravel()) / nrm
+
+
+
+@renamed_function(depname='pca', depmod='sporco.util')
+def pca(U, centre=False):
+    """Compute the PCA basis for columns of input array `U`.
+
+    Parameters
+    ----------
+    U : array_like
+      2D data array with rows corresponding to different variables and
+      columns corresponding to different observations
+    center : bool, optional (default False)
+      Flag indicating whether to centre data
+
+    Returns
+    -------
+    B : ndarray
+      A 2D array representing the PCA basis; each column is a PCA
+      component. `B.T` is the analysis transform into the PCA
+      representation, and `B` is the corresponding synthesis transform
+    S : ndarray
+      The eigenvalues of the PCA components
+    C : ndarray or None
+      None if centering is disabled, otherwise the mean of the data
+      matrix subtracted in performing the centering
+    """
+
+    if centre:
+        C = np.mean(U, axis=1, keepdims=True)
+        U = U - C
+    else:
+        C = None
+
+    B, S, _ = np.linalg.svd(U, full_matrices=False, compute_uv=True)
+    return B, S**2, C
+
+
+
+def _subsample_array(x, step, pad=False, mode='reflect'):
+    """A copy of util.subsample_array placed in this module to avoid circular
+    imports. This is a temporary solution.
+    """
+
+    if np.any(np.greater_equal(step, x.shape)):
+        raise ValueError('Step size must be less than array size on each axis')
+    sbsz, dvmd = np.divmod(x.shape, step)
+    if pad and np.any(dvmd):
+        sbsz += np.clip(dvmd, 0, 1)
+        psz = np.subtract(np.multiply(sbsz, step), x.shape)
+        pdt = [(0, p) for p in psz]
+        x = np.pad(x, pdt, mode=mode)
+    outsz = step + tuple(sbsz)
+    outstrd = x.strides + tuple(np.multiply(step, x.strides))
+    return np.lib.stride_tricks.as_strided(x, outsz, outstrd)
+
+
+
+
+@renamed_function(depname='nkp', depmod='sporco.util')
+def nkp(A, bshape, cshape):
+    r"""Solve the Nearest Kronecker Product problem.
+
+    Given matrix :math:`A`, find matrices :math:`B` and :math:`C`, of the
+    specified sizes, such that :math:`B` and :math:`C` solve the problem
+    :cite:`loan-2000-ubiquitous`
+
+    .. math::
+      \mathrm{argmin}_{B, C} \| A - B \otimes C \| \;.
+
+    Parameters
+    ----------
+    A : array_like
+      2D input array
+    bshape : tuple (Mb, Nb)
+      The desired shape of returned array :math:`B`
+    cshape : tuple (Mc, Nc)
+      The desired shape of returned array :math:`C`
+
+    Returns
+    -------
+    B : ndarray
+      2D output array :math:`B`
+    C : ndarray
+      2D output array :math:`C`
+    """
+
+    ashape = A.shape
+    if ashape[0] != bshape[0] * cshape[0] or \
+       ashape[1] != bshape[1] * cshape[1]:
+        raise ValueError("Shape of A is not compatible with bshape and cshape")
+
+    atshape = (bshape[0] * bshape[1], cshape[0] * cshape[1])
+    Atilde = _subsample_array(A, cshape).transpose().reshape(atshape)
+    U, S, Vt = np.linalg.svd(Atilde, full_matrices=False)
+    B = np.sqrt(S[0]) * U[:, [0]].reshape(bshape, order='F')
+    C = np.sqrt(S[0]) * Vt[[0], :].reshape(cshape, order='F')
+    return B, C
+
+
+
+@renamed_function(depname='kpsvd', depmod='sporco.util')
+def kpsvd(A, bshape, cshape):
+    r"""Compute the Kronecker Product SVD.
+
+    Given matrix :math:`A`, find matrices :math:`B_i` and :math:`C_i`,
+    of the specified sizes, such that
+
+    .. math::
+      A = \sum_i \sigma_i B_i \otimes C_i
+
+    and :math:`\sum_i^n \sigma_i B_i \otimes C_i` is the best :math:`n`
+    term approximation to :math:`A` :cite:`loan-2000-ubiquitous`.
+
+    Parameters
+    ----------
+    A : array_like
+      2D input array
+    bshape : tuple (Mb, Nb)
+      The desired shape of arrays :math:`B_i`
+    cshape : tuple (Mc, Nc)
+      The desired shape of arrays :math:`C_i`
+
+    Returns
+    -------
+    S : ndarray
+      1D array of :math:`\sigma_i` values
+    B : ndarray
+      3D array of :math:`B_i` matrices with index :math:`i` on the last
+      axis
+    C : ndarray
+      3D array of :math:`C_i` matrices with index :math:`i` on the last
+      axis
+    """
+
+    ashape = A.shape
+    if ashape[0] != bshape[0] * cshape[0] or \
+       ashape[1] != bshape[1] * cshape[1]:
+        raise ValueError("Shape of A is not compatible with bshape and cshape")
+
+    atshape = (bshape[0] * bshape[1], cshape[0] * cshape[1])
+    Atilde = _subsample_array(A, cshape).transpose().reshape(atshape)
+    U, S, Vt = np.linalg.svd(Atilde, full_matrices=False)
+    B = U.reshape(bshape + (U.shape[1],), order='F')
+    C = Vt.T.reshape(cshape + (Vt.shape[0],), order='F')
+    return S, B, C
+
+
+
