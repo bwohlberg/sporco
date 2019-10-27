@@ -93,6 +93,7 @@ class OnlineConvBPDNDictLearn(common.IterativeSolver):
 
             dictlrn.DictLearn.Options.__init__(self, {
                 'CBPDN': cbpdn.ConvBPDN.Options({
+                    'MaxMainIter': 100,
                     'AutoRho': {'Period': 10, 'AutoScaling': False,
                                 'RsdlRatio': 10.0, 'Scaling': 2.0,
                                 'RsdlTarget': 1.0}})
@@ -298,6 +299,8 @@ class OnlineConvBPDNDictLearn(common.IterativeSolver):
         if self.cri.Cd == 1 and self.cri.C > 1:
             Z = Z.reshape(self.cri.Nv + (1,) + (self.cri.Cx*self.cri.K,) +
                           (self.cri.M,))
+            if Z.shape != self.Z.shape:
+                self.Z = sl.pyfftw_empty_aligned(Z.shape, self.dtype)
         self.Z[:] = np.asarray(Z, dtype=self.dtype)
         self.Zf = sl.rfftn(self.Z, self.cri.Nv, self.cri.axisN)
 

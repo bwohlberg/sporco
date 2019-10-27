@@ -87,6 +87,24 @@ class TestSet01(object):
 
 
     def test_06(self):
+        N = 16
+        Nc = 3
+        Nd = 5
+        M = 4
+        K = 3
+        D0 = np.random.randn(Nd, Nd, 1, M)
+        S = np.random.randn(N, N, Nc, K)
+        lmbda = 1e-1
+        opt = cbpdndl.ConvBPDNDictLearn.Options({'MaxMainIter': 10})
+        try:
+            b = cbpdndl.ConvBPDNDictLearn(D0, S, lmbda, opt=opt)
+            b.solve()
+        except Exception as e:
+            print(e)
+            assert 0
+
+
+    def test_07(self):
         lmbda = 1e-1
         opt = cbpdndl.ConvBPDNDictLearn.Options({'AccurateDFid': True,
                                                  'MaxMainIter': 10})
@@ -98,7 +116,7 @@ class TestSet01(object):
             assert 0
 
 
-    def test_07(self):
+    def test_08(self):
         lmbda = 1e-1
         opt = cbpdndl.ConvBPDNDictLearn.Options({'MaxMainIter': 10},
                                                 dmethod='fista')
@@ -112,7 +130,7 @@ class TestSet01(object):
 
 
 
-    def test_08(self):
+    def test_09(self):
         lmbda = 1e-1
         opt = cbpdndl.ConvBPDNDictLearn.Options({'MaxMainIter': 10},
                                                 xmethod='fista')
@@ -126,7 +144,7 @@ class TestSet01(object):
 
 
 
-    def test_09(self):
+    def test_10(self):
         lmbda = 1e-1
         opt = cbpdndl.ConvBPDNDictLearn.Options({'MaxMainIter': 10},
                                                 xmethod='fista', dmethod='cns')
