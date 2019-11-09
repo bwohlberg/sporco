@@ -38,7 +38,7 @@ __all__ = ['complex_dtype', 'pyfftw_byte_aligned', 'pyfftw_empty_aligned',
            'solvedbi_sm_c', 'solvedbd_sm', 'solvedbd_sm_c', 'solvemdbi_ism',
            'solvemdbi_rsm', 'solvemdbi_cg', 'lu_factor', 'lu_solve_ATAI',
            'lu_solve_AATI', 'cho_factor', 'cho_solve_ATAI', 'cho_solve_AATI',
-           'zpad', 'Gax', 'GTax', 'gradient_filters', 'zdivide', 'proj_l2ball',
+           'zpad', 'grad', 'gradT', 'gradient_filters', 'zdivide', 'proj_l2ball',
            'promote16', 'atleast_nd', 'split', 'block_circulant', 'fl2norm2',
            'rfl2norm2', 'rrs', 'pca', 'nkp', 'kpsvd']
 
@@ -1096,7 +1096,8 @@ def zpad(x, pd, ax):
 
 
 
-def Gax(x, ax):
+@renamed_function(depname='Gax')
+def grad(x, ax):
     """Compute gradient of `x` along axis `ax`.
 
     Parameters
@@ -1119,7 +1120,8 @@ def Gax(x, ax):
 
 
 
-def GTax(x, ax):
+@renamed_function(depname='GTax')
+def gradT(x, ax):
     """Compute transpose of gradient of `x` along axis `ax`.
 
     Parameters

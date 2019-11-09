@@ -289,7 +289,7 @@ class TVL2Denoise(admm.ADMM):
         """
 
         return np.concatenate(
-            [sl.Gax(X, ax)[..., np.newaxis] for ax in self.axes],
+            [sl.grad(X, ax)[..., np.newaxis] for ax in self.axes],
             axis=X.ndim)
 
 
@@ -301,7 +301,7 @@ class TVL2Denoise(admm.ADMM):
         """
 
         return np.sum(np.concatenate(
-            [sl.GTax(X[..., ax], ax)[..., np.newaxis] for ax in self.axes],
+            [sl.gradT(X[..., ax], ax)[..., np.newaxis] for ax in self.axes],
             axis=X.ndim-1), axis=X.ndim-1)
 
 

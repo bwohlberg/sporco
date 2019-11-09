@@ -14,8 +14,9 @@ Version 0.1.12   (not yet released)
 • New functions for nearest Kronecker product, Kronecker product SVD in linalg
   module, and new functions for least absolute deviations linear regression,
   and least maximum error linear regression in interp module
-• Renamed linalg.GradientFilters to linalg.gradient_filters, util.extractblocks
-  to util.extract_blocks, util.averageblocks to util.average_blocks, and
+• Renamed linalg.GradientFilters to linalg.gradient_filters, linalg.Gax to
+  linalg.grad, linalg.GTax to linalg.gradT, util.extractblocks to
+  util.extract_blocks, util.averageblocks to util.average_blocks, and
   util.combineblocks to util.combine_blocks
 • Moved util.pca to linalg.pca
 • Optional mpldatacursor support in sporco.plot is disabled in Matplotlib 3.x
