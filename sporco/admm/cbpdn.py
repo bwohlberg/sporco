@@ -2171,8 +2171,11 @@ class ConvBPDNMaskDcpl(ConvTwoBlockCnstrnt):
           Regularisation parameter
         W : array_like
           Mask array. The array shape must be such that the array is
-          compatible for multiplication with input array S (see
-          :func:`.cnvrep.mskWshape` for more details).
+          compatible for multiplication with the *internal* shape of
+          input array S (see :class:`.cnvrep.CSC_ConvRepIndexing` for a
+          discussion of the distinction between *external* and *internal*
+          data layouts) after reshaping to the shape determined by
+          :func:`.cnvrep.mskWshape`.
         opt : :class:`ConvBPDNMaskDcpl.Options` object
           Algorithm options
         dimK : 0, 1, or None, optional (default None)

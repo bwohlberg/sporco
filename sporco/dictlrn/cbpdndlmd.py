@@ -418,7 +418,8 @@ class ConvBPDNMaskDictLearn(dictlrn.DictLearn):
           compatible for multiplication with the *internal* shape of
           input array S (see :class:`.cnvrep.CDU_ConvRepIndexing` for a
           discussion of the distinction between *external* and *internal*
-          data layouts).
+          data layouts) after reshaping to the shape determined by
+          :func:`.cnvrep.mskWshape`.
         opt : :class:`ConvBPDNMaskDictLearn.Options` object
           Algorithm options
         xmethod : string, optional (default 'admm')

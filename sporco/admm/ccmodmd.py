@@ -215,8 +215,11 @@ class ConvCnstrMODMaskDcplBase(admm.ADMMTwoBlockCnstrnt):
           Signal array
         W : array_like
           Mask array. The array shape must be such that the array is
-          compatible for multiplication with input array S (see
-          :func:`.cnvrep.mskWshape` for more details).
+          compatible for multiplication with the *internal* shape of
+          input array S (see :class:`.cnvrep.CDU_ConvRepIndexing` for a
+          discussion of the distinction between *external* and *internal*
+          data layouts) after reshaping to the shape determined by
+          :func:`.cnvrep.mskWshape`.
         dsz : tuple
           Filter support size(s)
         opt : :class:`ConvCnstrMODMaskDcplBase.Options` object
