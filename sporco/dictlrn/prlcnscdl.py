@@ -305,15 +305,15 @@ class ConvBPDNDictLearn_Consensus(cbpdndl.ConvBPDNDictLearn):
     multi-channel input signal to a single-channel input with channels
     converted into additional single-channel signal instances.
 
-    This class is derived from :class:`.dictlrn.cbpdndl.ConvBPDNDictLearn` so
-    that the variable initialisation of its parent can be re-used. The entire
-    :meth:`.solve` infrastructure is overidden in this class, without any
-    use of inherited functionality. Variables initialised by the parent
-    class that are non-singleton on axis ``axisK`` have this axis swapped
-    with axis 0 for simpler and more computationally efficient indexing.
-    Note that automatic penalty parameter selection (see option ``AutoRho``
-    in :class:`.admm.ADMM.Options`) is not supported, the option settings
-    being silently ignored.
+    This class is derived from :class:`.dictlrn.cbpdndl.ConvBPDNDictLearn`
+    so that the variable initialisation of its parent can be re-used. The
+    entire :meth:`.solve` infrastructure is overidden in this class,
+    without any use of inherited functionality. Variables initialised by
+    the parent class that are non-singleton on axis ``axisK`` have this
+    axis swapped with axis 0 for simpler and more computationally
+    efficient indexing. Note that automatic penalty parameter selection
+    (see option ``AutoRho`` in :class:`.admm.ADMM.Options`) is not
+    supported, the option settings being silently ignored.
 
     After termination of the :meth:`solve` method, attribute :attr:`itstat`
     is a list of tuples representing statistics of each iteration. The
@@ -1002,10 +1002,7 @@ class ConvBPDNMaskDcplDictLearn_Consensus(cbpdndlmd.ConvBPDNMaskDictLearn):
         global mp_Df
         init_mpraw('mp_Df', self.xstep.Df)
         global mp_W
-        if self.dstep.W.ndim > self.xstep.cri.axisK:
-            init_mpraw_swap('mp_W', self.dstep.W)
-        else:
-            init_mpraw('mp_W', self.dstep.W)
+        init_mpraw_swap('mp_W', self.dstep.W)
         global mp_Zf
         shp = np.insert(np.roll(self.xstep.Xf.shape, 1), -1, 1)
         shp[[0, -1]] = shp[[-1, 0]]
