@@ -31,7 +31,6 @@ else:
 
 confpath = os.path.dirname(__file__)
 sys.path.append(confpath)
-import automodule
 import callgraph
 import docntbk
 
@@ -436,6 +435,8 @@ def process_signature(app, what, name, obj, options, signature,
 
 
 def subpackage_summary(*args):
+
+    import automodule
 
     pkgname = 'sporco'
     modpath = os.path.join(rootpath, 'sporco')
