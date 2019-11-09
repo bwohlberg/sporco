@@ -397,6 +397,12 @@ class ConvBPDNDictLearn_Consensus(cbpdndl.ConvBPDNDictLearn):
             D0, S, lmbda, opt=opt, xmethod='admm', dmethod='cns',
             dimK=dimK, dimN=dimN)
 
+        # Check for unsupported case of multi-channel signal with
+        # single-channel dictionary
+        if self.xstep.cri.Cd == 1 and self.xstep.cri.C > 1:
+            raise ValueError("Learning of a single-channel dictionary from"
+                             " multi-channel training data is not supported")
+
         # Set up iterations statistics
         itstat_fields = ['Iter', 'ObjFun', 'DFid', 'RegL1', 'Time']
         self.IterationStats = collections.namedtuple('IterationStats',
@@ -939,6 +945,12 @@ class ConvBPDNMaskDcplDictLearn_Consensus(cbpdndlmd.ConvBPDNMaskDictLearn):
         super(ConvBPDNMaskDcplDictLearn_Consensus, self).__init__(
             D0, S, lmbda, W, opt=opt, xmethod='admm', dmethod='cns',
             dimK=dimK, dimN=dimN)
+
+        # Check for unsupported case of multi-channel signal with
+        # single-channel dictionary
+        if self.xstep.cri.Cd == 1 and self.xstep.cri.C > 1:
+            raise ValueError("Learning of a single-channel dictionary from"
+                             " multi-channel training data is not supported")
 
         # Set up iterations statistics
         itstat_fields = ['Iter', 'ObjFun', 'DFid', 'RegL1', 'Time']
