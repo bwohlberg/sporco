@@ -35,7 +35,7 @@ class TestSet01(object):
         assert np.abs(c0 - c1) < 1e-5
 
 
-   def test_03(self):
+    def test_03(self):
         x = np.random.randn(9, 8)
         y = interp.bilinear_demosaic(x)
         assert np.array_equal(x[1::2, 1::2], y[1::2, 1::2, 0])
