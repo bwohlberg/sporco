@@ -510,6 +510,7 @@ def fix_inherit_diagram(*args):
 def setup(app):
 
     app.add_stylesheet("sporco.css")
+    app.add_stylesheet("http://netdna.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css")
     app.connect("autodoc-skip-member", skip_member)
     app.connect('builder-inited', insertsolve)
     app.connect('builder-inited', genexamples)
