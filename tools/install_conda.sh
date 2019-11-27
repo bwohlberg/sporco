@@ -65,7 +65,8 @@ conda create -n py36 python=3.6
 source activate py36
 conda install future numpy scipy imageio pyfftw matplotlib mpldatacursor \
       pytest pytest-runner ipython jupyter sphinx pygraphviz numpydoc \
-      cython mpi4py pyhamcrest sphinxcontrib-bibtex jonga pypandoc
+      cython mpi4py pyhamcrest sphinxcontrib-bibtex jonga pypandoc \
+      libopenblas
 
 # ffmpeg is required by imageio for reading mp4 video files
 # it can also be installed via the system package manager, .e.g.
@@ -74,7 +75,7 @@ if [ "`which ffmpeg`" = '' ]; then
     conda install ffmpeg
 fi
 
-pip install sphinx_tabs sphinx_fontawesome py2jn
+pip install sphinx_tabs sphinx_fontawesome py2jn bm3d
 
 
 # Install cupy and gputil if nvcc is present (indicating that the

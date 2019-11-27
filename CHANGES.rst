@@ -11,6 +11,7 @@ Version 0.1.12   (not yet released)
   admm.pdcsc.ConvProdDictL1L1GrdJoint
 • Minimum required SciPy version is now 0.19.1
 • Renamed prox.prox_l1l2 to prox_sl1l2
+• Added new modules and example scripts for the Plug and Play Priors method
 • New functions for nearest Kronecker product, Kronecker product SVD in linalg
   module, and new functions for least absolute deviations linear regression,
   and least maximum error linear regression in interp module

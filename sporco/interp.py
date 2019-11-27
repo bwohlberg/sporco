@@ -13,11 +13,78 @@ from builtins import range
 import warnings
 import numpy as np
 import scipy.optimize as sco
+from scipy.interpolate import interp2d, griddata
 
 from sporco._util import renamed_function
 
 
 __author__ = """Brendt Wohlberg <brendt@ieee.org>"""
+
+
+def bilinear_demosaic(img):
+    """Demosaicing by bilinear interpolation.
+
+    The input is assumed to be an image formed with a `colour filter
+    array <https://en.wikipedia.org/wiki/Color_filter_array>`__ with the
+    pattern
+
+    ::
+
+      B G B G ...
+      G R G R ...
+      B G B G ...
+      G R G R ...
+      . . . . .
+      . . . .   .
+      . . . .     .
+
+
+    Parameters
+    ----------
+    img : 2d ndarray
+      A 2d array representing an image formed with a colour filter array
+
+    Returns
+    -------
+    imgd : 3d ndarray
+      Demosaiced 3d image
+    """
+
+    # Interpolate red channel
+    x = range(1, img.shape[1], 2)
+    y = range(1, img.shape[0], 2)
+    fi = interp2d(x, y, img[1::2, 1::2])
+    sr = fi(range(0, img.shape[1]), range(0, img.shape[0]))
+
+    # Interpolate green channel. We can't use `interp2d` here because
+    # the green channel isn't arranged in a simple grid pattern. Since
+    # the locations of the green samples can be represented as the union
+    # of two grids, we use `griddata` with an array of coordinates
+    # constructed by stacking the coordinates of these two grids
+    x0, y0 = np.mgrid[0:img.shape[0]:2, 1:img.shape[1]:2]
+    x1, y1 = np.mgrid[1:img.shape[0]:2, 0:img.shape[1]:2]
+    xy01 = np.vstack((np.hstack((x0.ravel().T, x1.ravel().T)),
+                      np.hstack((y0.ravel().T, y1.ravel().T)))).T
+    z = np.hstack((img[0::2, 1::2].ravel(), img[1::2, 0::2].ravel()))
+    x2, y2 = np.mgrid[0:img.shape[0], 0:img.shape[1]]
+    xy2 = np.vstack((x2.ravel(), y2.ravel())).T
+    sg = griddata(xy01, z, xy2, method='linear').reshape(img.shape[0:2])
+    if np.isnan(sg[0, 0]):
+        sg[0, 0] = (sg[0, 1] + sg[1, 0]) / 2.0
+    if np.isnan(sg[0, -1]):
+        sg[0, -1] = (sg[0, -2] + sg[1, -1]) / 2.0
+    if np.isnan(sg[-1, 0]):
+        sg[-1, 0] = (sg[-2, 0] + sg[-1, 1]) / 2.0
+    if np.isnan(sg[-1, -1]):
+        sg[-1, -1] = (sg[-2, -1] + sg[-1, -2]) / 2.0
+
+    # Interpolate blue channel
+    x = range(0, img.shape[1], 2)
+    y = range(0, img.shape[0], 2)
+    fi = interp2d(x, y, img[0::2, 0::2])
+    sb = fi(range(0, img.shape[1]), range(0, img.shape[0]))
+
+    return np.dstack((sr, sg, sb))
 
 
 
@@ -41,7 +108,7 @@ def lstabsdev(A, b):
     Parameters
     ----------
     A : (M, N) array_like
-      Regression coefficient matrix.
+      Regression coefficient matrix
     b : (M,) array_like
       Regression ordinate / dependent variable
 
@@ -87,7 +154,7 @@ def lstmaxdev(A, b):
     Parameters
     ----------
     A : (M, N) array_like
-      Regression coefficient matrix.
+      Regression coefficient matrix
     b : (M,) array_like
       Regression ordinate / dependent variable
 
