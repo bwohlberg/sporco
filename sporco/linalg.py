@@ -38,9 +38,10 @@ __all__ = ['complex_dtype', 'pyfftw_byte_aligned', 'pyfftw_empty_aligned',
            'solvedbi_sm_c', 'solvedbd_sm', 'solvedbd_sm_c', 'solvemdbi_ism',
            'solvemdbi_rsm', 'solvemdbi_cg', 'lu_factor', 'lu_solve_ATAI',
            'lu_solve_AATI', 'cho_factor', 'cho_solve_ATAI', 'cho_solve_AATI',
-           'zpad', 'grad', 'gradT', 'gradient_filters', 'zdivide', 'proj_l2ball',
-           'promote16', 'atleast_nd', 'split', 'block_circulant', 'fl2norm2',
-           'rfl2norm2', 'rrs', 'pca', 'nkp', 'kpsvd']
+           'zpad', 'grad', 'gradT', 'gradient_filters', 'zdivide',
+           'proj_l2ball', 'promote16', 'atleast_nd', 'split',
+           'block_circulant', 'fl2norm2', 'rfl2norm2', 'rrs', 'pca', 'nkp',
+           'kpsvd']
 
 
 
