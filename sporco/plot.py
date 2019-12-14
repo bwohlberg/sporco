@@ -289,8 +289,8 @@ def plot(y, x=None, ptyp='plot', xlbl=None, ylbl=None, title=None,
 
 
 def surf(z, x=None, y=None, elev=None, azim=None, xlbl=None, ylbl=None,
-         zlbl=None, title=None, lblpad=8.0, cntr=None, cmap=None,
-         fgsz=None, fgnm=None, fig=None, ax=None):
+         zlbl=None, title=None, lblpad=8.0, alpha=1.0, cntr=None,
+         cmap=None, fgsz=None, fgnm=None, fig=None, ax=None):
     """
     Plot a 2D surface in 3D. If a figure object is specified then the
     surface is drawn in that figure, and ``fig.show()`` is not called.
@@ -318,6 +318,8 @@ def surf(z, x=None, y=None, elev=None, azim=None, xlbl=None, ylbl=None,
         Figure title
     lblpad : float, optional (default 8.0)
         Label padding
+    alpha : float between 0.0 and 1.0, optional (default 1.0)
+        Transparency
     cntr : int or sequence of ints, optional (default None)
         If not None, plot contours of the surface on the lower end of
         the z-axis. An int specifies the number of contours to plot, and
@@ -368,7 +370,7 @@ def surf(z, x=None, y=None, elev=None, azim=None, xlbl=None, ylbl=None,
         y = range(z.shape[0])
 
     xg, yg = np.meshgrid(x, y)
-    ax.plot_surface(xg, yg, z, rstride=1, cstride=1, cmap=cmap)
+    ax.plot_surface(xg, yg, z, rstride=1, cstride=1, alpha=alpha, cmap=cmap)
 
     if cntr is not None:
         offset = np.around(z.min() - 0.2 * (z.max() - z.min()), 3)
