@@ -190,8 +190,8 @@ def cbpdn_ustep(k):
 
 
 def ccmod_setcoef(k):
-    """Set the coefficient maps for the ccmod stage. The only parameter is
-    the slice index `k` and there are no return values; all inputs and
+    """Set the coefficient maps for the ccmod stage. The only parameter
+    is the slice index `k` and there are no return values; all inputs and
     outputs are from and to global variables.
     """
 
@@ -298,17 +298,22 @@ class ConvBPDNDictLearn_Consensus(cbpdndl.ConvBPDNDictLearn):
     where :math:`C` is the feasible set consisting of filters with
     unit norm and constrained support, via interleaved alternation
     between the ADMM steps of the sparse coding and dictionary update
-    algorithms. Multi-channel signals are supported.
+    algorithms. Multi-channel signals with multi-channel dictionaries are
+    supported. Unlike :class:`.dictlrn.cbpdndl.ConvBPDNDictLearn`,
+    multi-channel signals with single-channel dictionaries are *not*
+    supported; it is the responsibility of the user to convert the
+    multi-channel input signal to a single-channel input with channels
+    converted into additional single-channel signal instances.
 
-    This class is derived from :class:`.dictlrn.cbpdndl.ConvBPDNDictLearn` so
-    that the variable initialisation of its parent can be re-used. The entire
-    :meth:`.solve` infrastructure is overidden in this class, without any
-    use of inherited functionality. Variables initialised by the parent
-    class that are non-singleton on axis ``axisK`` have this axis swapped
-    with axis 0 for simpler and more computationally efficient indexing.
-    Note that automatic penalty parameter selection (see option ``AutoRho``
-    in :class:`.admm.ADMM.Options`) is not supported, the option settings
-    being silently ignored.
+    This class is derived from :class:`.dictlrn.cbpdndl.ConvBPDNDictLearn`
+    so that the variable initialisation of its parent can be re-used. The
+    entire :meth:`.solve` infrastructure is overidden in this class,
+    without any use of inherited functionality. Variables initialised by
+    the parent class that are non-singleton on axis ``axisK`` have this
+    axis swapped with axis 0 for simpler and more computationally
+    efficient indexing. Note that automatic penalty parameter selection
+    (see option ``AutoRho`` in :class:`.admm.ADMM.Options`) is not
+    supported, the option settings being silently ignored.
 
     After termination of the :meth:`solve` method, attribute :attr:`itstat`
     is a list of tuples representing statistics of each iteration. The
@@ -381,8 +386,8 @@ class ConvBPDNDictLearn_Consensus(cbpdndl.ConvBPDNDictLearn):
         """
 
         if nproc is None:
-            # Number of processes to run is the smaller of the number of CPUs
-            # and K, the number of training signals
+            # Number of processes to run is the smaller of the number of
+            # CPUs and K, the number of training signals
             self.nproc = min(mp.cpu_count(), S.shape[-1])
         else:
             self.nproc = nproc
@@ -391,6 +396,12 @@ class ConvBPDNDictLearn_Consensus(cbpdndl.ConvBPDNDictLearn):
         super(ConvBPDNDictLearn_Consensus, self).__init__(
             D0, S, lmbda, opt=opt, xmethod='admm', dmethod='cns',
             dimK=dimK, dimN=dimN)
+
+        # Check for unsupported case of multi-channel signal with
+        # single-channel dictionary
+        if self.xstep.cri.Cd == 1 and self.xstep.cri.C > 1:
+            raise ValueError("Learning of a single-channel dictionary from"
+                             " multi-channel training data is not supported")
 
         # Set up iterations statistics
         itstat_fields = ['Iter', 'ObjFun', 'DFid', 'RegL1', 'Time']
@@ -612,8 +623,8 @@ class ConvBPDNDictLearn_Consensus(cbpdndl.ConvBPDNDictLearn):
 
 
     def getitstat(self):
-        """Get iteration stats as named tuple of arrays instead of array of
-        named tuples.
+        """Get iteration stats as named tuple of arrays instead of array
+        of named tuples.
         """
 
         return util.transpose_ntpl_list(self.itstat)
@@ -713,8 +724,8 @@ def cbpdnmd_ustep(k):
 
 
 def ccmodmd_setcoef(k):
-    """Set the coefficient maps for the ccmod stage. The only parameter is
-    the slice index `k` and there are no return values; all inputs and
+    """Set the coefficient maps for the ccmod stage. The only parameter
+    is the slice index `k` and there are no return values; all inputs and
     outputs are from and to global variables.
     """
 
@@ -827,8 +838,14 @@ class ConvBPDNMaskDcplDictLearn_Consensus(cbpdndlmd.ConvBPDNMaskDictLearn):
 
     where :math:`W` is a mask array and :math:`C` is the feasible set
     consisting of filters with unit norm and constrained support, via
-    interleaved alternation between the ADMM steps of the sparse coding and
-    dictionary update algorithms. Multi-channel signals are supported.
+    interleaved alternation between the ADMM steps of the sparse coding
+    and dictionary update algorithms. Multi-channel signals with
+    multi-channel dictionaries are supported. Unlike
+    :class:`.dictlrn.cbpdndl.ConvBPDNDictLearn`, multi-channel signals
+    with single-channel dictionaries are *not* supported; it is the
+    responsibility of the user to convert the multi-channel input signal
+    to a single-channel input with channels converted into additional
+    single-channel signal instances.
 
     This class is derived from :class:`.cbpdndlmd.ConvBPDNMaskDictLearn`
     so that the variable initialisation of its parent can be re-used. The
@@ -900,8 +917,11 @@ class ConvBPDNMaskDcplDictLearn_Consensus(cbpdndlmd.ConvBPDNMaskDictLearn):
           Regularisation parameter
         W : array_like
           Mask array. The array shape must be such that the array is
-          compatible for multiplication with input array S (see
-          :func:`.cnvrep.mskWshape` for more details).
+          compatible for multiplication with the *internal* shape of
+          input array S (see :class:`.cnvrep.CDU_ConvRepIndexing` for a
+          discussion of the distinction between *external* and *internal*
+          data layouts) after reshaping to the shape determined by
+          :func:`.cnvrep.mskWshape`.
         opt : :class:`.cbpdndlmd.ConvBPDNMaskDictLearn.Options` object
           Algorithm options
         nproc : int
@@ -915,8 +935,8 @@ class ConvBPDNMaskDcplDictLearn_Consensus(cbpdndlmd.ConvBPDNMaskDictLearn):
         """
 
         if nproc is None:
-            # Number of processes to run is the smaller of the number of CPUs
-            # and K, the number of training signals
+            # Number of processes to run is the smaller of the number of
+            # CPUs and K, the number of training signals
             self.nproc = min(mp.cpu_count(), S.shape[-1])
         else:
             self.nproc = nproc
@@ -925,6 +945,12 @@ class ConvBPDNMaskDcplDictLearn_Consensus(cbpdndlmd.ConvBPDNMaskDictLearn):
         super(ConvBPDNMaskDcplDictLearn_Consensus, self).__init__(
             D0, S, lmbda, W, opt=opt, xmethod='admm', dmethod='cns',
             dimK=dimK, dimN=dimN)
+
+        # Check for unsupported case of multi-channel signal with
+        # single-channel dictionary
+        if self.xstep.cri.Cd == 1 and self.xstep.cri.C > 1:
+            raise ValueError("Learning of a single-channel dictionary from"
+                             " multi-channel training data is not supported")
 
         # Set up iterations statistics
         itstat_fields = ['Iter', 'ObjFun', 'DFid', 'RegL1', 'Time']
@@ -938,10 +964,10 @@ class ConvBPDNMaskDcplDictLearn_Consensus(cbpdndlmd.ConvBPDNMaskDictLearn):
 
 
         def init_mpraw_swap(mpv, npv):
-            """Set a global variable as a multiprocessing RawArray in shared
-            memory with a numpy array wrapper and initialise its value
-            to the specified array after swapping axisK of that array
-            to axis index 0.
+            """Set a global variable as a multiprocessing RawArray in
+            shared memory with a numpy array wrapper and initialise its
+            value to the specified array after swapping axisK of that
+            array to axis index 0.
 
             Parameters
             ----------
@@ -976,10 +1002,7 @@ class ConvBPDNMaskDcplDictLearn_Consensus(cbpdndlmd.ConvBPDNMaskDictLearn):
         global mp_Df
         init_mpraw('mp_Df', self.xstep.Df)
         global mp_W
-        if self.dstep.W.ndim > self.xstep.cri.axisK:
-            init_mpraw_swap('mp_W', self.dstep.W)
-        else:
-            init_mpraw('mp_W', self.dstep.W)
+        init_mpraw_swap('mp_W', self.dstep.W)
         global mp_Zf
         shp = np.insert(np.roll(self.xstep.Xf.shape, 1), -1, 1)
         shp[[0, -1]] = shp[[-1, 0]]
@@ -1015,8 +1038,8 @@ class ConvBPDNMaskDcplDictLearn_Consensus(cbpdndlmd.ConvBPDNMaskDictLearn):
 
 
     def step(self):
-        """Do a single iteration over all cbpdn and ccmod steps. Those that
-        are not coupled on the K axis are performed in parallel."""
+        """Do a single iteration over all cbpdn and ccmod steps. Those
+        that are not coupled on the K axis are performed in parallel."""
 
         # If the nproc parameter of __init__ is zero, just iterate
         # over the K consensus instances instead of using
@@ -1167,8 +1190,8 @@ class ConvBPDNMaskDcplDictLearn_Consensus(cbpdndlmd.ConvBPDNMaskDictLearn):
 
 
     def getitstat(self):
-        """Get iteration stats as named tuple of arrays instead of array of
-        named tuples.
+        """Get iteration stats as named tuple of arrays instead of array
+        of named tuples.
         """
 
         return util.transpose_ntpl_list(self.itstat)

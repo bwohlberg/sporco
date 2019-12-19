@@ -96,11 +96,18 @@ is system dependent:
 				python3-imageio python3-pip python3-future libfftw3-dev python3-pytest
 	sudo -H pip3 install pyfftw pytest-runner
 
+      The following optional dependencies are required only for the
+      :ref:`PPP <invprob_ppp>` usage examples, for which Python 3 is
+      required
+
+      ::
+
+	sudo apt-get -y install libopenblas-base
+	sudo -H pip3 install bm3d
 
       Some additional dependencies are required for building the
       documentation from the package source, for which Python 3.3 or
-      later is required. For example, under Ubuntu Linux 18.04, the
-      following commands should be sufficient
+      later is required
 
       ::
 
@@ -139,6 +146,14 @@ is system dependent:
 	pip install pytz pytest pytest-runner
 
       (For Python 3, replace `pip` above with `pip3`.)
+
+
+      The following optional dependency is required only for the
+      :ref:`PPP <invprob_ppp>` usage examples, for which Python 3 is required
+
+      ::
+
+	pip3 install bm3d
 
 
       Some additional dependencies are required for building the
@@ -190,6 +205,14 @@ is system dependent:
 	pip install future imageio
 
 
+      The following optional dependency is required only for the
+      :ref:`PPP <invprob_ppp>` usage examples
+
+      ::
+
+	pip install bm3d
+
+
       Some additional dependencies are required for building the
       documentation from the package source
 
@@ -220,6 +243,7 @@ additional features when installed:
 .. |wrltzr| replace:: `wurlitzer <https://github.com/minrk/wurlitzer>`__
 .. |gputil| replace:: `GPUtil <https://github.com/anderskm/gputil>`__
 .. |mpi4py| replace:: `mpi4py <https://github.com/mpi4py/mpi4py>`__
+.. |bm3d| replace:: `bm3d <https://pypi.org/project/bm3d>`__
 
 
 =================  ======================================================
@@ -234,4 +258,6 @@ Optional Package   Features Supported
 |gputil|           Additional utility functions in :mod:`sporco.cupy`
 |mpi4py|           Parallel computation of the grid search in
 		   :mod:`sporco.mpiutil`
+|bm3d|             Required by :ref:`demo scripts <examples_ppp_index>`
+		   for :mod:`.admm.ppp` and :mod:`.fista.ppp`
 =================  ======================================================

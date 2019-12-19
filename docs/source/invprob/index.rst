@@ -33,6 +33,7 @@ Miscellaneous
 * :doc:`tvl2 <tvl2>` (:math:`\ell_2` Total Variation)
 * :doc:`spline <spline>` (:math:`\ell_1` Spline)
 * :doc:`rpca <rpca>` (Robust Principal Component Analysis)
+* :doc:`ppp <ppp>` (Plug and Play Priors)
 
 
 Extensions
@@ -56,3 +57,4 @@ The :doc:`ADMM <../admm/index>` and :doc:`FISTA <../fista/index>` classes are de
    tvl2
    spline
    rpca
+   ppp

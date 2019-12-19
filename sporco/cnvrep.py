@@ -563,7 +563,9 @@ def mskWshape(W, cri):
     `S`, except that non-singleton dimensions in `S` may be singleton
     dimensions in `W`. If `W` has a single non-spatial axis, it is
     assigned as a channel or multi-signal axis depending on the
-    corresponding assignement in `S`.
+    corresponding assignement in `S` (if `S` has non-singleton channel
+    and signal axes, the single non-spatial axis in `W` is taken as a
+    channel axis).
 
     Parameters
     ----------

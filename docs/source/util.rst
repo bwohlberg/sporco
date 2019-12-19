@@ -17,25 +17,29 @@ the following modules:
   A parallel-processing grid search for parameter optimisation that
   distributes processes via MPI.
 
-* :mod:`.plot`
-
-  Functions for plotting graphs or 3D surfaces and visualising images.
-
-* :mod:`.metric`
-
-  Various image quality metrics including standard metrics such as
-  MSE, SNR, and PSNR.
-
 * :mod:`.linalg`
 
   Various linear algebra and related functions, including solvers for
   specific forms of linear system and filters for computing image
   gradients.
 
+* :mod:`.interp`
+
+  Interpolation and regression functions.
+
 * :mod:`.prox`
 
   Evaluation of various norms and their proximal operators and projection
   operators.
+
+* :mod:`.metric`
+
+  Various image quality metrics including standard metrics such as
+  MSE, SNR, and PSNR.
+
+* :mod:`.plot`
+
+  Functions for plotting graphs or 3D surfaces and visualising images.
 
 * :mod:`.cnvrep`
 

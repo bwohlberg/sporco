@@ -30,6 +30,7 @@ before_install:
     - export URLROOT=https://repo.continuum.io/miniconda/;
       if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
          brew update;
+         brew upgrade;
          brew install fftw;
          export MCINST=Miniconda3-latest-MacOSX-x86_64.sh;
       else

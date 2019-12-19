@@ -10,6 +10,7 @@ The examples are organised into directories according to topic:
 * `Convolutional Sparse Coding <csc>`__
 * `Convolutional Dictionary Learning <cdl>`__
 * `Total Variation <tv>`__
+* `Plug and Play Priors <ppp>`__
 * `Miscellaneous <misc>`__
 
 .. toc-end

@@ -59,9 +59,28 @@ td.field-body blockquote {
   padding-left: 30px;
 }
 
+
+/*
+ * Alternative style for function parameters/returns descriptions for sphinx
+ * 2.x.
+ */
 dl.field-list {
-  margin-top: 1em;
+  border-collapse: collapse;
+  border-spacing: 5px;
+  margin-left: 1px;
+  margin-top: 0.75em;
 }
+dl.field-list > dt {
+  flex-basis: 8em;
+}
+dl.field-list dt.field-odd, dt.field-even {
+  text-align: left;
+  padding: 1px 8px 1px 5px;
+  white-space: nowrap;
+  background-color: #ebebeb;
+  width: 7em;
+}
+
 
 /*
  * Style for custom class kwargs for documenting **kwargs parameters
@@ -111,6 +130,12 @@ dl.exception > dt:first-child  {
   background-color: #ebebeb;
   padding: 2px 5px 2px 5px;
   border-radius: 3px;
+}
+dl.function > dd > p:first-child, dl.class > dd > p:nth-child(2),
+dl.method > dd > p:first-child, dl.exception > dd > p:nth-child(2) {
+  margin-bottom: 0.5em;
+  font-family: 'Lucida Sans Unicode', 'Arial', 'Helvetica';
+  font-size: 110%;
 }
 dl.class > dt:first-child + dd > p:first-child {
   margin-bottom: 0.8em;
@@ -207,6 +232,10 @@ code {
 ul {
   padding-left: 1em;
   margin-top: 3px;
+}
+li > p:last-child {
+  margin-top: -0.5em;
+  margin-bottom: 0.75em;
 }
 div.content ul > li {
   -moz-background-clip:border;

@@ -28,10 +28,12 @@ API Reference
    sporco.admm.tvl2
    sporco.admm.rpca
    sporco.admm.spline
+   sporco.admm.ppp
    sporco.fista.fista
    sporco.fista.bpdn
    sporco.fista.cbpdn
    sporco.fista.ccmod
+   sporco.fista.ppp
    sporco.dictlrn.common
    sporco.dictlrn.dictlrn
    sporco.dictlrn.bpdndl
@@ -84,10 +86,12 @@ API Reference
    sporco.admm.tvl2
    sporco.admm.rpca
    sporco.admm.spline
+   sporco.admm.ppp
    sporco.fista.fista
    sporco.fista.bpdn
    sporco.fista.cbpdn
    sporco.fista.ccmod
+   sporco.fista.ppp
    sporco.dictlrn.common
    sporco.dictlrn.dictlrn
    sporco.dictlrn.bpdndl
