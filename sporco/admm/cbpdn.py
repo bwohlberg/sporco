@@ -2882,3 +2882,223 @@ class MultiDictConvBPDN(object):
               (slice(self.chncs[b], self.chncs[b+1]),)
         Sf = np.sum(self.cbpdn.Df[slc] * Xf, axis=self.cbpdn.cri.axisM)
         return sl.irfftn(Sf, self.cbpdn.cri.Nv, self.cbpdn.cri.axisN)
+
+
+
+
+
+class ConvBPDNLatInh(ConvBPDN):
+    r"""
+    TODO - this might need to change
+    ADMM algorithm for the Convolutional BPDN (CBPDN)
+    :cite:`wohlberg-2014-efficient` :cite:`wohlberg-2016-efficient`
+    :cite:`wohlberg-2016-convolutional` problem.
+
+    |
+
+    .. inheritance-diagram:: ConvBPDN
+       :parts: 2
+
+    |
+
+    Solve the optimisation problem
+
+    .. math::
+       \mathrm{argmin}_\mathbf{x} \;
+       (1/2) \left\| \sum_m \mathbf{d}_m * \mathbf{x}_m -
+       \mathbf{s} \right\|_2^2 + \lambda \sum_m \| \mathbf{x}_m \|_1
+
+    for input image :math:`\mathbf{s}`, dictionary filters
+    :math:`\mathbf{d}_m`, and coefficient maps :math:`\mathbf{x}_m`,
+    via the ADMM problem
+
+    .. math::
+       \mathrm{argmin}_{\mathbf{x}, \mathbf{y}} \;
+       (1/2) \left\| \sum_m \mathbf{d}_m * \mathbf{x}_m -
+       \mathbf{s} \right\|_2^2 + \lambda \sum_m \| \mathbf{y}_m \|_1
+       \quad \text{such that} \quad \mathbf{x}_m = \mathbf{y}_m \;\;.
+
+    Multi-image and multi-channel problems are also supported. The
+    multi-image problem is
+
+    .. math::
+       \mathrm{argmin}_\mathbf{x} \;
+       (1/2) \sum_k \left\| \sum_m \mathbf{d}_m * \mathbf{x}_{k,m} -
+       \mathbf{s}_k \right\|_2^2 + \lambda \sum_k \sum_m
+       \| \mathbf{x}_{k,m} \|_1
+
+    with input images :math:`\mathbf{s}_k` and coefficient maps
+    :math:`\mathbf{x}_{k,m}`, and the multi-channel problem with input
+    image channels :math:`\mathbf{s}_c` is either
+
+    .. math::
+       \mathrm{argmin}_\mathbf{x} \;
+       (1/2) \sum_c \left\| \sum_m \mathbf{d}_m * \mathbf{x}_{c,m} -
+       \mathbf{s}_c \right\|_2^2 +
+       \lambda \sum_c \sum_m \| \mathbf{x}_{c,m} \|_1
+
+    with single-channel dictionary filters :math:`\mathbf{d}_m` and
+    multi-channel coefficient maps :math:`\mathbf{x}_{c,m}`, or
+
+    .. math::
+       \mathrm{argmin}_\mathbf{x} \;
+       (1/2) \sum_c \left\| \sum_m \mathbf{d}_{c,m} * \mathbf{x}_m -
+       \mathbf{s}_c \right\|_2^2 + \lambda \sum_m \| \mathbf{x}_m \|_1
+
+    with multi-channel dictionary filters :math:`\mathbf{d}_{c,m}` and
+    single-channel coefficient maps :math:`\mathbf{x}_m`.
+
+    After termination of the :meth:`solve` method, attribute :attr:`itstat`
+    is a list of tuples representing statistics of each iteration. The
+    fields of the named tuple ``IterationStats`` are:
+
+       ``Iter`` : Iteration number
+
+       ``ObjFun`` : Objective function value
+
+       ``DFid`` : Value of data fidelity term :math:`(1/2) \| \sum_m
+       \mathbf{d}_m * \mathbf{x}_m - \mathbf{s} \|_2^2`
+
+       ``RegL1`` : Value of regularisation term :math:`\sum_m \|
+       \mathbf{x}_m \|_1`
+
+       ``PrimalRsdl`` : Norm of primal residual
+
+       ``DualRsdl`` : Norm of dual residual
+
+       ``EpsPrimal`` : Primal residual stopping tolerance
+       :math:`\epsilon_{\mathrm{pri}}`
+
+       ``EpsDual`` : Dual residual stopping tolerance
+       :math:`\epsilon_{\mathrm{dua}}`
+
+       ``Rho`` : Penalty parameter
+
+       ``XSlvRelRes`` : Relative residual of X step solver
+
+       ``Time`` : Cumulative run time
+    """
+
+
+    class Options(ConvBPDN.Options):
+        r"""ConvBPDNLatInh algorithm options
+
+        Options include all of those defined in
+        :class:`.cbpdn.ConvBPDN.Options`.
+        """
+
+        #defaults = copy.deepcopy(GenericConvBPDN.Options.defaults)
+        #defaults.update({'L1Weight': 1.0})
+
+
+        def __init__(self, opt=None):
+            """
+            Parameters
+            ----------
+            opt : dict or None, optional (default None)
+              ConvBPDNLatInh algorithm options
+            """
+
+            if opt is None:
+                opt = {}
+            ConvBPDN.Options.__init__(self, opt)
+
+
+
+    itstat_fields_objfn = ('ObjFun', 'DFid', 'RegL1')
+    hdrtxt_objfn = ('Fnc', 'DFid', u('Regℓ1'))
+    hdrval_objfun = {'Fnc': 'ObjFun', 'DFid': 'DFid', u('Regℓ1'): 'RegL1'}
+
+
+
+    def __init__(self, D, S, Wg=None, Wh=None, lmbda=None, mu=None, opt=None, dimK=None, dimN=2):
+        """
+        TODO - this might need to change
+        This class supports an arbitrary number of spatial dimensions,
+        `dimN`, with a default of 2. The input dictionary `D` is either
+        `dimN` + 1 dimensional, in which case each spatial component
+        (image in the default case) is assumed to consist of a single
+        channel, or `dimN` + 2 dimensional, in which case the final
+        dimension is assumed to contain the channels (e.g. colour
+        channels in the case of images). The input signal set `S` is
+        either `dimN` dimensional (no channels, only one signal), `dimN`
+        + 1 dimensional (either multiple channels or multiple signals),
+        or `dimN` + 2 dimensional (multiple channels and multiple
+        signals). Determination of problem dimensions is handled by
+        :class:`.cnvrep.CSC_ConvRepIndexing`.
+
+
+        |
+
+        **Call graph**
+
+        .. image:: ../_static/jonga/cbpdn_init.svg
+           :width: 20%
+           :target: ../_static/jonga/cbpdn_init.svg
+
+        |
+
+
+        Parameters
+        ----------
+        D : array_like
+          Dictionary array
+        S : array_like
+          Signal array
+        lmbda : float
+          Regularisation parameter
+        opt : :class:`ConvBPDN.Options` object
+          Algorithm options
+        dimK : 0, 1, or None, optional (default None)
+          Number of dimensions in input signal corresponding to multiple
+          independent signals
+        dimN : int, optional (default 2)
+          Number of spatial/temporal dimensions
+        """
+
+        # Set default options if none specified
+        if opt is None:
+            opt = ConvBPDN.Options()
+
+        # Set dtype attribute based on S.dtype and opt['DataType']
+        self.set_dtype(opt, S.dtype)
+
+        # Call parent class __init__
+        super(ConvBPDNLatInh, self).__init__(D, S, lmbda, opt, dimK, dimN)
+
+        # Set default group weighting if not specified
+        if Wg is None:
+            # TODO
+            pass
+
+        # Set default spatial weighting if not specified
+        if Wh is None:
+            # TODO
+            pass
+
+        # Set lateral inhibition scaling term
+        if mu is None:
+            # TODO
+            pass
+
+
+
+    def ystep(self):
+        r"""Minimise Augmented Lagrangian with respect to
+        :math:`\mathbf{y}`."""
+
+        self.Y = sp.prox_l1(self.AX + self.U,
+                            (self.lmbda / self.rho) * self.wl1)
+        # TODO - This needs to be modified accordingly
+        super(ConvBPDNLatInh, self).ystep()
+
+
+
+    def obfn_reg(self):
+        """Compute regularisation term and contribution to objective
+        function.
+        """
+
+        rl1 = np.linalg.norm((self.wl1 * self.obfn_gvar()).ravel(), 1)
+        # TODO - calculate inhibition term and include + find out what this is supposed to return
+        return (self.lmbda*rl1, rl1)
