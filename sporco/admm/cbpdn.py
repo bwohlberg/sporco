@@ -2889,7 +2889,7 @@ class MultiDictConvBPDN(object):
 
 class ConvBPDNLatInh(ConvBPDN):
     r"""
-    TODO - this might need to change
+    TODO - this block comment will need to be updated
     ADMM algorithm for the Convolutional BPDN (CBPDN)
     :cite:`wohlberg-2014-efficient` :cite:`wohlberg-2016-efficient`
     :cite:`wohlberg-2016-convolutional` problem.
@@ -3013,7 +3013,7 @@ class ConvBPDNLatInh(ConvBPDN):
 
     def __init__(self, D, S, Wg=None, Wh=None, lmbda=None, mu=None, opt=None, dimK=None, dimN=2):
         """
-        TODO - this might need to change
+        TODO - this block comment will need to be updated
         This class supports an arbitrary number of spatial dimensions,
         `dimN`, with a default of 2. The input dictionary `D` is either
         `dimN` + 1 dimensional, in which case each spatial component
@@ -3068,18 +3068,56 @@ class ConvBPDNLatInh(ConvBPDN):
 
         # Set default group weighting if not specified
         if Wg is None:
-            # TODO
-            pass
+            # Assume each filter is independent, i.e. there is no grouping and no inhibition
+            # TODO - make sure ystep is ok with an empty cmni in this case,
+            #        or just catch this case and call super
+            Wg = np.eye(self.cri.M)
+
+        # Add this value to the class instance
+        self.Wg = Wg
+
+        # Add the number of groups to the indexer
+        self.cri.Ng = Wg.shape[0]
+
+        # Infer the number of filters per group and add to the indexer
+        self.cri.Mg = self.cri.M // self.cri.Ng
+
+        # Obtain the grouping matrix c_{m,n}, where:
+        #     c_{m,n} = 1 if m != n and filter m and n belong to the same group,
+        #     0 otherwise.
+        self.cmn = (1 - np.eye(self.cri.M)) * np.repeat(Wg, repeats=self.cri.Mg, axis=0)
+
+        # Obtain a matrix of the indices where c_{m,n} is non-zero, i.e. the filter
+        # ids n of those which belong to the same group as filter m where m != n
+        # TODO - matlab equivalent self.cmni = np.reshape(np.where(self.cmn)[-1], (self.cri.M, self.cri.Mg - 1))
+        #        this part may need to be fixed
+        self.cmni = np.where(self.cmn)
 
         # Set default spatial weighting if not specified
         if Wh is None:
-            # TODO
-            pass
+            # This defaults to 50 ms if the sampling rate is 44.1k Hz.
+            # It should be specified where the solver is initialized,
+            # where the sampling rate and time window size are presumably known.
+            Wh = np.ones(self.cri.shpS, dtype=self.dtype)
+            Wh[:, 2205:-2205] = 0
 
-        # Set lateral inhibition scaling term
+        self.Wh = Wh
+        self.Whf = sl.fftn(Wh)
+
+        # Set default scaling term
         if mu is None:
-            # TODO
-            pass
+            # TODO - open to suggestions for a better default
+            mu = self.lmbda * 10E-4
+
+        # Set scaling term for lateral inhibition
+        self.mu = self.dtype.type(mu)
+
+        # Initialize lateral inhibition l1 weighting term and its previous value
+        self.wm = np.array(1)
+        self.wm_prev = None
+
+        # Initialize smoothing for lateral inhibition l1 weighting term
+        self.wms = np.array(0.9)
 
 
 
@@ -3088,9 +3126,20 @@ class ConvBPDNLatInh(ConvBPDN):
         :math:`\mathbf{y}`."""
 
         self.Y = sp.prox_l1(self.AX + self.U,
-                            (self.lmbda / self.rho) * self.wl1)
-        # TODO - This needs to be modified accordingly
-        super(ConvBPDNLatInh, self).ystep()
+                            (self.lmbda / self.rho) * self.wm)
+
+        Yl2 = self.Wg * sp.norm_l2(self.Y)
+        Yl2[Yl2 == 0] = 1
+        self.Y = self.Y * sp.prox_l1(Yl2, self.mu) / Yl2
+
+        self.wm_prev = self.wm
+
+        self.WhX = sl.ifftn(self.Whf * self.Xf)
+
+        self.wm = np.sum(self.WhX[self.cmni], axis=-1)
+
+        # Smooth lateral inhibition weighting term
+        self.wm = self.wms * self.wm_prev + (1 - self.wms) * self.wm
 
 
 
@@ -3100,5 +3149,5 @@ class ConvBPDNLatInh(ConvBPDN):
         """
 
         rl1 = np.linalg.norm((self.wl1 * self.obfn_gvar()).ravel(), 1)
-        # TODO - calculate inhibition term and include + find out what this is supposed to return
-        return (self.lmbda*rl1, rl1)
+        rl2 = np.linalg.norm((self.Wg * sp.norm_l2(self.obfn_gvar())).ravel(), 1)
+        return (self.lmbda*rl1 + self.mu*rl2, rl1, rl2)
