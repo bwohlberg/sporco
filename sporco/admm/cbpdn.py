@@ -3005,13 +3005,13 @@ class ConvBPDNLatInh(ConvBPDN):
 
 
 
-    itstat_fields_objfn = ('ObjFun', 'DFid', 'RegL1')
-    hdrtxt_objfn = ('Fnc', 'DFid', u('Regℓ1'))
-    hdrval_objfun = {'Fnc': 'ObjFun', 'DFid': 'DFid', u('Regℓ1'): 'RegL1'}
+    itstat_fields_objfn = ('ObjFun', 'DFid', 'RegL1', 'RegL1W')
+    hdrtxt_objfn = ('Fnc', 'DFid', u('Regℓ1'), u('Regℓ1W'))
+    hdrval_objfun = {'Fnc': 'ObjFun', 'DFid': 'DFid', u('Regℓ1'): 'RegL1', u('Regℓ1W'): 'RegL1W'}
 
 
 
-    def __init__(self, D, S, Wg=None, Wh=None, lmbda=None, mu=None, opt=None, dimK=None, dimN=2):
+    def __init__(self, D, S, Wg=None, fs=44100, T=0.05, lmbda=None, mu=None, opt=None, dimK=None, dimN=2):
         """
         TODO - this block comment will need to be updated
         This class supports an arbitrary number of spatial dimensions,
@@ -3071,7 +3071,7 @@ class ConvBPDNLatInh(ConvBPDN):
             # Assume each filter is independent, i.e. there is no grouping and no inhibition
             # TODO - make sure ystep is ok with an empty cmni in this case,
             #        or just catch this case and call super
-            Wg = np.eye(self.cri.M)
+            Wg = np.eye(self.cri.M, dtype=self.dtype)
 
         # Add this value to the class instance
         self.Wg = Wg
@@ -3091,33 +3091,30 @@ class ConvBPDNLatInh(ConvBPDN):
         # ids n of those which belong to the same group as filter m where m != n
         # TODO - matlab equivalent self.cmni = np.reshape(np.where(self.cmn)[-1], (self.cri.M, self.cri.Mg - 1))
         #        this part may need to be fixed
-        self.cmni = np.where(self.cmn)
+        self.cmni = self.cmn == 1
 
-        # Set default spatial weighting if not specified
-        if Wh is None:
-            # This defaults to 50 ms if the sampling rate is 44.1k Hz.
-            # It should be specified where the solver is initialized,
-            # where the sampling rate and time window size are presumably known.
-            Wh = np.ones(self.cri.shpS, dtype=self.dtype)
-            Wh[:, 2205:-2205] = 0
+        # Set default spatial weighting
+        Wh = np.ones(self.cri.shpS, dtype=self.dtype)
+        Wh[:, int(fs * T):-int(fs * T)] = 0
 
-        self.Wh = Wh
-        self.Whf = sl.fftn(Wh)
+        self.Whf = sl.rfftn(Wh, self.cri.Nv, self.cri.axisN)
+
+        self.WhX = None
 
         # Set default scaling term
         if mu is None:
             # TODO - open to suggestions for a better default
-            mu = self.lmbda * 10E-4
+            mu = self.lmbda * 10
 
         # Set scaling term for lateral inhibition
         self.mu = self.dtype.type(mu)
 
         # Initialize lateral inhibition l1 weighting term and its previous value
-        self.wm = np.array(1)
+        self.wm = 1
         self.wm_prev = None
 
         # Initialize smoothing for lateral inhibition l1 weighting term
-        self.wms = np.array(0.9)
+        self.wms = 0.9
 
 
 
@@ -3125,18 +3122,21 @@ class ConvBPDNLatInh(ConvBPDN):
         r"""Minimise Augmented Lagrangian with respect to
         :math:`\mathbf{y}`."""
 
-        self.Y = sp.prox_l1(self.AX + self.U,
-                            (self.lmbda / self.rho) * self.wm)
+        self.Y = sp.prox_l1(self.AX + self.U, (self.lmbda / self.rho) * self.wm)
 
-        Yl2 = self.Wg * sp.norm_l2(self.Y)
+        # TODO - reuse sp functions or make new? Yl2 = self.Wg * sp.norm_l2(self.Y)
+        Yl2 = np.dot(np.sqrt(np.sum(np.dot(self.Y ** 2, self.Wg.T), axis=0)), self.Wg)
         Yl2[Yl2 == 0] = 1
         self.Y = self.Y * sp.prox_l1(Yl2, self.mu) / Yl2
 
         self.wm_prev = self.wm
 
-        self.WhX = sl.ifftn(self.Whf * self.Xf)
 
-        self.wm = np.sum(self.WhX[self.cmni], axis=-1)
+        Xaf = sl.rfftn(np.abs(self.X), self.cri.Nv, self.cri.axisN)
+        self.WhX = sl.irfftn(self.Whf * Xaf, self.cri.Nv, self.cri.axisN)
+
+        self.wm = np.concatenate([np.expand_dims(np.sum(self.WhX[:, :, :, self.cmni[m, :]], axis=-1), -1)
+                                 for m in range(self.cri.M)], axis=-1)
 
         # Smooth lateral inhibition weighting term
         self.wm = self.wms * self.wm_prev + (1 - self.wms) * self.wm
