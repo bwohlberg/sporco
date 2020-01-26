@@ -3129,8 +3129,9 @@ class ConvBPDNLatInh(ConvBPDN):
         Yl2[Yl2 == 0] = 1
         self.Y = self.Y * sp.prox_l1(Yl2, self.mu) / Yl2
 
-        self.wm_prev = self.wm
+        super(ConvBPDN, self).ystep()
 
+        self.wm_prev = self.wm
 
         Xaf = sl.rfftn(np.abs(self.X), self.cri.Nv, self.cri.axisN)
         self.WhX = sl.irfftn(self.Whf * Xaf, self.cri.Nv, self.cri.axisN)
@@ -3148,6 +3149,7 @@ class ConvBPDNLatInh(ConvBPDN):
         function.
         """
 
-        rl1 = np.linalg.norm((self.wl1 * self.obfn_gvar()).ravel(), 1)
-        rl2 = np.linalg.norm((self.Wg * sp.norm_l2(self.obfn_gvar())).ravel(), 1)
+        Y = self.obfn_gvar()
+        rl1 = np.linalg.norm((self.wm * Y).ravel(), 1)
+        rl2 = np.linalg.norm((np.sqrt(np.sum(np.dot(Y ** 2, self.Wg.T), axis=0))).ravel(), 1)
         return (self.lmbda*rl1 + self.mu*rl2, rl1, rl2)
