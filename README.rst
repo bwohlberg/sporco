@@ -53,7 +53,7 @@ If you use this software for published work, please `cite it <http://sporco.read
 Documentation
 -------------
 
-Documentation is `available online <http://sporco.rtfd.io/>`_, or can be built from the root directory of the source distribution by the command
+`Documentation is available online <http://sporco.rtfd.io/>`_, or can be built from the root directory of the source distribution by the command
 
 ::
 
