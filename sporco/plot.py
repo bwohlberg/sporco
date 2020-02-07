@@ -18,16 +18,12 @@ import matplotlib.cm as cm
 from matplotlib.pyplot import figure, subplot, subplots, gcf, gca, savefig
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from mpl_toolkits.mplot3d import Axes3D
-# mpldatacursor is currently broken for matplotlib 3.x
-if int(matplotlib.__version__.split('.')[0]) >= 3:
+try:
+    import mpldatacursor as mpldc
+except ImportError:
     have_mpldc = False
 else:
-    try:
-        import mpldatacursor as mpldc
-    except ImportError:
-        have_mpldc = False
-    else:
-        have_mpldc = True
+    have_mpldc = True
 
 
 __author__ = """Brendt Wohlberg <brendt@ieee.org>"""
