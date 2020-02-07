@@ -101,7 +101,7 @@ Define proximal operator of (implicit, unknown) regularisation term for PPP prob
 
 bsigma = 3.5e-2  # Denoiser parameter
 
-def proxg(x):
+def proxg(x, L):
     return bm3d_rgb(x, bsigma)
 
 

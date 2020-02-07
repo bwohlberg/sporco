@@ -62,7 +62,7 @@ class GenericPPP(fista.FISTA):
     def eval_proxop(self, V):
         """Compute proximal operator of :math:`g`."""
 
-        return self.proxg(V)
+        return self.proxg(V, self.L)
 
 
 
