@@ -92,7 +92,7 @@ Define gradient of data fidelity term for PPP problem.
 """
 
 def gradf(x):
-    return AT(A(x)  - sn)
+    return AT(A(x) - sn)
 
 
 """
