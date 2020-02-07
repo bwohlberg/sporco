@@ -85,7 +85,7 @@ Di[0, 0] = 1.0
 D = np.concatenate((Di, D0), axis=2)
 
 S = img.reshape((-1, img.shape[-1])).T
-pcaB, pcaS, pcaC = util.pca(S, centre=False)
+pcaB, pcaS, pcaC = sl.pca(S, centre=False)
 B = pcaB[:, 0:20]
 
 
