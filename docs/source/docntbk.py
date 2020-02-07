@@ -216,7 +216,7 @@ def script_string_to_notebook_with_links(str, pth, cr=None):
 
 
 
-def rst_to_notebook(infile, outfile):
+def rst_to_notebook(infile, outfile, diridx=False):
     """Convert an rst file to a notebook file."""
 
     # Read infile into a string
@@ -228,6 +228,9 @@ def rst_to_notebook(infile, outfile):
                                   extra_args=['--atx-headers'])
     # In links, replace .py extensions with .ipynb
     mdstr = re.sub(r'\(([^\)]+).py\)', r'(\1.ipynb)', mdstr)
+    # Links to subdirectories require explicit index file inclusion
+    if diridx:
+        mdstr = re.sub(r']\(([^\)/]+)\)', r'](\1/index.ipynb)', mdstr)
     # Enclose the markdown within triple quotes and convert from
     # python to notebook
     mdstr = '"""' + mdstr + '"""'

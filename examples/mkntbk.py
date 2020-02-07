@@ -43,8 +43,9 @@ for fp in glob(os.path.join(ppth, '*.rst')) + \
     # doesn't exist, or is older than index file
     if docntbk.update_required(fp, fn):
         print('Converting %s' % fp)
+        diridx = True if fp == 'scripts/index.rst' else False
         # Convert index to notebook
-        docntbk.rst_to_notebook(fp, fn)
+        docntbk.rst_to_notebook(fp, fn, diridx=diridx)
 
 
 # Get intersphinx inventory and sphinx environment and construct cross
