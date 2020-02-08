@@ -20,8 +20,6 @@ Version 0.1.12   (not yet released)
   util.extract_blocks, util.averageblocks to util.average_blocks, and
   util.combineblocks to util.combine_blocks
 • Moved util.pca to linalg.pca
-• Optional mpldatacursor support in sporco.plot is disabled in Matplotlib 3.x
-  due to unresolved compatibility issues in mpldatacursor
 
 
 
