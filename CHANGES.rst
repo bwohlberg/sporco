@@ -3,8 +3,8 @@ SPORCO Release Notes
 ====================
 
 
-Version 0.1.12   (not yet released)
------------------------------------
+Version 0.1.12   (2020-02-08)
+-----------------------------
 
 • Improved run time and memory usage of tikhonov_filter function
 • Fixed bug in functional value calculation in class
