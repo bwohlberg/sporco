@@ -2980,34 +2980,10 @@ class ConvBPDNLatInh(ConvBPDN):
     """
 
 
-    class Options(ConvBPDN.Options):
-        r"""ConvBPDNLatInh algorithm options
-
-        Options include all of those defined in
-        :class:`.cbpdn.ConvBPDN.Options`.
-        """
-
-        #defaults = copy.deepcopy(GenericConvBPDN.Options.defaults)
-        #defaults.update({'L1Weight': 1.0})
-
-
-        def __init__(self, opt=None):
-            """
-            Parameters
-            ----------
-            opt : dict or None, optional (default None)
-              ConvBPDNLatInh algorithm options
-            """
-
-            if opt is None:
-                opt = {}
-            ConvBPDN.Options.__init__(self, opt)
-
-
 
     itstat_fields_objfn = ('ObjFun', 'DFid', 'RegL1', 'RegL1W')
-    hdrtxt_objfn = ('Fnc', 'DFid', u('Regℓ1'), u('Regℓ1W'))
-    hdrval_objfun = {'Fnc': 'ObjFun', 'DFid': 'DFid', u('Regℓ1'): 'RegL1', u('Regℓ1W'): 'RegL1W'}
+    hdrtxt_objfn = ('Fnc', 'DFid', u('Regℓ1'), u('Regℓ2,1'))
+    hdrval_objfun = {'Fnc': 'ObjFun', 'DFid': 'DFid', u('Regℓ1'): 'RegL1', u('Regℓ2,1'): 'RegL2,1'}
 
 
 
@@ -3056,65 +3032,70 @@ class ConvBPDNLatInh(ConvBPDN):
           Number of spatial/temporal dimensions
         """
 
-        # Set default options if none specified
-        if opt is None:
-            opt = ConvBPDN.Options()
-
-        # Set dtype attribute based on S.dtype and opt['DataType']
-        self.set_dtype(opt, S.dtype)
-
         # Call parent class __init__
         super(ConvBPDNLatInh, self).__init__(D, S, lmbda, opt, dimK, dimN)
 
-        # Set default group weighting if not specified
-        if Wg is None:
-            # Assume each filter is independent, i.e. there is no grouping and no inhibition
-            # TODO - make sure ystep is ok with an empty cmni in this case,
-            #        or just catch this case and call super
-            Wg = np.eye(self.cri.M, dtype=self.dtype)
-
-        # Add this value to the class instance
+        # Add the groups to the class instance
         self.Wg = Wg
 
-        # Add the number of groups to the indexer
-        self.cri.Ng = Wg.shape[0]
+        # Check to make sure a valid grouping is provided. If not, we assume
+        # each filter is independent, i.e. there is no grouping and no inhibition.
+        if self.Wg is not None:
+            # Set the type of the grouping weights
+            self.Wg = self.Wg.astype(self.dtype)
 
-        # Infer the number of filters per group and add to the indexer
-        self.cri.Mg = self.cri.M // self.cri.Ng
+            # Add the number of groups to the indexer
+            self.cri.Ng = self.Wg.shape[0]
 
-        # Obtain the grouping matrix c_{m,n}, where:
-        #     c_{m,n} = 1 if m != n and filter m and n belong to the same group,
-        #     0 otherwise.
-        self.cmn = (1 - np.eye(self.cri.M)) * np.repeat(Wg, repeats=self.cri.Mg, axis=0)
+            # Determine the number of filters per group and add to the indexer
+            self.cri.Mgs = np.sum((self.Wg != 0), axis=1)
 
-        # Obtain a matrix of the indices where c_{m,n} is non-zero, i.e. the filter
-        # ids n of those which belong to the same group as filter m where m != n
-        # TODO - matlab equivalent self.cmni = np.reshape(np.where(self.cmn)[-1], (self.cri.M, self.cri.Mg - 1))
-        #        this part may need to be fixed
-        self.cmni = self.cmn == 1
+            # Initialize the grouping matrix
+            self.cmn = np.zeros((self.cri.M, self.cri.M), dtype=self.dtype)
 
-        # Set default spatial weighting
-        Wh = np.ones(self.cri.shpS, dtype=self.dtype)
-        Wh[:, int(fs * T):-int(fs * T)] = 0
+            # Obtain the grouping matrix c_{m,n}, where:
+            #     c_{m,n} = 1 if m != n and filter m and n belong to the same group,
+            #             = 0 otherwise.
+            for g in range(self.cri.Ng):
+                temp_groups = np.zeros(self.cmn.shape, dtype=self.dtype)
+                mmbr_indces = (self.Wg[g] != 0)
+                temp_groups[mmbr_indces, :] = self.Wg[g]
+                self.cmn += temp_groups
 
-        self.Whf = sl.rfftn(Wh, self.cri.Nv, self.cri.axisN)
+            # Remove self-grouping
+            self.cmn = self.cmn * (1 - np.eye(self.cri.M))
 
-        self.WhX = None
+            # Protect against same pair in multiple groups
+            self.cmn[self.cmn != 0] = 1
 
-        # Set default scaling term
-        if mu is None:
-            # TODO - open to suggestions for a better default
-            mu = self.lmbda * 10
+            # Obtain a matrix of the indices where c_{m,n} is non-zero, i.e. the filter
+            # ids n of those which belong to the same group as filter m where m != n
+            self.cmni = self.cmn == 1
 
-        # Set scaling term for lateral inhibition
-        self.mu = self.dtype.type(mu)
+            # Create rectangular time inhibition window
+            # TODO - options for other window functions
+            Wh = np.ones(self.cri.shpS, dtype=self.dtype)
+            Wh[int(fs * T):-int(fs * T)] = 0
 
-        # Initialize lateral inhibition l1 weighting term and its previous value
-        self.wm = 1
-        self.wm_prev = None
+            # Obtain the inhibition window frequency representation
+            self.Whf = sl.rfftn(Wh, self.cri.Nv, self.cri.axisN)
 
-        # Initialize smoothing for lateral inhibition l1 weighting term
-        self.wms = 0.9
+            # Initialize weights for weighted l1 norm (lateral inhibition)
+            self.WhXa = None
+
+            # Set default scaling term
+            if mu is None:
+                mu = self.lmbda * 1E-2
+
+            # Set weighted l1 (lateral inhibition) term scaling
+            self.mu = self.dtype.type(mu)
+
+            # Initialize weighted l1 term and its previous value
+            self.wm = 1
+            self.wm_prev = None
+
+            # Initialize smoothing for weighted l1 term
+            self.wms = 0.9
 
 
 
@@ -3122,25 +3103,39 @@ class ConvBPDNLatInh(ConvBPDN):
         r"""Minimise Augmented Lagrangian with respect to
         :math:`\mathbf{y}`."""
 
-        self.Y = sp.prox_l1(self.AX + self.U, (self.lmbda / self.rho) * self.wm)
+        if self.Wg is None:
+            # Skip unnecessary lateral inhibition steps and run standard CBPDN
+            super(ConvBPDNLatInh, self).ystep()
 
-        # TODO - reuse sp functions or make new? Yl2 = self.Wg * sp.norm_l2(self.Y)
-        Yl2 = np.dot(np.sqrt(np.sum(np.dot(self.Y ** 2, self.Wg.T), axis=0)), self.Wg)
-        Yl2[Yl2 == 0] = 1
-        self.Y = self.Y * sp.prox_l1(Yl2, self.mu) / Yl2
+        else:
+            # Perform soft-thresholding step of Y subproblem using l1 weights
+            Y = sp.prox_l1(self.AX + self.U, (self.lmbda / self.rho) * self.wm)
 
-        super(ConvBPDN, self).ystep()
+            # TODO - I don't understand where this block comes from - I believe it pertains to group sparsity
+            # TODO - add another function to _lp.py for 2,1-norm
+            Yl2 = np.dot(np.sqrt(np.sum(np.dot(Y ** 2, self.Wg.T), axis=0)), self.Wg)
+            Yl2[Yl2 == 0] = 1
+            self.Y = Y * sp.prox_l1(Yl2, self.mu) / Yl2
 
-        self.wm_prev = self.wm
+            # Handle negative coefficients and boundary crossings
+            super(ConvBPDN, self).ystep()
 
-        Xaf = sl.rfftn(np.abs(self.X), self.cri.Nv, self.cri.axisN)
-        self.WhX = sl.irfftn(self.Whf * Xaf, self.cri.Nv, self.cri.axisN)
+            # Update previous weighted l1 term
+            self.wm_prev = self.wm
 
-        self.wm = np.concatenate([np.expand_dims(np.sum(self.WhX[:, :, :, self.cmni[m, :]], axis=-1), -1)
-                                 for m in range(self.cri.M)], axis=-1)
+            # Compute the frequency domain representation of the magnitude of X
+            Xaf = sl.rfftn(np.abs(self.X), self.cri.Nv, self.cri.axisN)
 
-        # Smooth lateral inhibition weighting term
-        self.wm = self.wms * self.wm_prev + (1 - self.wms) * self.wm
+            # Convolve the time inhibition window with the magnitude of X
+            self.WhXa = sl.irfftn(self.Whf * Xaf, self.cri.Nv, self.cri.axisN)
+
+            # Sum the weights across in-group members for each element
+            self.wm = np.concatenate([np.expand_dims(np.sum(self.WhXa[:,:,:,self.cmni[m]], -1), -1)
+                                     for m in range(self.cri.M)], axis=-1)
+
+            # Smooth weighted l1 term
+            # TODO - more smoothing options
+            self.wm = self.wms * self.wm_prev + (1 - self.wms) * self.wm
 
 
 
@@ -3149,7 +3144,8 @@ class ConvBPDNLatInh(ConvBPDN):
         function.
         """
 
+        # TODO - l1 and l2,1-norm in original implementation
         Y = self.obfn_gvar()
         rl1 = np.linalg.norm((self.wm * Y).ravel(), 1)
-        rl2 = np.linalg.norm((np.sqrt(np.sum(np.dot(Y ** 2, self.Wg.T), axis=0))).ravel(), 1)
-        return (self.lmbda*rl1 + self.mu*rl2, rl1, rl2)
+        rwl1 = np.linalg.norm((np.sqrt(np.sum(np.dot(Y ** 2, self.Wg.T), axis=0))).ravel(), 1)
+        return (self.lmbda*rl1 + self.mu*rwl1, rl1, rwl1)
