@@ -2981,9 +2981,9 @@ class ConvBPDNLatInh(ConvBPDN):
 
 
 
-    itstat_fields_objfn = ('ObjFun', 'DFid', 'RegL1', 'RegL1W')
-    hdrtxt_objfn = ('Fnc', 'DFid', u('Regℓ1'), u('Regℓ2,1'))
-    hdrval_objfun = {'Fnc': 'ObjFun', 'DFid': 'DFid', u('Regℓ1'): 'RegL1', u('Regℓ2,1'): 'RegL2,1'}
+    itstat_fields_objfn = ('ObjFun', 'DFid', 'RegL1', 'RegL21')
+    hdrtxt_objfn = ('Fnc', 'DFid', u('Regℓ1'), u('Regℓ21'))
+    hdrval_objfun = {'Fnc': 'ObjFun', 'DFid': 'DFid', u('Regℓ1'): 'RegL1', u('Regℓ21'): 'RegL21'}
 
 
 
