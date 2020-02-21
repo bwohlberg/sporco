@@ -3144,6 +3144,6 @@ class ConvBPDNLatInh(ConvBPDN):
         function.
         """
 
-        rl1 = np.linalg.norm(self.obfn_gvar().ravel(), 1)
+        rl1 = np.linalg.norm((self.wl1 * self.obfn_gvar()).ravel(), 1)
         rwl1 = np.linalg.norm((self.wm * self.obfn_gvar()).ravel(), 1)
         return (self.lmbda*rl1 + self.mu*rwl1, rl1, rwl1)
