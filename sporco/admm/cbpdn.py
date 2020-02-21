@@ -2890,13 +2890,12 @@ class MultiDictConvBPDN(object):
 class ConvBPDNLatInh(ConvBPDN):
     r"""
     TODO - this block comment will need to be updated
-    ADMM algorithm for the Convolutional BPDN (CBPDN)
-    :cite:`wohlberg-2014-efficient` :cite:`wohlberg-2016-efficient`
-    :cite:`wohlberg-2016-convolutional` problem.
+    ADMM algorithm for Convolutional BPDN with lateral inhibition via a
+    weighted :math:`\ell_{1}` norm term :cite:`wohlberg-2016-convolutional2`
 
     |
 
-    .. inheritance-diagram:: ConvBPDN
+    .. inheritance-diagram:: ConvBPDNLatInh
        :parts: 2
 
     |
@@ -2905,48 +2904,20 @@ class ConvBPDNLatInh(ConvBPDN):
 
     .. math::
        \mathrm{argmin}_\mathbf{x} \;
-       (1/2) \left\| \sum_m \mathbf{d}_m * \mathbf{x}_m -
-       \mathbf{s} \right\|_2^2 + \lambda \sum_m \| \mathbf{x}_m \|_1
+       (1/2) \sum_c \left\| \sum_m \mathbf{d}_m * \mathbf{x}_{c,m} -
+       \mathbf{s}_c \right\|_2^2 + \lambda \sum_c \sum_m
+       \| \mathbf{x}_{c,m} \|_1 + \mu \| \{ \mathbf{x}_{c,m} \} \|_{2,1}
 
-    for input image :math:`\mathbf{s}`, dictionary filters
-    :math:`\mathbf{d}_m`, and coefficient maps :math:`\mathbf{x}_m`,
-    via the ADMM problem
+    with input images :math:`\mathbf{s}_c`, dictionary filters
+    :math:`\mathbf{d}_m`, and coefficient maps
+    :math:`\mathbf{x}_{c,m}`, via the ADMM problem
 
     .. math::
        \mathrm{argmin}_{\mathbf{x}, \mathbf{y}} \;
-       (1/2) \left\| \sum_m \mathbf{d}_m * \mathbf{x}_m -
-       \mathbf{s} \right\|_2^2 + \lambda \sum_m \| \mathbf{y}_m \|_1
-       \quad \text{such that} \quad \mathbf{x}_m = \mathbf{y}_m \;\;.
-
-    Multi-image and multi-channel problems are also supported. The
-    multi-image problem is
-
-    .. math::
-       \mathrm{argmin}_\mathbf{x} \;
-       (1/2) \sum_k \left\| \sum_m \mathbf{d}_m * \mathbf{x}_{k,m} -
-       \mathbf{s}_k \right\|_2^2 + \lambda \sum_k \sum_m
-       \| \mathbf{x}_{k,m} \|_1
-
-    with input images :math:`\mathbf{s}_k` and coefficient maps
-    :math:`\mathbf{x}_{k,m}`, and the multi-channel problem with input
-    image channels :math:`\mathbf{s}_c` is either
-
-    .. math::
-       \mathrm{argmin}_\mathbf{x} \;
        (1/2) \sum_c \left\| \sum_m \mathbf{d}_m * \mathbf{x}_{c,m} -
-       \mathbf{s}_c \right\|_2^2 +
-       \lambda \sum_c \sum_m \| \mathbf{x}_{c,m} \|_1
-
-    with single-channel dictionary filters :math:`\mathbf{d}_m` and
-    multi-channel coefficient maps :math:`\mathbf{x}_{c,m}`, or
-
-    .. math::
-       \mathrm{argmin}_\mathbf{x} \;
-       (1/2) \sum_c \left\| \sum_m \mathbf{d}_{c,m} * \mathbf{x}_m -
-       \mathbf{s}_c \right\|_2^2 + \lambda \sum_m \| \mathbf{x}_m \|_1
-
-    with multi-channel dictionary filters :math:`\mathbf{d}_{c,m}` and
-    single-channel coefficient maps :math:`\mathbf{x}_m`.
+       \mathbf{s}_c \right\|_2^2 + \lambda \sum_c \sum_m
+       \| \mathbf{y}_{c,m} \|_1 + \mu \| \{ \mathbf{y}_{c,m} \} \|_{2,1}
+       \quad \text{such that} \quad \mathbf{x}_{c,m} = \mathbf{y}_{c,m} \;\;.
 
     After termination of the :meth:`solve` method, attribute :attr:`itstat`
     is a list of tuples representing statistics of each iteration. The
@@ -2956,15 +2927,19 @@ class ConvBPDNLatInh(ConvBPDN):
 
        ``ObjFun`` : Objective function value
 
-       ``DFid`` : Value of data fidelity term :math:`(1/2) \| \sum_m
-       \mathbf{d}_m * \mathbf{x}_m - \mathbf{s} \|_2^2`
+       ``DFid`` :  Value of data fidelity term :math:`(1/2) \sum_c
+       \left\| \sum_m \mathbf{d}_m * \mathbf{x}_{k,m} - \mathbf{s}_c
+       \right\|_2^2`
 
-       ``RegL1`` : Value of regularisation term :math:`\sum_m \|
-       \mathbf{x}_m \|_1`
+       ``RegL1`` : Value of regularisation term :math:`\sum_c \sum_m
+       \| \mathbf{x}_{c,m} \|_1`
+
+       ``RegL21`` : Value of regularisation term :math:`\| \{
+       \mathbf{x}_{c,m} \} \|_{2,1}`
 
        ``PrimalRsdl`` : Norm of primal residual
 
-       ``DualRsdl`` : Norm of dual residual
+       ``DualRsdl`` : Norm of dual Residual
 
        ``EpsPrimal`` : Primal residual stopping tolerance
        :math:`\epsilon_{\mathrm{pri}}`
@@ -2974,16 +2949,43 @@ class ConvBPDNLatInh(ConvBPDN):
 
        ``Rho`` : Penalty parameter
 
-       ``XSlvRelRes`` : Relative residual of X step solver
-
        ``Time`` : Cumulative run time
     """
 
 
+    class Options(ConvBPDN.Options):
+        r"""ConvBPDNLatInh algorithm options
+        TODO - this block comment will need to be updated
 
-    itstat_fields_objfn = ('ObjFun', 'DFid', 'RegL1', 'RegL21')
-    hdrtxt_objfn = ('Fnc', 'DFid', u('Regℓ1'), u('Regℓ21'))
-    hdrval_objfun = {'Fnc': 'ObjFun', 'DFid': 'DFid', u('Regℓ1'): 'RegL1', u('Regℓ21'): 'RegL21'}
+        Options include all of those defined in
+        :class:`.cbpdn.ConvBPDN.Options`, together with additional options:
+
+          ``LISmWeight`` : Smoothing for the weighted :math:`\ell_1`
+          norm (lateral inhibition). The value acts as the percentage of the
+          previous value which is added to the.
+        """
+
+        defaults = copy.deepcopy(GenericConvBPDN.Options.defaults)
+        defaults.update({'LISmWeight': 0.9})
+
+
+        def __init__(self, opt=None):
+            """
+            Parameters
+            ----------
+            opt : dict or None, optional (default None)
+              ConvBPDNLatInh algorithm options
+            """
+
+            if opt is None:
+                opt = {}
+            ConvBPDN.Options.__init__(self, opt)
+
+
+
+    itstat_fields_objfn = ('ObjFun', 'DFid', 'RegL1', 'RegWL1')
+    hdrtxt_objfn = ('Fnc', 'DFid', u('Regℓ1'), u('RegWℓ1'))
+    hdrval_objfun = {'Fnc': 'ObjFun', 'DFid': 'DFid', u('Regℓ1'): 'RegL1', u('RegWℓ1'): 'RegWL1'}
 
 
 
@@ -3032,6 +3034,10 @@ class ConvBPDNLatInh(ConvBPDN):
           Number of spatial/temporal dimensions
         """
 
+        # Set default options if none specified
+        if opt is None:
+            opt = ConvBPDNLatInh.Options()
+
         # Call parent class __init__
         super(ConvBPDNLatInh, self).__init__(D, S, lmbda, opt, dimK, dimN)
 
@@ -3073,7 +3079,6 @@ class ConvBPDNLatInh(ConvBPDN):
             self.cmni = self.cmn == 1
 
             # Create rectangular time inhibition window
-            # TODO - options for other window functions
             Wh = np.ones(self.cri.shpS, dtype=self.dtype)
             Wh[int(fs * T):-int(fs * T)] = 0
 
@@ -3095,7 +3100,7 @@ class ConvBPDNLatInh(ConvBPDN):
             self.wm_prev = None
 
             # Initialize smoothing for weighted l1 term
-            self.wms = 0.9
+            self.wms = opt['L1Weight']
 
 
 
@@ -3103,26 +3108,18 @@ class ConvBPDNLatInh(ConvBPDN):
         r"""Minimise Augmented Lagrangian with respect to
         :math:`\mathbf{y}`."""
 
-        if self.Wg is None:
+        if self.Wg is None or not self.mu:
             # Skip unnecessary lateral inhibition steps and run standard CBPDN
             super(ConvBPDNLatInh, self).ystep()
 
         else:
             # Perform soft-thresholding step of Y subproblem using l1 weights
-            Y = sp.prox_l1(self.AX + self.U, (self.lmbda / self.rho) * self.wm)
-
-            # TODO - I don't understand where this block comes from - I believe it pertains to group sparsity
-            # TODO - add another function to _lp.py for 2,1-norm
-            Yl2 = np.dot(np.sqrt(np.sum(np.dot(Y ** 2, self.Wg.T), axis=0)), self.Wg)
-            Yl2[Yl2 == 0] = 1
-            self.Y = Y * sp.prox_l1(Yl2, self.mu) / Yl2
-
-            # Handle negative coefficients and boundary crossings
-            super(ConvBPDN, self).ystep()
+            self.Y = sp.prox_l1(self.AX + self.U, (self.lmbda * self.wl1 + self.mu * self.wm) / self.rho)
 
             # Update previous weighted l1 term
             self.wm_prev = self.wm
 
+            # TODO ------> can we speed up this portion?
             # Compute the frequency domain representation of the magnitude of X
             Xaf = sl.rfftn(np.abs(self.X), self.cri.Nv, self.cri.axisN)
 
@@ -3132,10 +3129,13 @@ class ConvBPDNLatInh(ConvBPDN):
             # Sum the weights across in-group members for each element
             self.wm = np.concatenate([np.expand_dims(np.sum(self.WhXa[:,:,:,self.cmni[m]], -1), -1)
                                      for m in range(self.cri.M)], axis=-1)
+            # TODO ------>
 
             # Smooth weighted l1 term
-            # TODO - more smoothing options
             self.wm = self.wms * self.wm_prev + (1 - self.wms) * self.wm
+
+            # Handle negative coefficients and boundary crossings
+            super(ConvBPDN, self).ystep()
 
 
 
@@ -3144,8 +3144,6 @@ class ConvBPDNLatInh(ConvBPDN):
         function.
         """
 
-        # TODO - l1 and l2,1-norm in original implementation
-        Y = self.obfn_gvar()
-        rl1 = np.linalg.norm((self.wm * Y).ravel(), 1)
-        rwl1 = np.linalg.norm((np.sqrt(np.sum(np.dot(Y ** 2, self.Wg.T), axis=0))).ravel(), 1)
+        rl1 = np.linalg.norm(self.obfn_gvar().ravel(), 1)
+        rwl1 = np.linalg.norm((self.wm * self.obfn_gvar()).ravel(), 1)
         return (self.lmbda*rl1 + self.mu*rwl1, rl1, rwl1)
