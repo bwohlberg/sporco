@@ -2965,7 +2965,7 @@ class ConvBPDNLatInh(ConvBPDN):
           previous value which is added to the.
         """
 
-        defaults = copy.deepcopy(GenericConvBPDN.Options.defaults)
+        defaults = copy.deepcopy(ConvBPDN.Options.defaults)
         defaults.update({'LISmWeight': 0.9})
 
 
