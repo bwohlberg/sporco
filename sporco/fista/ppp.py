@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2019 by Brendt Wohlberg <brendt@ieee.org>
-#                       Ulugbek Kamilov <kamilov@wustl.edu>
+# Copyright (C) 2019-2020 by Brendt Wohlberg <brendt@ieee.org>
+#                            Ulugbek Kamilov <kamilov@wustl.edu>
 # All rights reserved. BSD 3-clause License.
 # This file is part of the SPORCO package. Details of the copyright
 # and user license can be found in the 'LICENSE.txt' file distributed
@@ -20,7 +20,8 @@ __author__ = """\n""".join(['Brendt Wohlberg <brendt@ieee.org>',
 
 
 class GenericPPP(fista.FISTA):
-    """Base class for PPP FISTA solvers :cite:`kamilov-2017-plugandplay`."""
+    """Base class for Plug and Play Priors (PPP) FISTA solvers
+    :cite:`kamilov-2017-plugandplay`."""
 
     def __init__(self, xshape, opt=None):
         """
@@ -28,7 +29,7 @@ class GenericPPP(fista.FISTA):
         ----------
         xshape : tuple of ints
           Shape of working variable X
-        opt : :class:`PPP.Options` object
+        opt : :class:`GenericPPP.Options` object
           Algorithm options
         """
 
@@ -53,7 +54,7 @@ class GenericPPP(fista.FISTA):
 
 
     def eval_grad(self):
-        """Compute gradient in spatial domain for variable Y."""
+        """Compute the gradient of :math:`f`."""
 
         return self.gradf(self.Y)
 
@@ -74,20 +75,55 @@ class GenericPPP(fista.FISTA):
 
 
     def eval_objfn(self):
-        r"""Compute components of objective function. In this case the
-        regularisation term is implicit so we can only evaluate the
-        data fidelity term represented by the :math:`f(\cdot)`
-        component of the functional to be minimised.
+        r"""Compute components of objective function.
+
+        In this case the regularisation term is implicit so we can only
+        evaluate the data fidelity term represented by the
+        :math:`f(\cdot)` component of the functional to be minimised.
         """
 
         return (self.f(self.X),)
 
 
 
+    def gradf(self, X):
+        r"""Compute the gradient of :math:`f(\cdot)`.
+
+        Overriding this method is required.
+        """
+
+        raise NotImplementedError()
+
+
+
+    def proxg(self, X, L):
+        r"""Compute the proximal operator of :math:`L^{-1} g(\cdot)`.
+
+        Overriding this method is required. Note that this method
+        should compute the proximal operator of
+        :math:`L^{-1} g(\cdot)`, *not* the proximal operator
+        of :math:`L g(\cdot)`.
+        """
+
+        raise NotImplementedError()
+
+
+
+    def f(self, X):
+        r"""Evauate the data fidelity term :math:`f(\mathbf{x})`.
+
+        Overriding this method is required.
+        """
+
+        raise NotImplementedError()
+
+
+
+
 
 class PPP(GenericPPP):
-    """PPP solver that can be used without the need to derive a new
-    class."""
+    """Plug and Play Priors (PPP) solver :cite:`kamilov-2017-plugandplay`
+    that can be used without the need to derive a new class."""
 
     def __init__(self, xshape, f, gradf, proxg, opt=None):
         """
@@ -96,11 +132,12 @@ class PPP(GenericPPP):
         xshape : tuple of ints
           Shape of working variable X
         f : function
-          Evaluate the data fidelity term
+          Function evaluating the data fidelity term
         gradf : function
-          Compute the gradient of the data fidelity term
+          Function computing the gradient of the data fidelity term
         proxg : function
-          Compute the proximal operator of the regularisation term
+          Function computing the proximal operator of the regularisation
+          term
         opt : :class:`PPP.Options` object
           Algorithm options
         """

@@ -8,7 +8,7 @@
 Plug-and-Play FISTA Demosaicing
 ===============================
 
-This example demonstrates the use of class :class:`.fista.ppp.PPP` for solving a raw image demosaicing problem.
+This example demonstrates the use of class :class:`.fista.ppp.PPP` for solving a raw image demosaicing problem via the FISTA Plug and Play Priors (PPP) algorithm :cite:`kamilov-2017-plugandplay`.
 """
 
 
@@ -99,7 +99,7 @@ def gradf(x):
 Define proximal operator of (implicit, unknown) regularisation term for PPP problem. In this case we use BM3D :cite:`dabov-2008-image` as the denoiser, using the [code](https://pypi.org/project/bm3d) released with :cite:`makinen-2019-exact`.
 """
 
-bsigma = 3.5e-2  # Denoiser parameter
+bsigma = 3.3e-2  # Denoiser parameter
 
 def proxg(x, L):
     return bm3d_rgb(x, bsigma)

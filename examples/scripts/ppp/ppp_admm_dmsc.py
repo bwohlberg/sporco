@@ -8,7 +8,7 @@
 Plug-and-Play ADMM Demosaicing
 ==============================
 
-This example demonstrates the use of class :class:`.admm.ppp.PPP` for solving a raw image demosaicing problem.
+This example demonstrates the use of class :class:`.admm.ppp.PPP` for solving a raw image demosaicing problem via the ADMM Plug and Play Priors (PPP) algorithm :cite:`venkatakrishnan-2013-plugandplay2` :cite:`sreehari-2016-plug`.
 """
 
 
@@ -106,7 +106,7 @@ def proxf(x, rho, tol=1e-3, maxit=100):
 Define proximal operator of (implicit, unknown) regularisation term for PPP problem. In this case we use BM3D :cite:`dabov-2008-image` as the denoiser, using the [code](https://pypi.org/project/bm3d) released with :cite:`makinen-2019-exact`.
 """
 
-bsigma = 7.5e-2  # Denoiser parameter
+bsigma = 6.1e-2  # Denoiser parameter
 
 def proxg(x, rho):
     return bm3d_rgb(x, bsigma)
@@ -124,7 +124,7 @@ Set algorithm options for PPP solver, including use of bilinear demosaiced solut
 """
 
 opt = PPP.Options({'Verbose': True, 'RelStopTol': 1e-3,
-                   'MaxMainIter': 10, 'rho': 1.5e-1, 'Y0': imgb})
+                   'MaxMainIter': 12, 'rho': 1.8e-1, 'Y0': imgb})
 
 
 """
