@@ -572,7 +572,7 @@ def tikhonov_filter(s, lmbda, npd=16):
     gcv = np.array([-1.0, 1.0]).reshape([1, 2])
     Gr = sl.rfftn(grv, (s.shape[0] + 2*npd, s.shape[1] + 2*npd), (0, 1))
     Gc = sl.rfftn(gcv, (s.shape[0] + 2*npd, s.shape[1] + 2*npd), (0, 1))
-    A = 1.0 + lmbda*np.conj(Gr)*Gr + lmbda*np.conj(Gc)*Gc
+    A = 1.0 + lmbda * (np.conj(Gr)*Gr + np.conj(Gc)*Gc).real
     if s.ndim > 2:
         A = A[(slice(None),)*2 + (np.newaxis,)*(s.ndim-2)]
     sp = np.pad(s, ((npd, npd),)*2 + ((0, 0),)*(s.ndim-2), 'symmetric')
