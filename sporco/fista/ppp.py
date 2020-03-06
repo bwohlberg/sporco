@@ -37,7 +37,7 @@ class GenericPPP(fista.FISTA):
             opt = GenericPPP.Options()
 
         # Set dtype attribute, default is np.float32
-        self.set_dtype(opt, np.float32)
+        self.set_dtype(opt, np.dtype(np.float32))
 
         super(GenericPPP, self).__init__(xshape, self.dtype, opt)
 
