@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2015-2017 by Brendt Wohlberg <brendt@ieee.org>
+# Copyright (C) 2015-2020 by Brendt Wohlberg <brendt@ieee.org>
 # All rights reserved. BSD 3-clause License.
 # This file is part of the SPORCO package. Details of the copyright
 # and user license can be found in the 'LICENSE.txt' file distributed
@@ -1593,7 +1593,10 @@ class ADMMConsensus(ADMM):
     def prox_g(self, X, rho):
         r"""Proximal operator of :math:`\rho^{-1} g(\cdot)`.
 
-        Overriding this method is required.
+        Overriding this method is required. Note that this method
+        should compute the proximal operator of
+        :math:`\rho^{-1} g(\cdot)`, *not* the proximal operator
+        of :math:`\rho g(\cdot)`.
         """
 
         raise NotImplementedError()
