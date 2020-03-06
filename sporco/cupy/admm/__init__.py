@@ -81,6 +81,10 @@ sys.modules['sporco.admm'] = admm
 sys.modules['sporco.admm.admm'] = admm.admm
 
 
+# Construct sporco.cupy.admm.rpca
+admm.rpca = sporco_cupy_patch_module('sporco.admm.rpca',
+                                     {'admm': admm.admm, 'sp': prox})
+
 # Construct sporco.cupy.admm.tvl1
 admm.tvl1 = sporco_cupy_patch_module('sporco.admm.tvl1',
                                      {'admm': admm.admm, 'sl': linalg,

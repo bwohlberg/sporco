@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2015-2019 by Brendt Wohlberg <brendt@ieee.org>
+# Copyright (C) 2015-2020 by Brendt Wohlberg <brendt@ieee.org>
 # All rights reserved. BSD 3-clause License.
 # This file is part of the SPORCO package. Details of the copyright
 # and user license can be found in the 'LICENSE.txt' file distributed
@@ -132,7 +132,7 @@ class RobustPCA(admm.ADMM):
 
         # Set default lambda value if not specified
         if lmbda is None:
-            lmbda = 1.0 / np.sqrt(S.shape[0])
+            lmbda = S.shape[0] ** -0.5
         self.lmbda = self.dtype.type(lmbda)
 
         # Set penalty parameter

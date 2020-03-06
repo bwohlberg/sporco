@@ -326,6 +326,23 @@ def _cho_solve_AATI(A, rho, b, c, lwr, check_finite=True):
     return x
 
 
+def _promote16(u, fn=None, *args, **kwargs):
+    """Patched version of :func:`sporco.linalg.promote16`."""
+
+    dtype = np.float32 if u.dtype == np.float16 else u.dtype
+    up = u.astype(dtype=dtype)
+    if fn is None:
+        return up
+    else:
+        v = fn(up, *args, **kwargs)
+        if isinstance(v, tuple):
+            vp = tuple([vk.astype(dtype=u.dtype) for vk in v])
+        else:
+            vp = v.astype(dtype=u.dtype)
+        return vp
+
+
+
 # Construct sporco.cupy.linalg
 linalg = sporco_cupy_patch_module(
     'sporco.linalg',
@@ -337,11 +354,12 @@ linalg = sporco_cupy_patch_module(
      'pyfftw_rfftn_empty_aligned': _pyfftw_rfftn_empty_aligned,
      'fftconv': _fftconv, 'inner': _inner, 'zdivide': _zdivide,
      'cho_factor': _linalg_cho_factor, 'cho_solve_ATAI': _cho_solve_ATAI,
-     'cho_solve_AATI': _cho_solve_AATI})
+     'cho_solve_AATI': _cho_solve_AATI, 'promote16': _promote16})
 
 
 # Construct sporco.cupy.prox
 prox_lp = sporco_cupy_patch_module('sporco.prox._lp', {'have_numexpr': False,
                                                        'sl': linalg})
+prox_nuclear = sporco_cupy_patch_module('sporco.prox._nuclear', {'sl': linalg})
 prox = sporco_cupy_patch_module('sporco.prox', {'have_numexpr': False,
                                                 'sl': linalg})
