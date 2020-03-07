@@ -88,7 +88,7 @@ class GenericConvBPDN(admm.ADMMEqual):
 
 
     class Options(admm.ADMMEqual.Options):
-        """ConvBPDN algorithm options
+        """GenericConvBPDN algorithm options
 
         Options include all of those defined in
         :class:`.admm.ADMMEqual.Options`, together with additional options:
