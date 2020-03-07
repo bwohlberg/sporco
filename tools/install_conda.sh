@@ -2,7 +2,7 @@
 
 # This script installs a conda environment with all required and optional
 # sporco dependencies, including cupy if a GPU is available. This script
-# should functional correctly under both Linux and OSX, but note that there
+# should function correctly under both Linux and OSX, but note that there
 # are some additional complications in using a conda installed matplotlib
 # under OSX
 #   https://matplotlib.org/faq/osx_framework.html
@@ -117,4 +117,4 @@ if [ "$cupy_installed" = 'True' ]; then
     echo "  source activate py36cu"
 fi
 echo "The environment can be deactivated with the command"
-echo "  source deactivate"
+echo "  conda deactivate"
