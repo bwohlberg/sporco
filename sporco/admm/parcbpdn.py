@@ -216,7 +216,7 @@ def par_y1step(i):
     global mp_Y1
     grpind = slice(mp_grp[i], mp_grp[i+1])
     XU1 = mp_X[grpind] + 1/mp_alpha*mp_U1[grpind]
-    if mp_wl1.shape[mp_axisM] is 1:
+    if mp_wl1.shape[mp_axisM] == 1:
         gamma = mp_lmbda/(mp_alpha**2*mp_rho)*mp_wl1
     else:
         gamma = mp_lmbda/(mp_alpha**2*mp_rho)*mp_wl1[grpind]
