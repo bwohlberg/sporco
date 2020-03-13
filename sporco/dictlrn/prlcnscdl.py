@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2017-2019 by Brendt Wohlberg <brendt@ieee.org>
+# Copyright (C) 2017-2020 by Brendt Wohlberg <brendt@ieee.org>
 # All rights reserved. BSD 3-clause License.
 # This file is part of the SPORCO package. Details of the copyright
 # and user license can be found in the 'LICENSE.txt' file distributed
@@ -19,7 +19,7 @@ import numpy as np
 
 import sporco.linalg as sl
 import sporco.prox as sp
-# Required due to pyFFTW bug #135 - see "Notes" section of SPORCO docs.
+# Required due to pyFFTW bug #135 - see "Notes" section of SPORCO docs
 sl.pyfftw_threads = 1
 from sporco.dictlrn import cbpdndl
 from sporco.dictlrn import cbpdndlmd
@@ -119,8 +119,6 @@ def init_mpraw(mpv, npv):
 
     globals()[mpv] = mpraw_as_np(npv.shape, npv.dtype)
     globals()[mpv][:] = npv
-
-
 
 
 
@@ -661,7 +659,6 @@ def cbpdnmd_setdict():
 
 
 
-
 def cbpdnmd_xstep(k):
     """Do the X step of the cbpdn stage. The only parameter is the slice
     index `k` and there are no return values; all inputs and outputs are
@@ -781,8 +778,8 @@ def ccmodmd_ustep():
     global variables.
     """
 
-    mp_D_U0[:] += mp_D_X - mp_D_Y0
-    mp_D_U1[:] += mp_DX - mp_D_Y1 - mp_S
+    mp_D_U0 += mp_D_X - mp_D_Y0
+    mp_D_U1 += mp_DX - mp_D_Y1 - mp_S
 
 
 
