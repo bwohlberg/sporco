@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2015-2019 by Brendt Wohlberg <brendt@ieee.org>
+# Copyright (C) 2015-2020 by Brendt Wohlberg <brendt@ieee.org>
 # All rights reserved. BSD 3-clause License.
 # This file is part of the SPORCO package. Details of the copyright
 # and user license can be found in the 'LICENSE.txt' file distributed
@@ -51,6 +51,9 @@ pyfftw.interfaces.cache.set_keepalive_time(300)
 pyfftw_threads = multiprocessing.cpu_count()
 """Global variable setting the number of threads used in :mod:`pyfftw`
 computations"""
+pyfftw_planner_effort = 'FFTW_MEASURE'
+"""FFTW planning rigor flag used in :mod:`pyfftw` computations"""
+
 
 
 def complex_dtype(dtype):
@@ -193,7 +196,7 @@ def fftn(a, s=None, axes=None):
 
     return pyfftw.interfaces.numpy_fft.fftn(
         a, s=s, axes=axes, overwrite_input=False,
-        planner_effort='FFTW_MEASURE', threads=pyfftw_threads)
+        planner_effort=pyfftw_planner_effort, threads=pyfftw_threads)
 
 
 
@@ -222,7 +225,7 @@ def ifftn(a, s=None, axes=None):
 
     return pyfftw.interfaces.numpy_fft.ifftn(
         a, s=s, axes=axes, overwrite_input=False,
-        planner_effort='FFTW_MEASURE', threads=pyfftw_threads)
+        planner_effort=pyfftw_planner_effort, threads=pyfftw_threads)
 
 
 
@@ -251,7 +254,7 @@ def rfftn(a, s=None, axes=None):
 
     return pyfftw.interfaces.numpy_fft.rfftn(
         a, s=s, axes=axes, overwrite_input=False,
-        planner_effort='FFTW_MEASURE', threads=pyfftw_threads)
+        planner_effort=pyfftw_planner_effort, threads=pyfftw_threads)
 
 
 
@@ -283,7 +286,7 @@ def irfftn(a, s, axes=None):
 
     return pyfftw.interfaces.numpy_fft.irfftn(
         a, s=s, axes=axes, overwrite_input=False,
-        planner_effort='FFTW_MEASURE', threads=pyfftw_threads)
+        planner_effort=pyfftw_planner_effort, threads=pyfftw_threads)
 
 
 
