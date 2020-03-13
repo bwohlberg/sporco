@@ -1094,7 +1094,7 @@ class ExampleImages(object):
             pth = os.path.join(self.bpth, group, fname)
 
         try:
-            img = np.asarray(imageio.imread(pth), dtype=dtype)
+            img = imageio.imread(pth).astype(dtype)
         except IOError:
             raise IOError('Could not access image %s in group %s' %
                           (fname, group))
