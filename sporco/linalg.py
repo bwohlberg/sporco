@@ -535,7 +535,7 @@ def solvedbi_sm(ah, rho, b, c=None, axis=4):
         c = solvedbi_sm_c(ah, a, rho, axis)
     if have_numexpr:
         cb = inner(c, b, axis=axis)
-        return ne.evaluate('(b - (a * cb)) / rho')
+        return ne.evaluate('(b - (a * cb)) / rho').astype(a.dtype)
     else:
         return (b - (a * inner(c, b, axis=axis))) / rho
 
