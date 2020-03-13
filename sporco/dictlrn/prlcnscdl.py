@@ -778,8 +778,8 @@ def ccmodmd_ustep():
     global variables.
     """
 
-    mp_D_U0 += mp_D_X - mp_D_Y0
-    mp_D_U1 += mp_DX - mp_D_Y1 - mp_S
+    mp_D_U0[:] += mp_D_X - mp_D_Y0
+    mp_D_U1[:] += mp_DX - mp_D_Y1 - mp_S
 
 
 
