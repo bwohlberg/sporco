@@ -699,14 +699,14 @@ def solvemdbi_ism(ah, rho, b, axisM, axisK):
         delta[slck] = 1.0 + inner(ah[slck], gamma[slck], axis=axisM)
 
         d = gamma[slck] * inner(ah[slck], beta, axis=axisM)
-        beta[:] -= d / delta[slck]
+        beta -= d / delta[slck]
 
         if k < K - 1:
             alpha[:] = np.take(a, [k + 1], axisK) / rho
             for l in range(0, k + 1):
                 slcl = slcnc + (slice(l, l + 1),)
                 d = gamma[slcl] * inner(ah[slcl], alpha, axis=axisM)
-                alpha[:] -= d / delta[slcl]
+                alpha -= d / delta[slcl]
 
     return beta
 
