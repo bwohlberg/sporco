@@ -3126,7 +3126,7 @@ class ConvBPDNLatInh(ConvBPDN):
             self.WhXa = sl.irfftn(self.Whf * Xaf, self.cri.Nv, self.cri.axisN)
 
             # Sum the weights across in-group members for each element
-            self.wm = np.dot(np.dot(self.WhXa, self.Wg.T), self.Wg) - self.WhXa
+            self.wm = np.dot(np.dot(self.WhXa, self.Wg.T), self.Wg) - np.sum(self.Wg, axis=0) * self.WhXa
 
             # Smooth weighted l1 term
             self.wm = self.wms * self.wm_prev + (1 - self.wms) * self.wm
