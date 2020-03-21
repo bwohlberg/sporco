@@ -3119,7 +3119,6 @@ class ConvBPDNLatInh(ConvBPDN):
             # Update previous weighted l1 term
             self.wm_prev = self.wm
 
-            # TODO ------> can we speed up this portion?
             # Compute the frequency domain representation of the magnitude of X
             Xaf = sl.rfftn(np.abs(self.X), self.cri.Nv, self.cri.axisN)
 
@@ -3127,9 +3126,7 @@ class ConvBPDNLatInh(ConvBPDN):
             self.WhXa = sl.irfftn(self.Whf * Xaf, self.cri.Nv, self.cri.axisN)
 
             # Sum the weights across in-group members for each element
-            self.wm = np.concatenate([np.expand_dims(np.sum(self.WhXa[:,:,:,self.cmni[m]], -1), -1)
-                                     for m in range(self.cri.M)], axis=-1)
-            # TODO ------>
+            self.wm = np.dot(np.dot(self.WhXa, self.Wg.T), self.Wg) - self.WhXa
 
             # Smooth weighted l1 term
             self.wm = self.wms * self.wm_prev + (1 - self.wms) * self.wm
