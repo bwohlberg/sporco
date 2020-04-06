@@ -2989,7 +2989,7 @@ class ConvBPDNLatInh(ConvBPDN):
 
 
 
-    def __init__(self, D, S, Wg=None, fs=44100, T=0.05, lmbda=None, mu=None, opt=None, dimK=None, dimN=2):
+    def __init__(self, D, S, Wg=None, Whn=2205, lmbda=None, mu=None, opt=None, dimK=None, dimN=2):
         """
         TODO - this block comment will need to be updated
         This class supports an arbitrary number of spatial dimensions,
@@ -3079,8 +3079,10 @@ class ConvBPDNLatInh(ConvBPDN):
             self.cmni = self.cmn == 1
 
             # Create rectangular time inhibition window
-            Wh = np.ones(self.cri.shpS, dtype=self.dtype)
-            Wh[int(fs * T):-int(fs * T)] = 0
+            Wh = np.zeros(self.cri.shpS, dtype=self.dtype)
+            Wh[np.meshgrid(*[np.arange(Whn)]*dimN)] = 1
+            for i in range(dimN):
+                Wh = np.roll(Wh, -Whn//2, axis=i)
 
             # Obtain the inhibition window frequency representation
             self.Whf = sl.rfftn(Wh, self.cri.Nv, self.cri.axisN)
