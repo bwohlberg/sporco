@@ -3102,7 +3102,7 @@ class ConvBPDNLatInh(ConvBPDN):
             self.wm_prev = None
 
             # Initialize smoothing for weighted l1 term
-            self.wms = opt['L1Weight']
+            self.wms = opt['LISmWeight']
 
 
 
