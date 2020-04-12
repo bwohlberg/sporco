@@ -5,9 +5,9 @@
 # with the package.
 
 """
-Single-channel CSC
+Single-channel CSC With Weighted Lateral Inhibition
 ==================
-
+TODO
 This example demonstrates solving a convolutional sparse coding problem with a greyscale signal
 
   $$\mathrm{argmin}_\mathbf{x} \; \frac{1}{2} \left\| \sum_m \mathbf{d}_m * \mathbf{x}_{m} - \mathbf{s} \right\|_2^2 + \lambda \sum_m \| \mathbf{x}_{m} \|_1 \;,$$
@@ -51,16 +51,19 @@ sl, sh = util.tikhonov_filter(img, fltlmbd, npd)
 Load dictionary and display it.
 """
 
-D = util.convdicts()['G:12x12x72']
-plot.imview(util.tiledict(D), fgsz=(7, 7))
+D = util.convdicts()['G:12x12x36']
+D = np.concatenate((D + 0.01*np.random.randn(*D.shape),
+                    D + 0.01*np.random.randn(*D.shape),
+                    D + 0.01*np.random.randn(*D.shape)), axis=-1)
+plot.imview(util.tiledict(D), fgsz=(9, 8))
 
 
 """
 Set :class:`.admm.cbpdn.ConvBPDN` solver options.
 """
 
-mu    = 1e-2
 lmbda = 5e-2
+mu    = 2.5e-2 # Be careful not to set this too high for large dictionaries
 opt = cbpdn.ConvBPDNLatInh.Options({'Verbose': True, 'MaxMainIter': 200,
                                     'RelStopTol': 5e-3, 'AuxVarObj': False})
 
@@ -69,8 +72,8 @@ opt = cbpdn.ConvBPDNLatInh.Options({'Verbose': True, 'MaxMainIter': 200,
 Initialise and run CSC solver.
 """
 
-Wg1 = np.concatenate((np.eye(24), np.eye(24), np.zeros((24, 24))), axis=-1)
-Wg2 = 0.25 * np.concatenate((np.eye(24), np.zeros((24, 24)), np.eye(24)), axis=-1)
+Wg1 = np.concatenate((np.eye(36), np.eye(36), np.zeros((36, 36))), axis=-1)
+Wg2 = 0.25 * np.concatenate((np.eye(36), np.zeros((36, 36)), np.eye(36)), axis=-1)
 Wg = np.append(Wg1, Wg2, axis=0)
 b = cbpdn.ConvBPDNLatInh(D, sh, Wg, 12, lmbda, mu, opt, dimK=0)
 X = b.solve()
@@ -87,45 +90,33 @@ print("Reconstruction PSNR: %.2fdB\n" % sm.psnr(img, imgr))
 
 
 """
-Split the activation group
-"""
-
-Xg1 = X[:,:,:,:,:24]
-Xg2 = X[:,:,:,:,24:48]
-Xg3 = X[:,:,:,:,48:]
-
-
-"""
 Display low pass component and sum of absolute values of coefficient maps of highpass component.
 """
 
-fig = plot.figure(figsize=(10, 10))
-plot.subplot(3, 3, 1)
+fig = plot.figure(figsize=(14, 7))
+plot.subplot(1, 2, 1)
 plot.imview(sl, title='Lowpass component', fig=fig)
-plot.subplot(3, 3, 2)
-plot.imview(np.sum(abs(X), axis=b.cri.axisM).squeeze(),
-            cmap=plot.cm.Blues, title='Sparse representation (Full)', fig=fig)
-plot.subplot(3, 3, 3)
-plot.imview(np.sum(abs(Xg1), axis=b.cri.axisM).squeeze(),
-            cmap=plot.cm.Blues, title='Elements (1-24)', fig=fig)
-plot.subplot(3, 3, 4)
-plot.imview(np.sum(abs(Xg2), axis=b.cri.axisM).squeeze(),
-            cmap=plot.cm.Blues, title='Elements (24-48)', fig=fig)
-plot.subplot(3, 3, 5)
-plot.imview(np.sum(abs(Xg3), axis=b.cri.axisM).squeeze(),
-            cmap=plot.cm.Blues, title='Elements (48-72)', fig=fig)
-plot.subplot(3, 3, 6)
-plot.imview(np.sum(abs(abs(Xg1) - abs(Xg2)), axis=b.cri.axisM).squeeze(),
-            cmap=plot.cm.Blues, title='||Xg1| - |Xg2||', fig=fig)
-plot.subplot(3, 3, 7)
-plot.imview(np.sum(abs(abs(Xg1) - abs(Xg3)), axis=b.cri.axisM).squeeze(),
-            cmap=plot.cm.Blues, title='||Xg1| - |Xg3||', fig=fig)
-plot.subplot(3, 3, 8)
-plot.imview(np.sum(abs(abs(Xg2) - abs(Xg3)), axis=b.cri.axisM).squeeze(),
-            cmap=plot.cm.Blues, title='||Xg2| - |Xg3||', fig=fig)
-plot.subplot(3, 3, 9)
-plot.imview(np.sum(abs(abs(abs(Xg1) - abs(Xg2) - abs(Xg3))), axis=b.cri.axisM).squeeze(),
-            cmap=plot.cm.Blues, title='|||Xg1| - |Xg2|| - |Xg3||', fig=fig)
+plot.subplot(1, 2, 2)
+plot.imview(np.sum(abs(X), axis=b.cri.axisM).squeeze(), cmap=plot.cm.Blues,
+            title='Sparse representation', fig=fig)
+fig.show()
+
+
+"""
+Show activation of grouped elements column-wise for first four groups of both schemes.
+"""
+
+fig = plot.figure(figsize=(14, 10))
+for i in range(4):
+    plot.subplot(3, 4, i+1)
+    plot.imview(abs(X[:,:,:,:,i]).squeeze(), cmap=plot.cm.Blues,
+                title=f'X[{i}]', fig=fig)
+    plot.subplot(3, 4, i+5)
+    plot.imview(abs(X[:,:,:,:,i+36]).squeeze(), cmap=plot.cm.Blues,
+                title=f'X[{i+36}]', fig=fig)
+    plot.subplot(3, 4, i+9)
+    plot.imview(abs(X[:,:,:,:,i+72]).squeeze(), cmap=plot.cm.Blues,
+                title=f'X[{i+72}]', fig=fig)
 fig.show()
 
 

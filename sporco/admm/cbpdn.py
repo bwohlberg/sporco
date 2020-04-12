@@ -3080,7 +3080,7 @@ class ConvBPDNLatInh(ConvBPDN):
 
             # Create rectangular time inhibition window
             Wh = np.zeros(self.cri.shpS, dtype=self.dtype)
-            Wh[np.meshgrid(*[np.arange(Whn)]*dimN)] = 1
+            Wh[tuple(np.meshgrid(*([np.arange(Whn)]*dimN)))] = 1
             for i in range(dimN):
                 Wh = np.roll(Wh, -Whn//2, axis=i)
 
