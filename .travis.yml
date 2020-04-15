@@ -59,8 +59,8 @@ install:
       conda create --yes -q -n test-env python=$PYTHON_VERSION future numpy scipy pillow matplotlib
     - source activate test-env
     - conda install -c conda-forge pytest pytest-runner pyfftw mpi4py
-    - if [[ "$TRAVIS_OS_NAME" != "osx" ]]; then
-         pip install codecov;
+    - if [[ "$TRAVIS_OS_NAME" != "osx" && "$TRAVIS_PYTHON_VERSION" == "3.7" ]]; then
+         conda install -c conda-forge codecov;
       fi
     - python setup.py build
     - python setup.py install
