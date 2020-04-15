@@ -321,7 +321,7 @@ def surf(z, x=None, y=None, elev=None, azim=None, xlbl=None, ylbl=None,
         the z-axis. An int specifies the number of contours to plot, and
         a sequence specifies the specific contour levels to plot.
     cmap : :class:`matplotlib.colors.Colormap` object, optional (default None)
-        Colour map for surface. If none specifed, defaults to cm.coolwarm
+        Colour map for surface. If none specifed, defaults to cm.YlOrRd
     fgsz : tuple (width,height), optional (default None)
         Specify figure dimensions in inches
     fgnm : integer, optional (default None)
@@ -358,7 +358,7 @@ def surf(z, x=None, y=None, elev=None, azim=None, xlbl=None, ylbl=None,
         ax.view_init(elev=elev, azim=azim)
 
     if cmap is None:
-        cmap = cm.coolwarm
+        cmap = cm.YlOrRd
 
     if x is None:
         x = range(z.shape[1])
@@ -396,9 +396,10 @@ def surf(z, x=None, y=None, elev=None, azim=None, xlbl=None, ylbl=None,
 
 
 
-def contour(z, x=None, y=None, v=5, xlbl=None, ylbl=None, title=None,
-            cfntsz=10, lfntsz=None, intrp='bicubic', alpha=0.5, cmap=None,
-            vmin=None, vmax=None, fgsz=None, fgnm=None, fig=None, ax=None):
+def contour(z, x=None, y=None, v=5, xlog=False, ylog=False, xlbl=None,
+            ylbl=None, title=None, cfntsz=10, lfntsz=None, alpha=1.0,
+            cmap=None, vmin=None, vmax=None, fgsz=None, fgnm=None,
+            fig=None, ax=None):
     """
     Contour plot of a 2D surface. If a figure object is specified then the
     plot is drawn in that figure, and ``fig.show()`` is not called. The
@@ -412,9 +413,13 @@ def contour(z, x=None, y=None, v=5, xlbl=None, ylbl=None, title=None,
         Values for x-axis of the plot
     y : array_like, optional (default None)
         Values for y-axis of the plot
-    v : int or sequence of ints, optional (default 5)
+    v : int or sequence of floats, optional (default 5)
         An int specifies the number of contours to plot, and a sequence
         specifies the specific contour levels to plot.
+    xlog : boolean, optional (default False)
+        Set x-axis to log scale
+    ylog : boolean, optional (default False)
+        Set y-axis to log scale
     xlbl : string, optional (default None)
         Label for x-axis
     ylbl : string, optional (default None)
@@ -426,14 +431,10 @@ def contour(z, x=None, y=None, v=5, xlbl=None, ylbl=None, title=None,
         set to 0 or None.
     lfntsz : int, optional (default None)
         Axis label font size. The default font size is used if set to None.
-    intrp : string, optional (default 'bicubic')
-        Specify type of interpolation used to display image underlying
-        contours (see ``interpolation`` parameter of
-        :meth:`matplotlib.axes.Axes.imshow`)
-    alpha : float, optional (default 0.5)
+    alpha : float, optional (default 1.0)
         Underlying image display alpha value
     cmap : :class:`matplotlib.colors.Colormap`, optional (default None)
-        Colour map for surface. If none specifed, defaults to cm.coolwarm
+        Colour map for surface. If none specifed, defaults to cm.YlOrRd
     vmin, vmax : float, optional (default None)
         Set upper and lower bounds for the colour map (see the corresponding
         parameters of :meth:`matplotlib.axes.Axes.imshow`)
@@ -462,8 +463,13 @@ def contour(z, x=None, y=None, v=5, xlbl=None, ylbl=None, title=None,
     elif ax is None:
         ax = fig.gca()
 
+    if xlog:
+        ax.set_xscale('log')
+    if ylog:
+        ax.set_yscale('log')
+
     if cmap is None:
-        cmap = cm.coolwarm
+        cmap = cm.YlOrRd
 
     if x is None:
         x = np.arange(z.shape[1])
@@ -478,12 +484,17 @@ def contour(z, x=None, y=None, v=5, xlbl=None, ylbl=None, title=None,
     cntr = ax.contour(xg, yg, z, v, colors='black')
     if cfntsz is not None and cfntsz > 0:
         plt.clabel(cntr, inline=True, fontsize=cfntsz)
-    im = ax.imshow(z, origin='lower', interpolation=intrp, aspect='auto',
-                   extent=[x.min(), x.max(), y.min(), y.max()], cmap=cmap,
-                   vmin=vmin, vmax=vmax, alpha=alpha)
+    pc = ax.pcolormesh(xg, yg, z, cmap=cmap, vmin=vmin, vmax=vmax, alpha=alpha,
+                       shading='gouraud', clim=(vmin, vmax))
 
-    ax.fmt_xdata = lambda x: "{: .2f}".format(x)
-    ax.fmt_ydata = lambda x: "{: .2f}".format(x)
+    if xlog:
+        ax.fmt_xdata = lambda x: "{: .2e}".format(x)
+    else:
+        ax.fmt_xdata = lambda x: "{: .2f}".format(x)
+    if ylog:
+        ax.fmt_ydata = lambda x: "{: .2e}".format(x)
+    else:
+        ax.fmt_ydata = lambda x: "{: .2f}".format(x)
 
     if title is not None:
         ax.set_title(title)
@@ -494,7 +505,7 @@ def contour(z, x=None, y=None, v=5, xlbl=None, ylbl=None, title=None,
 
     divider = make_axes_locatable(ax)
     cax = divider.append_axes("right", size="5%", pad=0.2)
-    plt.colorbar(im, ax=ax, cax=cax)
+    plt.colorbar(pc, ax=ax, cax=cax)
 
     attach_keypress(fig)
     attach_zoom(ax)
