@@ -123,7 +123,7 @@ class TestSet01(object):
         im1 = ei.image('sail.png')
         im2 = ei.image('sail.png', scaled=True, dtype=np.float32,
                        idxexp=np.s_[:, 10:-10], zoom=0.5)
-        im2 = ei.image('sail.png', dtype=np.float32,
+        im3 = ei.image('sail.png', dtype=np.float32,
                        idxexp=np.s_[:, 10:-10], zoom=2.0, gray=True)
 
 

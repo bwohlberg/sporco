@@ -529,8 +529,6 @@ def rgb2gray(rgb):
 
 
 
-
-
 def tikhonov_filter(s, lmbda, npd=16):
     r"""Lowpass filter based on Tikhonov regularization.
 

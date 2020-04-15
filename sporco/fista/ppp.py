@@ -19,6 +19,7 @@ __author__ = """\n""".join(['Brendt Wohlberg <brendt@ieee.org>',
                             'Ulugbek Kamilov <kamilov@wustl.edu>'])
 
 
+
 class GenericPPP(fista.FISTA):
     """Base class for Plug and Play Priors (PPP) FISTA solvers
     :cite:`kamilov-2017-plugandplay`."""

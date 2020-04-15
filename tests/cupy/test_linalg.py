@@ -35,8 +35,8 @@ class TestSet01(object):
         Z = (D.T.dot(D).dot(X) + rho*X - D.T.dot(S)) / rho
         c, lwr = linalg.cho_factor(D, rho)
         Xslv = linalg.cho_solve_ATAI(D, rho, D.T.dot(S) + rho*Z, c, lwr)
-        assert(linalg.rrs(D.T.dot(D).dot(Xslv) + rho*Xslv,
-                        D.T.dot(S) + rho*Z) < 1e-11)
+        assert linalg.rrs(D.T.dot(D).dot(Xslv) + rho*Xslv,
+                          D.T.dot(S) + rho*Z) < 1e-11
 
 
 
@@ -51,8 +51,8 @@ class TestSet01(object):
         Z = (D.T.dot(D).dot(X) + rho*X - D.T.dot(S)) / rho
         c, lwr = linalg.cho_factor(D, rho)
         Xslv = linalg.cho_solve_ATAI(D, rho, D.T.dot(S) + rho*Z, c, lwr)
-        assert(linalg.rrs(D.T.dot(D).dot(Xslv) + rho*Xslv,
-                        D.T.dot(S) + rho*Z) < 1e-14)
+        assert linalg.rrs(D.T.dot(D).dot(Xslv) + rho*Xslv,
+                          D.T.dot(S) + rho*Z) < 1e-14
 
 
 
@@ -67,8 +67,8 @@ class TestSet01(object):
         Z = (D.dot(X).dot(X.T) + rho*D - S.dot(X.T)) / rho
         c, lwr = linalg.cho_factor(X, rho)
         Dslv = linalg.cho_solve_AATI(X, rho, S.dot(X.T) + rho*Z, c, lwr)
-        assert(linalg.rrs(Dslv.dot(X).dot(X.T) + rho*Dslv,
-                        S.dot(X.T) + rho*Z) < 1e-11)
+        assert linalg.rrs(Dslv.dot(X).dot(X.T) + rho*Dslv,
+                          S.dot(X.T) + rho*Z) < 1e-11
 
 
 
@@ -83,8 +83,8 @@ class TestSet01(object):
         Z = (D.dot(X).dot(X.T) + rho*D - S.dot(X.T)) / rho
         c, lwr = linalg.cho_factor(X, rho)
         Dslv = linalg.cho_solve_AATI(X, rho, S.dot(X.T) + rho*Z, c, lwr)
-        assert(linalg.rrs(Dslv.dot(X).dot(X.T) + rho*Dslv,
-                        S.dot(X.T) + rho*Z) < 1e-11)
+        assert linalg.rrs(Dslv.dot(X).dot(X.T) + rho*Dslv,
+                          S.dot(X.T) + rho*Z) < 1e-11
 
 
 
@@ -99,8 +99,8 @@ class TestSet01(object):
         Z = (D.conj()*cp.sum(D*X, axis=4, keepdims=True) + \
              rho*X - D.conj()*S) / rho
         Xslv = linalg.solvedbi_sm(D, rho, D.conj()*S + rho*Z)
-        assert(linalg.rrs(D.conj()*cp.sum(D*Xslv, axis=4, keepdims=True) +
-                        rho*Xslv, D.conj()*S + rho*Z) < 1e-11)
+        assert linalg.rrs(D.conj()*cp.sum(D*Xslv, axis=4, keepdims=True) +
+                          rho * Xslv, D.conj() * S + rho*Z) < 1e-11
 
 
 
@@ -116,8 +116,8 @@ class TestSet01(object):
         Z = (D.conj()*cp.sum(D*X, axis=4, keepdims=True) +
              d*X - D.conj()*S) / d
         Xslv = linalg.solvedbd_sm(D, d, D.conj()*S + d*Z)
-        assert(linalg.rrs(D.conj()*cp.sum(D*Xslv, axis=4, keepdims=True) +
-                        d*Xslv, D.conj()*S + d*Z) < 1e-11)
+        assert linalg.rrs(D.conj()*cp.sum(D*Xslv, axis=4, keepdims=True) +
+                          d*Xslv, D.conj()*S + d*Z) < 1e-11
 
 
 

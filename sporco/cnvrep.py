@@ -17,8 +17,8 @@ import functools
 import numpy as np
 
 
-
 __author__ = """Brendt Wohlberg <brendt@ieee.org>"""
+
 
 
 class CSC_ConvRepIndexing(object):
