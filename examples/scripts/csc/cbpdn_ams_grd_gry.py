@@ -56,8 +56,8 @@ Define pad and crop functions.
 """
 
 pn = 8
-spad = lambda x:  np.pad(x, pn, mode='symmetric')
-zpad = lambda x:  np.pad(x, pn, mode='constant')
+spad = lambda x: np.pad(x, pn, mode='symmetric')
+zpad = lambda x: np.pad(x, pn, mode='constant')
 crop = lambda x: x[pn:-pn, pn:-pn]
 
 
