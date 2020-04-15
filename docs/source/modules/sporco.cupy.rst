@@ -25,7 +25,7 @@ To use `CuPy <https://cupy.chainer.org/>`_, first `install CUDA <http://docs.nvi
 
 ::
 
-   export CUDAHOME=/usr/local/cuda-9.2
+   export CUDAHOME=/usr/local/cuda-10.2
    export PATH=${CUDAHOME}/bin:${PATH}
 
 (substitute the appropriate path to the CUDA installation) to avoid a
@@ -58,6 +58,7 @@ The ``sporco.cupy`` subpackage currently provides `CuPy <https://cupy.chainer.or
 ``sporco.cupy.admm.cbpdn``         :mod:`sporco.admm.cbpdn`
 ``sporco.cupy.admm.cbpdntv``       :mod:`sporco.admm.cbpdntv`
 ``sporco.cupy.admm.pdcsc``         :mod:`sporco.admm.pdcsc`
+``sporco.cupy.admm.rpca``          :mod:`sporco.admm.rpca`
 ``sporco.cupy.admm.tvl1``          :mod:`sporco.admm.tvl1`
 ``sporco.cupy.admm.tvl2``          :mod:`sporco.admm.tvl2`
 ``sporco.cupy.fista.cbpdn``        :mod:`sporco.fista.cbpdn`
