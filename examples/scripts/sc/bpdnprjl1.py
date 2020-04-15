@@ -56,7 +56,7 @@ s = s0 + sigma*np.random.randn(N,1)
 Set :class:`.bpdn.BPDNProjL1` solver class options. The value of $\gamma$ has been manually chosen for good performance.
 """
 
-gamma = 5.0
+gamma = 2.5e1
 opt = bpdn.BPDNProjL1.Options({'Verbose': True, 'MaxMainIter': 500,
                     'RelStopTol': 1e-6, 'AutoRho': {'RsdlTarget': 1.0}})
 
