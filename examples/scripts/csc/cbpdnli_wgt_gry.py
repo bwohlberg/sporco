@@ -5,11 +5,11 @@
 # with the package.
 
 """
-Single-channel CSC With Lateral Inhibition
+Single-channel CSC With Weighted Lateral Inhibition
 ==================
-
-This example demonstrates solving a convolutional sparse coding problem with a greyscale signal
 TODO
+This example demonstrates solving a convolutional sparse coding problem with a greyscale signal
+
   $$\mathrm{argmin}_\mathbf{x} \; \frac{1}{2} \left\| \sum_m \mathbf{d}_m * \mathbf{x}_{m} - \mathbf{s} \right\|_2^2 + \lambda \sum_m \| \mathbf{x}_{m} \|_1 \;,$$
 
 where $\mathbf{d}_{m}$ is the $m^{\text{th}}$ dictionary filter, $\mathbf{x}_{m}$ is the coefficient map corresponding to the $m^{\text{th}}$ dictionary filter, and $\mathbf{s}$ is the input image.
@@ -27,7 +27,7 @@ import numpy as np
 from sporco import util
 from sporco import plot
 import sporco.metric as sm
-from sporco.admm import cbpdn
+from sporco.admm import cbpdnli
 
 
 """
@@ -52,27 +52,30 @@ Load dictionary and display it.
 """
 
 D = util.convdicts()['G:12x12x36']
-D = np.append(D + 0.01*np.random.randn(*D.shape),
-              D + 0.01*np.random.randn(*D.shape), axis=-1)
-plot.imview(util.tiledict(D), fgsz=(10, 10))
+D = np.concatenate((D + 0.01*np.random.randn(*D.shape),
+                    D + 0.01*np.random.randn(*D.shape),
+                    D + 0.01*np.random.randn(*D.shape)), axis=-1)
+plot.imview(util.tiledict(D), fgsz=(9, 8))
 
 
 """
-Set :class:`.admm.cbpdn.ConvBPDNLatInh` solver options.
+Set :class:`.admm.cbpdn.ConvBPDN` solver options.
 """
 
 lmbda = 5e-2
-mu    = 5e-2
-opt = cbpdn.ConvBPDNLatInh.Options({'Verbose': True, 'MaxMainIter': 200,
+mu    = 2.5e-2 # Be careful not to set this too high for large dictionaries
+opt = cbpdnli.ConvBPDNLatInh.Options({'Verbose': True, 'MaxMainIter': 200,
                                     'RelStopTol': 5e-3, 'AuxVarObj': False})
 
 
 """
 Initialise and run CSC solver.
 """
-# TODO - more description
-Wg = np.append(np.eye(36), np.eye(36), axis=-1)
-b = cbpdn.ConvBPDNLatInh(D, sh, Wg, 12, lmbda, mu, opt, dimK=0)
+
+Wg1 = np.concatenate((np.eye(36), np.eye(36), np.zeros((36, 36))), axis=-1)
+Wg2 = 0.25 * np.concatenate((np.eye(36), np.zeros((36, 36)), np.eye(36)), axis=-1)
+Wg = np.append(Wg1, Wg2, axis=0)
+b = cbpdnli.ConvBPDNLatInh(D, sh, Wg, 12, lmbda, mu, opt, dimK=0)
 X = b.solve()
 print("ConvBPDN solve time: %.2fs" % b.timer.elapsed('solve'))
 
@@ -100,17 +103,21 @@ fig.show()
 
 
 """
-Show activation of grouped elements column-wise for first four groups.
+Show activation of grouped elements column-wise for first four groups of both schemes.
 """
+#TODO - note to zoom in
 
-fig = plot.figure(figsize=(14, 7))
+fig = plot.figure(figsize=(14, 10))
 for i in range(4):
-    plot.subplot(2, 4, i+1)
+    plot.subplot(3, 4, i+1)
     plot.imview(abs(X[:,:,:,:,i]).squeeze(), cmap=plot.cm.Blues,
                 title=f'X[{i}]', fig=fig)
-    plot.subplot(2, 4, i+5)
+    plot.subplot(3, 4, i+5)
     plot.imview(abs(X[:,:,:,:,i+36]).squeeze(), cmap=plot.cm.Blues,
                 title=f'X[{i+36}]', fig=fig)
+    plot.subplot(3, 4, i+9)
+    plot.imview(abs(X[:,:,:,:,i+72]).squeeze(), cmap=plot.cm.Blues,
+                title=f'X[{i+72}]', fig=fig)
 fig.show()
 
 
