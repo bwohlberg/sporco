@@ -523,7 +523,7 @@ def rgb2gray(rgb):
       Grayscale image as Nr x Nc or Nr x Nc x K array
     """
 
-    w = np.array([0.299, 0.587, 0.144], dtype=rgb.dtype)[np.newaxis,
+    w = np.array([0.299, 0.587, 0.114], dtype=rgb.dtype)[np.newaxis,
                                                          np.newaxis]
     return np.sum(w * rgb, axis=2)
 
