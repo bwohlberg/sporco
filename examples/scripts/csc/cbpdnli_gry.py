@@ -72,7 +72,7 @@ Initialise and run CSC solver.
 """
 # TODO - more description
 Wg = np.append(np.eye(36), np.eye(36), axis=-1)
-b = cbpdnli.ConvBPDNLatInh(D, sh, Wg, 12, lmbda, mu, opt, dimK=0)
+b = cbpdnli.ConvBPDNLatInh(D, sh, Wg, 12, lmbda, mu, None, opt, dimK=0)
 X = b.solve()
 print("ConvBPDN solve time: %.2fs" % b.timer.elapsed('solve'))
 

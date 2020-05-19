@@ -17,7 +17,7 @@ import numpy as np
 from sporco.admm import cbpdn
 import sporco.linalg as sl
 import sporco.prox as sp
-from sporco.util import u
+from scipy import signal
 
 
 __author__ = """Frank Cwitkowitz <fcwitkow@ur.rochester.edu>"""
@@ -119,13 +119,13 @@ class ConvBPDNLatInh(cbpdn.ConvBPDN):
 
 
 
-    itstat_fields_objfn = ('ObjFun', 'DFid', 'RegL1', 'RegWL1')
-    hdrtxt_objfn = ('Fnc', 'DFid', u('Regℓ1'), u('RegWℓ1'))
-    hdrval_objfun = {'Fnc': 'ObjFun', 'DFid': 'DFid', u('Regℓ1'): 'RegL1', u('RegWℓ1'): 'RegWL1'}
+    itstat_fields_objfn = ('ObjFun', 'DFid', 'l', 'm', 'g')
+    hdrtxt_objfn = ('Fnc', 'DFid', 'l', 'm', 'g')
+    hdrval_objfun = {'Fnc': 'ObjFun', 'DFid': 'DFid', 'l': 'l', 'm': 'm', 'g': 'g'}
 
 
 
-    def __init__(self, D, S, Wg=None, Whn=2205, lmbda=None, mu=None, opt=None, dimK=None, dimN=2):
+    def __init__(self, D, S, Wg=None, Whn=2205, lmbda=None, mu=None, gamma=None, opt=None, dimK=None, dimN=2):
         """
         TODO - this block comment will need to be updated
         This class supports an arbitrary number of spatial dimensions,
@@ -180,9 +180,28 @@ class ConvBPDNLatInh(cbpdn.ConvBPDN):
         # Add the groups to the class instance
         self.Wg = Wg
 
+        # Set default lateral inhibition scaling term
+        if mu is None:
+            mu = 10 * self.lmbda
+
+        # Set weighted l1 (lateral inhibition) term scaling
+        self.mu = self.dtype.type(mu)
+
+        # Set default self inhibition scaling term
+        if gamma is None:
+            # No self inhibition by default
+            gamma = 0.0
+
+        # Set weighted l1 (self inhibition) term scaling
+        self.gamma = self.dtype.type(gamma)
+
+        self.wml, self.wms = 0, 0
+
         # Check to see if a grouping scheme is provided. If not, we assume
         # each filter is independent, i.e. there is no grouping and no inhibition.
-        if self.Wg is not None:
+        # If no grouping scheme and no gamma, nothing indicates inhibition, and we skip the following.
+        if (self.Wg is not None and self.mu != 0) or self.gamma:
+
             # Set the type of the grouping weights
             self.Wg = self.Wg.astype(self.dtype)
 
@@ -216,32 +235,35 @@ class ConvBPDNLatInh(cbpdn.ConvBPDN):
 
             # Create generalized spatial weighting matrix. This matrix is convolved with
             # weights during lateral inhibition to enforce locality of inhibition.
-            Wh = np.zeros(self.cri.shpS, dtype=self.dtype)
-            # Add ones for N-dimensional rectangular window
-            Wh[tuple(np.meshgrid(*([np.arange(Whn)]*dimN)))] = 1
+            Whl = np.zeros(self.cri.shpS, dtype=self.dtype)
+            # Ensure inhibition sample length is odd for symmetric inhibition
+            Whn += not Whn % 2
+            # Create N-dimensional window function
+            # TODO - allow selection of window function
+            nDimInd = tuple(np.meshgrid(*([np.arange(Whn)]*dimN)))
+            nDimWin = np.meshgrid(*([np.array(signal.hann(Whn))]*dimN))
+            nDimWin = np.concatenate([np.expand_dims(nDimWin[i], axis=0) for i in range(len(nDimWin))])
+            nDimWin = np.prod(nDimWin, axis=0)
+            Whl[nDimInd] = np.reshape(nDimWin, Whl[nDimInd].shape)
             # Center window around origin in each dimension
             for i in range(dimN):
-                Wh = np.roll(Wh, -Whn//2, axis=i)
+                Whl = np.roll(Whl, -Whn//2+1, axis=i)
+            # Create a spatial weighting matrix for self inhibition (Zero-out t=0)
+            Whs = Whl.copy()
+            Whs[tuple([0]*dimN)] = 0
 
-            # Obtain the inhibition window frequency representation
-            self.Whf = sl.rfftn(Wh, self.cri.Nv, self.cri.axisN)
+            # Obtain the lateral and self inhibition window frequency representations
+            self.Whfl = sl.rfftn(Whl, self.cri.Nv, self.cri.axisN)
+            self.Whfs = sl.rfftn(Whs, self.cri.Nv, self.cri.axisN)
 
-            # Initialize weights for weighted l1 norm (lateral inhibition)
-            self.WhXa = None
+            # Initialize pre-summed weights for weight l1 norm (lateral inhibition)
+            self.WhXal = None
 
-            # Set default scaling term
-            if mu is None:
-                mu = self.lmbda * 1E-2
+            # Initialize previous values
+            self.wml_prev, self.wms_prev = None, None
 
-            # Set weighted l1 (lateral inhibition) term scaling
-            self.mu = self.dtype.type(mu)
-
-            # Initialize weighted l1 term and its previous value
-            self.wm = 1
-            self.wm_prev = None
-
-            # Initialize smoothing for weighted l1 term
-            self.wms = opt['LISmWeight']
+            # Initialize smoothing for weighted l1 terms
+            self.wmsm = opt['LISmWeight']
 
 
 
@@ -249,28 +271,33 @@ class ConvBPDNLatInh(cbpdn.ConvBPDN):
         r"""Minimise Augmented Lagrangian with respect to
         :math:`\mathbf{y}`."""
 
-        if self.Wg is None or not self.mu:
-            # Skip unnecessary lateral inhibition steps and run standard CBPDN
+        if (self.Wg is None or self.mu == 0) and self.gamma == 0:
+            # Skip unnecessary inhibition steps and run standard CBPDN
             super(ConvBPDNLatInh, self).ystep()
 
         else:
             # Perform soft-thresholding step of Y subproblem using l1 weights
-            self.Y = sp.prox_l1(self.AX + self.U, (self.lmbda * self.wl1 + self.mu * self.wm) / self.rho)
+            self.Y = sp.prox_l1(self.AX + self.U, (self.lmbda * self.wl1 + self.mu * self.wml + self.gamma * self.wms) / self.rho)
 
             # Update previous weighted l1 term
-            self.wm_prev = self.wm
+            self.wml_prev = self.wml
 
             # Compute the frequency domain representation of the magnitude of X
             Xaf = sl.rfftn(np.abs(self.X), self.cri.Nv, self.cri.axisN)
 
             # Convolve the spatial weighting matrix with the magnitude of X
-            self.WhXa = sl.irfftn(self.Whf * Xaf, self.cri.Nv, self.cri.axisN)
+            self.WhXal = sl.irfftn(self.Whfl * Xaf, self.cri.Nv, self.cri.axisN)
 
             # Sum the weights across in-group members for each element
-            self.wm = np.dot(np.dot(self.WhXa, self.Wg.T), self.Wg) - np.sum(self.Wg, axis=0) * self.WhXa
+            self.wml = np.dot(np.dot(self.WhXal, self.Wg.T), self.Wg) - np.sum(self.Wg, axis=0) * self.WhXal
 
             # Smooth weighted l1 term
-            self.wm = self.wms * self.wm_prev + (1 - self.wms) * self.wm
+            self.wml = self.wmsm * self.wml_prev + (1 - self.wmsm) * self.wml
+
+            if self.gamma > 0:
+                self.wms_prev = self.wms
+                self.wms = sl.irfftn(self.Whfs * Xaf, self.cri.Nv, self.cri.axisN)
+                self.wms = self.wmsm * self.wms_prev + (1 - self.wmsm) * self.wms
 
             # Handle negative coefficients and boundary crossings
             super(cbpdn.ConvBPDN, self).ystep()
@@ -282,6 +309,7 @@ class ConvBPDNLatInh(cbpdn.ConvBPDN):
         function.
         """
 
-        rl1 = np.linalg.norm((self.wl1 * self.obfn_gvar()).ravel(), 1)
-        rwl1 = np.linalg.norm((self.wm * self.obfn_gvar()).ravel(), 1)
-        return (self.lmbda*rl1 + self.mu*rwl1, rl1, rwl1)
+        rl = np.linalg.norm((self.wl1 * self.obfn_gvar()).ravel(), 1)
+        rm = np.linalg.norm((self.wml * self.obfn_gvar()).ravel(), 1)
+        rg = np.linalg.norm((self.wms * self.obfn_gvar()).ravel(), 1)
+        return (self.lmbda*rl + self.mu*rm + self.gamma*rg, rl, rm, rg)
