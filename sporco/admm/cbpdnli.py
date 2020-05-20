@@ -125,7 +125,7 @@ class ConvBPDNLatInh(cbpdn.ConvBPDN):
 
 
 
-    def __init__(self, D, S, Wg=None, Whn=2205, lmbda=None, mu=None, gamma=None, opt=None, dimK=None, dimN=2):
+    def __init__(self, D, S, Wg=None, Whn=2205, win_args=('tukey', 0.5), lmbda=None, mu=None, gamma=None, opt=None, dimK=None, dimN=2):
         """
         TODO - this block comment will need to be updated
         This class supports an arbitrary number of spatial dimensions,
@@ -239,11 +239,10 @@ class ConvBPDNLatInh(cbpdn.ConvBPDN):
             # Ensure inhibition sample length is odd for symmetric inhibition
             Whn += not Whn % 2
             # Create N-dimensional window function
-            # TODO - allow selection of window function
             nDimInd = tuple(np.meshgrid(*([np.arange(Whn)]*dimN)))
-            nDimWin = np.meshgrid(*([np.array(signal.hann(Whn))]*dimN))
+            nDimWin = np.meshgrid(*([np.array(signal.get_window(win_args, Whn))]*dimN))
             nDimWin = np.concatenate([np.expand_dims(nDimWin[i], axis=0) for i in range(len(nDimWin))])
-            nDimWin = np.prod(nDimWin, axis=0)
+            nDimWin = np.power(np.prod(nDimWin, axis=0), 1/dimN)
             Whl[nDimInd] = np.reshape(nDimWin, Whl[nDimInd].shape)
             # Center window around origin in each dimension
             for i in range(dimN):
