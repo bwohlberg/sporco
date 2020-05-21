@@ -5,8 +5,7 @@
 # and user license can be found in the 'LICENSE.txt' file distributed
 # with the package.
 
-"""Classes for ADMM algorithms for convolutional sparse coding with
-Lateral Inhibition terms"""
+"""Class for ADMM algorithm for convolutional sparse coding with inhibition terms"""
 
 from __future__ import division, print_function
 from builtins import range
@@ -25,9 +24,8 @@ __author__ = """Frank Cwitkowitz <fcwitkow@ur.rochester.edu>"""
 
 class ConvBPDNLatInh(cbpdn.ConvBPDN):
     r"""
-    TODO - this block comment will need to be updated
-    ADMM algorithm for Convolutional BPDN with lateral inhibition via a
-    weighted :math:`\ell_{1}` norm term :cite:`wohlberg-2016-convolutional2`
+    ADMM algorithm for Convolutional BPDN with inhibition via
+    weighted :math:`\ell_{1}` norm terms :cite:`cogliati-2017-piano`
 
     |
 
@@ -40,20 +38,29 @@ class ConvBPDNLatInh(cbpdn.ConvBPDN):
 
     .. math::
        \mathrm{argmin}_\mathbf{x} \;
-       (1/2) \sum_c \left\| \sum_m \mathbf{d}_m * \mathbf{x}_{c,m} -
-       \mathbf{s}_c \right\|_2^2 + \lambda \sum_c \sum_m
-       \| \mathbf{x}_{c,m} \|_1 + \mu \| \{ \mathbf{x}_{c,m} \} \|_{2,1}
+       (1/2) \left\| \sum_m \mathbf{d}_m * \mathbf{x}_m -
+       \mathbf{s} \right\|_2^2 + \lambda \sum_m \| \mathbf{x}_m \|_1
+       + \mu \sum_m \mathbf{\omega}^T_m \| \mathbf{x}_m \| +
+       \gamma \sum_m \mathbf{z}^T_m \| \mathbf{x}_m \|
 
-    with input images :math:`\mathbf{s}_c`, dictionary filters
-    :math:`\mathbf{d}_m`, and coefficient maps
-    :math:`\mathbf{x}_{c,m}`, via the ADMM problem
+    for input image :math:`\mathbf{s}`, dictionary filters
+    :math:`\mathbf{d}_m`, and coefficient maps :math:`\mathbf{x}_m`,
+    via the ADMM problem
 
     .. math::
        \mathrm{argmin}_{\mathbf{x}, \mathbf{y}} \;
-       (1/2) \sum_c \left\| \sum_m \mathbf{d}_m * \mathbf{x}_{c,m} -
-       \mathbf{s}_c \right\|_2^2 + \lambda \sum_c \sum_m
-       \| \mathbf{y}_{c,m} \|_1 + \mu \| \{ \mathbf{y}_{c,m} \} \|_{2,1}
-       \quad \text{such that} \quad \mathbf{x}_{c,m} = \mathbf{y}_{c,m} \;\;.
+       (1/2) \left\| \sum_m \mathbf{d}_m * \mathbf{x}_m -
+       \mathbf{s} \right\|_2^2 + \lambda \sum_m \| \mathbf{y}_m \|_1 +
+       \mu \sum_m \mathbf{\omega}^T_m \| \mathbf{y}_m \| +
+       \gamma \sum_m \mathbf{z}^T_m \| \mathbf{y}_m \|
+       \quad \text{such that} \quad \mathbf{x}_m = \mathbf{y}_m \;\;.
+
+    Here, :math:`\mathbf{\omega}^T_m = \sum_n c_{m,n} (\| \mathbf{x}_n * \mathbf{h} \|)^T` and
+    :math:`\mathbf{z}^T_m = \sum_m (\| \mathbf{x}_m * \mathbf{h}' \|)^T`, where
+    :math:`c_{m,n}` is a square matrix with non-zero entries where elements :math:`m`
+    and :math:`n` share the same group and :math:`m != n`, and :math:`\mathbf{h}` is a spatial
+    weighting matrix non-zero around the origin with radius :math:`\frac{T}{2}`, and :math:`\mathbf{h}'`
+    is the same matrix with zero at the origin.
 
     After termination of the :meth:`solve` method, attribute :attr:`itstat`
     is a list of tuples representing statistics of each iteration. The
@@ -63,19 +70,21 @@ class ConvBPDNLatInh(cbpdn.ConvBPDN):
 
        ``ObjFun`` : Objective function value
 
-       ``DFid`` :  Value of data fidelity term :math:`(1/2) \sum_c
-       \left\| \sum_m \mathbf{d}_m * \mathbf{x}_{k,m} - \mathbf{s}_c
-       \right\|_2^2`
+       ``DFid`` : Value of data fidelity term :math:`(1/2) \| \sum_m
+       \mathbf{d}_m * \mathbf{x}_m - \mathbf{s} \|_2^2`
 
-       ``RegL1`` : Value of regularisation term :math:`\sum_c \sum_m
-       \| \mathbf{x}_{c,m} \|_1`
+       ``l`` : Value of regularisation term :math:`\sum_m \|
+       \mathbf{x}_m \|_1`
 
-       ``RegL21`` : Value of regularisation term :math:`\| \{
-       \mathbf{x}_{c,m} \} \|_{2,1}`
+       ``m`` : Value of regularisation term :math:`\sum_m
+       \mathbf{\omega}^T_m \| \mathbf{x}_m \|`
+
+       ``g`` : Value of regularisation term :math:`\sum_m
+       \mathbf{z}^T_m \| \mathbf{x}_m \|`
 
        ``PrimalRsdl`` : Norm of primal residual
 
-       ``DualRsdl`` : Norm of dual Residual
+       ``DualRsdl`` : Norm of dual residual
 
        ``EpsPrimal`` : Primal residual stopping tolerance
        :math:`\epsilon_{\mathrm{pri}}`
@@ -85,20 +94,21 @@ class ConvBPDNLatInh(cbpdn.ConvBPDN):
 
        ``Rho`` : Penalty parameter
 
+       ``XSlvRelRes`` : Relative residual of X step solver
+
        ``Time`` : Cumulative run time
     """
 
 
     class Options(cbpdn.ConvBPDN.Options):
         r"""ConvBPDNLatInh algorithm options
-        TODO - this block comment will need to be updated
 
         Options include all of those defined in
         :class:`.cbpdn.ConvBPDN.Options`, together with additional options:
 
           ``LISmWeight`` : Smoothing for the weighted :math:`\ell_1`
-          norm (lateral inhibition). The value acts as the percentage of the
-          previous value which is added to the.
+          norms . The value acts as the percentage of the previous weights
+          to superimpose with the new weights before iterating.
         """
 
         defaults = copy.deepcopy(cbpdn.ConvBPDN.Options.defaults)
@@ -125,9 +135,9 @@ class ConvBPDNLatInh(cbpdn.ConvBPDN):
 
 
 
-    def __init__(self, D, S, Wg=None, Whn=2205, win_args=('tukey', 0.5), lmbda=None, mu=None, gamma=None, opt=None, dimK=None, dimN=2):
+    def __init__(self, D, S, Wg=None, Whn=2205, win_args=('tukey', 0.5),
+                 lmbda=None, mu=None, gamma=None, opt=None, dimK=None, dimN=2):
         """
-        TODO - this block comment will need to be updated
         This class supports an arbitrary number of spatial dimensions,
         `dimN`, with a default of 2. The input dictionary `D` is either
         `dimN` + 1 dimensional, in which case each spatial component
@@ -159,8 +169,20 @@ class ConvBPDNLatInh(cbpdn.ConvBPDN):
           Dictionary array
         S : array_like
           Signal array
+        Wg : array_like
+          Grouping matrix with rows representing groups where non-zero
+          values indicate element membership
+        Whn: int
+          Diameter of inhibition window (in samples)
+        win_args: tuple
+          Window function parameters for inhibition window, fed to
+          scipy.signal.get_window()
         lmbda : float
-          Regularisation parameter
+          Regularisation parameter for sparsity
+        mu : float
+          Regularisation parameter for lateral inhibition
+        gamma : float
+          Regularisation parameter for self inhibition
         opt : :class:`ConvBPDN.Options` object
           Algorithm options
         dimK : 0, 1, or None, optional (default None)
@@ -183,23 +205,19 @@ class ConvBPDNLatInh(cbpdn.ConvBPDN):
         # Set default lateral inhibition scaling term
         if mu is None:
             mu = 10 * self.lmbda
-
-        # Set weighted l1 (lateral inhibition) term scaling
         self.mu = self.dtype.type(mu)
 
         # Set default self inhibition scaling term
         if gamma is None:
             # No self inhibition by default
             gamma = 0.0
-
-        # Set weighted l1 (self inhibition) term scaling
         self.gamma = self.dtype.type(gamma)
 
+        # Initialize lateral and self inhibition weights, respectively, as zero
         self.wml, self.wms = 0, 0
 
-        # Check to see if a grouping scheme is provided. If not, we assume
-        # each filter is independent, i.e. there is no grouping and no inhibition.
-        # If no grouping scheme and no gamma, nothing indicates inhibition, and we skip the following.
+        # If no grouping scheme and no gamma are provided, nothing
+        # indicates inhibition, and standard CBPDN is executed.
         if (self.Wg is not None and self.mu != 0) or self.gamma:
 
             # Set the type of the grouping weights
@@ -211,32 +229,11 @@ class ConvBPDNLatInh(cbpdn.ConvBPDN):
             # Determine the number of filters per group and add to the indexer
             self.cri.Mgs = np.sum((self.Wg != 0), axis=1)
 
-            # Initialize the grouping matrix
-            self.cmn = np.zeros((self.cri.M, self.cri.M), dtype=self.dtype)
-
-            # Obtain the grouping matrix c_{m,n}, where:
-            #     c_{m,n} = 1 if m != n and filter m and n belong to the same group,
-            #             = 0 otherwise.
-            for g in range(self.cri.Ng):
-                temp_groups = np.zeros(self.cmn.shape, dtype=self.dtype)
-                mmbr_indces = (self.Wg[g] != 0)
-                temp_groups[mmbr_indces, :] = self.Wg[g]
-                self.cmn += temp_groups
-
-            # Remove self-grouping
-            self.cmn = self.cmn * (1 - np.eye(self.cri.M))
-
-            # Protect against same pair in multiple groups
-            self.cmn[self.cmn != 0] = 1
-
-            # Obtain a matrix of the indices where c_{m,n} is non-zero, i.e. the filter
-            # ids n of those which belong to the same group as filter m where m != n
-            self.cmni = self.cmn == 1
-
             # Create generalized spatial weighting matrix. This matrix is convolved with
-            # weights during lateral inhibition to enforce locality of inhibition.
+            # activations during inhibition to window and enforce locality of inhibition.
             Whl = np.zeros(self.cri.shpS, dtype=self.dtype)
             # Ensure inhibition sample length is odd for symmetric inhibition
+            # and so the origin is the first element of the matrix
             Whn += not Whn % 2
             # Create N-dimensional window function
             nDimInd = tuple(np.meshgrid(*([np.arange(Whn)]*dimN)))
@@ -251,14 +248,11 @@ class ConvBPDNLatInh(cbpdn.ConvBPDN):
             Whs = Whl.copy()
             Whs[tuple([0]*dimN)] = 0
 
-            # Obtain the lateral and self inhibition window frequency representations
+            # Obtain the lateral and self inhibition windows in frequency domain
             self.Whfl = sl.rfftn(Whl, self.cri.Nv, self.cri.axisN)
             self.Whfs = sl.rfftn(Whs, self.cri.Nv, self.cri.axisN)
 
-            # Initialize pre-summed weights for weight l1 norm (lateral inhibition)
-            self.WhXal = None
-
-            # Initialize previous values
+            # Initialize previous values for lateral and self inhibition weights
             self.wml_prev, self.wms_prev = None, None
 
             # Initialize smoothing for weighted l1 terms
@@ -276,26 +270,29 @@ class ConvBPDNLatInh(cbpdn.ConvBPDN):
 
         else:
             # Perform soft-thresholding step of Y subproblem using l1 weights
-            self.Y = sp.prox_l1(self.AX + self.U, (self.lmbda * self.wl1 + self.mu * self.wml + self.gamma * self.wms) / self.rho)
-
-            # Update previous weighted l1 term
-            self.wml_prev = self.wml
+            self.Y = sp.prox_l1(self.AX + self.U, (self.lmbda * self.wl1 +
+                                                   self.mu * self.wml +
+                                                   self.gamma * self.wms) / self.rho)
 
             # Compute the frequency domain representation of the magnitude of X
             Xaf = sl.rfftn(np.abs(self.X), self.cri.Nv, self.cri.axisN)
 
-            # Convolve the spatial weighting matrix with the magnitude of X
-            self.WhXal = sl.irfftn(self.Whfl * Xaf, self.cri.Nv, self.cri.axisN)
-
-            # Sum the weights across in-group members for each element
-            self.wml = np.dot(np.dot(self.WhXal, self.Wg.T), self.Wg) - np.sum(self.Wg, axis=0) * self.WhXal
-
-            # Smooth weighted l1 term
-            self.wml = self.wmsm * self.wml_prev + (1 - self.wmsm) * self.wml
+            if self.mu > 0:
+                # Update previous lateral inhibition term
+                self.wml_prev = self.wml
+                # Convolve the lateral spatial weighting matrix with the magnitude of X
+                WhXal = sl.irfftn(self.Whfl * Xaf, self.cri.Nv, self.cri.axisN)
+                # Sum the weights across in-group members for each element
+                self.wml = np.dot(np.dot(WhXal, self.Wg.T), self.Wg) - np.sum(self.Wg, axis=0) * WhXal
+                # Smooth lateral inhibition term
+                self.wml = self.wmsm * self.wml_prev + (1 - self.wmsm) * self.wml
 
             if self.gamma > 0:
+                # Update previous self inhibition term
                 self.wms_prev = self.wms
+                # Convolve the self spatial weighting matrix with the magnitude of X
                 self.wms = sl.irfftn(self.Whfs * Xaf, self.cri.Nv, self.cri.axisN)
+                # Smooth self inhibition term
                 self.wms = self.wmsm * self.wms_prev + (1 - self.wmsm) * self.wms
 
             # Handle negative coefficients and boundary crossings
@@ -308,7 +305,10 @@ class ConvBPDNLatInh(cbpdn.ConvBPDN):
         function.
         """
 
+        # Sparsity term
         rl = np.linalg.norm((self.wl1 * self.obfn_gvar()).ravel(), 1)
+        # Lateral inhibition term
         rm = np.linalg.norm((self.wml * self.obfn_gvar()).ravel(), 1)
+        # Self inhibition term
         rg = np.linalg.norm((self.wms * self.obfn_gvar()).ravel(), 1)
         return (self.lmbda*rl + self.mu*rm + self.gamma*rg, rl, rm, rg)
