@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2016-2019 by Brendt Wohlberg <brendt@ieee.org>
+# Copyright (C) 2020 by Frank Cwitkowitz <fcwitkow@ur.rochester.edu>
+#                       Brendt Wohlberg <brendt@ieee.org>
 # All rights reserved. BSD 3-clause License.
 # This file is part of the SPORCO package. Details of the copyright
 # and user license can be found in the 'LICENSE.txt' file distributed
 # with the package.
 
-"""Class for ADMM algorithm for convolutional sparse coding with inhibition terms"""
+"""Class for ADMM algorithm for convolutional sparse coding with lateral
+inhibition terms"""
 
 from __future__ import division, print_function
 from builtins import range
