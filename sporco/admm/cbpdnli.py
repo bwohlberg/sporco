@@ -158,9 +158,9 @@ class ConvBPDNLatInh(cbpdn.ConvBPDN):
 
         **Call graph**
 
-        .. image:: ../_static/jonga/cbpdn_init.svg
+        .. image:: ../_static/jonga/cbpdnli_init.svg
            :width: 20%
-           :target: ../_static/jonga/cbpdn_init.svg
+           :target: ../_static/jonga/cbpdnli_init.svg
 
         |
 
