@@ -353,17 +353,17 @@ def gengraphs(pth, nopyfftw):
     from sporco.admm import cbpdnli
     mdnm = 'sporco.admm.cbpdnli'
 
-    D = np.random.randn(4, 4, 16)
+    D = np.random.randn(4, 4, 32)
     s = np.random.randn(8, 8)
     lmbda = 0.1
     mu = 0.01
     Wg = np.append(np.eye(16), np.eye(16), axis=-1)
 
     ## ConvBPDNLatInh class
-    opt = cbpdnli.ConvBPDNLatInh.Options({'Verbose': False, 'MaxMainIter': 1})
+    opt = cbpdnli.ConvBPDNInhib.Options({'Verbose': False, 'MaxMainIter': 1})
 
     with CallGraph(ct, mdnm, pth, 'cbpdnli_init.svg', **kwargs):
-        b = cbpdnli.ConvBPDNLatInh(D, s, Wg, Whn=4, lmbda=lmbda, mu=mu,
+        b = cbpdnli.ConvBPDNInhib(D, s, Wg, Whn=4, lmbda=lmbda, mu=mu,
                                    gamma=None, opt=opt)
 
     with CallGraph(ct, mdnm, pth, 'cbpdnli_solve.svg', **kwargs):

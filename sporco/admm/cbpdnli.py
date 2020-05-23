@@ -6,25 +6,25 @@
 # and user license can be found in the 'LICENSE.txt' file distributed
 # with the package.
 
-"""Class for ADMM algorithm for convolutional sparse coding with lateral
-inhibition terms"""
+"""Class for ADMM algorithm for convolutional sparse coding with inhibition terms"""
 
 from __future__ import division, print_function
 from builtins import range
 
 import copy
 import numpy as np
+from scipy import signal
 
 from sporco.admm import cbpdn
 import sporco.linalg as sl
 import sporco.prox as sp
-from scipy import signal
+from sporco.util import u
 
 
 __author__ = """Frank Cwitkowitz <fcwitkow@ur.rochester.edu>"""
 
 
-class ConvBPDNLatInh(cbpdn.ConvBPDN):
+class ConvBPDNInhib(cbpdn.ConvBPDN):
     r"""
     ADMM algorithm for Convolutional BPDN with inhibition via
     weighted :math:`\ell_{1}` norm terms :cite:`cogliati-2017-piano`
@@ -60,7 +60,7 @@ class ConvBPDNLatInh(cbpdn.ConvBPDN):
     Here, :math:`\mathbf{\omega}^T_m = \sum_n c_{m,n} (\| \mathbf{x}_n * \mathbf{h} \|)^T` and
     :math:`\mathbf{z}^T_m = \sum_m (\| \mathbf{x}_m * \mathbf{h}' \|)^T`, where
     :math:`c_{m,n}` is a square matrix with non-zero entries where elements :math:`m`
-    and :math:`n` share the same group and :math:`m != n`, and :math:`\mathbf{h}` is a spatial
+    and :math:`n` share the same group and :math:`m != n`, :math:`\mathbf{h}` is a spatial
     weighting matrix non-zero around the origin with radius :math:`\frac{T}{2}`, and :math:`\mathbf{h}'`
     is the same matrix with zero at the origin.
 
@@ -75,13 +75,13 @@ class ConvBPDNLatInh(cbpdn.ConvBPDN):
        ``DFid`` : Value of data fidelity term :math:`(1/2) \| \sum_m
        \mathbf{d}_m * \mathbf{x}_m - \mathbf{s} \|_2^2`
 
-       ``l`` : Value of regularisation term :math:`\sum_m \|
+       ``RegL1`` : Value of regularisation term :math:`\sum_m \|
        \mathbf{x}_m \|_1`
 
-       ``m`` : Value of regularisation term :math:`\sum_m
+       ``RegLat`` : Value of regularisation term :math:`\sum_m
        \mathbf{\omega}^T_m \| \mathbf{x}_m \|`
 
-       ``g`` : Value of regularisation term :math:`\sum_m
+       ``RegSelf`` : Value of regularisation term :math:`\sum_m
        \mathbf{z}^T_m \| \mathbf{x}_m \|`
 
        ``PrimalRsdl`` : Norm of primal residual
@@ -103,18 +103,18 @@ class ConvBPDNLatInh(cbpdn.ConvBPDN):
 
 
     class Options(cbpdn.ConvBPDN.Options):
-        r"""ConvBPDNLatInh algorithm options
+        r"""ConvBPDNInhib algorithm options
 
         Options include all of those defined in
         :class:`.cbpdn.ConvBPDN.Options`, together with additional options:
 
-          ``LISmWeight`` : Smoothing for the weighted :math:`\ell_1`
+          ``SmoothWeight`` : Smoothing for the weighted :math:`\ell_1`
           norms . The value acts as the percentage of the previous weights
           to superimpose with the new weights before iterating.
         """
 
         defaults = copy.deepcopy(cbpdn.ConvBPDN.Options.defaults)
-        defaults.update({'LISmWeight': 0.9})
+        defaults.update({'SmoothWeight': 0.9})
 
 
         def __init__(self, opt=None):
@@ -122,7 +122,7 @@ class ConvBPDNLatInh(cbpdn.ConvBPDN):
             Parameters
             ----------
             opt : dict or None, optional (default None)
-              ConvBPDNLatInh algorithm options
+              ConvBPDNInhib algorithm options
             """
 
             if opt is None:
@@ -131,13 +131,13 @@ class ConvBPDNLatInh(cbpdn.ConvBPDN):
 
 
 
-    itstat_fields_objfn = ('ObjFun', 'DFid', 'l', 'm', 'g')
-    hdrtxt_objfn = ('Fnc', 'DFid', 'l', 'm', 'g')
-    hdrval_objfun = {'Fnc': 'ObjFun', 'DFid': 'DFid', 'l': 'l', 'm': 'm', 'g': 'g'}
+    itstat_fields_objfn = ('ObjFun', 'DFid', 'RegL1', 'RegLat', 'RegSelf')
+    hdrtxt_objfn = ('Fnc', 'DFid', u('Regℓ1'), 'RegLat', 'RegSelf')
+    hdrval_objfun = {'Fnc': 'ObjFun', 'DFid': 'DFid', u('Regℓ1'): 'RegL1', 'RegLat': 'RegLat', 'RegSelf': 'RegSelf'}
 
 
 
-    def __init__(self, D, S, Wg=None, Whn=2205, win_args=('tukey', 0.5),
+    def __init__(self, D, S, Wg=None, Whn=None, win_args=None,
                  lmbda=None, mu=None, gamma=None, opt=None, dimK=None, dimN=2):
         """
         This class supports an arbitrary number of spatial dimensions,
@@ -196,10 +196,10 @@ class ConvBPDNLatInh(cbpdn.ConvBPDN):
 
         # Set default options if none specified
         if opt is None:
-            opt = ConvBPDNLatInh.Options()
+            opt = ConvBPDNInhib.Options()
 
         # Call parent class __init__
-        super(ConvBPDNLatInh, self).__init__(D, S, lmbda, opt, dimK, dimN)
+        super(ConvBPDNInhib, self).__init__(D, S, lmbda, opt, dimK, dimN)
 
         # Add the groups to the class instance
         self.Wg = Wg
@@ -221,15 +221,22 @@ class ConvBPDNLatInh(cbpdn.ConvBPDN):
         # If no grouping scheme and no gamma are provided, nothing
         # indicates inhibition, and standard CBPDN is executed.
         if (self.Wg is not None and self.mu != 0) or self.gamma:
+            if self.Wg is not None:
+                # Set the type of the grouping weights
+                self.Wg = self.Wg.astype(self.dtype)
 
-            # Set the type of the grouping weights
-            self.Wg = self.Wg.astype(self.dtype)
+                # Add the number of groups to the indexer
+                self.cri.Ng = self.Wg.shape[0]
 
-            # Add the number of groups to the indexer
-            self.cri.Ng = self.Wg.shape[0]
+                # Determine the number of filters per group and add to the indexer
+                self.cri.Mgs = np.sum((self.Wg != 0), axis=1)
 
-            # Determine the number of filters per group and add to the indexer
-            self.cri.Mgs = np.sum((self.Wg != 0), axis=1)
+            if Whn is None:
+                # Make inhibition window size of dictionary elements by default
+                Whn = self.D.shape[self.cri.axisN[0]]
+
+            if win_args is None:
+                win_args = ('tukey', 0.5)
 
             # Create generalized spatial weighting matrix. This matrix is convolved with
             # activations during inhibition to window and enforce locality of inhibition.
@@ -257,8 +264,8 @@ class ConvBPDNLatInh(cbpdn.ConvBPDN):
             # Initialize previous values for lateral and self inhibition weights
             self.wml_prev, self.wms_prev = None, None
 
-            # Initialize smoothing for weighted l1 terms
-            self.wmsm = opt['LISmWeight']
+            # Initialize smoothing for inhibition terms
+            self.smooth = opt['SmoothWeight']
 
 
 
@@ -268,7 +275,7 @@ class ConvBPDNLatInh(cbpdn.ConvBPDN):
 
         if (self.Wg is None or self.mu == 0) and self.gamma == 0:
             # Skip unnecessary inhibition steps and run standard CBPDN
-            super(ConvBPDNLatInh, self).ystep()
+            super(ConvBPDNInhib, self).ystep()
 
         else:
             # Perform soft-thresholding step of Y subproblem using l1 weights
@@ -279,7 +286,7 @@ class ConvBPDNLatInh(cbpdn.ConvBPDN):
             # Compute the frequency domain representation of the magnitude of X
             Xaf = sl.rfftn(np.abs(self.X), self.cri.Nv, self.cri.axisN)
 
-            if self.mu > 0:
+            if self.mu > 0 and self.Wg is not None:
                 # Update previous lateral inhibition term
                 self.wml_prev = self.wml
                 # Convolve the lateral spatial weighting matrix with the magnitude of X
@@ -287,7 +294,7 @@ class ConvBPDNLatInh(cbpdn.ConvBPDN):
                 # Sum the weights across in-group members for each element
                 self.wml = np.dot(np.dot(WhXal, self.Wg.T), self.Wg) - np.sum(self.Wg, axis=0) * WhXal
                 # Smooth lateral inhibition term
-                self.wml = self.wmsm * self.wml_prev + (1 - self.wmsm) * self.wml
+                self.wml = self.smooth * self.wml_prev + (1 - self.smooth) * self.wml
 
             if self.gamma > 0:
                 # Update previous self inhibition term
@@ -295,7 +302,7 @@ class ConvBPDNLatInh(cbpdn.ConvBPDN):
                 # Convolve the self spatial weighting matrix with the magnitude of X
                 self.wms = sl.irfftn(self.Whfs * Xaf, self.cri.Nv, self.cri.axisN)
                 # Smooth self inhibition term
-                self.wms = self.wmsm * self.wms_prev + (1 - self.wmsm) * self.wms
+                self.wms = self.smooth * self.wms_prev + (1 - self.smooth) * self.wms
 
             # Handle negative coefficients and boundary crossings
             super(cbpdn.ConvBPDN, self).ystep()
