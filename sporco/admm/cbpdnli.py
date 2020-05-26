@@ -31,7 +31,7 @@ class ConvBPDNInhib(cbpdn.ConvBPDN):
 
     |
 
-    .. inheritance-diagram:: ConvBPDNLatInh
+    .. inheritance-diagram:: ConvBPDNInhib
        :parts: 2
 
     |

@@ -359,7 +359,7 @@ def gengraphs(pth, nopyfftw):
     mu = 0.01
     Wg = np.append(np.eye(16), np.eye(16), axis=-1)
 
-    ## ConvBPDNLatInh class
+    ## ConvBPDNInhib class
     opt = cbpdnli.ConvBPDNInhib.Options({'Verbose': False, 'MaxMainIter': 1})
 
     with CallGraph(ct, mdnm, pth, 'cbpdnli_init.svg', **kwargs):
@@ -727,7 +727,7 @@ def insert_solve_docs():
         'sporco.admm.cbpdntv.ConvBPDNScalarTV': 'cbpdnstv_solve.svg',
         'sporco.admm.cbpdntv.ConvBPDNVectorTV': 'cbpdnvtv_solve.svg',
         'sporco.admm.cbpdntv.ConvBPDNRecTV': 'cbpdnrtv_solve.svg',
-        'sporco.admm.cbpdnli.ConvBPDNLatInh': 'cbpdnli_solve.svg',
+        'sporco.admm.cbpdnli.ConvBPDNInhib': 'cbpdnli_solve.svg',
         'sporco.admm.cmod.CnstrMOD': 'cmod_solve.svg',
         'sporco.admm.ccmod.ConvCnstrMOD_IterSM': 'ccmodism_solve.svg',
         'sporco.admm.ccmod.ConvCnstrMOD_CG': 'ccmodcg_solve.svg',
