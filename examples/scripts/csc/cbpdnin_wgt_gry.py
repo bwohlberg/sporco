@@ -5,7 +5,7 @@
 # with the package.
 
 """
-Single-channel CSC With Weighted Lateral Inhibition
+Single-channel CSC With Weighted Lateral Inhibition / No Self Inhibition
 ==================
 
 This example demonstrates solving a convolutional sparse coding problem with a greyscale signal using a weighted
@@ -17,7 +17,7 @@ grouping matrix
 
 where $\mathbf{d}_{m}$ is the $m^{\text{th}}$ dictionary filter, $\mathbf{x}_{m}$ is the coefficient map corresponding
 to the $m^{\text{th}}$ dictionary filter, $\mathbf{s}$ is the input image, and $\mathbf{\omega}^T_m$ and $\mathbf{z}^T_m$
-are inhibition weights corresponding to lateral and self inhibition, respectively. (See cbpdnli.ConvBPDNInhib)
+are inhibition weights corresponding to lateral and self inhibition, respectively. (See cbpdnin.ConvBPDNInhib)
 """
 
 
@@ -31,7 +31,7 @@ import numpy as np
 from sporco import util
 from sporco import plot
 import sporco.metric as sm
-from sporco.admm import cbpdnli
+from sporco.admm import cbpdnin
 
 
 """
@@ -69,7 +69,7 @@ Set :class:`.admm.cbpdn.ConvBPDNInhib` solver options.
 
 lmbda = 5e-2
 mu    = 5e-3 # if 'RegLat' diverges, lower mu
-opt = cbpdnli.ConvBPDNInhib.Options({'Verbose': True, 'MaxMainIter': 200,
+opt = cbpdnin.ConvBPDNInhib.Options({'Verbose': True, 'MaxMainIter': 200,
                                     'RelStopTol': 5e-3, 'AuxVarObj': False})
 
 
@@ -91,7 +91,7 @@ Wg1 = np.concatenate((np.eye(36), np.eye(36), np.zeros((36, 36))), axis=-1)
 Wg2 = 0.25 * np.concatenate((np.eye(36), np.zeros((36, 36)), np.eye(36)), axis=-1)
 Wg = np.append(Wg1, Wg2, axis=0)
 # We additionally, choose a rectangular inhibition window of sample diameter 12.
-b = cbpdnli.ConvBPDNInhib(D, sh, Wg, 12, ('boxcar'), lmbda, mu, None, opt, dimK=0)
+b = cbpdnin.ConvBPDNInhib(D, sh, Wg, 12, ('boxcar'), lmbda, mu, None, opt, dimK=0)
 X = b.solve()
 print("ConvBPDN solve time: %.2fs" % b.timer.elapsed('solve'))
 

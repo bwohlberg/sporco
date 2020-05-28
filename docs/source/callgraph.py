@@ -349,9 +349,9 @@ def gengraphs(pth, nopyfftw):
 
 
 
-    #### cbpdnli module
-    from sporco.admm import cbpdnli
-    mdnm = 'sporco.admm.cbpdnli'
+    #### cbpdnin module
+    from sporco.admm import cbpdnin
+    mdnm = 'sporco.admm.cbpdnin'
 
     D = np.random.randn(4, 4, 32)
     s = np.random.randn(8, 8)
@@ -359,14 +359,14 @@ def gengraphs(pth, nopyfftw):
     mu = 0.01
     Wg = np.append(np.eye(16), np.eye(16), axis=-1)
 
-    ## ConvBPDNLatInh class
-    opt = cbpdnli.ConvBPDNInhib.Options({'Verbose': False, 'MaxMainIter': 1})
+    ## ConvBPDNInhib class
+    opt = cbpdnin.ConvBPDNInhib.Options({'Verbose': False, 'MaxMainIter': 1})
 
-    with CallGraph(ct, mdnm, pth, 'cbpdnli_init.svg', **kwargs):
-        b = cbpdnli.ConvBPDNInhib(D, s, Wg, Whn=4, lmbda=lmbda, mu=mu,
+    with CallGraph(ct, mdnm, pth, 'cbpdnin_init.svg', **kwargs):
+        b = cbpdnin.ConvBPDNInhib(D, s, Wg, Whn=4, lmbda=lmbda, mu=mu,
                                    gamma=None, opt=opt)
 
-    with CallGraph(ct, mdnm, pth, 'cbpdnli_solve.svg', **kwargs):
+    with CallGraph(ct, mdnm, pth, 'cbpdnin_solve.svg', **kwargs):
         b.solve()
 
 
@@ -727,7 +727,7 @@ def insert_solve_docs():
         'sporco.admm.cbpdntv.ConvBPDNScalarTV': 'cbpdnstv_solve.svg',
         'sporco.admm.cbpdntv.ConvBPDNVectorTV': 'cbpdnvtv_solve.svg',
         'sporco.admm.cbpdntv.ConvBPDNRecTV': 'cbpdnrtv_solve.svg',
-        'sporco.admm.cbpdnli.ConvBPDNLatInh': 'cbpdnli_solve.svg',
+        'sporco.admm.cbpdnin.ConvBPDNInhib': 'cbpdnin_solve.svg',
         'sporco.admm.cmod.CnstrMOD': 'cmod_solve.svg',
         'sporco.admm.ccmod.ConvCnstrMOD_IterSM': 'ccmodism_solve.svg',
         'sporco.admm.ccmod.ConvCnstrMOD_CG': 'ccmodcg_solve.svg',

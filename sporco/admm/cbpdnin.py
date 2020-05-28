@@ -31,7 +31,7 @@ class ConvBPDNInhib(cbpdn.ConvBPDN):
 
     |
 
-    .. inheritance-diagram:: ConvBPDNLatInh
+    .. inheritance-diagram:: ConvBPDNInhib
        :parts: 2
 
     |
@@ -158,9 +158,9 @@ class ConvBPDNInhib(cbpdn.ConvBPDN):
 
         **Call graph**
 
-        .. image:: ../_static/jonga/cbpdnli_init.svg
+        .. image:: ../_static/jonga/cbpdnin_init.svg
            :width: 20%
-           :target: ../_static/jonga/cbpdnli_init.svg
+           :target: ../_static/jonga/cbpdnin_init.svg
 
         |
 

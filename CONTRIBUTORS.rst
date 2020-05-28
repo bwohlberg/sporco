@@ -18,7 +18,7 @@
 
 • Frank Cwitkowitz
 
-  - Convolutional BPDN with lateral inhibition module and examples
+  - Convolutional BPDN with inhibition module and examples
 
 • Aric Hagberg
 
