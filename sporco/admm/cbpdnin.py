@@ -133,7 +133,8 @@ class ConvBPDNInhib(cbpdn.ConvBPDN):
 
     itstat_fields_objfn = ('ObjFun', 'DFid', 'RegL1', 'RegLat', 'RegSelf')
     hdrtxt_objfn = ('Fnc', 'DFid', u('Regℓ1'), 'RegLat', 'RegSelf')
-    hdrval_objfun = {'Fnc': 'ObjFun', 'DFid': 'DFid', u('Regℓ1'): 'RegL1', 'RegLat': 'RegLat', 'RegSelf': 'RegSelf'}
+    hdrval_objfun = {'Fnc': 'ObjFun', 'DFid': 'DFid', u(
+        'Regℓ1'): 'RegL1', 'RegLat': 'RegLat', 'RegSelf': 'RegSelf'}
 
 
 
@@ -245,17 +246,19 @@ class ConvBPDNInhib(cbpdn.ConvBPDN):
             # and so the origin is the first element of the matrix
             Whn += not Whn % 2
             # Create N-dimensional window function
-            nDimInd = tuple(np.meshgrid(*([np.arange(Whn)]*dimN)))
-            nDimWin = np.meshgrid(*([np.array(signal.get_window(win_args, Whn))]*dimN))
-            nDimWin = np.concatenate([np.expand_dims(nDimWin[i], axis=0) for i in range(len(nDimWin))])
-            nDimWin = np.power(np.prod(nDimWin, axis=0), 1/dimN)
+            nDimInd = tuple(np.meshgrid(*([np.arange(Whn)] * dimN)))
+            nDimWin = np.meshgrid(
+                *([np.array(signal.get_window(win_args, Whn))] * dimN))
+            nDimWin = np.concatenate(
+                [np.expand_dims(nDimWin[i], axis=0) for i in range(len(nDimWin))])
+            nDimWin = np.power(np.prod(nDimWin, axis=0), 1 / dimN)
             Whl[nDimInd] = np.reshape(nDimWin, Whl[nDimInd].shape)
             # Center window around origin in each dimension
             for i in range(dimN):
-                Whl = np.roll(Whl, -Whn//2+1, axis=i)
+                Whl = np.roll(Whl, -Whn // 2 + 1, axis=i)
             # Create a spatial weighting matrix for self inhibition (Zero-out t=0)
             Whs = Whl.copy()
-            Whs[tuple([0]*dimN)] = 0
+            Whs[tuple([0] * dimN)] = 0
 
             # Obtain the lateral and self inhibition windows in frequency domain
             self.Whfl = sl.rfftn(Whl, self.cri.Nv, self.cri.axisN)
@@ -292,17 +295,21 @@ class ConvBPDNInhib(cbpdn.ConvBPDN):
                 # Convolve the lateral spatial weighting matrix with the magnitude of X
                 WhXal = sl.irfftn(self.Whfl * Xaf, self.cri.Nv, self.cri.axisN)
                 # Sum the weights across in-group members for each element
-                self.wml = np.dot(np.dot(WhXal, self.Wg.T), self.Wg) - np.sum(self.Wg, axis=0) * WhXal
+                self.wml = np.dot(np.dot(WhXal, self.Wg.T),
+                                  self.Wg) - np.sum(self.Wg, axis=0) * WhXal
                 # Smooth lateral inhibition term
-                self.wml = self.smooth * self.wml_prev + (1 - self.smooth) * self.wml
+                self.wml = self.smooth * self.wml_prev + \
+                    (1 - self.smooth) * self.wml
 
             if self.gamma > 0:
                 # Update previous self inhibition term
                 self.wms_prev = self.wms
                 # Convolve the self spatial weighting matrix with the magnitude of X
-                self.wms = sl.irfftn(self.Whfs * Xaf, self.cri.Nv, self.cri.axisN)
+                self.wms = sl.irfftn(
+                    self.Whfs * Xaf, self.cri.Nv, self.cri.axisN)
                 # Smooth self inhibition term
-                self.wms = self.smooth * self.wms_prev + (1 - self.smooth) * self.wms
+                self.wms = self.smooth * self.wms_prev + \
+                    (1 - self.smooth) * self.wms
 
             # Handle negative coefficients and boundary crossings
             super(cbpdn.ConvBPDN, self).ystep()
@@ -320,4 +327,4 @@ class ConvBPDNInhib(cbpdn.ConvBPDN):
         rm = np.linalg.norm((self.wml * self.obfn_gvar()).ravel(), 1)
         # Self inhibition term
         rg = np.linalg.norm((self.wms * self.obfn_gvar()).ravel(), 1)
-        return (self.lmbda*rl + self.mu*rm + self.gamma*rg, rl, rm, rg)
+        return (self.lmbda * rl + self.mu * rm + self.gamma * rg, rl, rm, rg)

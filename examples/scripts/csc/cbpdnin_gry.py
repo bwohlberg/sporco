@@ -38,7 +38,7 @@ Load example image.
 """
 
 img = util.ExampleImages().image('kodim23.png', scaled=True, gray=True,
-                                idxexp=np.s_[160:416,60:316])
+                                 idxexp=np.s_[160:416, 60:316])
 
 
 """
@@ -56,8 +56,8 @@ Load dictionary and display it.
 
 D = util.convdicts()['G:12x12x36']
 # Repeat the dictionary twice, adding noise to each respective pair
-D = np.append(D + 0.01*np.random.randn(*D.shape),
-              D + 0.01*np.random.randn(*D.shape), axis=-1)
+D = np.append(D + 0.01 * np.random.randn(*D.shape),
+              D + 0.01 * np.random.randn(*D.shape), axis=-1)
 plot.imview(util.tiledict(D), fgsz=(10, 10))
 
 
@@ -66,9 +66,9 @@ Set :class:`.admm.cbpdn.ConvBPDNInhib` solver options.
 """
 
 lmbda = 5e-2
-mu    = 5e-2
+mu = 5e-2
 opt = cbpdnin.ConvBPDNInhib.Options({'Verbose': True, 'MaxMainIter': 200,
-                                    'RelStopTol': 5e-3, 'AuxVarObj': False})
+                                     'RelStopTol': 5e-3, 'AuxVarObj': False})
 
 
 """
@@ -81,7 +81,8 @@ Initialise and run CSC solver.
 # elements i and i + 36 are paired for i = 0, ..., 35.
 Wg = np.append(np.eye(36), np.eye(36), axis=-1)
 # We additionally, choose a rectangular inhibition window of sample diameter 12.
-b = cbpdnin.ConvBPDNInhib(D, sh, Wg, 12, ('boxcar'), lmbda, mu, None, opt, dimK=0)
+b = cbpdnin.ConvBPDNInhib(D, sh, Wg, 12, ('boxcar'),
+                          lmbda, mu, None, opt, dimK=0)
 X = b.solve()
 print("ConvBPDN solve time: %.2fs" % b.timer.elapsed('solve'))
 
@@ -116,11 +117,11 @@ You will likely need to zoom in to see the activations clearly.
 
 fig = plot.figure(figsize=(14, 7))
 for i in range(4):
-    plot.subplot(2, 4, i+1)
-    plot.imview(abs(X[:,:,:,:,i]).squeeze(), cmap=plot.cm.Blues,
+    plot.subplot(2, 4, i + 1)
+    plot.imview(abs(X[:, :, :, :, i]).squeeze(), cmap=plot.cm.Blues,
                 title=f'X[{i}]', fig=fig)
-    plot.subplot(2, 4, i+5)
-    plot.imview(abs(X[:,:,:,:,i+36]).squeeze(), cmap=plot.cm.Blues,
+    plot.subplot(2, 4, i + 5)
+    plot.imview(abs(X[:, :, :, :, i + 36]).squeeze(), cmap=plot.cm.Blues,
                 title=f'X[{i+36}]', fig=fig)
 fig.show()
 
