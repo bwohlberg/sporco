@@ -360,7 +360,11 @@ def gengraphs(pth, nopyfftw):
     Wg = np.append(np.eye(16), np.eye(16), axis=-1)
 
     ## ConvBPDNInhib class
+<<<<<<< HEAD
     opt = cbpdnin.ConvBPDNInhib.Options({'Verbose': False, 'MaxMainIter': 1})
+=======
+    opt = cbpdnli.ConvBPDNInhib.Options({'Verbose': False, 'MaxMainIter': 1})
+>>>>>>> 554bfbad93c0790195958d7a3aa368ab9f021080
 
     with CallGraph(ct, mdnm, pth, 'cbpdnin_init.svg', **kwargs):
         b = cbpdnin.ConvBPDNInhib(D, s, Wg, Whn=4, lmbda=lmbda, mu=mu,
