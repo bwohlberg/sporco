@@ -9,13 +9,15 @@ Greyscale Images
 
 .. toc-start
 
-* `Convolutional sparse coding of a greyscale image (ADMM solver) <cbpdn_gry.py>`__
-* `Convolutional sparse coding of a greyscale image using the parallel ADMM solver <parcbpdn_gry.py>`__
-* `Convolutional sparse coding of a greyscale image using the CUDA solver <cbpdn_cuda.py>`__
-* `Convolutional sparse coding of a greyscale image (FISTA solver) <cbpdn_fista_gry.py>`__
-* `Convolutional sparse coding of a greyscale image (constrained data fidelity) <cminl1_gry.py>`__
-* `Convolutional sparse coding of a greyscale image (constrained penalty term) <cprjl1_gry.py>`__
-* `Convolutional sparse coding with gradient penalty of a greyscale image using the CUDA solver <cbpdn_grd_cuda.py>`__
+* `Convolutional sparse coding (ADMM solver) <cbpdn_gry.py>`__
+* `Convolutional sparse coding using the parallel ADMM solver <parcbpdn_gry.py>`__
+* `Convolutional sparse coding using the CUDA solver <cbpdn_cuda.py>`__
+* `Convolutional sparse coding (FISTA solver) <cbpdn_fista_gry.py>`__
+* `Convolutional sparse coding (constrained data fidelity) <cminl1_gry.py>`__
+* `Convolutional sparse coding (constrained penalty term) <cprjl1_gry.py>`__
+* `Convolutional sparse coding with gradient penalty using the CUDA solver <cbpdn_grd_cuda.py>`__
+* `Convolutional sparse coding with lateral inhibition <cbpdnin_gry.py>`__
+* `Convolutional sparse coding with weighted lateral inhibition <cbpdnin_wgt_gry.py>`__
 
 .. toc-end
 
