@@ -6,19 +6,16 @@
 
 """
 Single-channel CSC With Lateral Inhibition / No Self Inhibition
-==================
+===============================================================
 
 This example demonstrates solving a convolutional sparse coding problem with a greyscale signal
 
-  $$\mathrm{argmin}_\mathbf{x} \; \frac{1}{2} \left\| \sum_m \mathbf{d}_m * \mathbf{x}_{m} - \mathbf{s} \right\|_2^2
-  + \lambda \sum_m \| \mathbf{x}_{m} \|_1 + \sum_m \mathbf{\omega}^T_m \| \mathbf{x}_m \| + \sum_m \mathbf{z}^T_m \|
+  $$\mathrm{argmin}_\mathbf{x} \; \frac{1}{2} \left\| \sum_m \mathbf{d}_m * \mathbf{x}_{m} - \mathbf{s} \right\|_2^2 + \lambda \sum_m \| \mathbf{x}_{m} \|_1 + \sum_m \mathbf{\omega}^T_m \| \mathbf{x}_m \| + \sum_m \mathbf{z}^T_m \|
   \mathbf{x}_m \| \;,$$
 
-where $\mathbf{d}_{m}$ is the $m^{\text{th}}$ dictionary filter, $\mathbf{x}_{m}$ is the coefficient map corresponding
-to the $m^{\text{th}}$ dictionary filter, $\mathbf{s}$ is the input image, and $\mathbf{\omega}^T_m$ and $\mathbf{z}^T_m$
-are inhibition weights corresponding to lateral and self inhibition, respectively. (See cbpdnin.ConvBPDNInhib)
+where $\mathbf{d}_{m}$ is the $m^{\text{th}}$ dictionary filter, $\mathbf{x}_{m}$ is the coefficient map corresponding to the $m^{\text{th}}$ dictionary filter, $\mathbf{s}$ is the input image, and $\mathbf{\omega}^T_m$ and $\mathbf{z}^T_m$
+are inhibition weights corresponding to lateral and self inhibition, respectively (see :class:`.admm.cbpdnin.ConvBPDNInhib`).
 """
-
 
 
 from __future__ import print_function
@@ -62,7 +59,7 @@ plot.imview(util.tiledict(D), fgsz=(10, 10))
 
 
 """
-Set :class:`.admm.cbpdn.ConvBPDNInhib` solver options.
+Set :class:`.admm.cbpdnin.ConvBPDNInhib` solver options.
 """
 
 lmbda = 5e-2
@@ -75,12 +72,14 @@ opt = cbpdnin.ConvBPDNInhib.Options({'Verbose': True, 'MaxMainIter': 200,
 Initialise and run CSC solver.
 """
 
-# Create the Ng x M grouping matrix, where Ng is the number of groups, and M is
-# the number of dictionary elements. A non-zero entry at Wg(n, m), means that
-# element m belongs to group n. Our dictionary was repeated contiguously, so
-# elements i and i + 36 are paired for i = 0, ..., 35.
+# Create the Ng x M grouping matrix, where Ng is the number of groups,
+# and M is the number of dictionary elements. A non-zero entry at
+# Wg(n, m), means that element m belongs to group n. Our dictionary
+# was repeated contiguously, so elements i and i + 36 are paired for
+# i = 0, ..., 35.
 Wg = np.append(np.eye(36), np.eye(36), axis=-1)
-# We additionally, choose a rectangular inhibition window of sample diameter 12.
+# We additionally choose a rectangular inhibition window of sample
+# diameter 12.
 b = cbpdnin.ConvBPDNInhib(D, sh, Wg, 12, ('boxcar'),
                           lmbda, mu, None, opt, dimK=0)
 X = b.solve()
@@ -110,9 +109,7 @@ fig.show()
 
 
 """
-Show activation of grouped elements column-wise for first four groups.
-As mu is lowered, the vertical pairs should look more and more similar.
-You will likely need to zoom in to see the activations clearly.
+Show activation of grouped elements column-wise for first four groups.  As mu is lowered, the vertical pairs should look more and more similar.  You will likely need to zoom in to see the activations clearly.
 """
 
 fig = plot.figure(figsize=(14, 7))
