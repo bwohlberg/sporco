@@ -177,19 +177,23 @@ class ConvBPDNInhib(cbpdn.ConvBPDN):
         S : array_like
           Signal array
         Wg : array_like
-          Grouping matrix with rows representing groups where non-zero
-          values indicate element membership
+          Ng x M grouping matrix with rows representing groups where non-zero
+          values indicate strength of element membership - dimensionality of
+          input signal does not affect the shape of this matrix
         Whn: int
-          Diameter of inhibition window (in samples)
+          Diameter of inhibition window (in samples) across each dimension
         win_args: tuple
           Window function parameters for inhibition window, passed to
           :func:`scipy.signal.get_window`
         lmbda : float
           Regularisation parameter for sparsity
         mu : float
-          Regularisation parameter for lateral inhibition
+          Regularisation parameter for lateral inhibition - this discourages
+          grouped elements from being active within the same windowed area
         gamma : float
-          Regularisation parameter for self inhibition
+          Regularisation parameter for self inhibition - this discourages
+          single elements from being active more than once within the same
+          windowed area, leading to more impulse-like activations
         opt : :class:`ConvBPDNInhib.Options` object
           Algorithm options
         dimK : 0, 1, or None, optional (default None)
