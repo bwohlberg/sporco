@@ -14,7 +14,6 @@ This example demonstrates the use of class :class:`.tvl2.TVL2Denoise` for removi
 
 from __future__ import print_function
 from builtins import input
-from builtins import range
 
 import numpy as np
 

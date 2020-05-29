@@ -14,8 +14,12 @@ import copy
 import numpy as np
 
 from sporco.admm import admm
-import sporco.linalg as sl
-import sporco.prox as sp
+from sporco.array import zpad, atleast_nd, zdivide
+from sporco.fft import rfftn, irfftn
+from sporco.signal import gradient_filters, grad, gradT
+from sporco.linalg import rrs
+from sporco.prox import prox_l1, prox_l2
+
 
 __author__ = """Brendt Wohlberg <brendt@ieee.org>"""
 
@@ -211,7 +215,7 @@ class TVL1Denoise(admm.ADMM):
             # boyd-2010-distributed) is satisfied.
             Yss = np.sqrt(np.sum(self.Y[..., 0:-1]**2, axis=self.S.ndim,
                                  keepdims=True))
-            U0 = (self.lmbda/self.rho)*sl.zdivide(self.Y[..., 0:-1], Yss)
+            U0 = (self.lmbda/self.rho)*zdivide(self.Y[..., 0:-1], Yss)
             U1 = (1.0 / self.rho)*np.sign(self.Y[..., -1:])
             return np.concatenate((U0, U1), axis=self.S.ndim)
 
@@ -231,7 +235,7 @@ class TVL1Denoise(admm.ADMM):
         while gsrrs > self.opt['GSTol'] and ngsit < self.opt['MaxGSIter']:
             self.X = self.GaussSeidelStep(
                 SYU, self.X, ATYU, 1.0, self.lcw, 1.0)
-            gsrrs = sl.rrs(
+            gsrrs = rrs(
                 self.cnst_AT(self.cnst_A(self.X)),
                 self.cnst_AT(self.cnst_c() - self.cnst_B(self.Y) - self.U)
             )
@@ -246,10 +250,10 @@ class TVL1Denoise(admm.ADMM):
         :math:`\mathbf{y}`.
         """
 
-        self.Y[..., 0:-1] = sp.prox_l2(
+        self.Y[..., 0:-1] = prox_l2(
             self.AX[..., 0:-1] + self.U[..., 0:-1],
             (self.lmbda/self.rho)*self.Wtvna, axis=self.saxes)
-        self.Y[..., -1] = sp.prox_l1(
+        self.Y[..., -1] = prox_l1(
             self.AX[..., -1] + self.U[..., -1] - self.S,
             (1.0/self.rho)*self.Wdf)
 
@@ -298,7 +302,7 @@ class TVL1Denoise(admm.ADMM):
         """
 
         return np.concatenate(
-            [sl.grad(X, ax)[..., np.newaxis] for ax in self.axes] +
+            [grad(X, ax)[..., np.newaxis] for ax in self.axes] +
             [X[..., np.newaxis],], axis=X.ndim)
 
 
@@ -310,7 +314,7 @@ class TVL1Denoise(admm.ADMM):
         """
 
         return np.sum(np.concatenate(
-            [sl.gradT(X[..., ax], ax)[..., np.newaxis] for ax in self.axes] +
+            [gradT(X[..., ax], ax)[..., np.newaxis] for ax in self.axes] +
             [X[..., -1:],], axis=X.ndim-1), axis=X.ndim-1)
 
 
@@ -368,9 +372,9 @@ class TVL1Denoise(admm.ADMM):
 
         Xss = np.zeros_like(S, dtype=self.dtype)
         for ax in self.axes:
-            Xss += sl.zpad(X[(slice(None),)*ax + (slice(0, -1),)], (1, 0), ax)
-            Xss += sl.zpad(X[(slice(None),)*ax + (slice(1, None),)],
-                           (0, 1), ax)
+            Xss += zpad(X[(slice(None),)*ax + (slice(0, -1),)], (1, 0), ax)
+            Xss += zpad(X[(slice(None),)*ax + (slice(1, None),)],
+                        (0, 1), ax)
         return (rho*(Xss + ATYU) + W2*S) / (W2 + rho*lcw)
 
 
@@ -547,9 +551,9 @@ class TVL1Deconv(admm.ADMM):
         super(TVL1Deconv, self).__init__(S.size, yshape, yshape, S.dtype, opt)
 
         self.axshp = tuple([S.shape[k] for k in axes])
-        self.A = sl.atleast_nd(S.ndim, A.astype(self.dtype))
-        self.Af = sl.rfftn(self.A, self.axshp, axes=axes)
-        self.Sf = sl.rfftn(self.S, axes=axes)
+        self.A = atleast_nd(S.ndim, A.astype(self.dtype))
+        self.Af = rfftn(self.A, self.axshp, axes=axes)
+        self.Sf = rfftn(self.S, axes=axes)
         self.AHAf = np.conj(self.Af)*self.Af
         self.AHSf = np.conj(self.Af)*self.Sf
 
@@ -560,8 +564,8 @@ class TVL1Deconv(admm.ADMM):
         else:
             self.Wtvna = self.Wtv
 
-        self.Gf, self.GHGf = sl.gradient_filters(S.ndim, axes, self.axshp,
-                                                 dtype=self.dtype)
+        self.Gf, self.GHGf = gradient_filters(S.ndim, axes, self.axshp,
+                                              dtype=self.dtype)
         self.GAf = np.concatenate((self.Gf, self.Af[..., np.newaxis]),
                                   axis=self.Gf.ndim-1)
 
@@ -578,7 +582,7 @@ class TVL1Deconv(admm.ADMM):
             # boyd-2010-distributed) is satisfied.
             Yss = np.sqrt(np.sum(self.Y[..., 0:-1]**2, axis=self.S.ndim,
                                  keepdims=True))
-            U0 = (self.lmbda/self.rho)*sl.zdivide(self.Y[..., 0:-1], Yss)
+            U0 = (self.lmbda/self.rho)*zdivide(self.Y[..., 0:-1], Yss)
             U1 = (1.0 / self.rho)*np.sign(self.Y[..., -1:])
             return np.concatenate((U0, U1), axis=self.S.ndim)
 
@@ -590,14 +594,14 @@ class TVL1Deconv(admm.ADMM):
         """
 
         b = self.AHSf + np.sum(
-            np.conj(self.GAf) * sl.rfftn(self.Y-self.U, axes=self.axes),
+            np.conj(self.GAf) * rfftn(self.Y-self.U, axes=self.axes),
             axis=self.Y.ndim-1)
         self.Xf = b / (self.AHAf + self.GHGf)
-        self.X = sl.irfftn(self.Xf, self.axsz, axes=self.axes)
+        self.X = irfftn(self.Xf, self.axsz, axes=self.axes)
 
         if self.opt['LinSolveCheck']:
             ax = (self.AHAf + self.GHGf)*self.Xf
-            self.xrrs = sl.rrs(ax, b)
+            self.xrrs = rrs(ax, b)
         else:
             self.xrrs = None
 
@@ -608,10 +612,10 @@ class TVL1Deconv(admm.ADMM):
         :math:`\mathbf{y}`.
         """
 
-        self.Y[..., 0:-1] = sp.prox_l2(
+        self.Y[..., 0:-1] = prox_l2(
             self.AX[..., 0:-1] + self.U[..., 0:-1],
             (self.lmbda/self.rho)*self.Wtvna, axis=self.saxes)
-        self.Y[..., -1] = sp.prox_l1(
+        self.Y[..., -1] = prox_l1(
             self.AX[..., -1] + self.U[..., -1] - self.S,
             (1.0/self.rho)*self.Wdf)
 
@@ -660,8 +664,8 @@ class TVL1Deconv(admm.ADMM):
         """
 
         if Xf is None:
-            Xf = sl.rfftn(X, axes=self.axes)
-        return sl.irfftn(self.GAf*Xf[..., np.newaxis], self.axsz,
+            Xf = rfftn(X, axes=self.axes)
+        return irfftn(self.GAf*Xf[..., np.newaxis], self.axsz,
                          axes=self.axes)
 
 
@@ -672,8 +676,8 @@ class TVL1Deconv(admm.ADMM):
         :math:`A^T \mathbf{x} = (G_r^T \;\; G_c^T \;\; H^T) \mathbf{x}`.
         """
 
-        Xf = sl.rfftn(X, axes=self.axes)
-        return np.sum(sl.irfftn(np.conj(self.GAf)*Xf, self.axsz,
+        Xf = rfftn(X, axes=self.axes)
+        return np.sum(irfftn(np.conj(self.GAf)*Xf, self.axsz,
                                 axes=self.axes), axis=self.Y.ndim-1)
 
 

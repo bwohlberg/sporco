@@ -14,7 +14,6 @@ from __future__ import print_function, absolute_import
 import copy
 import numpy as np
 
-import sporco.linalg as sl
 import sporco.cnvrep as cr
 import sporco.admm.cbpdn as admm_cbpdn
 import sporco.admm.ccmodmd as admm_ccmod
@@ -23,6 +22,8 @@ import sporco.fista.ccmod as fista_ccmod
 from sporco.dictlrn import dictlrn
 import sporco.dictlrn.common as dc
 from sporco.common import _fix_dynamic_class_lookup
+from sporco.fft import rfftn, irfftn
+from sporco.linalg import inner
 
 
 __author__ = """Brendt Wohlberg <brendt@ieee.org>"""
@@ -516,10 +517,10 @@ class ConvBPDNMaskDictLearn(dictlrn.DictLearn):
             D = self.getdict(crop=False)
         if X is None:
             X = self.getcoef()
-        Df = sl.rfftn(D, self.xstep.cri.Nv, self.xstep.cri.axisN)
-        Xf = sl.rfftn(X, self.xstep.cri.Nv, self.xstep.cri.axisN)
-        DXf = sl.inner(Df, Xf, axis=self.xstep.cri.axisM)
-        return sl.irfftn(DXf, self.xstep.cri.Nv, self.xstep.cri.axisN)
+        Df = rfftn(D, self.xstep.cri.Nv, self.xstep.cri.axisN)
+        Xf = rfftn(X, self.xstep.cri.Nv, self.xstep.cri.axisN)
+        DXf = inner(Df, Xf, axis=self.xstep.cri.axisM)
+        return irfftn(DXf, self.xstep.cri.Nv, self.xstep.cri.axisN)
 
 
 

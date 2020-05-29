@@ -6,6 +6,11 @@ SPORCO Release Notes
 Version 0.1.13   (not yet released)
 -----------------------------------
 
+• Major module restructuring: numerous functions from sporco.util and
+  sporco.linalg moved to new modules sporco.array, sporco.fft,
+  and sporco.signal, and functions nkp, kpsvd, tikhonov_filter,
+  gaussian, and local_contrast_normalise moved from sporco.util to
+  sporco.linalg
 
 
 

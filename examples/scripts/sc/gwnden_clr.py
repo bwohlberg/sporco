@@ -15,14 +15,13 @@ This example demonstrates the removal of Gaussian white noise from a colour imag
 
 from __future__ import print_function
 from builtins import input
-from builtins import range
 
 import pyfftw   # See https://github.com/pyFFTW/pyFFTW/issues/40
 import numpy as np
 
 from sporco import util
+from sporco import array
 from sporco import plot
-import sporco.linalg as spl
 import sporco.metric as sm
 from sporco.admm import bpdn
 
@@ -44,7 +43,7 @@ Extract blocks and center each channel of image patches, taking steps of size 2.
 blksz = (8, 8, 3)
 stpsz = (2, 2, 1)
 
-blocks = util.extract_blocks(imgn, blksz, stpsz)
+blocks = array.extract_blocks(imgn, blksz, stpsz)
 blockmeans = np.mean(blocks, axis=(0, 1))
 blocks -= blockmeans
 blocks = blocks.reshape(np.product(blksz), -1)
@@ -80,10 +79,10 @@ X = b.solve()
 The denoised estimate of the image is by aggregating the block reconstructions from the coefficient maps.
 """
 
-imgd_mean = util.average_blocks(np.dot(D, X).reshape(blksz + (-1,))
-                                + blockmeans, img.shape, stpsz)
-imgd_median = util.combine_blocks(np.dot(D, X).reshape(blksz + (-1,))
-                                  + blockmeans, img.shape, stpsz, np.median)
+imgd_mean = array.average_blocks(np.dot(D, X).reshape(blksz + (-1,))
+                                 + blockmeans, img.shape, stpsz)
+imgd_median = array.combine_blocks(np.dot(D, X).reshape(blksz + (-1,))
+                                   + blockmeans, img.shape, stpsz, np.median)
 
 
 """

@@ -12,8 +12,7 @@ except ImportError:
     pytest.skip("cupy not installed", allow_module_level=True)
 
 from sporco.cupy.admm import pdcsc
-import sporco.cupy.linalg as sl
-from sporco.cupy.util import list2array
+from sporco.cupy.array import list2array
 
 
 

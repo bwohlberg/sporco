@@ -15,7 +15,7 @@ except ImportError:
 
 
 from sporco.cupy.admm import bpdn
-from sporco.cupy.util import list2array
+from sporco.cupy.array import list2array
 
 
 
@@ -241,34 +241,34 @@ class TestSet01(object):
         assert b.U.dtype == dt
 
 
-#    def test_14(self):
-#        N = 8
-#        M = 16
-#        D = cp.random.randn(N, M)
-#        s = cp.random.randn(N, 1)
-#        gamma = 1e0
-#        try:
-#            b = bpdn.BPDNProjL1(D, s, gamma)
-#            b.solve()
-#        except Exception as e:
-#            print(e)
-#            assert 0
+    def test_14(self):
+        N = 8
+        M = 16
+        D = cp.random.randn(N, M)
+        s = cp.random.randn(N, 1)
+        gamma = 1e0
+        try:
+            b = bpdn.BPDNProjL1(D, s, gamma)
+            b.solve()
+        except Exception as e:
+            print(e)
+            assert 0
 
 
-#    def test_15(self):
-#        N = 8
-#        M = 16
-#        D = cp.random.randn(N, M)
-#        s = cp.random.randn(N, 1)
-#        dt = cp.float16
-#        opt = bpdn.BPDNProjL1.Options({'Verbose': False, 'MaxMainIter': 20,
-#                                       'AutoRho': {'Enabled': True},
-#                                       'DataType': dt})
-#        b = bpdn.BPDNProjL1(D, s, gamma=1.0, opt=opt)
-#        b.solve()
-#        assert b.X.dtype == dt
-#        assert b.Y.dtype == dt
-#        assert b.U.dtype == dt
+    def test_15(self):
+        N = 8
+        M = 16
+        D = cp.random.randn(N, M)
+        s = cp.random.randn(N, 1)
+        dt = cp.float32
+        opt = bpdn.BPDNProjL1.Options({'Verbose': False, 'MaxMainIter': 20,
+                                       'AutoRho': {'Enabled': True},
+                                       'DataType': dt})
+        b = bpdn.BPDNProjL1(D, s, gamma=1.0, opt=opt)
+        b.solve()
+        assert b.X.dtype == dt
+        assert b.Y.dtype == dt
+        assert b.U.dtype == dt
 
 
     def test_16(self):

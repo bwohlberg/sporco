@@ -18,7 +18,6 @@ where $D$ is the dictionary, $X$ is the sparse representation, and $S$ is the si
 
 from __future__ import print_function
 from builtins import input
-from builtins import range
 
 import numpy as np
 

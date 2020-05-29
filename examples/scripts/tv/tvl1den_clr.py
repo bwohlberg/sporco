@@ -14,12 +14,12 @@ This example demonstrates the use of class :class:`.tvl1.TVL1Denoise` for removi
 
 from __future__ import print_function
 from builtins import input
-from builtins import range
 
 import numpy as np
 
 from sporco.admm import tvl1
 from sporco import util
+from sporco import signal
 from sporco import metric
 from sporco import plot
 
@@ -37,7 +37,7 @@ Construct test image corrupted by 20% salt & pepper noise.
 """
 
 np.random.seed(12345)
-imgn = util.spnoise(img, 0.2)
+imgn = signal.spnoise(img, 0.2)
 
 
 """

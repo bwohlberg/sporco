@@ -18,12 +18,12 @@ where $\mathbf{d}_{c,m}$ is channel $c$ of the $m^{\text{th}}$ dictionary filter
 
 from __future__ import print_function
 from builtins import input
-from builtins import range
 
 import pyfftw   # See https://github.com/pyFFTW/pyFFTW/issues/40
 import numpy as np
 
 from sporco import util
+from sporco import signal
 from sporco import plot
 import sporco.metric as sm
 import sporco.prox as sp
@@ -54,7 +54,7 @@ Load a reference image and corrupt it with 33% salt and pepper noise. (The call 
 img = util.ExampleImages().image('monarch.png', zoom=0.5, scaled=True,
                                  idxexp=np.s_[:, 160:672])
 np.random.seed(12345)
-imgn = util.spnoise(img, 0.33)
+imgn = signal.spnoise(img, 0.33)
 
 
 """

@@ -14,9 +14,9 @@ except ImportError:
 
 
 from sporco.cupy.admm import cbpdn
-import sporco.cupy.linalg as sl
-from sporco.cupy.util import list2array
-
+from sporco.cupy.array import list2array
+from sporco.cupy.fft import fftn, ifftn, fftconv
+from sporco.cupy.linalg import rrs
 
 
 class TestSet01(object):
@@ -171,7 +171,7 @@ class TestSet01(object):
         xr = cp.random.randn(N, N, M)
         xp = cp.abs(xr) > 3
         X0[xp] = cp.random.randn(X0[xp].size)
-        S = cp.sum(sl.fftconv(D, X0), axis=2)
+        S = cp.sum(fftconv(D, X0), axis=2)
         lmbda = 1e-4
         rho = 1e-1
         opt = cbpdn.ConvBPDN.Options({'Verbose': False, 'MaxMainIter': 500,
@@ -180,9 +180,9 @@ class TestSet01(object):
         b = cbpdn.ConvBPDN(D, S, lmbda, opt)
         b.solve()
         X1 = b.Y.squeeze()
-        assert sl.rrs(X0, X1) < 5e-5
+        assert rrs(X0, X1) < 5e-5
         Sr = b.reconstruct().squeeze()
-        assert sl.rrs(S, Sr) < 1e-4
+        assert rrs(S, Sr) < 1e-4
 
 
     def test_11(self):
@@ -194,8 +194,8 @@ class TestSet01(object):
         xr = cp.random.randn(N, N, M)
         xp = cp.abs(xr) > 3
         X0[xp] = cp.random.randn(X0[xp].size)
-        S = cp.sum(sl.ifftn(sl.fftn(D, (N, N), (0, 1)) *
-                            sl.fftn(X0, None, (0, 1)), None, (0, 1)).real,
+        S = cp.sum(ifftn(fftn(D, (N, N), (0, 1)) *
+                         fftn(X0, None, (0, 1)), None, (0, 1)).real,
                    axis=2)
         lmbda = 1e-4
         rho = 1e-1
@@ -205,9 +205,9 @@ class TestSet01(object):
         b = cbpdn.ConvBPDN(D, S, lmbda, opt)
         b.solve()
         X1 = b.Y.squeeze()
-        assert sl.rrs(X0, X1) < 5e-5
+        assert rrs(X0, X1) < 5e-5
         Sr = b.reconstruct().squeeze()
-        assert sl.rrs(S, Sr) < 1e-4
+        assert rrs(S, Sr) < 1e-4
 
 
     def test_12(self):
@@ -402,7 +402,7 @@ class TestSet01(object):
         xr = cp.random.randn(N, N, M)
         xp = cp.abs(xr) > 3
         X0[xp] = cp.random.randn(X0[xp].size)
-        S = cp.sum(sl.fftconv(D, X0), axis=2)
+        S = cp.sum(fftconv(D, X0), axis=2)
         lmbda = 1e-3
         opt = cbpdn.ConvBPDN.Options(
             {'Verbose': False, 'MaxMainIter': 500, 'RelStopTol': 1e-5,
@@ -416,8 +416,8 @@ class TestSet01(object):
         bc = cbpdn.ConvMinL1InL2Ball(D, S, epsilon=epsilon, opt=opt)
         Xc = bc.solve()
         assert cp.linalg.norm(Xp - Xc) / cp.linalg.norm(Xp) < 1e-3
-        assert(cp.abs(cp.linalg.norm(Xp.ravel(), 1) -
-                      cp.linalg.norm(Xc.ravel(), 1)) < 1e-3)
+        assert cp.abs(cp.linalg.norm(Xp.ravel(), 1) -
+                      cp.linalg.norm(Xc.ravel(), 1)) < 1e-3
 
 
     def test_23(self):

@@ -13,12 +13,12 @@ This example demonstrates the use of the plotting functions in module :mod:`.plo
 
 from __future__ import print_function
 from builtins import input
-from builtins import range
 
 import numpy as np
 
 from sporco import plot
 from sporco import util
+from sporco import signal
 
 
 """
@@ -96,7 +96,7 @@ Load an example colour image and create a corresponding grayscale version.
 
 imgc = util.ExampleImages().image('kodim23.png', scaled=True,
                                 idxexp=np.s_[150:500, 30:380])
-imgg = util.rgb2gray(imgc)
+imgg = signal.rgb2gray(imgc)
 
 
 """

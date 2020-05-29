@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2016-2018 by Brendt Wohlberg <brendt@ieee.org>
+# Copyright (C) 2016-2019 by Brendt Wohlberg <brendt@ieee.org>
 #                            Cristina Garcia-Cardona <cgarciac@lanl.gov>
 # All rights reserved. BSD 3-clause License.
 # This file is part of the SPORCO package. Details of the copyright
@@ -14,8 +14,11 @@ import copy
 import numpy as np
 
 from sporco.fista import fista
-import sporco.cnvrep as cr
-import sporco.linalg as sl
+from sporco.array import atleast_nd
+from sporco.fft import (rfftn, irfftn, empty_aligned, rfftn_empty_aligned,
+                        rfl2norm2)
+from sporco.linalg import inner
+from sporco.cnvrep import CDU_ConvRepIndexing, getPcn, bcrop
 
 
 __author__ = """Cristina Garcia-Cardona <cgarciac@lanl.gov>"""
@@ -206,7 +209,7 @@ class ConvCnstrMOD(fista.FISTADFT):
             opt = ConvCnstrMOD.Options()
 
         # Infer problem dimensions and set relevant attributes of self
-        self.cri = cr.CDU_ConvRepIndexing(dsz, S, dimK=dimK, dimN=dimN)
+        self.cri = CDU_ConvRepIndexing(dsz, S, dimK=dimK, dimN=dimN)
 
         # Call parent class __init__
         xshape = self.cri.shpD
@@ -231,23 +234,23 @@ class ConvCnstrMOD(fista.FISTADFT):
         self.S = np.asarray(self.S, dtype=self.dtype)
 
         # Compute signal S in DFT domain
-        self.Sf = sl.rfftn(self.S, None, self.cri.axisN)
+        self.Sf = rfftn(self.S, None, self.cri.axisN)
 
         # Create constraint set projection function
-        self.Pcn = cr.getPcn(dsz, self.cri.Nv, self.cri.dimN, self.cri.dimCd,
-                             zm=opt['ZeroMean'])
+        self.Pcn = getPcn(dsz, self.cri.Nv, self.cri.dimN, self.cri.dimCd,
+                          zm=opt['ZeroMean'])
 
         # Create byte aligned arrays for FFT calls
         self.Y = self.X
-        self.X = sl.pyfftw_empty_aligned(self.Y.shape, dtype=self.dtype)
+        self.X = empty_aligned(self.Y.shape, dtype=self.dtype)
         self.X[:] = self.Y
 
         # Initialise auxiliary variable Vf: Create byte aligned arrays
         # for FFT calls
-        self.Vf = sl.pyfftw_rfftn_empty_aligned(self.X.shape, self.cri.axisN,
-                                                self.dtype)
+        self.Vf = rfftn_empty_aligned(self.X.shape, self.cri.axisN,
+                                      self.dtype)
 
-        self.Xf = sl.rfftn(self.X, None, self.cri.axisN)
+        self.Xf = rfftn(self.X, None, self.cri.axisN)
         self.Yf = self.Xf
         self.store_prev()
         self.Yfprv = self.Yf.copy() + 1e5
@@ -274,7 +277,7 @@ class ConvCnstrMOD(fista.FISTADFT):
                           (self.cri.M,))
         self.Z = np.asarray(Z, dtype=self.dtype)
 
-        self.Zf = sl.rfftn(self.Z, self.cri.Nv, self.cri.axisN)
+        self.Zf = rfftn(self.Z, self.cri.Nv, self.cri.axisN)
 
 
 
@@ -285,7 +288,7 @@ class ConvCnstrMOD(fista.FISTADFT):
 
         D = self.X
         if crop:
-            D = cr.bcrop(D, self.cri.dsz, self.cri.dimN)
+            D = bcrop(D, self.cri.dsz, self.cri.dimN)
         return D
 
 
@@ -296,7 +299,7 @@ class ConvCnstrMOD(fista.FISTADFT):
         # Compute X D - S
         Ryf = self.eval_Rf(self.Yf)
 
-        gradf = sl.inner(np.conj(self.Zf), Ryf, axis=self.cri.axisK)
+        gradf = inner(np.conj(self.Zf), Ryf, axis=self.cri.axisK)
 
         # Multiple channel signal, single channel dictionary
         if self.cri.C > 1 and self.cri.Cd == 1:
@@ -309,7 +312,7 @@ class ConvCnstrMOD(fista.FISTADFT):
     def eval_Rf(self, Vf):
         """Evaluate smooth term in Vf."""
 
-        return sl.inner(self.Zf, Vf, axis=self.cri.axisM) - self.Sf
+        return inner(self.Zf, Vf, axis=self.cri.axisM) - self.Sf
 
 
 
@@ -324,7 +327,7 @@ class ConvCnstrMOD(fista.FISTADFT):
         """Compute fixed point residual in Fourier domain."""
 
         diff = self.Xf - self.Yfprv
-        return sl.rfl2norm2(diff, self.X.shape, axis=self.cri.axisN)
+        return rfl2norm2(diff, self.X.shape, axis=self.cri.axisN)
 
 
 
@@ -345,7 +348,7 @@ class ConvCnstrMOD(fista.FISTADFT):
         """
 
         Ef = self.eval_Rf(self.Xf)
-        return sl.rfl2norm2(Ef, self.S.shape, axis=self.cri.axisN) / 2.0
+        return rfl2norm2(Ef, self.S.shape, axis=self.cri.axisN) / 2.0
 
 
 
@@ -379,10 +382,10 @@ class ConvCnstrMOD(fista.FISTADFT):
         if D is None:
             Df = self.Xf
         else:
-            Df = sl.rfftn(D, None, self.cri.axisN)
+            Df = rfftn(D, None, self.cri.axisN)
 
         Sf = np.sum(self.Zf * Df, axis=self.cri.axisM)
-        return sl.irfftn(Sf, self.cri.Nv, self.cri.axisN)
+        return irfftn(Sf, self.cri.Nv, self.cri.axisN)
 
 
 
@@ -489,11 +492,11 @@ class ConvCnstrMODMask(ConvCnstrMOD):
             opt = ConvCnstrMODMask.Options()
 
         # Infer problem dimensions and set relevant attributes of self
-        self.cri = cr.CDU_ConvRepIndexing(dsz, S, dimK=dimK, dimN=dimN)
+        self.cri = CDU_ConvRepIndexing(dsz, S, dimK=dimK, dimN=dimN)
 
         # Append singleton dimensions to W if necessary
         if hasattr(W, 'ndim'):
-            W = sl.atleast_nd(self.cri.dimN + 3, W)
+            W = atleast_nd(self.cri.dimN + 3, W)
 
         # Reshape W if necessary (see discussion of reshape of S in
         # ccmod base class)
@@ -525,9 +528,9 @@ class ConvCnstrMODMask(ConvCnstrMOD):
         super(ConvCnstrMODMask, self).__init__(Z, S, dsz, opt, dimK, dimN)
 
         # Create byte aligned arrays for FFT calls
-        self.WRy = sl.pyfftw_empty_aligned(self.S.shape, dtype=self.dtype)
-        self.Ryf = sl.pyfftw_rfftn_empty_aligned(self.S.shape, self.cri.axisN,
-                                                 self.dtype)
+        self.WRy = empty_aligned(self.S.shape, dtype=self.dtype)
+        self.Ryf = rfftn_empty_aligned(self.S.shape, self.cri.axisN,
+                                       self.dtype)
 
 
 
@@ -538,13 +541,13 @@ class ConvCnstrMODMask(ConvCnstrMOD):
         self.Ryf[:] = self.eval_Rf(self.Yf)
 
         # Map to spatial domain to multiply by mask
-        Ry = sl.irfftn(self.Ryf, self.cri.Nv, self.cri.axisN)
+        Ry = irfftn(self.Ryf, self.cri.Nv, self.cri.axisN)
         # Multiply by mask
         self.WRy[:] = (self.W**2) * Ry
         # Map back to frequency domain
-        WRyf = sl.rfftn(self.WRy, self.cri.Nv, self.cri.axisN)
+        WRyf = rfftn(self.WRy, self.cri.Nv, self.cri.axisN)
 
-        gradf = sl.inner(np.conj(self.Zf), WRyf, axis=self.cri.axisK)
+        gradf = inner(np.conj(self.Zf), WRyf, axis=self.cri.axisK)
 
         # Multiple channel signal, single channel dictionary
         if self.cri.C > 1 and self.cri.Cd == 1:
@@ -560,7 +563,7 @@ class ConvCnstrMODMask(ConvCnstrMOD):
         """
 
         Ef = self.eval_Rf(self.Xf)
-        E = sl.irfftn(Ef, self.cri.Nv, self.cri.axisN)
+        E = irfftn(Ef, self.cri.Nv, self.cri.axisN)
 
         return (np.linalg.norm(self.W * E)**2) / 2.0
 
@@ -578,7 +581,7 @@ class ConvCnstrMODMask(ConvCnstrMOD):
             Xf = self.Xf
 
         Rf = self.eval_Rf(Xf)
-        R = sl.irfftn(Rf, self.cri.Nv, self.cri.axisN)
-        WRf = sl.rfftn(self.W * R, self.cri.Nv, self.cri.axisN)
+        R = irfftn(Rf, self.cri.Nv, self.cri.axisN)
+        WRf = rfftn(self.W * R, self.cri.Nv, self.cri.axisN)
 
         return 0.5 * np.linalg.norm(WRf.flatten(), 2)**2

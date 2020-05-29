@@ -14,7 +14,6 @@ This example demonstrates the use of class :class:`.rpca.RobustPCA` for solving 
 
 from __future__ import print_function
 from builtins import input
-from builtins import range
 
 import numpy as np
 from scipy.ndimage.filters import gaussian_filter

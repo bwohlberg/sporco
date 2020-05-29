@@ -12,10 +12,10 @@ except ImportError:
     pytest.skip("cupy not installed", allow_module_level=True)
 
 
-import sporco.cupy.linalg as sl
 from sporco.cupy.fista import cbpdn
-from sporco.cupy.util import list2array
-
+from sporco.cupy.array import list2array
+from sporco.cupy.fft import complex_dtype, fftn, ifftn
+from sporco.cupy.linalg import rrs
 
 
 class TestSet01(object):
@@ -106,8 +106,8 @@ class TestSet01(object):
         b = cbpdn.ConvBPDN(D, s, lmbda, opt=opt)
         b.solve()
         assert b.X.dtype == dt
-        assert b.Xf.dtype == sl.complex_dtype(dt)
-        assert b.Yf.dtype == sl.complex_dtype(dt)
+        assert b.Xf.dtype == complex_dtype(dt)
+        assert b.Yf.dtype == complex_dtype(dt)
 
 
     def test_07(self):
@@ -125,8 +125,8 @@ class TestSet01(object):
         b = cbpdn.ConvBPDN(D, s, lmbda, opt=opt)
         b.solve()
         assert b.X.dtype == dt
-        assert b.Xf.dtype == sl.complex_dtype(dt)
-        assert b.Yf.dtype == sl.complex_dtype(dt)
+        assert b.Xf.dtype == complex_dtype(dt)
+        assert b.Yf.dtype == complex_dtype(dt)
 
 
     def test_08(self):
@@ -166,8 +166,8 @@ class TestSet01(object):
         xr = cp.random.randn(N, N, M)
         xp = cp.abs(xr) > 3
         X0[xp] = cp.random.randn(X0[xp].size)
-        S = cp.sum(sl.ifftn(sl.fftn(D, (N, N), (0, 1)) *
-                            sl.fftn(X0, None, (0, 1)), None, (0, 1)).real,
+        S = cp.sum(ifftn(fftn(D, (N, N), (0, 1)) *
+                            fftn(X0, None, (0, 1)), None, (0, 1)).real,
                    axis=2)
         lmbda = 1e-2
         L = 1e3
@@ -177,9 +177,9 @@ class TestSet01(object):
         b = cbpdn.ConvBPDN(D, S, lmbda, opt)
         b.solve()
         X1 = b.X.squeeze()
-        assert sl.rrs(X0, X1) < 5e-4
+        assert rrs(X0, X1) < 5e-4
         Sr = b.reconstruct().squeeze()
-        assert sl.rrs(S, Sr) < 3e-4
+        assert rrs(S, Sr) < 3e-4
 
 
     def test_11(self):
@@ -191,8 +191,8 @@ class TestSet01(object):
         xr = cp.random.randn(N, N, M)
         xp = cp.abs(xr) > 3
         X0[xp] = cp.random.randn(X0[xp].size)
-        S = cp.sum(sl.ifftn(sl.fftn(D, (N, N), (0, 1)) *
-                            sl.fftn(X0, None, (0, 1)), None, (0, 1)).real,
+        S = cp.sum(ifftn(fftn(D, (N, N), (0, 1)) *
+                         fftn(X0, None, (0, 1)), None, (0, 1)).real,
                    axis=2)
         lmbda = 1e-2
         L = 1e3
@@ -202,9 +202,9 @@ class TestSet01(object):
         b = cbpdn.ConvBPDN(D, S, lmbda, opt)
         b.solve()
         X1 = b.X.squeeze()
-        assert sl.rrs(X0, X1) < 5e-4
+        assert rrs(X0, X1) < 5e-4
         Sr = b.reconstruct().squeeze()
-        assert sl.rrs(S, Sr) < 2e-4
+        assert rrs(S, Sr) < 2e-4
 
 
     def test_12(self):

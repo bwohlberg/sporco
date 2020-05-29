@@ -20,11 +20,11 @@ are inhibition weights corresponding to lateral and self inhibition, respectivel
 
 from __future__ import print_function
 from builtins import input
-from builtins import range
 
 import numpy as np
 
 from sporco import util
+from sporco import signal
 from sporco import plot
 import sporco.metric as sm
 from sporco.admm import cbpdnin
@@ -44,7 +44,7 @@ Highpass filter example image.
 
 npd = 16
 fltlmbd = 10
-sl, sh = util.tikhonov_filter(img, fltlmbd, npd)
+sl, sh = signal.tikhonov_filter(img, fltlmbd, npd)
 
 
 """

@@ -12,7 +12,7 @@ except ImportError:
     pytest.ski
 
 from sporco.cupy.admm import cbpdntv
-from sporco.cupy.util import list2array
+from sporco.cupy.array import list2array
 
 
 

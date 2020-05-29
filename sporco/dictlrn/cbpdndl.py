@@ -12,7 +12,6 @@ from __future__ import print_function, absolute_import
 import copy
 import numpy as np
 
-import sporco.linalg as sl
 import sporco.cnvrep as cr
 import sporco.admm.cbpdn as admm_cbpdn
 import sporco.admm.ccmod as admm_ccmod
@@ -21,6 +20,8 @@ import sporco.fista.ccmod as fista_ccmod
 from sporco.dictlrn import dictlrn
 import sporco.dictlrn.common as dc
 from sporco.common import _fix_dynamic_class_lookup
+from sporco.linalg import inner
+from sporco.fft import (rfftn, irfftn, rfl2norm2)
 
 
 __author__ = """Brendt Wohlberg <brendt@ieee.org>"""
@@ -493,10 +494,10 @@ class ConvBPDNDictLearn(dictlrn.DictLearn):
             D = self.getdict(crop=False)
         if X is None:
             X = self.getcoef()
-        Df = sl.rfftn(D, self.xstep.cri.Nv, self.xstep.cri.axisN)
-        Xf = sl.rfftn(X, self.xstep.cri.Nv, self.xstep.cri.axisN)
-        DXf = sl.inner(Df, Xf, axis=self.xstep.cri.axisM)
-        return sl.irfftn(DXf, self.xstep.cri.Nv, self.xstep.cri.axisN)
+        Df = rfftn(D, self.xstep.cri.Nv, self.xstep.cri.axisN)
+        Xf = rfftn(X, self.xstep.cri.Nv, self.xstep.cri.axisN)
+        DXf = inner(Df, Xf, axis=self.xstep.cri.axisM)
+        return irfftn(DXf, self.xstep.cri.Nv, self.xstep.cri.axisN)
 
 
 
@@ -512,12 +513,12 @@ class ConvBPDNDictLearn(dictlrn.DictLearn):
                 X = self.xstep.getcoef()
             else:
                 X = self.xstep.var_y()
-            Df = sl.rfftn(D, self.xstep.cri.Nv, self.xstep.cri.axisN)
-            Xf = sl.rfftn(X, self.xstep.cri.Nv, self.xstep.cri.axisN)
+            Df = rfftn(D, self.xstep.cri.Nv, self.xstep.cri.axisN)
+            Xf = rfftn(X, self.xstep.cri.Nv, self.xstep.cri.axisN)
             Sf = self.xstep.Sf
-            Ef = sl.inner(Df, Xf, axis=self.xstep.cri.axisM) - Sf
-            dfd = sl.rfl2norm2(Ef, self.xstep.S.shape,
-                               axis=self.xstep.cri.axisN) / 2.0
+            Ef = inner(Df, Xf, axis=self.xstep.cri.axisM) - Sf
+            dfd = rfl2norm2(Ef, self.xstep.S.shape,
+                            axis=self.xstep.cri.axisN) / 2.0
             rl1 = np.sum(np.abs(X))
             return dict(DFid=dfd, RegL1=rl1,
                         ObjFun=dfd + self.xstep.lmbda * rl1)

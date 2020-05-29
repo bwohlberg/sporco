@@ -14,7 +14,6 @@ This example demonstrates the use of :class:`.dictlrn.cbpdndl.ConvBPDNDictLearn`
 
 from __future__ import print_function
 from builtins import input
-from builtins import range
 
 import pyfftw   # See https://github.com/pyFFTW/pyFFTW/issues/40
 import numpy as np
@@ -23,6 +22,7 @@ import imageio
 
 from sporco.dictlrn import cbpdndl
 from sporco import util
+from sporco import signal
 from sporco import plot
 
 
@@ -34,7 +34,7 @@ reader = imageio.get_reader('imageio:cockatoo.mp4')
 frmlst = []
 for i, frm in enumerate(reader):
     if i >= 250:
-        frm = zoom(util.rgb2gray(frm.astype(np.float32)/255.0), 0.25)
+        frm = zoom(signal.rgb2gray(frm.astype(np.float32)/255.0), 0.25)
         frmlst.append(frm[20:-20, 70:-70])
 vid = np.stack(frmlst, axis=2)
 
@@ -45,7 +45,7 @@ Highpass filter video frames.
 
 npd = 16
 fltlmbd = 10
-vl, vh = util.tikhonov_filter(vid, fltlmbd, npd)
+vl, vh = signal.tikhonov_filter(vid, fltlmbd, npd)
 
 
 """

@@ -14,16 +14,16 @@ This example demonstrates the use of :class:`.cbpdn.AddMaskSim` for convolutiona
 
 from __future__ import print_function
 from builtins import input
-from builtins import range
 
 import pyfftw   # See https://github.com/pyFFTW/pyFFTW/issues/40
 import numpy as np
 
 from sporco import util
-from sporco import metric
+from sporco import signal
 from sporco import plot
 from sporco.admm import tvl2
 from sporco.admm import cbpdn
+from sporco.metric import psnr
 
 
 """
@@ -41,7 +41,7 @@ Create random mask and apply to reference image to obtain test image. (The call 
 
 np.random.seed(12345)
 frc = 0.5
-msk = util.rndmask(img.shape, frc, dtype=np.float32)
+msk = signal.rndmask(img.shape, frc, dtype=np.float32)
 imgw = msk * img
 
 
@@ -116,8 +116,8 @@ Display solve time and reconstruction performance.
 
 print("AddMaskSim wrapped ConvBPDN solve time: %.2fs" %
       ams.timer.elapsed('solve'))
-print("Corrupted image PSNR: %5.2f dB" % metric.psnr(img, imgw))
-print("Recovered image PSNR: %5.2f dB" % metric.psnr(img, imgr))
+print("Corrupted image PSNR: %5.2f dB" % psnr(img, imgw))
+print("Recovered image PSNR: %5.2f dB" % psnr(img, imgr))
 
 
 """

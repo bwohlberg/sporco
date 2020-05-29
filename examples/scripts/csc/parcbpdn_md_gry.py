@@ -14,7 +14,6 @@ This example compares the use of :class:`.parcbpdn.ParConvBPDN` with :class:`.cb
 
 from __future__ import print_function
 from builtins import input
-from builtins import range
 
 import pyfftw   # See https://github.com/pyFFTW/pyFFTW/issues/40
 import numpy as np

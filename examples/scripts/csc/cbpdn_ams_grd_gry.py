@@ -14,17 +14,16 @@ This example demonstrates the use of :class:`.cbpdn.AddMaskSim` for convolutiona
 
 from __future__ import print_function
 from builtins import input
-from builtins import range
 
 import pyfftw   # See https://github.com/pyFFTW/pyFFTW/issues/40
 import numpy as np
 
 from sporco import util
+from sporco import signal
 from sporco import metric
-from sporco import linalg
 from sporco import plot
-from sporco.admm import tvl2
 from sporco.admm import cbpdn
+from sporco.fft import fftconv
 from sporco import cuda
 
 # If running in a notebook, try to use wurlitzer so that output from the CUDA
@@ -47,7 +46,7 @@ Create random mask and apply to reference image to obtain test image. (The call 
 
 np.random.seed(12345)
 frc = 0.5
-msk = util.rndmask(img.shape, frc, dtype=np.float32)
+msk = signal.rndmask(img.shape, frc, dtype=np.float32)
 imgw = msk * img
 
 
@@ -125,7 +124,7 @@ if cuda.device_count() > 0:
     with sys_pipes(), util.ContextTimer(tm):
         X = cuda.cbpdngrdmsk(Di, imgwp, mskp, lmbda, mu, opt)
     t = tm.elapsed()
-    imgr = crop(np.sum(linalg.fftconv(Di, X), axis=-1))
+    imgr = crop(np.sum(fftconv(Di, X), axis=-1))
 else:
     opt['L1Weight'] = wl1i
     opt['GradWeight'] = wgri

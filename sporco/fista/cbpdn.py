@@ -13,11 +13,14 @@ from __future__ import division, absolute_import, print_function
 import copy
 import numpy as np
 
-import sporco.cnvrep as cr
-import sporco.linalg as sl
-import sporco.prox as sp
 from sporco.util import u
+from sporco.cnvrep import CSC_ConvRepIndexing, mskWshape
+from sporco.linalg import inner
+from sporco.fft import (rfftn, irfftn, empty_aligned, rfftn_empty_aligned,
+                        rfl2norm2)
+from sporco.prox import prox_l1
 from sporco.fista import fista
+
 
 __author__ = """Cristina Garcia-Cardona <cgarciac@lanl.gov>"""
 
@@ -191,16 +194,16 @@ class ConvBPDN(fista.FISTADFT):
 
         # Infer problem dimensions and set relevant attributes of self
         if not hasattr(self, 'cri'):
-            self.cri = cr.CSC_ConvRepIndexing(D, S, dimK=dimK, dimN=dimN)
+            self.cri = CSC_ConvRepIndexing(D, S, dimK=dimK, dimN=dimN)
 
         # Set dtype attribute based on S.dtype and opt['DataType']
         self.set_dtype(opt, S.dtype)
 
         # Set default lambda value if not specified
         if lmbda is None:
-            cri = cr.CSC_ConvRepIndexing(D, S, dimK=dimK, dimN=dimN)
-            Df = sl.rfftn(D.reshape(cri.shpD), cri.Nv, axes=cri.axisN)
-            Sf = sl.rfftn(S.reshape(cri.shpS), axes=cri.axisN)
+            cri = CSC_ConvRepIndexing(D, S, dimK=dimK, dimN=dimN)
+            Df = rfftn(D.reshape(cri.shpD), cri.Nv, axes=cri.axisN)
+            Sf = rfftn(S.reshape(cri.shpS), axes=cri.axisN)
             b = np.conj(Df) * Sf
             lmbda = 0.1 * abs(b).max()
 
@@ -218,20 +221,20 @@ class ConvBPDN(fista.FISTADFT):
         self.S = np.asarray(S.reshape(self.cri.shpS), dtype=self.dtype)
 
         # Compute signal in DFT domain
-        self.Sf = sl.rfftn(self.S, None, self.cri.axisN)
+        self.Sf = rfftn(self.S, None, self.cri.axisN)
 
         # Create byte aligned arrays for FFT calls
         self.Y = self.X.copy()
-        self.X = sl.pyfftw_empty_aligned(self.Y.shape, dtype=self.dtype)
+        self.X = empty_aligned(self.Y.shape, dtype=self.dtype)
         self.X[:] = self.Y
 
         # Initialise auxiliary variable Vf: Create byte aligned arrays
         # for FFT calls
-        self.Vf = sl.pyfftw_rfftn_empty_aligned(self.X.shape, self.cri.axisN,
-                                                self.dtype)
+        self.Vf = rfftn_empty_aligned(self.X.shape, self.cri.axisN,
+                                          self.dtype)
 
 
-        self.Xf = sl.rfftn(self.X, None, self.cri.axisN)
+        self.Xf = rfftn(self.X, None, self.cri.axisN)
         self.Yf = self.Xf.copy()
         self.store_prev()
         self.Yfprv = self.Yf.copy() + 1e5
@@ -248,7 +251,7 @@ class ConvBPDN(fista.FISTADFT):
 
         if D is not None:
             self.D = np.asarray(D, dtype=self.dtype)
-        self.Df = sl.rfftn(self.D, self.cri.Nv, self.cri.axisN)
+        self.Df = rfftn(self.D, self.cri.Nv, self.cri.axisN)
 
 
 
@@ -278,14 +281,14 @@ class ConvBPDN(fista.FISTADFT):
     def eval_Rf(self, Vf):
         """Evaluate smooth term in Vf."""
 
-        return sl.inner(self.Df, Vf, axis=self.cri.axisM) - self.Sf
+        return inner(self.Df, Vf, axis=self.cri.axisM) - self.Sf
 
 
 
     def eval_proxop(self, V):
         """Compute proximal operator of :math:`g`."""
 
-        return sp.prox_l1(V, (self.lmbda / self.L) * self.wl1)
+        return prox_l1(V, (self.lmbda / self.L) * self.wl1)
 
 
 
@@ -293,7 +296,7 @@ class ConvBPDN(fista.FISTADFT):
         """Compute fixed point residual in Fourier domain."""
 
         diff = self.Xf - self.Yfprv
-        return sl.rfl2norm2(diff, self.X.shape, axis=self.cri.axisN)
+        return rfl2norm2(diff, self.X.shape, axis=self.cri.axisN)
 
 
 
@@ -314,12 +317,12 @@ class ConvBPDN(fista.FISTADFT):
         \mathbf{d}_m * \mathbf{x}_m - \mathbf{s} \|_2^2`.
         This function takes into account the unnormalised DFT scaling,
         i.e. given that the variables are the DFT of multi-dimensional
-        arrays computed via :func:`rfftn`, this returns the data fidelity
-        term in the original (spatial) domain.
+        arrays computed via :func:`.rfftn`, this returns the data
+        fidelity term in the original (spatial) domain.
         """
 
         Ef = self.eval_Rf(self.Xf)
-        return sl.rfl2norm2(Ef, self.S.shape, axis=self.cri.axisN) / 2.0
+        return rfl2norm2(Ef, self.S.shape, axis=self.cri.axisN) / 2.0
 
 
 
@@ -354,9 +357,9 @@ class ConvBPDN(fista.FISTADFT):
 
         if X is None:
             X = self.X
-        Xf = sl.rfftn(X, None, self.cri.axisN)
+        Xf = rfftn(X, None, self.cri.axisN)
         Sf = np.sum(self.Df * Xf, axis=self.cri.axisM)
-        return sl.irfftn(Sf, self.cri.Nv, self.cri.axisN)
+        return irfftn(Sf, self.cri.Nv, self.cri.axisN)
 
 
 
@@ -419,13 +422,13 @@ class ConvBPDNMask(ConvBPDN):
 
         if W is None:
             W = np.array([1.0], dtype=self.dtype)
-        self.W = np.asarray(W.reshape(cr.mskWshape(W, self.cri)),
+        self.W = np.asarray(W.reshape(mskWshape(W, self.cri)),
                             dtype=self.dtype)
 
         # Create byte aligned arrays for FFT calls
-        self.WRy = sl.pyfftw_empty_aligned(self.S.shape, dtype=self.dtype)
-        self.Ryf = sl.pyfftw_rfftn_empty_aligned(self.S.shape, self.cri.axisN,
-                                                 self.dtype)
+        self.WRy = empty_aligned(self.S.shape, dtype=self.dtype)
+        self.Ryf = rfftn_empty_aligned(self.S.shape, self.cri.axisN,
+                                           self.dtype)
 
 
 
@@ -436,11 +439,11 @@ class ConvBPDNMask(ConvBPDN):
         self.Ryf[:] = self.eval_Rf(self.Yf)
 
         # Map to spatial domain to multiply by mask
-        Ry = sl.irfftn(self.Ryf, self.cri.Nv, self.cri.axisN)
+        Ry = irfftn(self.Ryf, self.cri.Nv, self.cri.axisN)
         # Multiply by mask
         self.WRy[:] = (self.W**2) * Ry
         # Map back to frequency domain
-        WRyf = sl.rfftn(self.WRy, self.cri.Nv, self.cri.axisN)
+        WRyf = rfftn(self.WRy, self.cri.Nv, self.cri.axisN)
 
         gradf = np.conj(self.Df) * WRyf
 
@@ -458,7 +461,7 @@ class ConvBPDNMask(ConvBPDN):
         """
 
         Ef = self.eval_Rf(self.Xf)
-        E = sl.irfftn(Ef, self.cri.Nv, self.cri.axisN)
+        E = irfftn(Ef, self.cri.Nv, self.cri.axisN)
 
         return (np.linalg.norm(self.W * E)**2) / 2.0
 
@@ -476,7 +479,7 @@ class ConvBPDNMask(ConvBPDN):
             Xf = self.Xf
 
         Rf = self.eval_Rf(Xf)
-        R = sl.irfftn(Rf, self.cri.Nv, self.cri.axisN)
-        WRf = sl.rfftn(self.W * R, self.cri.Nv, self.cri.axisN)
+        R = irfftn(Rf, self.cri.Nv, self.cri.axisN)
+        WRf = rfftn(self.W * R, self.cri.Nv, self.cri.axisN)
 
         return 0.5 * np.linalg.norm(WRf.flatten(), 2)**2

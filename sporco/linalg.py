@@ -11,13 +11,10 @@ from __future__ import division
 from builtins import range
 
 import warnings
-import multiprocessing
 import numpy as np
 import scipy
 from scipy import linalg
-from scipy import fftpack
 from scipy.sparse.linalg import LinearOperator, cg
-import pyfftw
 try:
     import numexpr as ne
 except ImportError:
@@ -26,367 +23,19 @@ else:
     have_numexpr = True
 
 from sporco._util import renamed_function
+from sporco.array import zdivide, subsample_array
 
 
 __author__ = """Brendt Wohlberg <brendt@ieee.org>"""
 
 
 
-__all__ = ['complex_dtype', 'pyfftw_byte_aligned', 'pyfftw_empty_aligned',
-           'pyfftw_rfftn_empty_aligned', 'fftn', 'ifftn', 'rfftn', 'irfftn',
-           'dctii', 'idctii', 'fftconv', 'inner', 'dot', 'solvedbi_sm',
-           'solvedbi_sm_c', 'solvedbd_sm', 'solvedbd_sm_c', 'solvemdbi_ism',
-           'solvemdbi_rsm', 'solvemdbi_cg', 'lu_factor', 'lu_solve_ATAI',
-           'lu_solve_AATI', 'cho_factor', 'cho_solve_ATAI', 'cho_solve_AATI',
-           'zpad', 'grad', 'gradT', 'gradient_filters', 'zdivide',
-           'proj_l2ball', 'promote16', 'atleast_nd', 'split',
-           'block_circulant', 'fl2norm2', 'rfl2norm2', 'rrs', 'pca', 'nkp',
-           'kpsvd']
-
-
-
-pyfftw.interfaces.cache.enable()
-pyfftw.interfaces.cache.set_keepalive_time(300)
-
-pyfftw_threads = multiprocessing.cpu_count()
-"""Global variable setting the number of threads used in :mod:`pyfftw`
-computations"""
-pyfftw_planner_effort = 'FFTW_MEASURE'
-"""FFTW planning rigor flag used in :mod:`pyfftw` computations"""
-
-
-
-def complex_dtype(dtype):
-    """Construct the corresponding complex dtype for a given real dtype.
-
-    Construct the corresponding complex dtype for a given real dtype,
-    e.g. the complex dtype corresponding to ``np.float32`` is
-    ``np.complex64``.
-
-    Parameters
-    ----------
-    dtype : dtype
-      A real dtype, e.g. np.float32, np.float64
-
-    Returns
-    -------
-    cdtype : dtype
-      The complex dtype corresponding to the input dtype
-    """
-
-    return (np.zeros(1, dtype) + 1j).dtype
-
-
-
-def pyfftw_byte_aligned(array, dtype=None, n=None):
-    """Construct a byte-aligned array for FFTs.
-
-    Construct a byte-aligned array for efficient use by :mod:`pyfftw`.
-    This function is a wrapper for :func:`pyfftw.byte_align`
-
-    Parameters
-    ----------
-    array : ndarray
-      Input array
-    dtype : dtype, optional (default None)
-      Output array dtype
-    n : int, optional (default None)
-      Output array should be aligned to n-byte boundary
-
-    Returns
-    -------
-    a :  ndarray
-      Array with required byte-alignment
-    """
-
-    return pyfftw.byte_align(array, n=n, dtype=dtype)
-
-
-
-def pyfftw_empty_aligned(shape, dtype, order='C', n=None):
-    """Construct an empty byte-aligned array for FFTs.
-
-    Construct an empty byte-aligned array for efficient use by :mod:`pyfftw`.
-    This function is a wrapper for :func:`pyfftw.empty_aligned`
-
-    Parameters
-    ----------
-    shape : sequence of ints
-      Output array shape
-    dtype : dtype
-      Output array dtype
-    order : {'C', 'F'}, optional (default 'C')
-      Specify whether arrays should be stored in row-major (C-style) or
-      column-major (Fortran-style) order
-    n : int, optional (default None)
-      Output array should be aligned to n-byte boundary
-
-    Returns
-    -------
-    a :  ndarray
-      Empty array with required byte-alignment
-    """
-
-    return pyfftw.empty_aligned(shape, dtype, order, n)
-
-
-
-def pyfftw_rfftn_empty_aligned(shape, axes, dtype, order='C', n=None):
-    """Construct an empty byte-aligned array for real FFTs.
-
-    Construct an empty byte-aligned array for efficient use by :mod:`pyfftw`
-    functions :func:`pyfftw.interfaces.numpy_fft.rfftn` and
-    :func:`pyfftw.interfaces.numpy_fft.irfftn`. The shape of the
-    empty array is appropriate for the output of
-    :func:`pyfftw.interfaces.numpy_fft.rfftn` applied
-    to an array of the shape specified by parameter `shape`, and for the
-    input of the corresponding :func:`pyfftw.interfaces.numpy_fft.irfftn`
-    call that reverses this operation.
-
-    Parameters
-    ----------
-    shape : sequence of ints
-      Output array shape
-    axes : sequence of ints
-      Axes on which the FFT will be computed
-    dtype : dtype
-      Real dtype from which the complex dtype of the output array is derived
-    order : {'C', 'F'}, optional (default 'C')
-      Specify whether arrays should be stored in row-major (C-style) or
-      column-major (Fortran-style) order
-    n : int, optional (default None)
-      Output array should be aligned to n-byte boundary
-
-    Returns
-    -------
-    a :  ndarray
-      Empty array with required byte-alignment
-    """
-
-    ashp = list(shape)
-    raxis = axes[-1]
-    ashp[raxis] = ashp[raxis] // 2 + 1
-    cdtype = complex_dtype(dtype)
-    return pyfftw.empty_aligned(ashp, cdtype, order, n)
-
-
-
-def fftn(a, s=None, axes=None):
-    """Multi-dimensional discrete Fourier transform.
-
-    Compute the multi-dimensional discrete Fourier transform. This function
-    is a wrapper for :func:`pyfftw.interfaces.numpy_fft.fftn`,
-    with an interface similar to that of :func:`numpy.fft.fftn`.
-
-    Parameters
-    ----------
-    a : array_like
-      Input array (can be complex)
-    s : sequence of ints, optional (default None)
-      Shape of the output along each transformed axis (input is cropped or
-      zero-padded to match).
-    axes : sequence of ints, optional (default None)
-      Axes over which to compute the DFT.
-
-    Returns
-    -------
-    af : complex ndarray
-      DFT of input array
-    """
-
-    return pyfftw.interfaces.numpy_fft.fftn(
-        a, s=s, axes=axes, overwrite_input=False,
-        planner_effort=pyfftw_planner_effort, threads=pyfftw_threads)
-
-
-
-def ifftn(a, s=None, axes=None):
-    """Multi-dimensional inverse discrete Fourier transform.
-
-    Compute the multi-dimensional inverse discrete Fourier transform.
-    This function is a wrapper for :func:`pyfftw.interfaces.numpy_fft.ifftn`,
-    with an interface similar to that of :func:`numpy.fft.ifftn`.
-
-    Parameters
-    ----------
-    a : array_like
-      Input array (can be complex)
-    s : sequence of ints, optional (default None)
-      Shape of the output along each transformed axis (input is cropped
-      or zero-padded to match).
-    axes : sequence of ints, optional (default None)
-      Axes over which to compute the inverse DFT.
-
-    Returns
-    -------
-    af : complex ndarray
-      Inverse DFT of input array
-    """
-
-    return pyfftw.interfaces.numpy_fft.ifftn(
-        a, s=s, axes=axes, overwrite_input=False,
-        planner_effort=pyfftw_planner_effort, threads=pyfftw_threads)
-
-
-
-def rfftn(a, s=None, axes=None):
-    """Multi-dimensional discrete Fourier transform for real input.
-
-    Compute the multi-dimensional discrete Fourier transform for real input.
-    This function is a wrapper for :func:`pyfftw.interfaces.numpy_fft.rfftn`,
-    with an interface similar to that of :func:`numpy.fft.rfftn`.
-
-    Parameters
-    ----------
-    a : array_like
-      Input array (taken to be real)
-    s : sequence of ints, optional (default None)
-      Shape of the output along each transformed axis (input is cropped
-      or zero-padded to match).
-    axes : sequence of ints, optional (default None)
-      Axes over which to compute the DFT.
-
-    Returns
-    -------
-    af : complex ndarray
-      DFT of input array
-    """
-
-    return pyfftw.interfaces.numpy_fft.rfftn(
-        a, s=s, axes=axes, overwrite_input=False,
-        planner_effort=pyfftw_planner_effort, threads=pyfftw_threads)
-
-
-
-def irfftn(a, s, axes=None):
-    """Multi-dimensional inverse discrete Fourier transform for real input.
-
-    Compute the inverse of the multi-dimensional discrete Fourier
-    transform for real input. This function is a wrapper for
-    :func:`pyfftw.interfaces.numpy_fft.irfftn`, with an interface similar
-    to that of :func:`numpy.fft.irfftn`.
-
-    Parameters
-    ----------
-    a : array_like
-      Input array
-    s : sequence of ints
-      Shape of the output along each transformed axis (input is cropped
-      or zero-padded to match). This parameter is not optional because,
-      unlike :func:`ifftn`, the output shape cannot be uniquely
-      determined from the input shape.
-    axes : sequence of ints, optional (default None)
-      Axes over which to compute the inverse DFT.
-
-    Returns
-    -------
-    af : ndarray
-      Inverse DFT of input array
-    """
-
-    return pyfftw.interfaces.numpy_fft.irfftn(
-        a, s=s, axes=axes, overwrite_input=False,
-        planner_effort=pyfftw_planner_effort, threads=pyfftw_threads)
-
-
-
-def dctii(x, axes=None):
-    """Multi-dimensional DCT-II.
-
-    Compute a multi-dimensional DCT-II over specified array axes. This
-    function is implemented by calling the one-dimensional DCT-II
-    :func:`scipy.fftpack.dct` with normalization mode 'ortho' for each
-    of the specified axes.
-
-    Parameters
-    ----------
-    a : array_like
-      Input array
-    axes : sequence of ints, optional (default None)
-      Axes over which to compute the DCT-II.
-
-    Returns
-    -------
-    y : ndarray
-      DCT-II of input array
-    """
-
-    if axes is None:
-        axes = list(range(x.ndim))
-    for ax in axes:
-        x = fftpack.dct(x, type=2, axis=ax, norm='ortho')
-    return x
-
-
-
-def idctii(x, axes=None):
-    """Multi-dimensional inverse DCT-II.
-
-    Compute a multi-dimensional inverse DCT-II over specified array axes.
-    This function is implemented by calling the one-dimensional inverse
-    DCT-II :func:`scipy.fftpack.idct` with normalization mode 'ortho'
-    for each of the specified axes.
-
-    Parameters
-    ----------
-    a : array_like
-      Input array
-    axes : sequence of ints, optional (default None)
-      Axes over which to compute the inverse DCT-II.
-
-    Returns
-    -------
-    y : ndarray
-      Inverse DCT-II of input array
-    """
-
-    if axes is None:
-        axes = list(range(x.ndim))
-    for ax in axes[::-1]:
-        x = fftpack.idct(x, type=2, axis=ax, norm='ortho')
-    return x
-
-
-
-def fftconv(a, b, axes=(0, 1), origin=None):
-    """Multi-dimensional convolution via the Discrete Fourier Transform.
-
-    Compute a multi-dimensional convolution via the Discrete Fourier
-    Transform. Note that the output has a phase shift relative to the
-    output of :func:`scipy.ndimage.convolve` with the default `origin`
-    parameter.
-
-    Parameters
-    ----------
-    a : array_like
-      Input array
-    b : array_like
-      Input array
-    axes : sequence of ints, optional (default (0, 1))
-      Axes on which to perform convolution
-    origin : sequence of ints or None optional (default None)
-      Indices of centre of `a` filter. The default of None corresponds
-      to a centre at 0 on all axes of `a`
-
-    Returns
-    -------
-    ab : ndarray
-      Convolution of input arrays, `a` and `b`, along specified `axes`
-    """
-
-    if np.isrealobj(a) and np.isrealobj(b):
-        fft = rfftn
-        ifft = irfftn
-    else:
-        fft = fftn
-        ifft = ifftn
-    dims = np.maximum([a.shape[i] for i in axes], [b.shape[i] for i in axes])
-    af = fft(a, dims, axes)
-    bf = fft(b, dims, axes)
-    ab = ifft(af * bf, dims, axes)
-    if origin is not None:
-        ab = np.roll(ab, -np.array(origin), axis=axes)
-    return ab
+__all__ = ['inner', 'dot', 'solvedbi_sm', 'solvedbi_sm_c', 'solvedbd_sm',
+           'solvedbd_sm_c', 'solvemdbi_ism', 'solvemdbi_rsm',
+           'solvemdbi_cg', 'lu_factor', 'lu_solve_ATAI', 'lu_solve_AATI',
+           'cho_factor', 'cho_solve_ATAI', 'cho_solve_AATI',
+           'block_circulant', 'rrs', 'pca', 'nkp', 'kpsvd',
+           'proj_l2ball']
 
 
 
@@ -493,6 +142,35 @@ def dot(a, b, axis=-2):
     idxexp[axis + 1] = 0
     # Compute and return product
     return np.sum(ax * bx, axis=axis+1, keepdims=True)[tuple(idxexp)]
+
+
+
+@renamed_function(depname='blockcirculant')
+def block_circulant(A):
+    """Construct a block circulant matrix from a tuple of arrays.
+
+    Construct a block circulant matrix from a tuple of arrays. This is a
+    block-matrix variant of :func:`scipy.linalg.circulant`.
+
+    Parameters
+    ----------
+    A : tuple of array_like
+      Tuple of arrays corresponding to the first block column of the output
+      block matrix
+
+    Returns
+    -------
+    B : ndarray
+      Output array
+    """
+
+    r, c = A[0].shape
+    B = np.zeros((len(A) * r, len(A) * c), dtype=A[0].dtype)
+    for k in range(len(A)):
+        for l in range(len(A)):
+            kl = np.mod(k + l, len(A))
+            B[r*kl:r*(kl + 1), c*k:c*(k + 1)] = A[l]
+    return B
 
 
 
@@ -1069,387 +747,10 @@ def cho_solve_AATI(A, rho, b, c, lwr, check_finite=True):
     N, M = A.shape
     if N >= M:
         x = (b - linalg.cho_solve((c, lwr), b.dot(A).T,
-            check_finite=check_finite).T.dot(A.T)) / rho
+                                  check_finite=check_finite).T.dot(A.T)) / rho
     else:
         x = linalg.cho_solve((c, lwr), b.T, check_finite=check_finite).T
     return x
-
-
-
-def zpad(x, pd, ax):
-    """Zero-pad array `x` with `pd = (leading, trailing)` zeros on axis `ax`.
-
-    Parameters
-    ----------
-    x : array_like
-      Array to be padded
-    pd : tuple
-      Sequence of two ints (leading,trailing) specifying number of zeros
-      for padding
-    ax : int
-      Axis to be padded
-
-    Returns
-    -------
-    xp : array_like
-      Padded array
-    """
-
-    xpd = ((0, 0),)*ax + (pd,) + ((0, 0),)*(x.ndim-ax-1)
-    return np.pad(x, xpd, 'constant')
-
-
-
-@renamed_function(depname='Gax')
-def grad(x, ax):
-    """Compute gradient of `x` along axis `ax`.
-
-    Parameters
-    ----------
-    x : array_like
-      Input array
-    ax : int
-      Axis on which gradient is to be computed
-
-    Returns
-    -------
-    xg : ndarray
-      Output array
-    """
-
-    slc = (slice(None),)*ax + (slice(-1, None),)
-    xg = np.roll(x, -1, axis=ax) - x
-    xg[slc] = 0.0
-    return xg
-
-
-
-@renamed_function(depname='GTax')
-def gradT(x, ax):
-    """Compute transpose of gradient of `x` along axis `ax`.
-
-    Parameters
-    ----------
-    x : array_like
-      Input array
-    ax : int
-      Axis on which gradient transpose is to be computed
-
-    Returns
-    -------
-    xg : ndarray
-      Output array
-    """
-
-    slc0 = (slice(None),) * ax
-    xg = np.roll(x, 1, axis=ax) - x
-    xg[slc0 + (slice(0, 1),)] = -x[slc0 + (slice(0, 1),)]
-    xg[slc0 + (slice(-1, None),)] = x[slc0 + (slice(-2, -1),)]
-    return xg
-
-
-
-@renamed_function(depname='GradientFilters')
-def gradient_filters(ndim, axes, axshp, dtype=None):
-    r"""Construct a set of filters for computing gradients in the
-    frequency domain.
-
-    Parameters
-    ----------
-    ndim : integer
-      Total number of dimensions in array in which gradients are to be
-      computed
-    axes : tuple of integers
-      Axes on which gradients are to be computed
-    axshp : tuple of integers
-      Shape of axes on which gradients are to be computed
-    dtype : dtype
-      Data type of output arrays
-
-    Returns
-    -------
-    Gf : ndarray
-      Frequency domain gradient operators :math:`\hat{G}_i`
-    GHGf : ndarray
-      Sum of products :math:`\sum_i \hat{G}_i^H \hat{G}_i`
-    """
-
-    if dtype is None:
-        dtype = np.float32
-    g = np.zeros([2 if k in axes else 1 for k in range(ndim)] +
-                 [len(axes),], dtype)
-    for k in axes:
-        g[(0,) * k + (slice(None),) + (0,) * (g.ndim - 2 - k) + (k,)] = \
-            np.array([1, -1])
-    Gf = rfftn(g, axshp, axes=axes)
-    GHGf = np.sum(np.conj(Gf) * Gf, axis=-1).real
-    return Gf, GHGf
-
-
-
-def zdivide(x, y):
-    """Return `x`/`y`, with 0 instead of NaN where `y` is 0.
-
-    Parameters
-    ----------
-    x : array_like
-      Numerator
-    y : array_like
-      Denominator
-
-    Returns
-    -------
-    z : ndarray
-      Quotient `x`/`y`
-    """
-
-    # See https://stackoverflow.com/a/37977222
-    return np.divide(x, y, out=np.zeros_like(x), where=(y != 0))
-
-
-
-def proj_l2ball(b, s, r, axes=None):
-    r"""Projection onto the :math:`\ell_2` ball.
-
-    Project :math:`\mathbf{b}` onto the :math:`\ell_2` ball of radius
-    :math:`r` about :math:`\mathbf{s}`, i.e.
-    :math:`\{ \mathbf{x} : \|\mathbf{x} - \mathbf{s} \|_2 \leq r \}`.
-    Note that ``proj_l2ball(b, s, r)`` is equivalent to
-    :func:`.prox.proj_l2` ``(b - s, r) + s``.
-
-    **NB**: This function is to be deprecated; please use
-    :func:`.prox.proj_l2` instead (see note above about interface
-    differences).
-
-    Parameters
-    ----------
-    b : array_like
-      Vector :math:`\mathbf{b}` to be projected
-    s : array_like
-      Centre of :math:`\ell_2` ball :math:`\mathbf{s}`
-    r : float
-      Radius of ball
-    axes : sequence of ints, optional (default all axes)
-      Axes over which to compute :math:`\ell_2` norms
-
-    Returns
-    -------
-    x : ndarray
-      Projection of :math:`\mathbf{b}` into ball
-    """
-
-    wstr = "Function sporco.linalg.proj_l2ball is deprecated; please " \
-           "use sporco.prox.proj_l2 (noting the interface difference) " \
-           "instead."
-    warnings.simplefilter('always', DeprecationWarning)
-    warnings.warn(wstr, DeprecationWarning, stacklevel=2)
-    warnings.simplefilter('default', DeprecationWarning)
-    d = np.sqrt(np.sum((b - s)**2, axis=axes, keepdims=True))
-    p = zdivide(b - s, d)
-    return np.asarray((d <= r) * b + (d > r) * (s + r*p), b.dtype)
-
-
-
-def promote16(u, fn=None, *args, **kwargs):
-    r"""Promote ``np.float16`` arguments to ``np.float32`` dtype.
-
-    Utility function for use with functions that do not support arrays
-    of dtype ``np.float16``. This function has two distinct modes of
-    operation. If called with only the `u` parameter specified, the
-    returned value is either `u` itself if `u` is not of dtype
-    ``np.float16``, or `u` promoted to ``np.float32`` dtype if it is. If
-    the function parameter `fn` is specified then `u` is conditionally
-    promoted as described above, passed as the first argument to
-    function `fn`, and the returned values are converted back to dtype
-    ``np.float16`` if `u` is of that dtype. Note that if parameter `fn`
-    is specified, it may not be be specified as a keyword argument if it
-    is followed by any non-keyword arguments.
-
-    Parameters
-    ----------
-    u : array_like
-      Array to be promoted to np.float32 if it is of dtype ``np.float16``
-    fn : function or None, optional (default None)
-      Function to be called with promoted `u` as first parameter and
-      \*args and \*\*kwargs as additional parameters
-    *args
-      Variable length list of arguments for function `fn`
-    **kwargs
-      Keyword arguments for function `fn`
-
-    Returns
-    -------
-    up : ndarray
-      Conditionally dtype-promoted version of `u` if `fn` is None,
-      or value(s) returned by `fn`, converted to the same dtype as `u`,
-      if `fn` is a function
-    """
-
-    dtype = np.float32 if u.dtype == np.float16 else u.dtype
-    up = np.asarray(u, dtype=dtype)
-    if fn is None:
-        return up
-    else:
-        v = fn(up, *args, **kwargs)
-        if isinstance(v, tuple):
-            vp = tuple([np.asarray(vk, dtype=u.dtype) for vk in v])
-        else:
-            vp = np.asarray(v, dtype=u.dtype)
-        return vp
-
-
-
-def atleast_nd(n, u):
-    """Append axes to an array so that it is ``n`` dimensional.
-
-    If the input array has fewer than ``n`` dimensions, append singleton
-    dimensions so that it is ``n`` dimensional. Note that the interface
-    differs substantially from that of :func:`numpy.atleast_3d` etc.
-
-    Parameters
-    ----------
-    n : int
-      Minimum number of required dimensions
-    u : array_like
-      Input array
-
-    Returns
-    -------
-    v : ndarray
-      Output array with at least `n` dimensions
-    """
-
-    if u.ndim >= n:
-        return u
-    else:
-        return u.reshape(u.shape + (1,)*(n-u.ndim))
-
-
-
-def split(u, axis=0):
-    """Split an array into a list of arrays on the specified axis.
-
-    Split an array into a list of arrays on the specified axis. The
-    length of the list is the shape of the array on the specified axis,
-    and the corresponding axis is removed from each entry in the list.
-    This function does not have the same behaviour as :func:`numpy.split`.
-
-    Parameters
-    ----------
-    u : array_like
-      Input array
-    axis : int, optional (default 0)
-      Axis on which to split the input array
-
-    Returns
-    -------
-    v : list of ndarray
-      List of arrays
-    """
-
-    # Convert negative axis to positive
-    if axis < 0:
-        axis = u.ndim + axis
-
-    # Construct axis selection slice
-    slct0 = (slice(None),) * axis
-    return [u[slct0 + (k,)] for k in range(u.shape[axis])]
-
-
-
-@renamed_function(depname='blockcirculant')
-def block_circulant(A):
-    """Construct a block circulant matrix from a tuple of arrays.
-
-    Construct a block circulant matrix from a tuple of arrays. This is a
-    block-matrix variant of :func:`scipy.linalg.circulant`.
-
-    Parameters
-    ----------
-    A : tuple of array_like
-      Tuple of arrays corresponding to the first block column of the output
-      block matrix
-
-    Returns
-    -------
-    B : ndarray
-      Output array
-    """
-
-    r, c = A[0].shape
-    B = np.zeros((len(A) * r, len(A) * c), dtype=A[0].dtype)
-    for k in range(len(A)):
-        for l in range(len(A)):
-            kl = np.mod(k + l, len(A))
-            B[r*kl:r*(kl + 1), c*k:c*(k + 1)] = A[l]
-    return B
-
-
-
-def fl2norm2(xf, axis=(0, 1)):
-    r"""Compute the squared :math:`\ell_2` norm in the DFT domain.
-
-    Compute the squared :math:`\ell_2` norm in the DFT domain, taking
-    into account the unnormalised DFT scaling, i.e. given the DFT of a
-    multi-dimensional array computed via :func:`fftn`, return the
-    squared :math:`\ell_2` norm of the original array.
-
-    Parameters
-    ----------
-    xf : array_like
-      Input array
-    axis : sequence of ints, optional (default (0,1))
-      Axes on which the input is in the frequency domain
-
-    Returns
-    -------
-    x : float
-      :math:`\|\mathbf{x}\|_2^2` where the input array is the result of
-      applying :func:`fftn` to the specified axes of multi-dimensional
-      array :math:`\mathbf{x}`
-    """
-
-    xfs = xf.shape
-    return (np.linalg.norm(xf)**2) / np.prod(np.array([xfs[k] for k in axis]))
-
-
-
-def rfl2norm2(xf, xs, axis=(0, 1)):
-    r"""Compute the squared :math:`\ell_2` norm in the real DFT domain.
-
-    Compute the squared :math:`\ell_2` norm in the DFT domain, taking
-    into account the unnormalised DFT scaling, i.e. given the DFT of a
-    multi-dimensional array computed via :func:`rfftn`, return the
-    squared :math:`\ell_2` norm of the original array.
-
-    Parameters
-    ----------
-    xf : array_like
-      Input array
-    xs : sequence of ints
-      Shape of original array to which :func:`rfftn` was applied to
-      obtain the input array
-    axis : sequence of ints, optional (default (0,1))
-      Axes on which the input is in the frequency domain
-
-    Returns
-    -------
-    x : float
-      :math:`\|\mathbf{x}\|_2^2` where the input array is the result of
-      applying :func:`rfftn` to the specified axes of multi-dimensional
-      array :math:`\mathbf{x}`
-    """
-
-    scl = 1.0 / np.prod(np.array([xs[k] for k in axis]))
-    slc0 = (slice(None),) * axis[-1]
-    nrm0 = np.linalg.norm(xf[slc0 + (0,)])
-    idx1 = (xs[axis[-1]] + 1) // 2
-    nrm1 = np.linalg.norm(xf[slc0 + (slice(1, idx1),)])
-    if xs[axis[-1]] % 2 == 0:
-        nrm2 = np.linalg.norm(xf[slc0 + (slice(-1, None),)])
-    else:
-        nrm2 = 0.0
-    return scl*(nrm0**2 + 2.0*nrm1**2 + nrm2**2)
 
 
 
@@ -1517,26 +818,6 @@ def pca(U, centre=False):
 
 
 
-def _subsample_array(x, step, pad=False, mode='reflect'):
-    """A copy of util.subsample_array placed in this module to avoid circular
-    imports. This is a temporary solution.
-    """
-
-    if np.any(np.greater_equal(step, x.shape)):
-        raise ValueError('Step size must be less than array size on each axis')
-    sbsz, dvmd = np.divmod(x.shape, step)
-    if pad and np.any(dvmd):
-        sbsz += np.clip(dvmd, 0, 1)
-        psz = np.subtract(np.multiply(sbsz, step), x.shape)
-        pdt = [(0, p) for p in psz]
-        x = np.pad(x, pdt, mode=mode)
-    outsz = step + tuple(sbsz)
-    outstrd = x.strides + tuple(np.multiply(step, x.strides))
-    return np.lib.stride_tricks.as_strided(x, outsz, outstrd)
-
-
-
-
 @renamed_function(depname='nkp', depmod='sporco.util')
 def nkp(A, bshape, cshape):
     r"""Solve the Nearest Kronecker Product problem.
@@ -1571,7 +852,7 @@ def nkp(A, bshape, cshape):
         raise ValueError("Shape of A is not compatible with bshape and cshape")
 
     atshape = (bshape[0] * bshape[1], cshape[0] * cshape[1])
-    Atilde = _subsample_array(A, cshape).transpose().reshape(atshape)
+    Atilde = subsample_array(A, cshape).transpose().reshape(atshape)
     U, S, Vt = np.linalg.svd(Atilde, full_matrices=False)
     B = np.sqrt(S[0]) * U[:, [0]].reshape(bshape, order='F')
     C = np.sqrt(S[0]) * Vt[[0], :].reshape(cshape, order='F')
@@ -1619,7 +900,7 @@ def kpsvd(A, bshape, cshape):
         raise ValueError("Shape of A is not compatible with bshape and cshape")
 
     atshape = (bshape[0] * bshape[1], cshape[0] * cshape[1])
-    Atilde = _subsample_array(A, cshape).transpose().reshape(atshape)
+    Atilde = subsample_array(A, cshape).transpose().reshape(atshape)
     U, S, Vt = np.linalg.svd(Atilde, full_matrices=False)
     B = U.reshape(bshape + (U.shape[1],), order='F')
     C = Vt.T.reshape(cshape + (Vt.shape[0],), order='F')
@@ -1627,3 +908,42 @@ def kpsvd(A, bshape, cshape):
 
 
 
+def proj_l2ball(b, s, r, axes=None):
+    r"""Projection onto the :math:`\ell_2` ball.
+
+    Project :math:`\mathbf{b}` onto the :math:`\ell_2` ball of radius
+    :math:`r` about :math:`\mathbf{s}`, i.e.
+    :math:`\{ \mathbf{x} : \|\mathbf{x} - \mathbf{s} \|_2 \leq r \}`.
+    Note that ``proj_l2ball(b, s, r)`` is equivalent to
+    :func:`.prox.proj_l2` ``(b - s, r) + s``.
+
+    **NB**: This function is to be deprecated; please use
+    :func:`.prox.proj_l2` instead (see note above about interface
+    differences).
+
+    Parameters
+    ----------
+    b : array_like
+      Vector :math:`\mathbf{b}` to be projected
+    s : array_like
+      Centre of :math:`\ell_2` ball :math:`\mathbf{s}`
+    r : float
+      Radius of ball
+    axes : sequence of ints, optional (default all axes)
+      Axes over which to compute :math:`\ell_2` norms
+
+    Returns
+    -------
+    x : ndarray
+      Projection of :math:`\mathbf{b}` into ball
+    """
+
+    wstr = "Function sporco.linalg.proj_l2ball is deprecated; please " \
+           "use sporco.prox.proj_l2 (noting the interface difference) " \
+           "instead."
+    warnings.simplefilter('always', DeprecationWarning)
+    warnings.warn(wstr, DeprecationWarning, stacklevel=2)
+    warnings.simplefilter('default', DeprecationWarning)
+    d = np.sqrt(np.sum((b - s)**2, axis=axes, keepdims=True))
+    p = zdivide(b - s, d)
+    return np.asarray((d <= r) * b + (d > r) * (s + r*p), b.dtype)

@@ -17,11 +17,19 @@ the following modules:
   A parallel-processing grid search for parameter optimisation that
   distributes processes via MPI.
 
+* :mod:`.array`
+
+  Various functions operating on NumPy arrays.
+
 * :mod:`.linalg`
 
   Various linear algebra and related functions, including solvers for
   specific forms of linear system and filters for computing image
   gradients.
+
+* :mod:`.fft`
+
+  Variants of the Fast Fourier Transform and associated functions.
 
 * :mod:`.interp`
 
@@ -36,6 +44,10 @@ the following modules:
 
   Various image quality metrics including standard metrics such as
   MSE, SNR, and PSNR.
+
+* :mod:`.signal`
+
+  Signal and image processing and associated functions.
 
 * :mod:`.plot`
 

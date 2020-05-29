@@ -2,9 +2,10 @@ from builtins import object
 
 import numpy as np
 
-from sporco.admm import ccmod
-import sporco.linalg as sl
 import sporco.cnvrep as cr
+from sporco.admm import ccmod
+from sporco.linalg import rrs
+from sporco.fft import fftn, ifftn
 
 
 
@@ -24,8 +25,8 @@ class TestSet01(object):
         xr = np.random.randn(N, N, M)
         xp = np.abs(xr) > 3
         X[xp] = np.random.randn(X[xp].size)
-        S = np.sum(sl.ifftn(sl.fftn(D0, (N, N), (0, 1)) *
-                   sl.fftn(X, None, (0, 1)), None, (0, 1)).real, axis=2)
+        S = np.sum(ifftn(fftn(D0, (N, N), (0, 1)) *
+                   fftn(X, None, (0, 1)), None, (0, 1)).real, axis=2)
         rho = 1e-1
         opt = ccmod.ConvCnstrMOD_IterSM.Options({'Verbose': False,
                     'MaxMainIter': 500, 'LinSolveCheck': True,
@@ -36,7 +37,7 @@ class TestSet01(object):
         c = ccmod.ConvCnstrMOD_IterSM(Xr, Sr, D0.shape, opt)
         c.solve()
         D1 = cr.bcrop(c.Y, D0.shape).squeeze()
-        assert sl.rrs(D0, D1) < 1e-5
+        assert rrs(D0, D1) < 1e-5
         assert np.array(c.getitstat().XSlvRelRes).max() < 1e-5
 
 
@@ -50,8 +51,8 @@ class TestSet01(object):
         xr = np.random.randn(N, N, M)
         xp = np.abs(xr) > 3
         X[xp] = np.random.randn(X[xp].size)
-        S = np.sum(sl.ifftn(sl.fftn(D0, (N, N), (0, 1)) *
-                   sl.fftn(X, None, (0, 1)), None, (0, 1)).real, axis=2)
+        S = np.sum(ifftn(fftn(D0, (N, N), (0, 1)) *
+                   fftn(X, None, (0, 1)), None, (0, 1)).real, axis=2)
         rho = 1e-1
         opt = ccmod.ConvCnstrMOD_CG.Options({'Verbose': False,
                     'MaxMainIter': 500, 'LinSolveCheck': True,
@@ -63,7 +64,7 @@ class TestSet01(object):
         c = ccmod.ConvCnstrMOD_CG(Xr, Sr, D0.shape, opt)
         c.solve()
         D1 = cr.bcrop(c.Y, D0.shape).squeeze()
-        assert sl.rrs(D0, D1) < 1e-4
+        assert rrs(D0, D1) < 1e-4
         assert np.array(c.getitstat().XSlvRelRes).max() < 1e-3
 
 
@@ -77,8 +78,8 @@ class TestSet01(object):
         xr = np.random.randn(N, N, M)
         xp = np.abs(xr) > 3
         X[xp] = np.random.randn(X[xp].size)
-        S = np.sum(sl.ifftn(sl.fftn(D0, (N, N), (0, 1)) *
-                   sl.fftn(X, None, (0, 1)), None, (0, 1)).real, axis=2)
+        S = np.sum(ifftn(fftn(D0, (N, N), (0, 1)) *
+                   fftn(X, None, (0, 1)), None, (0, 1)).real, axis=2)
         rho = 1e1
         opt = ccmod.ConvCnstrMOD_Consensus.Options({'Verbose': False,
                     'MaxMainIter': 500, 'LinSolveCheck': True,
@@ -89,7 +90,7 @@ class TestSet01(object):
         c = ccmod.ConvCnstrMOD_Consensus(Xr, Sr, D0.shape, opt)
         c.solve()
         D1 = cr.bcrop(c.Y, D0.shape).squeeze()
-        assert sl.rrs(D0, D1) < 1e-5
+        assert rrs(D0, D1) < 1e-5
         assert np.array(c.getitstat().XSlvRelRes).max() < 1e-5
 
 

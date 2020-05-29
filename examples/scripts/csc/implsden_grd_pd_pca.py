@@ -20,7 +20,6 @@ This example uses the GPU accelerated version of :mod:`.admm.pdcsc` within the :
 
 from __future__ import print_function
 from builtins import input
-from builtins import range
 
 import os.path
 import tempfile
@@ -29,12 +28,12 @@ import numpy as np
 import scipy.io as sio
 
 from sporco import util
+from sporco import signal
 from sporco import plot
-import sporco.metric as sm
-import sporco.linalg as sl
-from sporco.cupy import cupy_enabled, np2cp, cp2np
-from sporco.cupy import select_device_by_load, gpu_info
-from sporco.cupy import cp
+from sporco.linalg import pca
+from sporco.metric import psnr
+from sporco.cupy import (cupy_enabled, np2cp, cp2np, select_device_by_load,
+                         gpu_info)
 from sporco.cupy.admm import pdcsc
 
 
@@ -72,7 +71,7 @@ img = img[16:-17, 16:-17, 0:200:2]
 img /= img.max()
 
 np.random.seed(12345)
-imgn = util.spnoise(img, 0.33)
+imgn = signal.spnoise(img, 0.33)
 
 
 """
@@ -85,7 +84,7 @@ Di[0, 0] = 1.0
 D = np.concatenate((Di, D0), axis=2)
 
 S = img.reshape((-1, img.shape[-1])).T
-pcaB, pcaS, pcaC = sl.pca(S, centre=False)
+pcaB, pcaS, pcaC = pca(S, centre=False)
 B = pcaB[:, 0:20]
 
 
@@ -153,8 +152,8 @@ Display solve time and denoising performance.
 """
 
 print("ConvProdDictL1L1GrdJoint solve time: %5.2f s" % b.timer.elapsed('solve'))
-print("Noisy image PSNR:    %5.2f dB" % sm.psnr(img, imgn))
-print("Denoised image PSNR: %5.2f dB" % sm.psnr(img, imgd))
+print("Noisy image PSNR:    %5.2f dB" % psnr(img, imgn))
+print("Denoised image PSNR: %5.2f dB" % psnr(img, imgd))
 
 
 """

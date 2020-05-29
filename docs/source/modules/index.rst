@@ -7,7 +7,10 @@ API Reference
 
    sporco.util
    sporco.mpiutil
+   sporco.array
    sporco.linalg
+   sporco.fft
+   sporco.signal
    sporco.interp
    sporco.prox
    sporco.metric
@@ -66,8 +69,11 @@ API Reference
 
    sporco.util
    sporco.mpiutil
+   sporco.array
    sporco.linalg
    sporco.interp
+   sporco.fft
+   sporco.signal
    sporco.prox
    sporco.metric
    sporco.plot

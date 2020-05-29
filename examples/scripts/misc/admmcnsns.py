@@ -13,7 +13,6 @@ A simple example demonstrating how to construct a solver for an ADMM Consensus p
 
 from __future__ import print_function
 from builtins import input
-from builtins import range
 
 import numpy as np
 

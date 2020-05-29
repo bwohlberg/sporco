@@ -18,12 +18,10 @@ where $D$ is the dictionary, $\mathbf{x}$ is the sparse representation, and $\ma
 
 from __future__ import print_function
 from builtins import input
-from builtins import range
 
 import numpy as np
 
 from sporco.fista import bpdn
-from sporco import util
 from sporco import plot
 
 

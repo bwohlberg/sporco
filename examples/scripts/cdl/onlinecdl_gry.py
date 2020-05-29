@@ -14,13 +14,13 @@ This example demonstrates the use of :class:`.dictlrn.onlinecdl.OnlineConvBPDNDi
 
 from __future__ import print_function
 from builtins import input
-from builtins import range
 
 import pyfftw   # See https://github.com/pyFFTW/pyFFTW/issues/40
 import numpy as np
 
 from sporco.dictlrn import onlinecdl
 from sporco import util
+from sporco import signal
 from sporco import cuda
 from sporco import plot
 
@@ -44,7 +44,7 @@ Highpass filter training images.
 
 npd = 16
 fltlmbd = 5
-sl, sh = util.tikhonov_filter(S, fltlmbd, npd)
+sl, sh = signal.tikhonov_filter(S, fltlmbd, npd)
 
 
 """

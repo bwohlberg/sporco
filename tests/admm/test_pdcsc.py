@@ -4,7 +4,6 @@ from builtins import object
 import numpy as np
 
 from sporco.admm import pdcsc
-import sporco.linalg as sl
 
 
 

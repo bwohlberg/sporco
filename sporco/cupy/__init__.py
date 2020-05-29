@@ -186,21 +186,50 @@ def _list2array(lst):
         return cp.asarray(lst)
 
 
-# Construct sporco.cupy.util
-util = sporco_cupy_patch_module('sporco.util', {'list2array': _list2array})
+if have_cupy:
+    def _zdivide(x, y):
+        """Patched version of :func:`sporco.array.zdivide`."""
 
-# Construct sporco.cupy.metric
-metric = sporco_cupy_patch_module('sporco.metric')
+        div = x / y
+        div[cp.logical_or(cp.isnan(div), cp.isinf(div))] = 0
+        return div
+else:
+    def _zdivide(x, y):
+        return np.divide(x, y, out=np.zeros_like(x), where=(y != 0))
 
-# Construct sporco.cupy.common
-common = sporco_cupy_patch_module('sporco.common')
+
+def _promote16(u, fn=None, *args, **kwargs):
+    """Patched version of :func:`sporco.linalg.promote16`."""
+
+    dtype = np.float32 if u.dtype == np.float16 else u.dtype
+    up = u.astype(dtype=dtype)
+    if fn is None:
+        return up
+    else:
+        v = fn(up, *args, **kwargs)
+        if isinstance(v, tuple):
+            vp = tuple([vk.astype(dtype=u.dtype) for vk in v])
+        else:
+            vp = v.astype(dtype=u.dtype)
+        return vp
+
+
+# Construct sporco.cupy.array
+array = sporco_cupy_patch_module('sporco.array',
+        {'list2array': _list2array, 'zdivide': _zdivide,
+         'promote16': _promote16})
+
 
 # Construct sporco.cupy.cnvrep
 cnvrep = sporco_cupy_patch_module('sporco.cnvrep')
 
 
+# Construct sporco.cupy.common
+common = sporco_cupy_patch_module('sporco.common')
+
+
 def _complex_dtype(dtype):
-    """Patched version of :func:`sporco.linalg.complex_dtype`."""
+    """Patched version of :func:`sporco.fft.complex_dtype`."""
 
     dt = cp.dtype(dtype)
     if dt == cp.dtype('float128'):
@@ -211,20 +240,20 @@ def _complex_dtype(dtype):
         return cp.dtype('complex64')
 
 
-def _pyfftw_byte_aligned(array, dtype=None, n=None):
-    """Patched version of :func:`sporco.linalg.pyfftw_byte_aligned`."""
+def _byte_aligned(array, dtype=None, n=None):
+    """Patched version of :func:`sporco.fft.byte_aligned`."""
 
     return array
 
 
-def _pyfftw_empty_aligned(shape, dtype, order='C', n=None):
-    """Patched version of :func:`sporco.linalg.`."""
+def _empty_aligned(shape, dtype, order='C', n=None):
+    """Patched version of :func:`sporco.fft.empty_aligned`."""
 
     return cp.empty(shape, dtype, order)
 
 
-def _pyfftw_rfftn_empty_aligned(shape, axes, dtype, order='C', n=None):
-    """Patched version of :func:`sporco.linalg.pyfftw_rfftn_empty_aligned`.
+def _rfftn_empty_aligned(shape, axes, dtype, order='C', n=None):
+    """Patched version of :func:`sporco.fft.rfftn_empty_aligned`.
     """
 
     ashp = list(shape)
@@ -235,7 +264,7 @@ def _pyfftw_rfftn_empty_aligned(shape, axes, dtype, order='C', n=None):
 
 
 def _fftconv(a, b, axes=(0, 1)):
-    """Patched version of :func:`sporco.linalg.fftconv`."""
+    """Patched version of :func:`sporco.fft.fftconv`."""
 
     if cp.isrealobj(a) and cp.isrealobj(b):
         fft = cp.fft.rfftn
@@ -251,22 +280,20 @@ def _fftconv(a, b, axes=(0, 1)):
     return ifft(af * bf, dims, axes)
 
 
+# Construct sporco.cupy.fft
+fft = sporco_cupy_patch_module('sporco.fft',
+    {'complex_dtype': _complex_dtype, 'fftn': cp.fft.fftn,
+     'ifftn': cp.fft.ifftn, 'rfftn': cp.fft.rfftn,
+     'irfftn': cp.fft.irfftn, 'byte_aligned': _byte_aligned,
+     'empty_aligned': _empty_aligned,
+     'rfftn_empty_aligned': _rfftn_empty_aligned,
+     'fftconv': _fftconv})
+
+
 def _inner(x, y, axis=-1):
     """Patched version of :func:`sporco.linalg.inner`."""
 
     return cp.sum(x * y, axis=axis, keepdims=True)
-
-
-if have_cupy:
-    def _zdivide(x, y):
-        """Patched version of :func:`sporco.linalg.zdivide`."""
-
-        div = x / y
-        div[cp.logical_or(cp.isnan(div), cp.isinf(div))] = 0
-        return div
-else:
-    def _zdivide(x, y):
-        return np.divide(x, y, out=np.zeros_like(x), where=(y != 0))
 
 
 def _cho_factor(A, lower=True, check_finite=True):
@@ -310,7 +337,7 @@ def _cho_solve_ATAI(A, rho, b, c, lwr, check_finite=True):
         x = _cho_solve((c, lwr), b, check_finite=check_finite)
     else:
         x = (b - A.T.dot(_cho_solve((c, lwr), A.dot(b),
-                                          check_finite=check_finite))) / rho
+                                    check_finite=check_finite))) / rho
     return x
 
 
@@ -320,46 +347,39 @@ def _cho_solve_AATI(A, rho, b, c, lwr, check_finite=True):
     N, M = A.shape
     if N >= M:
         x = (b - _cho_solve((c, lwr), b.dot(A).T,
-            check_finite=check_finite).T.dot(A.T)) / rho
+                            check_finite=check_finite).T.dot(A.T)) / rho
     else:
         x = _cho_solve((c, lwr), b.T, check_finite=check_finite).T
     return x
 
 
-def _promote16(u, fn=None, *args, **kwargs):
-    """Patched version of :func:`sporco.linalg.promote16`."""
-
-    dtype = np.float32 if u.dtype == np.float16 else u.dtype
-    up = u.astype(dtype=dtype)
-    if fn is None:
-        return up
-    else:
-        v = fn(up, *args, **kwargs)
-        if isinstance(v, tuple):
-            vp = tuple([vk.astype(dtype=u.dtype) for vk in v])
-        else:
-            vp = v.astype(dtype=u.dtype)
-        return vp
-
 
 
 # Construct sporco.cupy.linalg
-linalg = sporco_cupy_patch_module(
-    'sporco.linalg',
-    {'have_numexpr': False, 'fftn': cp.fft.fftn, 'ifftn': cp.fft.ifftn,
-     'rfftn': cp.fft.rfftn, 'irfftn': cp.fft.irfftn,
-     'complex_dtype': _complex_dtype,
-     'pyfftw_byte_aligned': _pyfftw_byte_aligned,
-     'pyfftw_empty_aligned': _pyfftw_empty_aligned,
-     'pyfftw_rfftn_empty_aligned': _pyfftw_rfftn_empty_aligned,
-     'fftconv': _fftconv, 'inner': _inner, 'zdivide': _zdivide,
-     'cho_factor': _linalg_cho_factor, 'cho_solve_ATAI': _cho_solve_ATAI,
-     'cho_solve_AATI': _cho_solve_AATI, 'promote16': _promote16})
+linalg = sporco_cupy_patch_module('sporco.linalg',
+    {'have_numexpr': False, 'inner': _inner, 'cho_factor': _linalg_cho_factor,
+     'cho_solve_ATAI': _cho_solve_ATAI, 'cho_solve_AATI': _cho_solve_AATI,
+     'subsample_array': array.subsample_array, 'zdivide': array.zdivide})
+
+
+# Construct sporco.cupy.metric
+metric = sporco_cupy_patch_module('sporco.metric')
+
+
+# Construct sporco.cupy.util
+signal = sporco_cupy_patch_module('sporco.signal',
+            {'rfftn': fft.rfftn, 'irfftn': fft.rfftn, 'fftconv': fft.fftconv})
+
+
+# Construct sporco.cupy.util
+util = sporco_cupy_patch_module('sporco.util', {'signal': signal})
 
 
 # Construct sporco.cupy.prox
-prox_lp = sporco_cupy_patch_module('sporco.prox._lp', {'have_numexpr': False,
-                                                       'sl': linalg})
-prox_nuclear = sporco_cupy_patch_module('sporco.prox._nuclear', {'sl': linalg})
-prox = sporco_cupy_patch_module('sporco.prox', {'have_numexpr': False,
-                                                'sl': linalg})
+prox_lp = sporco_cupy_patch_module('sporco.prox._lp',
+            {'have_numexpr': False, 'zdivide': _zdivide})
+prox_util = sporco_cupy_patch_module('sporco.prox._util')
+prox_l1proj = sporco_cupy_patch_module('sporco.prox._l1proj')
+prox_nuclear = sporco_cupy_patch_module('sporco.prox._nuclear',
+                                        {'promote16': _promote16})
+prox = sporco_cupy_patch_module('sporco.prox', {'have_numexpr': False})

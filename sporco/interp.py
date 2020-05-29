@@ -177,4 +177,3 @@ def lstmaxdev(A, b):
         raise ValueError('scipy.optimize.linprog failed with status %d' %
                          res.status)
     return res.x[1:]
-

@@ -14,7 +14,7 @@ except ImportError:
 
 import cupy as cp
 from sporco.cupy import linalg
-from sporco.cupy import util
+from sporco.cupy import signal
 
 
 
@@ -93,8 +93,8 @@ class TestSet01(object):
         N = 32
         M = 16
         K = 8
-        D = util.complex_randn(N, N, 1, 1, M)
-        X = util.complex_randn(N, N, 1, K, M)
+        D = signal.complex_randn(N, N, 1, 1, M)
+        X = signal.complex_randn(N, N, 1, K, M)
         S = cp.sum(D*X, axis=4, keepdims=True)
         Z = (D.conj()*cp.sum(D*X, axis=4, keepdims=True) + \
              rho*X - D.conj()*S) / rho
@@ -108,8 +108,8 @@ class TestSet01(object):
         N = 32
         M = 16
         K = 8
-        D = util.complex_randn(N, N, 1, 1, M)
-        X = util.complex_randn(N, N, 1, K, M)
+        D = signal.complex_randn(N, N, 1, 1, M)
+        X = signal.complex_randn(N, N, 1, K, M)
         S = cp.sum(D*X, axis=4, keepdims=True)
         d = 1e-1 * (cp.random.randn(N, N, 1, 1, M).astype('complex') +
             cp.random.randn(N, N, 1, 1, M).astype('complex') * 1.0j)
@@ -126,8 +126,8 @@ class TestSet01(object):
         N = 32
         M = 16
         K = 8
-        D = util.complex_randn(N, N, 1, 1, M)
-        X = util.complex_randn(N, N, 1, K, M)
+        D = signal.complex_randn(N, N, 1, 1, M)
+        X = signal.complex_randn(N, N, 1, K, M)
         S = cp.sum(D*X, axis=4, keepdims=True)
 
         Xop = lambda x: cp.sum(X * x, axis=4, keepdims=True)
@@ -145,8 +145,8 @@ class TestSet01(object):
         M = 16
         C = 3
         K = 8
-        D = util.complex_randn(N, N, C, 1, M)
-        X = util.complex_randn(N, N, 1, K, M)
+        D = signal.complex_randn(N, N, C, 1, M)
+        X = signal.complex_randn(N, N, 1, K, M)
         S = cp.sum(D*X, axis=4, keepdims=True)
 
         Xop = lambda x: cp.sum(X * x, axis=4, keepdims=True)
@@ -163,8 +163,8 @@ class TestSet01(object):
         N = 32
         M = 16
         K = 8
-        D = util.complex_randn(N, N, 1, 1, M)
-        X = util.complex_randn(N, N, 1, K, M)
+        D = signal.complex_randn(N, N, 1, 1, M)
+        X = signal.complex_randn(N, N, 1, K, M)
         S = cp.sum(D*X, axis=4, keepdims=True)
 
         Xop = lambda x: cp.sum(X * x, axis=4, keepdims=True)
@@ -182,8 +182,8 @@ class TestSet01(object):
         M = 32
         C = 3
         K = 8
-        D = util.complex_randn(N, N, C, 1, M)
-        X = util.complex_randn(N, N, 1, K, M)
+        D = signal.complex_randn(N, N, C, 1, M)
+        X = signal.complex_randn(N, N, 1, K, M)
         S = cp.sum(D*X, axis=4, keepdims=True)
 
         Xop = lambda x: cp.sum(X * x, axis=4, keepdims=True)

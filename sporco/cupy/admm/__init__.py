@@ -15,6 +15,9 @@ import re
 from sporco.cupy import sporco_cupy_patch_module
 from sporco.cupy import cp
 from sporco.cupy import util
+from sporco.cupy import fft
+from sporco.cupy import signal
+from sporco.cupy import array
 from sporco.cupy import common
 from sporco.cupy import linalg
 from sporco.cupy import prox
@@ -87,23 +90,34 @@ admm.rpca = sporco_cupy_patch_module('sporco.admm.rpca',
 
 # Construct sporco.cupy.admm.tvl1
 admm.tvl1 = sporco_cupy_patch_module('sporco.admm.tvl1',
-                                     {'admm': admm.admm, 'sl': linalg,
-                                      'sp': prox})
+            {'admm': admm.admm, 'rrs': linalg.rrs, 'prox_l1': prox.prox_l1,
+             'prox_l2': prox.prox_l2, 'zpad': array.zpad,
+             'atleast_nd': array.atleast_nd, 'zdivide': array.zdivide,
+             'rfftn': fft.rfftn, 'irfftn': fft.irfftn,
+             'gradient_filters': signal.gradient_filters,
+             'grad': signal.grad, 'gradT': signal.gradT})
 
 # Construct sporco.cupy.admm.tvl2
 admm.tvl2 = sporco_cupy_patch_module('sporco.admm.tvl2',
-                                     {'admm': admm.admm, 'sl': linalg,
-                                      'sp': prox})
+            {'admm': admm.admm, 'rrs': linalg.rrs, 'prox_l2': prox.prox_l2,
+             'zpad': array.zpad, 'atleast_nd': array.atleast_nd,
+             'zdivide': array.zdivide, 'rfftn': fft.rfftn,
+             'irfftn': fft.irfftn, 'rfl2norm2': fft.rfl2norm2,
+             'gradient_filters': signal.gradient_filters,
+             'grad': signal.grad, 'gradT': signal.gradT})
 
 # Construct sporco.cupy.admm.bpdn
 admm.bpdn = sporco_cupy_patch_module('sporco.admm.bpdn',
-                                     {'admm': admm.admm, 'sl': linalg,
-                                      'sp': prox})
+                {'admm': admm.admm, 'sl': linalg, 'sp': prox})
 
 # Construct sporco.cupy.admm.cbpdn
 admm.cbpdn = sporco_cupy_patch_module('sporco.admm.cbpdn',
-                                      {'admm': admm.admm, 'cr': cnvrep,
-                                       'sl': linalg, 'sp': prox})
+                {'admm': admm.admm, 'cr': cnvrep, 'sl': linalg, 'sp': prox,
+                 'rfftn': fft.rfftn, 'irfftn': fft.irfftn,
+                 'empty_aligned': fft.empty_aligned,
+                 'rfftn_empty_aligned': fft.rfftn_empty_aligned,
+                 'rfl2norm2': fft.rfl2norm2,
+                 'gradient_filters': signal.gradient_filters})
 
 
 def _index_primary(self):
@@ -120,15 +134,18 @@ admm.cbpdn.AddMaskSim.index_addmsk = _index_addmsk
 
 # Construct sporco.cupy.admm.cbpdnin
 admm.cbpdnin = sporco_cupy_patch_module('sporco.admm.cbpdnin',
-                                      {'cbpdn': admm.cbpdn, 'sl': linalg,
-                                       'sp': prox})
+            {'cbpdn': admm.cbpdn, 'sl': linalg, 'sp': prox,
+             'rfftn': fft.rfftn, 'irfftn': fft.irfftn})
 
 
 # Construct sporco.cupy.admm.cbpdntv
 admm.cbpdntv = sporco_cupy_patch_module('sporco.admm.cbpdntv',
-                                        {'admm': admm.admm, 'cr': cnvrep,
-                                         'cbpdn': admm.cbpdn, 'sl': linalg,
-                                         'sp': prox})
+            {'admm': admm.admm, 'cr': cnvrep, 'cbpdn': admm.cbpdn,
+             'sl': linalg, 'sp': prox, 'rfftn': fft.rfftn,
+             'irfftn': fft.irfftn, 'empty_aligned': fft.empty_aligned,
+             'rfftn_empty_aligned': fft.rfftn_empty_aligned,
+             'rfl2norm2': fft.rfl2norm2,
+             'gradient_filters': signal.gradient_filters})
 
 admm.cbpdntv.ConvBPDNScalarTV.cnst_c = _cnst0
 admm.cbpdntv.ConvBPDNRecTV.cnst_c = _cnst0
@@ -136,9 +153,16 @@ admm.cbpdntv.ConvBPDNRecTV.cnst_c = _cnst0
 
 # Construct sporco.cupy.admm.pdcsc
 admm.pdcsc = sporco_cupy_patch_module('sporco.admm.pdcsc',
-                                      {'admm': admm.admm, 'cr': cnvrep,
-                                       'cbpdn': admm.cbpdn, 'sl': linalg,
-                                       'sp': prox})
+            {'admm': admm.admm, 'cr': cnvrep, 'cbpdn': admm.cbpdn,
+            'rfftn': fft.rfftn, 'irfftn': fft.irfftn,
+             'empty_aligned': fft.empty_aligned, 'rfl2norm2': fft.rfl2norm2,
+             'dot': linalg.dot, 'inner': linalg.inner,
+             'solvedbi_sm_c': linalg.solvedbi_sm_c,
+             'solvedbi_sm': linalg.solvedbi_sm,
+             'solvedbd_sm_c': linalg.solvedbd_sm_c,
+             'solvedbd_sm': linalg.solvedbd_sm, 'rrs': linalg.rrs,
+             'prox_l1': prox.prox_l1, 'prox_sl1l2': prox.prox_sl1l2
+            })
 
 
 # Restore original entries in sys.modules

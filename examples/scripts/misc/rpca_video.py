@@ -14,14 +14,12 @@ This example demonstrates the use of class :class:`.rpca.RobustPCA` for video fo
 
 from __future__ import print_function
 from builtins import input
-from builtins import range
 
 import numpy as np
 import imageio
 
 from sporco.admm import rpca
-from sporco import metric
-from sporco import util
+from sporco import signal
 from sporco import plot
 
 
@@ -33,7 +31,7 @@ reader = imageio.get_reader('imageio:newtonscradle.gif')
 nfrm = reader.get_length()
 frmlst = []
 for i, frm in enumerate(reader):
-    frmlst.append(util.rgb2gray(frm[..., 0:3].astype(np.float32)/255.0))
+    frmlst.append(signal.rgb2gray(frm[..., 0:3].astype(np.float32)/255.0))
 v = np.stack(frmlst, axis=2)
 
 

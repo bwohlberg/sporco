@@ -13,8 +13,8 @@ from __future__ import division, absolute_import, print_function
 import copy
 import numpy as np
 
-import sporco.prox as sp
 from sporco.util import u
+from sporco.prox import prox_l1
 from sporco.fista import fista
 
 
@@ -183,7 +183,7 @@ class BPDN(fista.FISTA):
     def eval_proxop(self, V):
         """Compute proximal operator of :math:`g`."""
 
-        return np.asarray(sp.prox_l1(V, (self.lmbda / self.L) * self.wl1),
+        return np.asarray(prox_l1(V, (self.lmbda / self.L) * self.wl1),
                           dtype=self.dtype)
 
 

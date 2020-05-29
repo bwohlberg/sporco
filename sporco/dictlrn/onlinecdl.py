@@ -13,14 +13,16 @@ from __future__ import print_function, absolute_import
 import copy
 import numpy as np
 
-from sporco import util
 from sporco import common
-from sporco.util import u
-import sporco.linalg as sl
-import sporco.cnvrep as cr
 from sporco.admm import cbpdn
 from sporco import cuda
+from sporco.util import u, Timer
+from sporco.linalg import inner
+from sporco.cnvrep import (DictionarySize, stdformD, Pcn, getPcn,
+                           CDU_ConvRepIndexing, zpad, mskWshape)
 from sporco.dictlrn import dictlrn
+from sporco.array import transpose_ntpl_list
+from sporco.fft import rfftn, irfftn, byte_aligned, empty_aligned
 
 
 __author__ = """\n""".join(['Cristina Garcia-Cardona <cgarciac@lanl.gov>',
@@ -124,7 +126,7 @@ class OnlineConvBPDNDictLearn(common.IterativeSolver):
         initialisation timer."""
 
         instance = super(OnlineConvBPDNDictLearn, cls).__new__(cls)
-        instance.timer = util.Timer(['init', 'solve', 'solve_wo_eval'])
+        instance.timer = Timer(['init', 'solve', 'solve_wo_eval'])
         instance.timer.start('init')
         return instance
 
@@ -186,15 +188,15 @@ class OnlineConvBPDNDictLearn(common.IterativeSolver):
         self.cri = None
 
         # Normalise dictionary
-        ds = cr.DictionarySize(self.dsz, dimN)
+        ds = DictionarySize(self.dsz, dimN)
         dimCd = ds.ndim - dimN - 1
-        D0 = cr.stdformD(D0, ds.nchn, ds.nflt, dimN).astype(self.dtype)
-        self.D = cr.Pcn(D0, self.dsz, (), dimN, dimCd, crp=True,
+        D0 = stdformD(D0, ds.nchn, ds.nflt, dimN).astype(self.dtype)
+        self.D = Pcn(D0, self.dsz, (), dimN, dimCd, crp=True,
                         zm=opt['ZeroMean'])
         self.Dprv = self.D.copy()
 
         # Create constraint set projection function
-        self.Pcn = cr.getPcn(self.dsz, (), dimN, dimCd, crp=True,
+        self.Pcn = getPcn(self.dsz, (), dimN, dimCd, crp=True,
                              zm=opt['ZeroMean'])
 
         # Initalise iterations stats list and iteration index
@@ -245,7 +247,7 @@ class OnlineConvBPDNDictLearn(common.IterativeSolver):
 
         Nv = S.shape[0:self.dimN]
         if self.cri is None or Nv != self.cri.Nv:
-            self.cri = cr.CDU_ConvRepIndexing(self.dsz, S, dimK, self.dimN)
+            self.cri = CDU_ConvRepIndexing(self.dsz, S, dimK, self.dimN)
             if self.opt['CUDA_CBPDN']:
                 if self.cri.Cd > 1 or self.cri.Cx > 1:
                     raise ValueError('CUDA CBPDN solver can only be used for '
@@ -253,12 +255,12 @@ class OnlineConvBPDNDictLearn(common.IterativeSolver):
                 if self.cri.K > 1:
                     raise ValueError('CUDA CBPDN solver can not be used with '
                                      'mini-batches')
-            self.Df = sl.pyfftw_byte_aligned(sl.rfftn(self.D, self.cri.Nv,
-                                                      self.cri.axisN))
-            self.Gf = sl.pyfftw_empty_aligned(self.Df.shape, self.Df.dtype)
-            self.Z = sl.pyfftw_empty_aligned(self.cri.shpX, self.dtype)
+            self.Df = byte_aligned(rfftn(self.D, self.cri.Nv,
+                                         self.cri.axisN))
+            self.Gf = empty_aligned(self.Df.shape, self.Df.dtype)
+            self.Z = empty_aligned(self.cri.shpX, self.dtype)
         else:
-            self.Df[:] = sl.rfftn(self.D, self.cri.Nv, self.cri.axisN)
+            self.Df[:] = rfftn(self.D, self.cri.Nv, self.cri.axisN)
 
 
 
@@ -270,8 +272,8 @@ class OnlineConvBPDNDictLearn(common.IterativeSolver):
                            self.opt['CBPDN'])
             Z = Z.reshape(self.cri.Nv + (1, 1, self.cri.M,))
             self.Z[:] = np.asarray(Z, dtype=self.dtype)
-            self.Zf = sl.rfftn(self.Z, self.cri.Nv, self.cri.axisN)
-            self.Sf = sl.rfftn(S.reshape(self.cri.shpS), self.cri.Nv,
+            self.Zf = rfftn(self.Z, self.cri.Nv, self.cri.axisN)
+            self.Sf = rfftn(S.reshape(self.cri.shpS), self.cri.Nv,
                                self.cri.axisN)
             self.xstep_itstat = None
         else:
@@ -299,9 +301,9 @@ class OnlineConvBPDNDictLearn(common.IterativeSolver):
             Z = Z.reshape(self.cri.Nv + (1,) + (self.cri.Cx*self.cri.K,) +
                           (self.cri.M,))
             if Z.shape != self.Z.shape:
-                self.Z = sl.pyfftw_empty_aligned(Z.shape, self.dtype)
+                self.Z = empty_aligned(Z.shape, self.dtype)
         self.Z[:] = np.asarray(Z, dtype=self.dtype)
-        self.Zf = sl.rfftn(self.Z, self.cri.Nv, self.cri.axisN)
+        self.Zf = rfftn(self.Z, self.cri.Nv, self.cri.axisN)
 
 
 
@@ -311,9 +313,9 @@ class OnlineConvBPDNDictLearn(common.IterativeSolver):
         """
 
         # Compute X D - S
-        Ryf = sl.inner(self.Zf, self.Df, axis=self.cri.axisM) - self.Sf
+        Ryf = inner(self.Zf, self.Df, axis=self.cri.axisM) - self.Sf
         # Compute gradient
-        gradf = sl.inner(np.conj(self.Zf), Ryf, axis=self.cri.axisK)
+        gradf = inner(np.conj(self.Zf), Ryf, axis=self.cri.axisK)
 
         # If multiple channel signal, single channel dictionary
         if self.cri.C > 1 and self.cri.Cd == 1:
@@ -324,7 +326,7 @@ class OnlineConvBPDNDictLearn(common.IterativeSolver):
 
         # Compute gradient descent
         self.Gf[:] = self.Df - self.eta * gradf
-        self.G = sl.irfftn(self.Gf, self.cri.Nv, self.cri.axisN)
+        self.G = irfftn(self.Gf, self.cri.Nv, self.cri.axisN)
 
         # Eval proximal operator
         self.Dprv[:] = self.D
@@ -392,7 +394,7 @@ class OnlineConvBPDNDictLearn(common.IterativeSolver):
                     self.xstep_itstat.DualRsdl)
             rho = (self.xstep_itstat.Rho,)
 
-        cnstr = np.linalg.norm(cr.zpad(self.D, self.cri.Nv) - self.G)
+        cnstr = np.linalg.norm(zpad(self.D, self.cri.Nv) - self.G)
         dltd = np.linalg.norm(self.D - self.Dprv)
 
         tpl = (self.j,) + objfn + rsdl + rho + (cnstr, dltd, self.eta) + \
@@ -406,7 +408,7 @@ class OnlineConvBPDNDictLearn(common.IterativeSolver):
         array of named tuples.
         """
 
-        return util.transpose_ntpl_list(self.itstat)
+        return transpose_ntpl_list(self.itstat)
 
 
 
@@ -523,8 +525,7 @@ class OnlineConvBPDNMaskDictLearn(OnlineConvBPDNDictLearn):
         self.init_vars(S, dimK)
         if W is None:
             W = np.array([1.0], dtype=self.dtype)
-        W = np.asarray(W.reshape(cr.mskWshape(W, self.cri)),
-                       dtype=self.dtype)
+        W = np.asarray(W.reshape(mskWshape(W, self.cri)), dtype=self.dtype)
         self.xstep(S, W, self.lmbda, dimK)
         self.dstep(W)
 
@@ -553,8 +554,8 @@ class OnlineConvBPDNMaskDictLearn(OnlineConvBPDNDictLearn):
                               self.opt['CBPDN'])
             Z = Z.reshape(self.cri.Nv + (1, 1, self.cri.M,))
             self.Z[:] = np.asarray(Z, dtype=self.dtype)
-            self.Zf = sl.rfftn(self.Z, self.cri.Nv, self.cri.axisN)
-            self.Sf = sl.rfftn(S.reshape(self.cri.shpS), self.cri.Nv,
+            self.Zf = rfftn(self.Z, self.cri.Nv, self.cri.axisN)
+            self.Sf = rfftn(S.reshape(self.cri.shpS), self.cri.Nv,
                                self.cri.axisN)
             self.xstep_itstat = None
         else:
@@ -563,7 +564,7 @@ class OnlineConvBPDNMaskDictLearn(OnlineConvBPDNDictLearn):
                                            self.opt['CBPDN'], dimK=dimK,
                                            dimN=self.cri.dimN)
             xstep.solve()
-            self.Sf = sl.rfftn(S.reshape(self.cri.shpS), self.cri.Nv,
+            self.Sf = rfftn(S.reshape(self.cri.shpS), self.cri.Nv,
                                self.cri.axisN)
             self.setcoef(xstep.getcoef())
             self.xstep_itstat = xstep.itstat[-1] if xstep.itstat else None
@@ -576,13 +577,13 @@ class OnlineConvBPDNMaskDictLearn(OnlineConvBPDNDictLearn):
         """
 
         # Compute residual X D - S in frequency domain
-        Ryf = sl.inner(self.Zf, self.Df, axis=self.cri.axisM) - self.Sf
+        Ryf = inner(self.Zf, self.Df, axis=self.cri.axisM) - self.Sf
         # Transform to spatial domain, apply mask, and transform back to
         # frequency domain
-        Ryf[:] = sl.rfftn(W * sl.irfftn(Ryf, self.cri.Nv, self.cri.axisN),
+        Ryf[:] = rfftn(W * irfftn(Ryf, self.cri.Nv, self.cri.axisN),
                           None, self.cri.axisN)
         # Compute gradient
-        gradf = sl.inner(np.conj(self.Zf), Ryf, axis=self.cri.axisK)
+        gradf = inner(np.conj(self.Zf), Ryf, axis=self.cri.axisK)
 
         # If multiple channel signal, single channel dictionary
         if self.cri.C > 1 and self.cri.Cd == 1:
@@ -593,7 +594,7 @@ class OnlineConvBPDNMaskDictLearn(OnlineConvBPDNDictLearn):
 
         # Compute gradient descent
         self.Gf[:] = self.Df - self.eta * gradf
-        self.G = sl.irfftn(self.Gf, self.cri.Nv, self.cri.axisN)
+        self.G = irfftn(self.Gf, self.cri.Nv, self.cri.axisN)
 
         # Eval proximal operator
         self.Dprv[:] = self.D

@@ -14,16 +14,16 @@ This example demonstrates the use of the interface to the CUDA CSC solver extens
 
 from __future__ import print_function
 from builtins import input
-from builtins import range
 
 import pyfftw   # See https://github.com/pyFFTW/pyFFTW/issues/40
 import numpy as np
 
 from sporco import util
+from sporco import signal
 from sporco import plot
 from sporco import cuda
 from sporco.admm import cbpdn
-import sporco.linalg as spl
+import sporco.signal as spl
 import sporco.metric as spm
 
 # If running in a notebook, try to use wurlitzer so that output from the CUDA
@@ -45,7 +45,7 @@ Highpass filter example image.
 
 npd = 16
 fltlmbd = 20
-sl, sh = util.tikhonov_filter(img, fltlmbd, npd)
+sl, sh = signal.tikhonov_filter(img, fltlmbd, npd)
 
 
 """

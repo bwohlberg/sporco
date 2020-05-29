@@ -20,18 +20,16 @@ This example uses the GPU accelerated version of :mod:`.admm.cbpdn` within the :
 
 from __future__ import print_function
 from builtins import input
-from builtins import range
 
 import pyfftw   # See https://github.com/pyFFTW/pyFFTW/issues/40
 import numpy as np
 
 from sporco import util
+from sporco import signal
 from sporco import plot
-import sporco.metric as sm
-import sporco.linalg as sl
-from sporco.cupy import cupy_enabled, np2cp, cp2np
-from sporco.cupy import select_device_by_load, gpu_info
-from sporco.cupy import cp
+from sporco.metric import psnr
+from sporco.cupy import (cupy_enabled, np2cp, cp2np, select_device_by_load,
+                         gpu_info)
 from sporco.cupy.admm import cbpdn
 
 
@@ -59,7 +57,7 @@ Load a reference image and corrupt it with 33% salt and pepper noise. (The call 
 img = util.ExampleImages().image('monarch.png', zoom=0.5, scaled=True,
                                  idxexp=np.s_[:, 160:672])
 np.random.seed(12345)
-imgn = util.spnoise(img, 0.33)
+imgn = signal.spnoise(img, 0.33)
 
 
 """
@@ -119,8 +117,8 @@ Display solve time and denoising performance.
 """
 
 print("ConvL1L1Grd solve time: %5.2f s" % b.timer.elapsed('solve'))
-print("Noisy image PSNR:    %5.2f dB" % sm.psnr(img, imgn))
-print("Denoised image PSNR: %5.2f dB" % sm.psnr(img, imgd))
+print("Noisy image PSNR:    %5.2f dB" % psnr(img, imgn))
+print("Denoised image PSNR: %5.2f dB" % psnr(img, imgd))
 
 
 """

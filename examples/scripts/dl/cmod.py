@@ -14,13 +14,13 @@ This example demonstrates the use of :class:`.cmod.CnstrMOD` for computing a dic
 
 from __future__ import print_function
 from builtins import input
-from builtins import range
 
 import numpy as np
 
 from sporco.admm import bpdn
 from sporco.admm import cmod
 from sporco import util
+from sporco import array
 from sporco import plot
 
 
@@ -40,7 +40,7 @@ S5 = exim.image('tulips.png', idxexp=np.s_[:, 30:542])
 Extract all 8x8 image blocks, reshape, and subtract block means.
 """
 
-S = util.extract_blocks((S1, S2, S3, S4, S5), (8, 8))
+S = array.extract_blocks((S1, S2, S3, S4, S5), (8, 8))
 S = np.reshape(S, (np.prod(S.shape[0:2]), S.shape[2]))
 S -= np.mean(S, axis=0)
 

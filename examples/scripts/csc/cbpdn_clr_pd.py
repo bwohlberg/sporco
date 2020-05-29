@@ -20,18 +20,18 @@ This example uses the GPU accelerated version of :mod:`.admm.pdcsc` within the :
 
 from __future__ import print_function
 from builtins import input
-from builtins import range
 
 import pyfftw   # See https://github.com/pyFFTW/pyFFTW/issues/40
 import numpy as np
 
 from sporco import util
+from sporco import signal
+from sporco import fft
+from sporco import linalg
 from sporco import plot
-import sporco.metric as sm
-import sporco.linalg as sl
-from sporco.cupy import cupy_enabled, np2cp, cp2np
-from sporco.cupy import select_device_by_load, gpu_info
-from sporco.cupy import cp
+from sporco import metric
+from sporco.cupy import (cupy_enabled, np2cp, cp2np, select_device_by_load,
+                         gpu_info)
 from sporco.cupy.admm import pdcsc
 from sporco.dictlrn import bpdndl
 
@@ -50,7 +50,7 @@ Highpass filter example image.
 
 npd = 16
 fltlmbd = 10
-slc, shc = util.tikhonov_filter(img, fltlmbd, npd)
+slc, shc = signal.tikhonov_filter(img, fltlmbd, npd)
 
 
 """
@@ -107,11 +107,11 @@ print("ConvProdDictBPDN solve time: %.2fs" % b.timer.elapsed('solve'))
 Compute partial and full reconstructions from sparse representation $X$ with respect to convolutional dictionary $D$ and standard dictionary $B$. The partial reconstructions are $DX$ and $XB$, and the full reconstruction is $DXB$.
 """
 
-DX = sl.fftconv(D[..., np.newaxis, np.newaxis, :], X)
-XB = sl.dot(B, X, axis=2)
+DX = fft.fftconv(D[..., np.newaxis, np.newaxis, :], X)
+XB = linalg.dot(B, X, axis=2)
 shr = cp2np(b.reconstruct().squeeze())
 imgr = slc + shr
-print("Reconstruction PSNR: %.2fdB\n" % sm.psnr(img, imgr))
+print("Reconstruction PSNR: %.2fdB\n" % metric.psnr(img, imgr))
 
 
 """

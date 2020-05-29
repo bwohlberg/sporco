@@ -20,6 +20,9 @@ from sporco.admm import cbpdn
 import sporco.linalg as sl
 import sporco.prox as sp
 from sporco.util import u
+from sporco.fft import (rfftn, irfftn, empty_aligned, rfftn_empty_aligned,
+                        rfl2norm2)
+from sporco.signal import gradient_filters
 
 
 __author__ = """Brendt Wohlberg <brendt@ieee.org>"""
@@ -227,16 +230,16 @@ class ConvBPDNScalarTV(admm.ADMM):
         self.S = np.asarray(S.reshape(self.cri.shpS), dtype=self.dtype)
 
         # Compute signal in DFT domain
-        self.Sf = sl.rfftn(self.S, None, self.cri.axisN)
+        self.Sf = rfftn(self.S, None, self.cri.axisN)
 
-        self.Gf, GHGf = sl.gradient_filters(self.cri.dimN+3, self.cri.axisN,
-                                            self.cri.Nv, dtype=self.dtype)
+        self.Gf, GHGf = gradient_filters(self.cri.dimN+3, self.cri.axisN,
+                                         self.cri.Nv, dtype=self.dtype)
         self.GHGf = self.Wtv**2 * GHGf
 
         # Initialise byte-aligned arrays for pyfftw
-        self.YU = sl.pyfftw_empty_aligned(self.Y.shape, dtype=self.dtype)
-        self.Xf = sl.pyfftw_rfftn_empty_aligned(self.cri.shpX, self.cri.axisN,
-                                                self.dtype)
+        self.YU = empty_aligned(self.Y.shape, dtype=self.dtype)
+        self.Xf = rfftn_empty_aligned(self.cri.shpX, self.cri.axisN,
+                                      self.dtype)
 
         self.setdict()
 
@@ -247,7 +250,7 @@ class ConvBPDNScalarTV(admm.ADMM):
 
         if D is not None:
             self.D = np.asarray(D, dtype=self.dtype)
-        self.Df = sl.rfftn(self.D, self.cri.Nv, self.cri.axisN)
+        self.Df = rfftn(self.D, self.cri.Nv, self.cri.axisN)
         # Compute D^H S
         self.DSf = np.conj(self.Df) * self.Sf
         if self.cri.Cd > 1:
@@ -276,7 +279,7 @@ class ConvBPDNScalarTV(admm.ADMM):
         :math:`\mathbf{x}`."""
 
         self.YU[:] = self.Y - self.U
-        YUf = sl.rfftn(self.YU, None, self.cri.axisN)
+        YUf = rfftn(self.YU, None, self.cri.axisN)
 
         # The sum is over the extra axis indexing spatial gradient
         # operators G_i, *not* over axisM
@@ -292,7 +295,7 @@ class ConvBPDNScalarTV(admm.ADMM):
                 self.Df, self.rho*self.GHGf + self.rho, b, self.cri.axisM,
                 self.cri.axisC)
 
-        self.X = sl.irfftn(self.Xf, self.cri.Nv, self.cri.axisN)
+        self.X = irfftn(self.Xf, self.cri.Nv, self.cri.axisN)
 
         if self.opt['LinSolveCheck']:
             Dop = lambda x: sl.inner(self.Df, x, axis=self.cri.axisM)
@@ -325,7 +328,7 @@ class ConvBPDNScalarTV(admm.ADMM):
         """
 
         return self.Xf if self.opt['fEvalX'] else \
-            sl.rfftn(self.Y[..., -1], None, self.cri.axisN)
+            rfftn(self.Y[..., -1], None, self.cri.axisN)
 
 
 
@@ -429,7 +432,7 @@ class ConvBPDNScalarTV(admm.ADMM):
 
         Ef = sl.inner(self.Df, self.obfn_fvarf(), axis=self.cri.axisM) \
              - self.Sf
-        return sl.rfl2norm2(Ef, self.S.shape, axis=self.cri.axisN)/2.0
+        return rfl2norm2(Ef, self.S.shape, axis=self.cri.axisN)/2.0
 
 
 
@@ -458,8 +461,8 @@ class ConvBPDNScalarTV(admm.ADMM):
         """
 
         if Xf is None:
-            Xf = sl.rfftn(X, axes=self.cri.axisN)
-        return self.Wtv[..., np.newaxis] * sl.irfftn(
+            Xf = rfftn(X, axes=self.cri.axisN)
+        return self.Wtv[..., np.newaxis] * irfftn(
             self.Gf * Xf[..., np.newaxis], self.cri.Nv, axes=self.cri.axisN)
 
 
@@ -471,8 +474,8 @@ class ConvBPDNScalarTV(admm.ADMM):
         \mathbf{x}`.
         """
 
-        Xf = sl.rfftn(X, axes=self.cri.axisN)
-        return self.Wtv[..., np.newaxis] * sl.irfftn(
+        Xf = rfftn(X, axes=self.cri.axisN)
+        return self.Wtv[..., np.newaxis] * irfftn(
             np.conj(self.Gf) * Xf[..., 0:-1], self.cri.Nv, axes=self.cri.axisN)
 
 
@@ -563,9 +566,9 @@ class ConvBPDNScalarTV(admm.ADMM):
         if X is None:
             Xf = self.Xf
         else:
-            Xf = sl.rfftn(X, None, self.cri.axisN)
+            Xf = rfftn(X, None, self.cri.axisN)
         Sf = np.sum(self.Df * Xf, axis=self.cri.axisM)
-        return sl.irfftn(Sf, self.cri.Nv, self.cri.axisN)
+        return irfftn(Sf, self.cri.Nv, self.cri.axisN)
 
 
 
@@ -937,15 +940,15 @@ class ConvBPDNRecTV(admm.ADMM):
         self.S = np.asarray(S.reshape(self.cri.shpS), dtype=self.dtype)
 
         # Compute signal in DFT domain
-        self.Sf = sl.rfftn(self.S, None, self.cri.axisN)
+        self.Sf = rfftn(self.S, None, self.cri.axisN)
 
-        self.Gf, GHGf = sl.gradient_filters(self.cri.dimN+3, self.cri.axisN,
-                                            self.cri.Nv, dtype=self.dtype)
+        self.Gf, GHGf = gradient_filters(self.cri.dimN+3, self.cri.axisN,
+                                         self.cri.Nv, dtype=self.dtype)
 
         # Initialise byte-aligned arrays for pyfftw
-        self.YU = sl.pyfftw_empty_aligned(self.Y.shape, dtype=self.dtype)
-        self.Xf = sl.pyfftw_rfftn_empty_aligned(self.cri.shpX, self.cri.axisN,
-                                                self.dtype)
+        self.YU = empty_aligned(self.Y.shape, dtype=self.dtype)
+        self.Xf = rfftn_empty_aligned(self.cri.shpX, self.cri.axisN,
+                                      self.dtype)
 
         self.setdict()
 
@@ -956,7 +959,7 @@ class ConvBPDNRecTV(admm.ADMM):
 
         if D is not None:
             self.D = np.asarray(D, dtype=self.dtype)
-        self.Df = sl.rfftn(self.D, self.cri.Nv, self.cri.axisN)
+        self.Df = rfftn(self.D, self.cri.Nv, self.cri.axisN)
 
         self.GDf = self.Gf * (self.Wtv * self.Df)[..., np.newaxis]
 
@@ -1023,7 +1026,7 @@ class ConvBPDNRecTV(admm.ADMM):
         :math:`\mathbf{x}`."""
 
         self.YU[:] = self.Y - self.U
-        YUf = sl.rfftn(self.YU, None, self.cri.axisN)
+        YUf = rfftn(self.YU, None, self.cri.axisN)
         YUf0 = self.block_sep0(YUf)
         YUf1 = self.block_sep1(YUf)
 
@@ -1073,7 +1076,7 @@ class ConvBPDNRecTV(admm.ADMM):
             self.Xf[:] = sl.solvemdbi_ism(DfGDf, self.rho, b, self.cri.axisM,
                                           self.cri.axisC)
 
-        self.X = sl.irfftn(self.Xf, self.cri.Nv, self.cri.axisN)
+        self.X = irfftn(self.Xf, self.cri.Nv, self.cri.axisN)
 
         if self.opt['LinSolveCheck']:
             if self.cri.C > 1 and self.cri.Cd == 1:
@@ -1110,7 +1113,7 @@ class ConvBPDNRecTV(admm.ADMM):
         """
 
         return self.Xf if self.opt['fEvalX'] else \
-            sl.rfftn(self.block_sep0(self.Y), None, self.cri.axisN)
+            rfftn(self.block_sep0(self.Y), None, self.cri.axisN)
 
 
 
@@ -1214,7 +1217,7 @@ class ConvBPDNRecTV(admm.ADMM):
 
         Ef = sl.inner(self.Df, self.obfn_fvarf(), axis=self.cri.axisM) \
              - self.Sf
-        return sl.rfl2norm2(Ef, self.S.shape, axis=self.cri.axisN)/2.0
+        return rfl2norm2(Ef, self.S.shape, axis=self.cri.axisN)/2.0
 
 
 
@@ -1262,8 +1265,8 @@ class ConvBPDNRecTV(admm.ADMM):
         """
 
         if Xf is None:
-            Xf = sl.rfftn(X, axes=self.cri.axisN)
-        return sl.irfftn(sl.inner(
+            Xf = rfftn(X, axes=self.cri.axisN)
+        return irfftn(sl.inner(
             self.GDf, Xf[..., np.newaxis], axis=self.cri.axisM), self.cri.Nv,
                          self.cri.axisN)
 
@@ -1275,9 +1278,9 @@ class ConvBPDNRecTV(admm.ADMM):
         (\Gamma_0^T \;\; \Gamma_1^T \;\; \ldots) \mathbf{y}_1`.
         """
 
-        Y1f = sl.rfftn(Y1, None, axes=self.cri.axisN)
-        return sl.irfftn(np.conj(self.GDf) * Y1f, self.cri.Nv,
-                         self.cri.axisN)
+        Y1f = rfftn(Y1, None, axes=self.cri.axisN)
+        return irfftn(np.conj(self.GDf) * Y1f, self.cri.Nv,
+                      self.cri.axisN)
 
 
 
@@ -1347,6 +1350,6 @@ class ConvBPDNRecTV(admm.ADMM):
         if X is None:
             Xf = self.Xf
         else:
-            Xf = sl.rfftn(X, None, self.cri.axisN)
+            Xf = rfftn(X, None, self.cri.axisN)
         Sf = np.sum(self.Df * Xf, axis=self.cri.axisM)
-        return sl.irfftn(Sf, self.cri.Nv, self.cri.axisN)
+        return irfftn(Sf, self.cri.Nv, self.cri.axisN)

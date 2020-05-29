@@ -19,18 +19,16 @@ where $\mathbf{d}_m$ is the $m^{\text{th}}$ dictionary filter, $\mathbf{x}_{c,m}
 
 from __future__ import print_function
 from builtins import input
-from builtins import range
 
 import pyfftw   # See https://github.com/pyFFTW/pyFFTW/issues/40
 import numpy as np
 
 from sporco import util
 from sporco import plot
-import sporco.linalg as spl
+import sporco.signal as spl
 import sporco.metric as sm
-from sporco.cupy import cupy_enabled, np2cp, cp2np
-from sporco.cupy import select_device_by_load, gpu_info
-from sporco.cupy import cp
+from sporco.cupy import (cupy_enabled, np2cp, cp2np, select_device_by_load,
+                         gpu_info)
 from sporco.cupy.admm import cbpdn
 
 
@@ -67,7 +65,7 @@ Highpass filter test image.
 
 npd = 16
 fltlmbd = 5.0
-imgnl, imgnh = util.tikhonov_filter(imgn, fltlmbd, npd)
+imgnl, imgnh = spl.tikhonov_filter(imgn, fltlmbd, npd)
 
 
 """
@@ -81,7 +79,7 @@ D = util.convdicts()['G:8x8x128']
 Set solver options. See Section 8 of :cite:`wohlberg-2017-convolutional2` for details of construction of $\ell_1$ weighting matrix $W$.
 """
 
-imgnpl, imgnph = util.tikhonov_filter(pad(imgn), fltlmbd, npd)
+imgnpl, imgnph = spl.tikhonov_filter(pad(imgn), fltlmbd, npd)
 W = spl.irfftn(np.conj(spl.rfftn(D[..., np.newaxis, :], imgnph.shape[0:2],
                (0, 1))) * spl.rfftn(imgnph[..., np.newaxis], None, (0, 1)),
                imgnph.shape[0:2], (0, 1))

@@ -13,8 +13,9 @@ import copy
 import numpy as np
 
 from sporco.admm import admm
-import sporco.linalg as sl
-import sporco.prox as sp
+from sporco.fft import dctii, idctii
+from sporco.linalg import rrs
+from sporco.prox import prox_l1
 
 
 __author__ = """Brendt Wohlberg <brendt@ieee.org>"""
@@ -189,13 +190,13 @@ class SplineL1(admm.ADMM):
         r"""Minimise Augmented Lagrangian with respect to
         :math:`\mathbf{x}`."""
 
-        self.X = sl.idctii(self.Gamma*sl.dctii(self.Y + self.S - self.U,
-                                               axes=self.axes), axes=self.axes)
+        self.X = idctii(self.Gamma*dctii(self.Y + self.S - self.U,
+                                         axes=self.axes), axes=self.axes)
         if self.opt['LinSolveCheck']:
-            self.xrrs = sl.rrs(
+            self.xrrs = rrs(
                 self.X + (self.lmbda/self.rho) *
-                sl.idctii((self.Alpha**2) *
-                          sl.dctii(self.X, axes=self.axes),
+                idctii((self.Alpha**2) *
+                          dctii(self.X, axes=self.axes),
                           axes=self.axes), self.Y + self.S - self.U)
         else:
             self.xrrs = None
@@ -207,7 +208,7 @@ class SplineL1(admm.ADMM):
         :math:`\mathbf{y}`.
         """
 
-        self.Y = sp.prox_l1(self.AX - self.S + self.U, self.Wdf / self.rho)
+        self.Y = prox_l1(self.AX - self.S + self.U, self.Wdf / self.rho)
 
 
 
@@ -240,8 +241,8 @@ class SplineL1(admm.ADMM):
         gvr = self.obfn_gvar()
         dfd = np.sum(np.abs(self.Wdf * gvr))
         reg = 0.5*np.linalg.norm(
-            sl.idctii(self.Alpha*sl.dctii(self.X, axes=self.axes),
-                      axes=self.axes))**2
+            idctii(self.Alpha*dctii(self.X, axes=self.axes),
+                   axes=self.axes))**2
         obj = dfd + self.lmbda*reg
         return (obj, dfd, reg)
 

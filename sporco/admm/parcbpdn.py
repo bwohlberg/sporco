@@ -22,9 +22,11 @@ import sporco.linalg as sl
 import sporco.prox as sp
 from sporco.util import u
 from sporco.admm.cbpdn import GenericConvBPDN
+import sporco.fft
+from sporco.fft import rfftn, irfftn
 import sporco.cnvrep as cr
 # Required due to pyFFTW bug #135 - see "Notes" section of SPORCO docs.
-sl.pyfftw_threads = 1
+sporco.fft.pyfftw_threads = 1
 
 
 
@@ -139,8 +141,8 @@ def par_xstep(i):
     """
     global mp_X
     global mp_DX
-    YU0f = sl.rfftn(mp_Y0[[i]] - mp_U0[[i]], mp_Nv, mp_axisN)
-    YU1f = sl.rfftn(mp_Y1[mp_grp[i]:mp_grp[i+1]] -
+    YU0f = rfftn(mp_Y0[[i]] - mp_U0[[i]], mp_Nv, mp_axisN)
+    YU1f = rfftn(mp_Y1[mp_grp[i]:mp_grp[i+1]] -
                     1/mp_alpha*mp_U1[mp_grp[i]:mp_grp[i+1]], mp_Nv, mp_axisN)
     if mp_Cd == 1:
         b = np.conj(mp_Df[mp_grp[i]:mp_grp[i+1]]) * YU0f + mp_alpha**2*YU1f
@@ -151,9 +153,9 @@ def par_xstep(i):
                      axis=mp_C) + mp_alpha**2*YU1f
         Xf = sl.solvemdbi_ism(mp_Df[mp_grp[i]:mp_grp[i+1]], mp_alpha**2, b,
                               mp_axisM, mp_axisC)
-    mp_X[mp_grp[i]:mp_grp[i+1]] = sl.irfftn(Xf, mp_Nv,
+    mp_X[mp_grp[i]:mp_grp[i+1]] = irfftn(Xf, mp_Nv,
                                             mp_axisN)
-    mp_DX[i] = sl.irfftn(sl.inner(mp_Df[mp_grp[i]:mp_grp[i+1]], Xf,
+    mp_DX[i] = irfftn(sl.inner(mp_Df[mp_grp[i]:mp_grp[i+1]], Xf,
                                   mp_axisM), mp_Nv, mp_axisN)
 
 
@@ -542,8 +544,8 @@ class ParConvBPDN(GenericConvBPDN):
         # Set default lambda value if not specified
         if lmbda is None:
             cri = cr.CSC_ConvRepIndexing(D, S, dimK=dimK, dimN=dimN)
-            Df = sl.rfftn(D.reshape(cri.shpD), cri.Nv, axes=cri.axisN)
-            Sf = sl.rfftn(S.reshape(cri.shpS), axes=cri.axisN)
+            Df = rfftn(D.reshape(cri.shpD), cri.Nv, axes=cri.axisN)
+            Sf = rfftn(S.reshape(cri.shpS), axes=cri.axisN)
             b = np.conj(Df) * Sf
             lmbda = 0.1*abs(b).max()
 
@@ -907,8 +909,8 @@ class ParConvBPDN(GenericConvBPDN):
         r"""Compute data fidelity term :math:`(1/2) \| W \left( \sum_m
         \mathbf{d}_m * \mathbf{x}_m - \mathbf{s} \right) \|_2^2`.
         """
-        XF = sl.rfftn(self.obfn_fvar(), mp_Nv, mp_axisN)
-        DX = np.moveaxis(sl.irfftn(sl.inner(mp_Df, XF, mp_axisM),
+        XF = rfftn(self.obfn_fvar(), mp_Nv, mp_axisN)
+        DX = np.moveaxis(irfftn(sl.inner(mp_Df, XF, mp_axisM),
                                    mp_Nv, mp_axisN), mp_axisM,
                          self.cri.axisM)
         return np.sum((self.W*(DX-self.S))**2)/2.0

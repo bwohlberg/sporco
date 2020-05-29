@@ -3,7 +3,8 @@ from builtins import object
 import numpy as np
 
 from sporco.fista import ccmod
-import sporco.linalg as sl
+from sporco.fft import complex_dtype, fftn, ifftn
+from sporco.linalg import rrs
 import sporco.cnvrep as cr
 
 
@@ -74,8 +75,8 @@ class TestSet01(object):
         c = ccmod.ConvCnstrMOD(X, S, (Nd, Nd, M), opt=opt)
         c.solve()
         assert c.X.dtype == dt
-        assert c.Xf.dtype == sl.complex_dtype(dt)
-        assert c.Yf.dtype == sl.complex_dtype(dt)
+        assert c.Xf.dtype == complex_dtype(dt)
+        assert c.Yf.dtype == complex_dtype(dt)
 
 
     def test_05(self):
@@ -92,8 +93,8 @@ class TestSet01(object):
         c = ccmod.ConvCnstrMOD(X, S, (Nd, Nd, M), opt=opt)
         c.solve()
         assert c.X.dtype == dt
-        assert c.Xf.dtype == sl.complex_dtype(dt)
-        assert c.Yf.dtype == sl.complex_dtype(dt)
+        assert c.Xf.dtype == complex_dtype(dt)
+        assert c.Yf.dtype == complex_dtype(dt)
 
 
     def test_06(self):
@@ -197,9 +198,8 @@ class TestSet01(object):
         xr = np.random.randn(N, N, M)
         xp = np.abs(xr) > 3
         X[xp] = np.random.randn(X[xp].size)
-        S = np.sum(sl.ifftn(sl.fftn(D0, (N, N), (0, 1)) *
-                            sl.fftn(X, None, (0, 1)), None, (0, 1)).real,
-                   axis=2)
+        S = np.sum(ifftn(fftn(D0, (N, N), (0, 1)) *
+                         fftn(X, None, (0, 1)), None, (0, 1)).real, axis=2)
         L = 2.5
         opt = ccmod.ConvCnstrMOD.Options(
             {'Verbose': False, 'MaxMainIter': 3000, 'ZeroMean': True,
@@ -209,7 +209,7 @@ class TestSet01(object):
         c = ccmod.ConvCnstrMOD(Xr, Sr, D0.shape, opt)
         c.solve()
         D1 = cr.bcrop(c.X, D0.shape).squeeze()
-        assert sl.rrs(D0, D1) < 1e-4
+        assert rrs(D0, D1) < 1e-4
         assert np.array(c.getitstat().Rsdl)[-1] < 1e-5
 
 
@@ -223,9 +223,8 @@ class TestSet01(object):
         xr = np.random.randn(N, N, M)
         xp = np.abs(xr) > 3
         X[xp] = np.random.randn(X[xp].size)
-        S = np.sum(sl.ifftn(sl.fftn(D0, (N, N), (0, 1)) *
-                            sl.fftn(X, None, (0, 1)), None, (0, 1)).real,
-                   axis=2)
+        S = np.sum(ifftn(fftn(D0, (N, N), (0, 1)) *
+                         fftn(X, None, (0, 1)), None, (0, 1)).real, axis=2)
         L = 0.5
         opt = ccmod.ConvCnstrMOD.Options(
             {'Verbose': False, 'MaxMainIter': 3000, 'ZeroMean': True,
@@ -235,7 +234,7 @@ class TestSet01(object):
         c = ccmod.ConvCnstrMOD(Xr, Sr, D0.shape, opt)
         c.solve()
         D1 = cr.bcrop(c.X, D0.shape).squeeze()
-        assert sl.rrs(D0, D1) < 1e-4
+        assert rrs(D0, D1) < 1e-4
         assert np.array(c.getitstat().Rsdl)[-1] < 1e-5
 
 
@@ -249,8 +248,8 @@ class TestSet01(object):
         xr = np.random.randn(N, N, M)
         xp = np.abs(xr) > 3
         X[xp] = np.random.randn(X[xp].size)
-        S = np.sum(sl.ifftn(sl.fftn(D0, (N, N), (0, 1)) *
-                            sl.fftn(X, None, (0, 1)), None, (0, 1)).real,
+        S = np.sum(ifftn(fftn(D0, (N, N), (0, 1)) *
+                         fftn(X, None, (0, 1)), None, (0, 1)).real,
                    axis=2)
         L = 0.5
         opt = ccmod.ConvCnstrMOD.Options(
@@ -262,7 +261,7 @@ class TestSet01(object):
         c.solve()
         D1 = cr.bcrop(c.X, D0.shape).squeeze()
 
-        assert sl.rrs(D0, D1) < 1e-4
+        assert rrs(D0, D1) < 1e-4
         assert np.array(c.getitstat().Rsdl)[-1] < 1e-5
 
 

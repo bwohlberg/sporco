@@ -18,6 +18,8 @@ from sporco.admm import ccmod
 import sporco.cnvrep as cr
 import sporco.linalg as sl
 from sporco.common import _fix_dynamic_class_lookup
+from sporco.fft import rfftn, irfftn, empty_aligned, rfftn_empty_aligned
+
 
 __author__ = """Brendt Wohlberg <brendt@ieee.org>"""
 
@@ -296,10 +298,10 @@ class ConvCnstrMODMaskDcplBase(admm.ADMMTwoBlockCnstrnt):
                              zm=opt['ZeroMean'])
 
         # Initialise byte-aligned arrays for pyfftw
-        self.YU = sl.pyfftw_empty_aligned(self.Y.shape, dtype=self.dtype)
+        self.YU = empty_aligned(self.Y.shape, dtype=self.dtype)
         xfshp = list(self.cri.Nv + (self.cri.Cd, 1, self.cri.M))
-        self.Xf = sl.pyfftw_rfftn_empty_aligned(xfshp, self.cri.axisN,
-                                                self.dtype)
+        self.Xf = rfftn_empty_aligned(xfshp, self.cri.axisN,
+                                      self.dtype)
 
         if Z is not None:
             self.setcoef(Z)
@@ -335,7 +337,7 @@ class ConvCnstrMODMaskDcplBase(admm.ADMMTwoBlockCnstrnt):
                                          self.cri.M,))
         self.Z = np.asarray(Z, dtype=self.dtype)
 
-        self.Zf = sl.rfftn(self.Z, self.cri.Nv, self.cri.axisN)
+        self.Zf = rfftn(self.Z, self.cri.Nv, self.cri.axisN)
 
 
 
@@ -473,8 +475,8 @@ class ConvCnstrMODMaskDcplBase(admm.ADMMTwoBlockCnstrnt):
         # when Xf is None (i.e. the function is not being applied to
         # self.X).
         if Xf is None:
-            Xf = sl.rfftn(X, None, self.cri.axisN)
-        return sl.irfftn(sl.inner(self.Zf, Xf, axis=self.cri.axisM),
+            Xf = rfftn(X, None, self.cri.axisN)
+        return irfftn(sl.inner(self.Zf, Xf, axis=self.cri.axisM),
                          self.cri.Nv, self.cri.axisN)
 
 
@@ -487,8 +489,8 @@ class ConvCnstrMODMaskDcplBase(admm.ADMMTwoBlockCnstrnt):
         # This calculation involves non-negligible computational cost. It
         # should be possible to disable relevant diagnostic information
         # (dual residual) to avoid this cost.
-        Y0f = sl.rfftn(Y0, None, self.cri.axisN)
-        return sl.irfftn(sl.inner(np.conj(self.Zf), Y0f,
+        Y0f = rfftn(Y0, None, self.cri.axisN)
+        return irfftn(sl.inner(np.conj(self.Zf), Y0f,
                                   axis=self.cri.axisK), self.cri.Nv,
                          self.cri.axisN)
 
@@ -545,10 +547,10 @@ class ConvCnstrMODMaskDcplBase(admm.ADMMTwoBlockCnstrnt):
         if D is None:
             Df = self.Xf
         else:
-            Df = sl.rfftn(D, None, self.cri.axisN)
+            Df = rfftn(D, None, self.cri.axisN)
 
         Sf = np.sum(self.Zf * Df, axis=self.cri.axisM)
-        return sl.irfftn(Sf, self.cri.Nv, self.cri.axisN)
+        return irfftn(Sf, self.cri.Nv, self.cri.axisN)
 
 
 
@@ -640,13 +642,13 @@ class ConvCnstrMODMaskDcpl_IterSM(ConvCnstrMODMaskDcplBase):
 
         self.YU[:] = self.Y - self.U
         self.block_sep0(self.YU)[:] += self.S
-        YUf = sl.rfftn(self.YU, None, self.cri.axisN)
+        YUf = rfftn(self.YU, None, self.cri.axisN)
         b = sl.inner(np.conj(self.Zf), self.block_sep0(YUf),
                      axis=self.cri.axisK) + self.block_sep1(YUf)
 
         self.Xf[:] = sl.solvemdbi_ism(self.Zf, 1.0, b, self.cri.axisM,
                                       self.cri.axisK)
-        self.X = sl.irfftn(self.Xf, self.cri.Nv, self.cri.axisN)
+        self.X = irfftn(self.Xf, self.cri.Nv, self.cri.axisN)
         self.xstep_check(b)
 
 
@@ -739,7 +741,7 @@ class ConvCnstrMODMaskDcpl_CG(ConvCnstrMODMaskDcplBase):
 
         self.YU[:] = self.Y - self.U
         self.block_sep0(self.YU)[:] += self.S
-        YUf = sl.rfftn(self.YU, None, self.cri.axisN)
+        YUf = rfftn(self.YU, None, self.cri.axisN)
         b = sl.inner(np.conj(self.Zf), self.block_sep0(YUf),
                      axis=self.cri.axisK) + self.block_sep1(YUf)
 
@@ -747,7 +749,7 @@ class ConvCnstrMODMaskDcpl_CG(ConvCnstrMODMaskDcplBase):
             self.Zf, 1.0, b, self.cri.axisM, self.cri.axisK,
             self.opt['CG', 'StopTol'], self.opt['CG', 'MaxIter'], self.Xf)
         self.cgit = cgit
-        self.X = sl.irfftn(self.Xf, self.cri.Nv, self.cri.axisN)
+        self.X = irfftn(self.Xf, self.cri.Nv, self.cri.axisN)
         self.xstep_check(b)
 
 
@@ -869,7 +871,7 @@ class ConvCnstrMODMaskDcpl_Consensus(ccmod.ConvCnstrMOD_Consensus):
         # decoupling
         self.Y1 = np.zeros(self.S.shape, dtype=self.dtype)
         self.U1 = np.zeros(self.S.shape, dtype=self.dtype)
-        self.YU1 = sl.pyfftw_empty_aligned(self.S.shape, dtype=self.dtype)
+        self.YU1 = empty_aligned(self.S.shape, dtype=self.dtype)
 
 
 
@@ -885,7 +887,7 @@ class ConvCnstrMODMaskDcpl_Consensus(ccmod.ConvCnstrMOD_Consensus):
             Z = Z.reshape(self.cri.Nv + (1,) + (self.cri.Cx*self.cri.K,) +
                           (self.cri.M,))
         self.Z = np.asarray(Z, dtype=self.dtype)
-        self.Zf = sl.rfftn(self.Z, self.cri.Nv, self.cri.axisN)
+        self.Zf = rfftn(self.Z, self.cri.Nv, self.cri.axisN)
 
 
 
@@ -911,7 +913,7 @@ class ConvCnstrMODMaskDcpl_Consensus(ccmod.ConvCnstrMOD_Consensus):
         """
 
         super(ConvCnstrMODMaskDcpl_Consensus, self).relax_AX()
-        self.AX1nr = sl.irfftn(sl.inner(self.Zf, self.swapaxes(self.Xf),
+        self.AX1nr = irfftn(sl.inner(self.Zf, self.swapaxes(self.Xf),
                                         axis=self.cri.axisM),
                                self.cri.Nv, self.cri.axisN)
         if self.rlx == 1.0:
@@ -933,7 +935,7 @@ class ConvCnstrMODMaskDcpl_Consensus(ccmod.ConvCnstrMOD_Consensus):
         """
 
         self.YU1[:] = self.Y1 - self.U1
-        self.ZSf = np.conj(self.Zf) * (self.Sf + sl.rfftn(
+        self.ZSf = np.conj(self.Zf) * (self.Sf + rfftn(
             self.YU1, None, self.cri.axisN))
         rho = self.rho
         self.rho = 1.0
@@ -972,7 +974,7 @@ class ConvCnstrMODMaskDcpl_Consensus(ccmod.ConvCnstrMOD_Consensus):
 
         Ef = sl.inner(self.Zf, self.obfn_fvarf(), axis=self.cri.axisM) \
           - self.Sf
-        return (np.linalg.norm(self.W * sl.irfftn(Ef, self.cri.Nv,
+        return (np.linalg.norm(self.W * irfftn(Ef, self.cri.Nv,
                                                   self.cri.axisN))**2) / 2.0
 
 
@@ -993,8 +995,8 @@ class ConvCnstrMODMaskDcpl_Consensus(ccmod.ConvCnstrMOD_Consensus):
 
         # The full dual residual is more complicated to compute than the
         # full primary residual
-        ATU = self.swapaxes(self.U) + sl.irfftn(
-            np.conj(self.Zf) * sl.rfftn(self.U1, self.cri.Nv, self.cri.axisN),
+        ATU = self.swapaxes(self.U) + irfftn(
+            np.conj(self.Zf) * rfftn(self.U1, self.cri.Nv, self.cri.axisN),
             self.cri.Nv, self.cri.axisN)
         s = self.rho * np.linalg.norm(ATU)
 

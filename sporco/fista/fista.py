@@ -14,17 +14,18 @@ from builtins import range
 import copy
 import numpy as np
 
-from sporco import cdict
-from sporco import util
-from sporco import common
-import sporco.linalg as sl
+from sporco.cdict import ConstrainedDict
+from sporco.common import IterativeSolver, solve_status_str
+from sporco.fft import rfftn, irfftn
+from sporco.array import transpose_ntpl_list
+from sporco.util import Timer
 
 
 __author__ = """Cristina Garcia-Cardona <cgarciac@lanl.gov>"""
 
 
 
-class FISTA(common.IterativeSolver):
+class FISTA(IterativeSolver):
     r"""Base class for Fast Iterative Shrinkage/Thresholding algorithm
     (FISTA) algorithms :cite:`beck-2009-fast`. A robust variant
     :cite:`florea-2017-robust` is also supported.
@@ -67,7 +68,7 @@ class FISTA(common.IterativeSolver):
        ``Time`` : Cumulative run time
     """
 
-    class Options(cdict.ConstrainedDict):
+    class Options(ConstrainedDict):
         r"""ADMM algorithm options.
 
         Options:
@@ -157,7 +158,7 @@ class FISTA(common.IterativeSolver):
 
             if opt is None:
                 opt = {}
-            cdict.ConstrainedDict.__init__(self, opt)
+            ConstrainedDict.__init__(self, opt)
 
 
 
@@ -188,8 +189,8 @@ class FISTA(common.IterativeSolver):
         """Create a FISTA object and start its initialisation timer."""
 
         instance = super(FISTA, cls).__new__(cls)
-        instance.timer = util.Timer(['init', 'solve', 'solve_wo_func',
-                                     'solve_wo_rsdl', 'solve_wo_btrack'])
+        instance.timer = Timer(['init', 'solve', 'solve_wo_func',
+                                'solve_wo_rsdl', 'solve_wo_btrack'])
         instance.timer.start('init')
         return instance
 
@@ -629,7 +630,7 @@ class FISTA(common.IterativeSolver):
         array of named tuples.
         """
 
-        return util.transpose_ntpl_list(self.itstat)
+        return transpose_ntpl_list(self.itstat)
 
 
 
@@ -647,7 +648,7 @@ class FISTA(common.IterativeSolver):
             else:
                 hdrtxt = type(self).hdrtxt()[0:-4]
             # Call utility function to construct status display formatting
-            hdrstr, fmtstr, nsep = common.solve_status_str(
+            hdrstr, fmtstr, nsep = solve_status_str(
                 hdrtxt, fmtmap={'It_Bt': '%5d'}, fwdth0=type(self).fwiter,
                 fprec=type(self).fpothr)
             # Print header and separator strings
@@ -845,10 +846,10 @@ class FISTADFT(FISTA):
             gradf = self.eval_grad()
 
         self.Vf[:] = self.Yf - (1. / self.L) * gradf
-        V = sl.irfftn(self.Vf, self.cri.Nv, self.cri.axisN)
+        V = irfftn(self.Vf, self.cri.Nv, self.cri.axisN)
 
         self.X[:] = self.eval_proxop(V)
-        self.Xf = sl.rfftn(self.X, None, self.cri.axisN)
+        self.Xf = rfftn(self.X, None, self.cri.axisN)
 
         return gradf
 

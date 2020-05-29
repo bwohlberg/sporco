@@ -60,7 +60,7 @@ class TestSet01(object):
         except Exception as e:
             print(e)
             assert 0
-        assert np.array(b.getitstat().Rsdl).min() < 2.e-4
+        assert np.array(b.getitstat().Rsdl).min() < 2e-4
 
 
     def test_04(self):
@@ -77,7 +77,7 @@ class TestSet01(object):
         except Exception as e:
             print(e)
             assert 0
-        assert np.array(b.getitstat().Rsdl).min() < 2.e-4
+        assert np.array(b.getitstat().Rsdl).min() < 2e-4
 
 
     def test_05(self):

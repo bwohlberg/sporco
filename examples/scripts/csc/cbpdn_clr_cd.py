@@ -18,14 +18,14 @@ where $\mathbf{d}_{c,m}$ is channel $c$ of the $m^{\text{th}}$ dictionary filter
 
 from __future__ import print_function
 from builtins import input
-from builtins import range
 
 import pyfftw   # See https://github.com/pyFFTW/pyFFTW/issues/40
 import numpy as np
 
 from sporco import util
+from sporco import signal
 from sporco import plot
-import sporco.metric as sm
+from sporco.metric import psnr
 from sporco.admm import cbpdn
 
 
@@ -43,7 +43,7 @@ Highpass filter example image.
 
 npd = 16
 fltlmbd = 10
-sl, sh = util.tikhonov_filter(img, fltlmbd, npd)
+sl, sh = signal.tikhonov_filter(img, fltlmbd, npd)
 
 
 """
@@ -78,7 +78,7 @@ Reconstruct image from sparse representation.
 
 shr = b.reconstruct().squeeze()
 imgr = sl + shr
-print("Reconstruction PSNR: %.2fdB\n" % sm.psnr(img, imgr))
+print("Reconstruction PSNR: %.2fdB\n" % psnr(img, imgr))
 
 
 """

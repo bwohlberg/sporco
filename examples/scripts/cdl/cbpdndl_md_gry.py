@@ -14,7 +14,6 @@ This example demonstrates the use of :class:`.cbpdndlmd.ConvBPDNMaskDictLearn` f
 
 from __future__ import print_function
 from builtins import input
-from builtins import range
 
 import pyfftw   # See https://github.com/pyFFTW/pyFFTW/issues/40
 import numpy as np
@@ -23,6 +22,7 @@ from sporco.admm import tvl2
 from sporco.dictlrn import cbpdndl
 from sporco.dictlrn import cbpdndlmd
 from sporco import util
+from sporco import signal
 from sporco import plot
 
 
@@ -49,7 +49,7 @@ Create random mask and apply to training images.
 """
 
 frc = 0.5
-W = util.rndmask(S.shape[0:2] + (1,), frc, dtype=np.float32)
+W = signal.rndmask(S.shape[0:2] + (1,), frc, dtype=np.float32)
 Sw = W * S
 
 

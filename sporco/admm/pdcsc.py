@@ -15,9 +15,11 @@ import numpy as np
 
 from sporco.admm import cbpdn
 import sporco.cnvrep as cr
-import sporco.linalg as sl
-import sporco.prox as sp
 from sporco.util import u
+from sporco.fft import rfftn, irfftn, empty_aligned, rfl2norm2
+from sporco.linalg import (dot, inner, solvedbi_sm_c, solvedbi_sm,
+                           solvedbd_sm_c, solvedbd_sm, rrs)
+from sporco.prox import prox_l1, prox_sl1l2
 
 
 __author__ = """Brendt Wohlberg <brendt@ieee.org>"""
@@ -112,10 +114,10 @@ class ConvProdDictBPDN(cbpdn.ConvBPDN):
             self.Gamma = np.abs(self.Gamma)
 
         if D is not None or not hasattr(self, 'Df'):
-            self.Df = sl.rfftn(self.D, self.cri.Nv, self.cri.axisN)
+            self.Df = rfftn(self.D, self.cri.Nv, self.cri.axisN)
             self.DSf = np.conj(self.Df) * self.Sf
-            self.DSfBQ = sl.dot(self.B.dot(self.Q).T, self.DSf,
-                                axis=self.cri.axisC)
+            self.DSfBQ = dot(self.B.dot(self.Q).T, self.DSf,
+                             axis=self.cri.axisC)
 
         # Fold square root of Gamma into the dictionary array to enable
         # use of the solvedbi_sm solver
@@ -125,8 +127,8 @@ class ConvProdDictBPDN(cbpdn.ConvBPDN):
         self.gDf = Gamma2 * self.Df
 
         if self.opt['HighMemSolve']:
-            self.c = sl.solvedbi_sm_c(self.gDf, np.conj(self.gDf), self.rho,
-                                      self.cri.axisM)
+            self.c = solvedbi_sm_c(self.gDf, np.conj(self.gDf), self.rho,
+                                   self.cri.axisM)
         else:
             self.c = None
 
@@ -137,23 +139,22 @@ class ConvProdDictBPDN(cbpdn.ConvBPDN):
         :math:`\mathbf{x}`."""
 
         self.YU[:] = self.Y - self.U
-        Zf = sl.rfftn(self.YU, None, self.cri.axisN)
-        ZfQ = sl.dot(self.Q.T, Zf, axis=self.cri.axisC)
+        Zf = rfftn(self.YU, None, self.cri.axisN)
+        ZfQ = dot(self.Q.T, Zf, axis=self.cri.axisC)
         b = self.DSfBQ + self.rho * ZfQ
 
-        Xh = sl.solvedbi_sm(self.gDf, self.rho, b, self.c,
-                            axis=self.cri.axisM)
-        self.Xf[:] = sl.dot(self.Q, Xh, axis=self.cri.axisC)
-        self.X = sl.irfftn(self.Xf, self.cri.Nv, self.cri.axisN)
+        Xh = solvedbi_sm(self.gDf, self.rho, b, self.c, axis=self.cri.axisM)
+        self.Xf[:] = dot(self.Q, Xh, axis=self.cri.axisC)
+        self.X = irfftn(self.Xf, self.cri.Nv, self.cri.axisN)
 
         if self.opt['LinSolveCheck']:
-            DDXf = np.conj(self.Df) *  sl.inner(self.Df, self.Xf,
-                                                axis=self.cri.axisM)
-            DDXfBB = sl.dot(self.B.T.dot(self.B), DDXf, axis=self.cri.axisC)
+            DDXf = np.conj(self.Df) *  inner(self.Df, self.Xf,
+                                             axis=self.cri.axisM)
+            DDXfBB = dot(self.B.T.dot(self.B), DDXf, axis=self.cri.axisC)
             ax = DDXfBB + self.rho * self.Xf
-            b = sl.dot(self.B.T, self.DSf, axis=self.cri.axisC) + \
+            b = dot(self.B.T, self.DSf, axis=self.cri.axisC) + \
                 self.rho * Zf
-            self.xrrs = sl.rrs(ax, b)
+            self.xrrs = rrs(ax, b)
         else:
             self.xrrs = None
 
@@ -163,11 +164,11 @@ class ConvProdDictBPDN(cbpdn.ConvBPDN):
         r"""Compute data fidelity term :math:`(1/2) \| D X B - S \|_2^2`.
         """
 
-        DXBf = sl.dot(self.B, sl.inner(self.Df, self.obfn_fvarf(),
-                                       axis=self.cri.axisM),
-                       axis=self.cri.axisC)
+        DXBf = dot(self.B, inner(self.Df, self.obfn_fvarf(),
+                                 axis=self.cri.axisM),
+                   axis=self.cri.axisC)
         Ef = DXBf - self.Sf
-        return sl.rfl2norm2(Ef, self.S.shape, axis=self.cri.axisN) / 2.0
+        return rfl2norm2(Ef, self.S.shape, axis=self.cri.axisN) / 2.0
 
 
 
@@ -175,8 +176,8 @@ class ConvProdDictBPDN(cbpdn.ConvBPDN):
         """Updated cached c array when rho changes."""
 
         if self.opt['HighMemSolve']:
-            self.c = sl.solvedbi_sm_c(self.gDf, np.conj(self.gDf), self.rho,
-                                      self.cri.axisM)
+            self.c = solvedbi_sm_c(self.gDf, np.conj(self.gDf), self.rho,
+                                   self.cri.axisM)
 
 
 
@@ -185,10 +186,10 @@ class ConvProdDictBPDN(cbpdn.ConvBPDN):
 
         if X is None:
             X = self.Y
-        Xf = sl.rfftn(X, None, self.cri.axisN)
-        Sf = sl.dot(self.B, np.sum(self.Df * Xf, axis=self.cri.axisM),
+        Xf = rfftn(X, None, self.cri.axisN)
+        Sf = dot(self.B, np.sum(self.Df * Xf, axis=self.cri.axisM),
                     axis=self.cri.axisC)
-        return sl.irfftn(Sf, self.cri.Nv, self.cri.axisN)
+        return irfftn(Sf, self.cri.Nv, self.cri.axisN)
 
 
 
@@ -266,9 +267,9 @@ class ConvProdDictBPDNJoint(ConvProdDictBPDN):
         :math:`\mathbf{y}`.
         """
 
-        self.Y = sp.prox_sl1l2(self.AX + self.U,
-                               (self.lmbda / self.rho) * self.wl1,
-                               (self.mu / self.rho), axis=self.cri.axisC)
+        self.Y = prox_sl1l2(self.AX + self.U,
+                            (self.lmbda / self.rho) * self.wl1,
+                            (self.mu / self.rho), axis=self.cri.axisC)
         cbpdn.GenericConvBPDN.ystep(self)
 
 
@@ -367,7 +368,7 @@ class ConvProdDictL1L1Grd(cbpdn.ConvL1L1Grd):
         # number of channels. This is the first of many nasty hacks in
         # this class!
         scidx = -2 if dimK == 1 else -1
-        SB = sl.dot(B.T, S, axis=scidx)
+        SB = dot(B.T, S, axis=scidx)
         super(ConvProdDictL1L1Grd, self).__init__(
             D, SB, lmbda, mu, W=W, opt=opt, dimK=dimK, dimN=dimN)
 
@@ -399,7 +400,7 @@ class ConvProdDictL1L1Grd(cbpdn.ConvL1L1Grd):
         self.yshp = self.cri.shpX[0:self.cri.axisC:] + (self.y0I + self.y1I,)
         self.Y = np.zeros(self.yshp, dtype=self.dtype)
         self.U = np.zeros(self.yshp, dtype=self.dtype)
-        self.YU = sl.pyfftw_empty_aligned(self.Y.shape, dtype=self.dtype)
+        self.YU = empty_aligned(self.Y.shape, dtype=self.dtype)
 
 
 
@@ -452,9 +453,9 @@ class ConvProdDictL1L1Grd(cbpdn.ConvL1L1Grd):
         """
 
         if Xf is None:
-            Xf = sl.rfftn(X, None, self.cri.axisN)
-        return sl.irfftn(
-            sl.dot(self.B, sl.inner(self.Df, Xf, axis=self.cri.axisM),
+            Xf = rfftn(X, None, self.cri.axisN)
+        return irfftn(
+            dot(self.B, inner(self.Df, Xf, axis=self.cri.axisM),
                    axis=self.cri.axisC), self.cri.Nv, self.cri.axisN)
 
 
@@ -467,9 +468,9 @@ class ConvProdDictL1L1Grd(cbpdn.ConvL1L1Grd):
         # This calculation involves non-negligible computational cost. It
         # should be possible to disable relevant diagnostic information
         # (dual residual) to avoid this cost.
-        Y0f = sl.rfftn(Y0, None, self.cri.axisN)
-        return sl.irfftn(
-            sl.dot(self.B.T, np.conj(self.Df) * Y0f, axis=self.cri.axisC),
+        Y0f = rfftn(Y0, None, self.cri.axisN)
+        return irfftn(
+            dot(self.B.T, np.conj(self.Df) * Y0f, axis=self.cri.axisC),
                    self.cri.Nv, self.cri.axisN)
 
 
@@ -487,7 +488,7 @@ class ConvProdDictL1L1Grd(cbpdn.ConvL1L1Grd):
             self.Gamma = np.abs(self.Gamma)
 
         if D is not None or not hasattr(self, 'Df'):
-            self.Df = sl.rfftn(self.D, self.cri.Nv, self.cri.axisN)
+            self.Df = rfftn(self.D, self.cri.Nv, self.cri.axisN)
 
         # Fold square root of Gamma into the dictionary array to enable
         # use of the solvedbi_sm solver
@@ -497,7 +498,7 @@ class ConvProdDictL1L1Grd(cbpdn.ConvL1L1Grd):
         self.gDf = Gamma2 * self.Df
 
         if self.opt['HighMemSolve']:
-            self.c = sl.solvedbd_sm_c(
+            self.c = solvedbd_sm_c(
                 self.gDf, np.conj(self.gDf),
                 (self.mu / self.rho) * self.GHGf + 1.0, self.cri.axisM)
         else:
@@ -512,29 +513,29 @@ class ConvProdDictL1L1Grd(cbpdn.ConvL1L1Grd):
 
         self.YU[:] = self.Y - self.U
         self.block_sep0(self.YU)[:] += self.S
-        Zf = sl.rfftn(self.YU, None, self.cri.axisN)
+        Zf = rfftn(self.YU, None, self.cri.axisN)
         Z0f = self.block_sep0(Zf)
         Z1f = self.block_sep1(Zf)
 
         DZ0f = np.conj(self.Df) * Z0f
-        DZ0fBQ = sl.dot(self.B.dot(self.Q).T, DZ0f, axis=self.cri.axisC)
-        Z1fQ = sl.dot(self.Q.T, Z1f, axis=self.cri.axisC)
+        DZ0fBQ = dot(self.B.dot(self.Q).T, DZ0f, axis=self.cri.axisC)
+        Z1fQ = dot(self.Q.T, Z1f, axis=self.cri.axisC)
         b = DZ0fBQ + Z1fQ
 
-        Xh = sl.solvedbd_sm(self.gDf, (self.mu / self.rho) * self.GHGf + 1.0,
-                            b, self.c, axis=self.cri.axisM)
-        self.Xf[:] = sl.dot(self.Q, Xh, axis=self.cri.axisC)
-        self.X = sl.irfftn(self.Xf, self.cri.Nv, self.cri.axisN)
+        Xh = solvedbd_sm(self.gDf, (self.mu / self.rho) * self.GHGf + 1.0,
+                         b, self.c, axis=self.cri.axisM)
+        self.Xf[:] = dot(self.Q, Xh, axis=self.cri.axisC)
+        self.X = irfftn(self.Xf, self.cri.Nv, self.cri.axisN)
 
         if self.opt['LinSolveCheck']:
-            DDXf = np.conj(self.Df) *  sl.inner(self.Df, self.Xf,
+            DDXf = np.conj(self.Df) *  inner(self.Df, self.Xf,
                                                 axis=self.cri.axisM)
-            DDXfBB = sl.dot(self.B.T.dot(self.B), DDXf, axis=self.cri.axisC)
+            DDXfBB = dot(self.B.T.dot(self.B), DDXf, axis=self.cri.axisC)
             ax = self.rho * (DDXfBB + self.Xf) + \
                  self.mu * self.GHGf * self.Xf
-            b = self.rho * (sl.dot(self.B.T, DZ0f, axis=self.cri.axisC)
+            b = self.rho * (dot(self.B.T, DZ0f, axis=self.cri.axisC)
                             + Z1f)
-            self.xrrs = sl.rrs(ax, b)
+            self.xrrs = rrs(ax, b)
         else:
             self.xrrs = None
 
@@ -544,7 +545,7 @@ class ConvProdDictL1L1Grd(cbpdn.ConvL1L1Grd):
         """Updated cached c array when rho changes."""
 
         if self.opt['HighMemSolve']:
-            self.c = sl.solvedbd_sm_c(
+            self.c = solvedbd_sm_c(
                 self.gDf, np.conj(self.gDf),
                 (self.mu / self.rho) * self.GHGf + 1.0, self.cri.axisM)
 
@@ -555,10 +556,10 @@ class ConvProdDictL1L1Grd(cbpdn.ConvL1L1Grd):
 
         if X is None:
             X = self.X
-        Xf = sl.rfftn(X, None, self.cri.axisN)
-        Sf = sl.dot(self.B, np.sum(self.Df * Xf, axis=self.cri.axisM),
-                    axis=self.cri.axisC)
-        return sl.irfftn(Sf, self.cri.Nv, self.cri.axisN)
+        Xf = rfftn(X, None, self.cri.axisN)
+        Sf = dot(self.B, np.sum(self.Df * Xf, axis=self.cri.axisM),
+                 axis=self.cri.axisC)
+        return irfftn(Sf, self.cri.Nv, self.cri.axisN)
 
 
 
@@ -683,10 +684,10 @@ class ConvProdDictL1L1GrdJoint(ConvProdDictL1L1Grd):
         """
 
         AXU = self.AX + self.U
-        Y0 = sp.prox_l1(self.block_sep0(AXU) - self.S, (1.0/self.rho)*self.W)
-        Y1 = sp.prox_sl1l2(self.block_sep1(AXU), 0.0,
-                           (self.lmbda/self.rho)*self.wl21,
-                           axis=self.cri.axisC)
+        Y0 = prox_l1(self.block_sep0(AXU) - self.S, (1.0/self.rho)*self.W)
+        Y1 = prox_sl1l2(self.block_sep1(AXU), 0.0,
+                        (self.lmbda/self.rho)*self.wl21,
+                        axis=self.cri.axisC)
         self.Y = self.block_cat(Y0, Y1)
         cbpdn.ConvTwoBlockCnstrnt.ystep(self)
 

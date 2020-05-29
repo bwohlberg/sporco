@@ -5,7 +5,8 @@ import pickle
 import numpy as np
 
 from sporco.admm import cbpdn
-import sporco.linalg as sl
+from sporco.linalg import rrs
+from sporco.fft import fftn, ifftn, fftconv
 
 
 
@@ -161,7 +162,7 @@ class TestSet01(object):
         xr = np.random.randn(N, N, M)
         xp = np.abs(xr) > 3
         X0[xp] = np.random.randn(X0[xp].size)
-        S = np.sum(sl.fftconv(D, X0), axis=2)
+        S = np.sum(fftconv(D, X0), axis=2)
         lmbda = 1e-4
         rho = 1e-1
         opt = cbpdn.ConvBPDN.Options({'Verbose': False, 'MaxMainIter': 500,
@@ -170,9 +171,9 @@ class TestSet01(object):
         b = cbpdn.ConvBPDN(D, S, lmbda, opt)
         b.solve()
         X1 = b.Y.squeeze()
-        assert sl.rrs(X0, X1) < 5e-5
+        assert rrs(X0, X1) < 5e-5
         Sr = b.reconstruct().squeeze()
-        assert sl.rrs(S, Sr) < 1e-4
+        assert rrs(S, Sr) < 1e-4
 
 
     def test_11(self):
@@ -184,8 +185,8 @@ class TestSet01(object):
         xr = np.random.randn(N, N, M)
         xp = np.abs(xr) > 3
         X0[xp] = np.random.randn(X0[xp].size)
-        S = np.sum(sl.ifftn(sl.fftn(D, (N, N), (0, 1)) *
-                            sl.fftn(X0, None, (0, 1)), None, (0, 1)).real,
+        S = np.sum(ifftn(fftn(D, (N, N), (0, 1)) *
+                         fftn(X0, None, (0, 1)), None, (0, 1)).real,
                    axis=2)
         lmbda = 1e-4
         rho = 1e-1
@@ -195,9 +196,9 @@ class TestSet01(object):
         b = cbpdn.ConvBPDN(D, S, lmbda, opt)
         b.solve()
         X1 = b.Y.squeeze()
-        assert sl.rrs(X0, X1) < 5e-5
+        assert rrs(X0, X1) < 5e-5
         Sr = b.reconstruct().squeeze()
-        assert sl.rrs(S, Sr) < 1e-4
+        assert rrs(S, Sr) < 1e-4
 
 
     def test_12(self):
@@ -392,7 +393,7 @@ class TestSet01(object):
         xr = np.random.randn(N, N, M)
         xp = np.abs(xr) > 3
         X0[xp] = np.random.randn(X0[xp].size)
-        S = np.sum(sl.fftconv(D, X0), axis=2)
+        S = np.sum(fftconv(D, X0), axis=2)
         lmbda = 1e-3
         opt = cbpdn.ConvBPDN.Options({'Verbose': False, 'MaxMainIter': 500,
                          'RelStopTol': 1e-5, 'rho': 5e-1,
@@ -407,8 +408,8 @@ class TestSet01(object):
         bc = cbpdn.ConvMinL1InL2Ball(D, S, epsilon=epsilon, opt=opt)
         Xc = bc.solve()
         assert np.linalg.norm(Xp - Xc) / np.linalg.norm(Xp) < 1e-3
-        assert(np.abs(np.linalg.norm(Xp.ravel(), 1) -
-                      np.linalg.norm(Xc.ravel(), 1)) < 1e-3)
+        assert np.abs(np.linalg.norm(Xp.ravel(), 1) -
+                      np.linalg.norm(Xc.ravel(), 1)) < 1e-3
 
 
     def test_23(self):

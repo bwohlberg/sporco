@@ -14,15 +14,14 @@ This example demonstrates the use of :class:`.onlinecdl.OnlineConvBPDNDictLearn`
 
 from __future__ import print_function
 from builtins import input
-from builtins import range
 
 import numpy as np
 
 from sporco import util
+from sporco import signal
 from sporco import plot
-from sporco.cupy import cupy_enabled, np2cp, cp2np
-from sporco.cupy import select_device_by_load, gpu_info
-from sporco.cupy import cp
+from sporco.cupy import (cupy_enabled, np2cp, cp2np, select_device_by_load,
+                         gpu_info)
 from sporco.cupy.dictlrn import onlinecdl
 
 
@@ -45,7 +44,7 @@ Highpass filter training images.
 
 npd = 16
 fltlmbd = 5
-sl, sh = util.tikhonov_filter(S, fltlmbd, npd)
+sl, sh = signal.tikhonov_filter(S, fltlmbd, npd)
 
 
 """

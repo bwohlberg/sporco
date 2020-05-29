@@ -11,7 +11,7 @@ from __future__ import division
 
 import numpy as np
 
-import sporco.linalg as sl
+from sporco.array import promote16
 
 
 __author__ = """Brendt Wohlberg <brendt@ieee.org>"""
@@ -38,7 +38,7 @@ def norm_nuclear(X):
       Nuclear norm of `X`
     """
 
-    return np.sum(np.linalg.svd(sl.promote16(X), compute_uv=False))
+    return np.sum(np.linalg.svd(promote16(X), compute_uv=False))
 
 
 
@@ -62,6 +62,6 @@ def prox_nuclear(V, alpha):
       Singular values of `X`
     """
 
-    Usvd, s, Vsvd = sl.promote16(V, fn=np.linalg.svd, full_matrices=False)
+    Usvd, s, Vsvd = promote16(V, fn=np.linalg.svd, full_matrices=False)
     ss = np.maximum(0, s - alpha)
     return np.dot(Usvd, np.dot(np.diag(ss), Vsvd)), ss

@@ -8,7 +8,6 @@
 """Base classes for ADMM algorithms"""
 
 from __future__ import division, print_function
-from builtins import object
 
 import copy
 import warnings
@@ -17,6 +16,7 @@ import numpy as np
 from sporco import cdict
 from sporco import util
 from sporco.util import u
+from sporco.array import transpose_ntpl_list
 from sporco import common
 
 
@@ -540,7 +540,7 @@ class ADMM(common.IterativeSolver):
         named tuples.
         """
 
-        return util.transpose_ntpl_list(self.itstat)
+        return transpose_ntpl_list(self.itstat)
 
 
 

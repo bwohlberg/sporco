@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2015-2018 by Brendt Wohlberg <brendt@ieee.org>
+# Copyright (C) 2015-2019 by Brendt Wohlberg <brendt@ieee.org>
 # All rights reserved. BSD 3-clause License.
 # This file is part of the SPORCO package. Details of the copyright
 # and user license can be found in the 'LICENSE.txt' file distributed
@@ -17,11 +17,10 @@ from builtins import object
 import collections
 
 from sporco import cdict
-from sporco import util
 from sporco import common
-from sporco.util import u
+from sporco.util import u, Timer
 from sporco.common import _fix_nested_class_lookup
-
+from sporco.array import transpose_ntpl_list
 
 __author__ = """Brendt Wohlberg <brendt@ieee.org>"""
 
@@ -234,7 +233,7 @@ class DictLearn(with_metaclass(_DictLearn_Meta, object)):
         """Create a DictLearn object and start its initialisation timer."""
 
         instance = super(DictLearn, cls).__new__(cls)
-        instance.timer = util.Timer(['init', 'solve', 'solve_wo_eval'])
+        instance.timer = Timer(['init', 'solve', 'solve_wo_eval'])
         instance.timer.start('init')
         return instance
 
@@ -417,4 +416,4 @@ class DictLearn(with_metaclass(_DictLearn_Meta, object)):
         named tuples.
         """
 
-        return util.transpose_ntpl_list(self.itstat)
+        return transpose_ntpl_list(self.itstat)

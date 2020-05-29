@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2015-2018 by Brendt Wohlberg <brendt@ieee.org>
+# Copyright (C) 2015-2019 by Brendt Wohlberg <brendt@ieee.org>
 # All rights reserved. BSD 3-clause License.
 # This file is part of the SPORCO package. Details of the copyright
 # and user license can be found in the 'LICENSE.txt' file distributed
@@ -19,7 +19,7 @@ except ImportError:
 else:
     have_numexpr = True
 
-import sporco.linalg as sl
+from sporco.array import zdivide
 
 
 __author__ = """Brendt Wohlberg <brendt@ieee.org>"""
@@ -276,7 +276,7 @@ def prox_l2(v, alpha, axis=None):
 
     a = np.sqrt(np.sum(v**2, axis=axis, keepdims=True))
     b = np.maximum(0, a - alpha)
-    b = sl.zdivide(b, a)
+    b = zdivide(b, a)
     return np.asarray(b * v, dtype=v.dtype)
 
 
@@ -323,5 +323,5 @@ def proj_l2(v, gamma, axis=None):
 
     d = np.sqrt(np.sum(v**2, axis=axis, keepdims=True))
     return np.asarray((d <= gamma) * v +
-                      (d > gamma) * (gamma * sl.zdivide(v, d)),
+                      (d > gamma) * (gamma * zdivide(v, d)),
                       dtype=v.dtype)

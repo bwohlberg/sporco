@@ -17,9 +17,9 @@ import numpy as np
 from scipy import signal
 
 from sporco.admm import cbpdn
-import sporco.linalg as sl
 import sporco.prox as sp
 from sporco.util import u
+from sporco.fft import (rfftn, irfftn)
 
 
 __author__ = """Frank Cwitkowitz <fcwitkow@ur.rochester.edu>"""
@@ -277,8 +277,8 @@ class ConvBPDNInhib(cbpdn.ConvBPDN):
 
             # Obtain the lateral and self inhibition windows in
             # frequency domain
-            self.Whfl = sl.rfftn(Whl, self.cri.Nv, self.cri.axisN)
-            self.Whfs = sl.rfftn(Whs, self.cri.Nv, self.cri.axisN)
+            self.Whfl = rfftn(Whl, self.cri.Nv, self.cri.axisN)
+            self.Whfs = rfftn(Whs, self.cri.Nv, self.cri.axisN)
 
             # Initialize previous values for lateral and self inhibition
             # weights
@@ -305,14 +305,14 @@ class ConvBPDNInhib(cbpdn.ConvBPDN):
 
             # Compute the frequency domain representation of the
             # magnitude of X
-            Xaf = sl.rfftn(np.abs(self.X), self.cri.Nv, self.cri.axisN)
+            Xaf = rfftn(np.abs(self.X), self.cri.Nv, self.cri.axisN)
 
             if self.mu > 0 and self.Wg is not None:
                 # Update previous lateral inhibition term
                 self.wml_prev = self.wml
                 # Convolve the lateral spatial weighting matrix with the
                 # magnitude of X
-                WhXal = sl.irfftn(self.Whfl * Xaf, self.cri.Nv, self.cri.axisN)
+                WhXal = irfftn(self.Whfl * Xaf, self.cri.Nv, self.cri.axisN)
                 # Sum the weights across in-group members for each element
                 self.wml = np.dot(np.dot(WhXal, self.Wg.T),
                                   self.Wg) - np.sum(self.Wg, axis=0) * WhXal
@@ -325,7 +325,7 @@ class ConvBPDNInhib(cbpdn.ConvBPDN):
                 self.wms_prev = self.wms
                 # Convolve the self spatial weighting matrix with the
                 # magnitude of X
-                self.wms = sl.irfftn(
+                self.wms = irfftn(
                     self.Whfs * Xaf, self.cri.Nv, self.cri.axisN)
                 # Smooth self inhibition term
                 self.wms = self.smooth * self.wms_prev + \
