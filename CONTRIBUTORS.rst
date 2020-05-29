@@ -16,6 +16,10 @@
   - Utility functions extractblocks, averageblocks, and combineblocks
   - Comments, suggestions, and bug reports
 
+• Frank Cwitkowitz
+
+  - Convolutional BPDN with inhibition module and examples
+
 • Aric Hagberg
 
   - Advice on python packaging, documentation, and related issues

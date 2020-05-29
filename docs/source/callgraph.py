@@ -316,7 +316,8 @@ def gengraphs(pth, nopyfftw):
     mu = 0.01
 
     ## ConvBPDNScalarTV class
-    opt = cbpdntv.ConvBPDNScalarTV.Options({'Verbose': False, 'MaxMainIter': 1})
+    opt = cbpdntv.ConvBPDNScalarTV.Options({'Verbose': False,
+                                            'MaxMainIter': 1})
 
     with CallGraph(ct, mdnm, pth, 'cbpdnstv_init.svg', **kwargs):
         b = cbpdntv.ConvBPDNScalarTV(D, s, lmbda, mu, opt)
@@ -326,7 +327,8 @@ def gengraphs(pth, nopyfftw):
 
 
     ## ConvBPDNVectorTV class
-    opt = cbpdntv.ConvBPDNVectorTV.Options({'Verbose': False, 'MaxMainIter': 1})
+    opt = cbpdntv.ConvBPDNVectorTV.Options({'Verbose': False,
+                                            'MaxMainIter': 1})
 
     with CallGraph(ct, mdnm, pth, 'cbpdnvtv_init.svg', **kwargs):
         b = cbpdntv.ConvBPDNVectorTV(D, s, lmbda, mu, opt)
@@ -342,6 +344,29 @@ def gengraphs(pth, nopyfftw):
         b = cbpdntv.ConvBPDNRecTV(D, s, lmbda, mu, opt)
 
     with CallGraph(ct, mdnm, pth, 'cbpdnrtv_solve.svg', **kwargs):
+        b.solve()
+
+
+
+
+    #### cbpdnin module
+    from sporco.admm import cbpdnin
+    mdnm = 'sporco.admm.cbpdnin'
+
+    D = np.random.randn(4, 4, 32)
+    s = np.random.randn(8, 8)
+    lmbda = 0.1
+    mu = 0.01
+    Wg = np.append(np.eye(16), np.eye(16), axis=-1)
+
+    ## ConvBPDNInhib class
+    opt = cbpdnin.ConvBPDNInhib.Options({'Verbose': False, 'MaxMainIter': 1})
+
+    with CallGraph(ct, mdnm, pth, 'cbpdnin_init.svg', **kwargs):
+        b = cbpdnin.ConvBPDNInhib(D, s, Wg, Whn=4, lmbda=lmbda, mu=mu,
+                                   gamma=None, opt=opt)
+
+    with CallGraph(ct, mdnm, pth, 'cbpdnin_solve.svg', **kwargs):
         b.solve()
 
 
@@ -702,6 +727,7 @@ def insert_solve_docs():
         'sporco.admm.cbpdntv.ConvBPDNScalarTV': 'cbpdnstv_solve.svg',
         'sporco.admm.cbpdntv.ConvBPDNVectorTV': 'cbpdnvtv_solve.svg',
         'sporco.admm.cbpdntv.ConvBPDNRecTV': 'cbpdnrtv_solve.svg',
+        'sporco.admm.cbpdnin.ConvBPDNInhib': 'cbpdnin_solve.svg',
         'sporco.admm.cmod.CnstrMOD': 'cmod_solve.svg',
         'sporco.admm.ccmod.ConvCnstrMOD_IterSM': 'ccmodism_solve.svg',
         'sporco.admm.ccmod.ConvCnstrMOD_CG': 'ccmodcg_solve.svg',

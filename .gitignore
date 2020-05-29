@@ -1,5 +1,6 @@
 # Editor
 .*~
+.idea/
 
 # Misc
 nodist

@@ -118,6 +118,12 @@ admm.cbpdn.AddMaskSim.index_primary = _index_primary
 admm.cbpdn.AddMaskSim.index_addmsk = _index_addmsk
 
 
+# Construct sporco.cupy.admm.cbpdnin
+admm.cbpdnin = sporco_cupy_patch_module('sporco.admm.cbpdnin',
+                                      {'cbpdn': admm.cbpdn, 'sl': linalg,
+                                       'sp': prox})
+
+
 # Construct sporco.cupy.admm.cbpdntv
 admm.cbpdntv = sporco_cupy_patch_module('sporco.admm.cbpdntv',
                                         {'admm': admm.admm, 'cr': cnvrep,

@@ -21,6 +21,7 @@ API Reference
    sporco.admm.cbpdn
    sporco.admm.parcbpdn
    sporco.admm.cbpdntv
+   sporco.admm.cbpdnin
    sporco.admm.pdcsc
    sporco.admm.ccmod
    sporco.admm.ccmodmd
@@ -79,6 +80,7 @@ API Reference
    sporco.admm.cbpdn
    sporco.admm.parcbpdn
    sporco.admm.cbpdntv
+   sporco.admm.cbpdnin
    sporco.admm.pdcsc
    sporco.admm.ccmod
    sporco.admm.ccmodmd
