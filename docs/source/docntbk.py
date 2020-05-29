@@ -359,6 +359,7 @@ def construct_notebook_index(title, pthlst, pthidx):
 
 def notebook_executed(pth):
     """Determine whether the notebook at `pth` has been executed."""
+
     try:
         nb = nbformat.read(pth, as_version=4)
     except (AttributeError, nbformat.reader.NotJSONError):
