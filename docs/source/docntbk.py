@@ -361,7 +361,7 @@ def notebook_executed(pth):
     """Determine whether the notebook at `pth` has been executed."""
     try:
         nb = nbformat.read(pth, as_version=4)
-    except nbformat.reader.NotJSONError:
+    except (AttributeError, nbformat.reader.NotJSONError):
         raise RuntimeError('Error reading notebook file %s' % pth)
     for n in range(len(nb['cells'])):
         if nb['cells'][n].cell_type == 'code' and \
