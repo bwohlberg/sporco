@@ -75,7 +75,7 @@ class CnstrMOD(admm.ADMMEqual):
 
 
     class Options(admm.ADMMEqual.Options):
-        """CMOD algorithm options
+        """CnstrMOD algorithm options
 
         Options include all of those defined in
         :class:`sporco.admm.admm.ADMMEqual.Options`, together with
@@ -109,7 +109,7 @@ class CnstrMOD(admm.ADMMEqual):
             Parameters
             ----------
             opt : dict or None, optional (default None)
-              CMOD algorithm options
+              CnstrMOD algorithm options
             """
 
             if opt is None:
