@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2018 by Cristina Garcia-Cardona <cgarciac@lanl.gov>
-#                       Brendt Wohlberg <brendt@ieee.org>
+# Copyright (C) 2018-2019 by Cristina Garcia-Cardona <cgarciac@lanl.gov>
+#                            Brendt Wohlberg <brendt@ieee.org>
 # All rights reserved. BSD 3-clause License.
 # This file is part of the SPORCO package. Details of the copyright
 # and user license can be found in the 'LICENSE.txt' file distributed
@@ -8,8 +8,7 @@
 
 """Online dictionary learning based on CBPDN sparse coding"""
 
-from __future__ import print_function
-from __future__ import absolute_import
+from __future__ import print_function, absolute_import
 
 import copy
 import numpy as np
