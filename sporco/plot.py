@@ -30,6 +30,12 @@ __author__ = """Brendt Wohlberg <brendt@ieee.org>"""
 
 
 
+__all__ = ['plot', 'surf', 'contour', 'imview', 'close',
+           'set_ipython_plot_backend', 'set_notebook_plot_backend',
+           'config_notebook_plotting']
+
+
+
 def attach_keypress(fig, scaling=1.1):
     """
     Attach a key press event handler that configures keys for closing a
