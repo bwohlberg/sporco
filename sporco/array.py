@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2015-2019 by Brendt Wohlberg <brendt@ieee.org>
+# Copyright (C) 2015-2020 by Brendt Wohlberg <brendt@ieee.org>
 # All rights reserved. BSD 3-clause License.
 # This file is part of the SPORCO package. Details of the copyright
 # and user license can be found in the 'LICENSE.txt' file distributed
@@ -21,7 +21,6 @@ from sporco._util import renamed_function
 __author__ = """Brendt Wohlberg <brendt@ieee.org>"""
 
 
-@renamed_function(depname='ntpl2array', depmod='sporco.util')
 def ntpl2array(ntpl):
     """Convert a namedtuple to an array.
 
@@ -45,7 +44,6 @@ def ntpl2array(ntpl):
 
 
 
-@renamed_function(depname='array2ntpl', depmod='sporco.util')
 def array2ntpl(arr):
     """Convert an array representation of a namedtuple back to a namedtuple.
 
@@ -70,7 +68,6 @@ def array2ntpl(arr):
 
 
 
-@renamed_function(depname='transpose_ntpl_list', depmod='sporco.util')
 def transpose_ntpl_list(lst):
     """Transpose a list of named tuple objects (of the same type) into a
     named tuple of lists.
@@ -254,7 +251,6 @@ def split(u, axis=0):
 
 
 
-@renamed_function(depname='rolling_window', depmod='sporco.util')
 def rolling_window(x, wsz, wnm=None, pad='wrap'):
     """Construct a rolling window view of the input array.
 
@@ -301,7 +297,6 @@ def rolling_window(x, wsz, wnm=None, pad='wrap'):
 
 
 
-@renamed_function(depname='subsample_array', depmod='sporco.util')
 def subsample_array(x, step, pad=False, mode='reflect'):
     """Construct a subsampled view of the input array.
 
@@ -347,7 +342,6 @@ def subsample_array(x, step, pad=False, mode='reflect'):
 
 
 
-@renamed_function(depname='extractblocks', depmod='sporco.util')
 def extract_blocks(img, blksz, stpsz=None):
     """Extract blocks from an ndarray signal into an ndarray.
 
@@ -393,7 +387,6 @@ def extract_blocks(img, blksz, stpsz=None):
 
 
 
-@renamed_function(depname='averageblocks', depmod='sporco.util')
 def average_blocks(blks, imgsz, stpsz=None):
     """Average blocks together from an ndarray to reconstruct ndarray signal.
 
@@ -443,7 +436,6 @@ def average_blocks(blks, imgsz, stpsz=None):
 
 
 
-@renamed_function(depname='combineblocks', depmod='sporco.util')
 def combine_blocks(blks, imgsz, stpsz=None, fn=np.median):
     """Combine blocks from an ndarray to reconstruct ndarray signal.
 

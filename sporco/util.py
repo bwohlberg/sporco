@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2015-2019 by Brendt Wohlberg <brendt@ieee.org>
+# Copyright (C) 2015-2020 by Brendt Wohlberg <brendt@ieee.org>
 # All rights reserved. BSD 3-clause License.
 # This file is part of the SPORCO package. Details of the copyright
 # and user license can be found in the 'LICENSE.txt' file distributed
@@ -892,3 +892,57 @@ class ContextTimer(object):
         """
 
         return self.timer.elapsed(self.label, total=total)
+
+
+
+
+
+import warnings
+
+
+def _depwarn(fn):
+    wstr = ('Function util.%s is deprecated; please use function '
+            'array.%s instead' % (fn, fn))
+    warnings.simplefilter('always', DeprecationWarning)
+    warnings.warn(wstr, DeprecationWarning, stacklevel=2)
+    warnings.simplefilter('default', DeprecationWarning)
+
+
+def ntpl2array(ntpl):
+    _depwarn('ntpl2array')
+    return signal.array.ntpl2array(ntpl)
+
+
+def array2ntpl(arr):
+    _depwarn('array2ntpl')
+    return signal.array.array2ntpl(arr)
+
+
+def transpose_ntpl_list(lst):
+    _depwarn('transpose_ntpl_list')
+    return signal.array.transpose_ntpl_list(lst)
+
+
+def rolling_window(*args, **kwargs):
+    _depwarn('rolling_window')
+    return signal.array.rolling_window(*args, **kwargs)
+
+
+def subsample_array(*args, **kwargs):
+    _depwarn('subsample_array')
+    return signal.array.subsample_array(*args, **kwargs)
+
+
+def extract_blocks(*args, **kwargs):
+    _depwarn('extract_blocks')
+    return signal.array.extract_blocks(*args, **kwargs)
+
+
+def average_blocks(*args, **kwargs):
+    _depwarn('average_blocks')
+    return signal.array.average_blocks(*args, **kwargs)
+
+
+def combine_blocks(*args, **kwargs):
+    _depwarn('combine_blocks')
+    return signal.array.combine_blocks(*args, **kwargs)
