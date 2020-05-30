@@ -117,31 +117,30 @@ def gengraphs(pth, nopyfftw):
     # Handle environment in which pyfftw is unavailable
     if nopyfftw:
         import numpy.fft as npfft
-        import sporco.linalg as spl
+        import sporco.fft as spf
 
         def empty(shape, dtype, order='C', n=None):
             return np.zeros(shape, dtype=dtype)
-        empty.__doc__ = spl.pyfftw_empty_aligned.__doc__
-        spl.pyfftw_empty_aligned = empty
-
+        empty.__doc__ = spf.empty_aligned.__doc__
+        spf.empty_aligned = empty
 
         def rfftn_empty(shape, axes, dtype, order='C', n=None):
             ashp = list(shape)
             raxis = axes[-1]
             ashp[raxis] = ashp[raxis] // 2 + 1
-            cdtype = spl.complex_dtype(dtype)
+            cdtype = spf.complex_dtype(dtype)
             return np.zeros(ashp, dtype=cdtype)
-        rfftn_empty.__doc__ = spl.pyfftw_rfftn_empty_aligned.__doc__
-        spl.pyfftw_rfftn_empty_aligned = rfftn_empty
+        rfftn_empty.__doc__ = spf.rfftn_empty_aligned.__doc__
+        spf.rfftn_empty_aligned = rfftn_empty
 
-        npfft.fftn.__doc__ = spl.fftn.__doc__
-        spl.fftn = npfft.fftn
-        npfft.ifftn.__doc__ = spl.ifftn.__doc__
-        spl.ifftn = npfft.ifftn
-        npfft.rfftn.__doc__ = spl.rfftn.__doc__
-        spl.rfftn = npfft.rfftn
-        npfft.irfftn.__doc__ = spl.irfftn.__doc__
-        spl.irfftn = npfft.irfftn
+        npfft.fftn.__doc__ = spf.fftn.__doc__
+        spf.fftn = npfft.fftn
+        npfft.ifftn.__doc__ = spf.ifftn.__doc__
+        spf.ifftn = npfft.ifftn
+        npfft.rfftn.__doc__ = spf.rfftn.__doc__
+        spf.rfftn = npfft.rfftn
+        npfft.irfftn.__doc__ = spf.irfftn.__doc__
+        spf.irfftn = npfft.irfftn
 
 
     import numpy as np
