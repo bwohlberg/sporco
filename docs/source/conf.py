@@ -374,6 +374,9 @@ if on_rtd:
     print
     print("Current working directory: {}" . format(os.path.abspath(os.curdir)))
 
+    import numpy as np
+    print('NumPy version: %s' % np.__version__)
+
     import matplotlib
     matplotlib.use('agg')
 
