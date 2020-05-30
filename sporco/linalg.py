@@ -70,8 +70,8 @@ def inner(x, y, axis=-1):
         xr = x
         yr = y
     else:
-        xr = np.rollaxis(x, axis, 0)
-        yr = np.rollaxis(y, axis, 0)
+        xr = np.moveaxis(x, axis, 0)
+        yr = np.moveaxis(y, axis, 0)
 
     # Efficient inner product on axis 0
     if np.__version__ == '1.14.0':
@@ -84,7 +84,7 @@ def inner(x, y, axis=-1):
 
     # Roll axis back to original position if necessary
     if axis != 0:
-        ip = np.rollaxis(ip, 0, axis + 1)
+        ip = np.moveaxis(ip, 0, axis)
 
     return ip
 
