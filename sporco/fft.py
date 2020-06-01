@@ -13,7 +13,17 @@ from builtins import range
 import multiprocessing
 import numpy as np
 from scipy import fftpack
-import pyfftw
+try:
+    import pyfftw
+except ImportError:
+    have_pyfftw = False
+    import warnings
+    warnings.warn('Module pyfftw could not be imported. FFT '
+                  'computations will be performed using numpy.fft, '
+                  'which may be substantially slower', RuntimeWarning)
+    import numpy.fft as npfft
+else:
+    have_pyfftw = True
 
 from sporco._util import renamed_function
 
@@ -21,9 +31,9 @@ from sporco._util import renamed_function
 __author__ = """Brendt Wohlberg <brendt@ieee.org>"""
 
 
-
-pyfftw.interfaces.cache.enable()
-pyfftw.interfaces.cache.set_keepalive_time(300)
+if have_pyfftw:
+    pyfftw.interfaces.cache.enable()
+    pyfftw.interfaces.cache.set_keepalive_time(300)
 
 pyfftw_threads = multiprocessing.cpu_count()
 """Global variable setting the number of threads used in :mod:`pyfftw`
@@ -52,6 +62,28 @@ def complex_dtype(dtype):
     """
 
     return (np.zeros(1, dtype) + 1j).dtype
+
+
+
+def real_dtype(dtype):
+    """Construct the corresponding real dtype for a given complex dtype.
+
+    Construct the corresponding real dtype for a given complex dtype,
+    e.g. the real dtype corresponding to ``np.complex64`` is
+    ``np.float32``.
+
+    Parameters
+    ----------
+    dtype : dtype
+      A complex dtype, e.g. np.complex64, np.complex128
+
+    Returns
+    -------
+    cdtype : dtype
+      The real dtype corresponding to the input dtype
+    """
+
+    return np.zeros(1, dtype).real.dtype
 
 
 
@@ -443,3 +475,55 @@ def rfl2norm2(xf, xs, axis=(0, 1)):
     else:
         nrm2 = 0.0
     return scl*(nrm0**2 + 2.0*nrm1**2 + nrm2**2)
+
+
+
+
+
+if not have_pyfftw:
+
+    __all__ = ['complex_dtype', 'real_dtype', 'byte_aligned', 'empty_aligned',
+               'rfftn_empty_aligned', 'fftn', 'ifftn', 'rfftn', 'irfftn',
+               'dctii', 'idctii', 'fftconv', 'fl2norm2', 'rfl2norm2']
+
+    def _aligned(array, dtype=None, n=None):
+        if dtype is None:
+            return array
+        else:
+            return array.astype(dtype)
+    _aligned.__doc__ = byte_aligned.__doc__
+    byte_aligned = _aligned
+
+    def _empty(shape, dtype, order='C', n=None):
+        return np.empty(shape, dtype=dtype)
+    _empty.__doc__ = empty_aligned.__doc__
+    empty_aligned = _empty
+
+    def _rfftn_empty(shape, axes, dtype, order='C', n=None):
+        ashp = list(shape)
+        raxis = axes[-1]
+        ashp[raxis] = ashp[raxis] // 2 + 1
+        cdtype = complex_dtype(dtype)
+        return np.empty(ashp, dtype=cdtype)
+    _rfftn_empty.__doc__ = rfftn_empty_aligned.__doc__
+    rfftn_empty_aligned = _rfftn_empty
+
+    def _fftn(a, s=None, axes=None):
+        return  npfft.fftn(a, s, axes).astype(complex_dtype(a.dtype))
+    _fftn.__doc__ = fftn.__doc__
+    fftn = _fftn
+
+    def _ifftn(a, s=None, axes=None):
+        return  npfft.ifftn(a, s, axes).astype(a.dtype)
+    _ifftn.__doc__ = ifftn.__doc__
+    ifftn = _ifftn
+
+    def _rfftn(a, s=None, axes=None):
+        return  npfft.rfftn(a, s, axes).astype(complex_dtype(a.dtype))
+    _rfftn.__doc__ = rfftn.__doc__
+    rfftn = _rfftn
+
+    def _irfftn(a, s=None, axes=None):
+        return  npfft.irfftn(a, s, axes).astype(real_dtype(a.dtype))
+    _irfftn.__doc__ = irfftn.__doc__
+    irfftn = _irfftn
