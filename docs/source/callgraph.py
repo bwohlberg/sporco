@@ -81,11 +81,10 @@ class CallGraph(jonga.ContextCallTracer):
 
 
 
-def gengraphs(pth, nopyfftw):
+def gengraphs(pth):
     """
     Generate call graph images when necessary. Parameter pth is the path
-    to the directory in which images are to be created. Parameter nopyfftw
-    is a flag indicating whether it is necessary to avoid using pyfftw.
+    to the directory in which images are to be created.
     """
 
     srcmodflt = '^sporco.admm'
@@ -112,36 +111,6 @@ def gengraphs(pth, nopyfftw):
     # Make destination directory if it doesn't exist
     if not os.path.exists(pth):
         os.makedirs(pth, exist_ok=True)
-
-
-    # Handle environment in which pyfftw is unavailable
-    if nopyfftw:
-        import numpy.fft as npfft
-        import sporco.fft as spf
-
-        def empty(shape, dtype, order='C', n=None):
-            return np.zeros(shape, dtype=dtype)
-        empty.__doc__ = spf.empty_aligned.__doc__
-        spf.empty_aligned = empty
-
-        def rfftn_empty(shape, axes, dtype, order='C', n=None):
-            ashp = list(shape)
-            raxis = axes[-1]
-            ashp[raxis] = ashp[raxis] // 2 + 1
-            cdtype = spf.complex_dtype(dtype)
-            return np.zeros(ashp, dtype=cdtype)
-        rfftn_empty.__doc__ = spf.rfftn_empty_aligned.__doc__
-        spf.rfftn_empty_aligned = rfftn_empty
-
-        npfft.fftn.__doc__ = spf.fftn.__doc__
-        spf.fftn = npfft.fftn
-        npfft.ifftn.__doc__ = spf.ifftn.__doc__
-        spf.ifftn = npfft.ifftn
-        npfft.rfftn.__doc__ = spf.rfftn.__doc__
-        spf.rfftn = npfft.rfftn
-        npfft.irfftn.__doc__ = spf.irfftn.__doc__
-        spf.irfftn = npfft.irfftn
-
 
     import numpy as np
     np.random.seed(12345)

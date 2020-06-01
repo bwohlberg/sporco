@@ -380,8 +380,6 @@ if on_rtd:
     import matplotlib
     matplotlib.use('agg')
 
-    MOCK_MODULES += ['pyfftw']
-
 
 class Mock(MagicMock):
     @classmethod
@@ -460,7 +458,7 @@ def gencallgraph(_):
         cgpth = '_static/jonga'
     else:
         cgpth = os.path.join(confpath, '_static/jonga')
-    callgraph.gengraphs(cgpth, on_rtd)
+    callgraph.gengraphs(cgpth)
 
 
 
