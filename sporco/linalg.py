@@ -686,7 +686,7 @@ def cho_factor(A, rho, lower=False, check_finite=True):
 
 
 
-def cho_solve_ATAI(A, rho, b, c, lwr, check_finite=True):
+def cho_solve_ATAI(A, rho, b, c, lwr=False, check_finite=True):
     r"""Solve the linear system :math:`(A^T A + \rho I)\mathbf{x} = \mathbf{b}`
     or :math:`(A^T A + \rho I)X = B` using :func:`scipy.linalg.cho_solve`.
 
@@ -701,8 +701,12 @@ def cho_solve_ATAI(A, rho, b, c, lwr, check_finite=True):
     c : array_like
       Matrix containing lower or upper triangular Cholesky factor,
       as returned by :func:`scipy.linalg.cho_factor`
-    lwr : bool
-      Flag indicating whether the factor is lower or upper triangular
+    lwr : bool, optional (default False)
+      Flag indicating whether lower or upper triangular factors are
+      computed
+    check_finite : bool, optional (default False)
+      Flag indicating whether the input array should be checked for Inf
+      and NaN values
 
     Returns
     -------
@@ -720,7 +724,7 @@ def cho_solve_ATAI(A, rho, b, c, lwr, check_finite=True):
 
 
 
-def cho_solve_AATI(A, rho, b, c, lwr, check_finite=True):
+def cho_solve_AATI(A, rho, b, c, lwr=False, check_finite=True):
     r"""Solve the linear system :math:`(A A^T + \rho I)\mathbf{x} = \mathbf{b}`
     or :math:`(A A^T + \rho I)X = B` using :func:`scipy.linalg.cho_solve`.
 
@@ -735,8 +739,12 @@ def cho_solve_AATI(A, rho, b, c, lwr, check_finite=True):
     c : array_like
       Matrix containing lower or upper triangular Cholesky factor,
       as returned by :func:`scipy.linalg.cho_factor`
-    lwr : bool
-      Flag indicating whether the factor is lower or upper triangular
+    lwr : bool, optional (default False)
+      Flag indicating whether lower or upper triangular factors are
+      computed
+    check_finite : bool, optional (default False)
+      Flag indicating whether the input array should be checked for Inf
+      and NaN values
 
     Returns
     -------
@@ -747,7 +755,7 @@ def cho_solve_AATI(A, rho, b, c, lwr, check_finite=True):
     N, M = A.shape
     if N >= M:
         x = (b - linalg.cho_solve((c, lwr), b.dot(A).T,
-                                  check_finite=check_finite).T.dot(A.T)) / rho
+            check_finite=check_finite).T.dot(A.T)) / rho
     else:
         x = linalg.cho_solve((c, lwr), b.T, check_finite=check_finite).T
     return x
@@ -757,9 +765,12 @@ def cho_solve_AATI(A, rho, b, c, lwr, check_finite=True):
 def rrs(ax, b):
     r"""Relative residual of the solution to a linear equation.
 
-    Compute relative residual :math:`\|\mathbf{b} - A \mathbf{x}\|_2 /
-    \|\mathbf{b}\|_2` of the solution to a linear equation :math:`A \mathbf{x}
-    = \mathbf{b}`. Returns 1.0 if :math:`\mathbf{b} = 0`.
+    The standard relative residual for the linear system
+    :math:`A \mathbf{x} = \mathbf{b}` is :math:`\|\mathbf{b} - A
+    \mathbf{x}\|_2 / \|\mathbf{b}\|_2`. This function computes a
+    variant :math:`\|\mathbf{b} - A \mathbf{x}\|_2 /
+    \max(\|A\mathbf{x}\|_2, \|\mathbf{b}\|_2)` that is robust to
+    the case :math:`\mathbf{b} = 0`.
 
     Parameters
     ----------
@@ -774,9 +785,9 @@ def rrs(ax, b):
       Relative residual
     """
 
-    nrm = np.linalg.norm(b.ravel())
+    nrm = max(np.linalg.norm(ax.ravel()), np.linalg.norm(b.ravel()))
     if nrm == 0.0:
-        return 1.0
+        return 0.0
     else:
         return np.linalg.norm((ax - b).ravel()) / nrm
 
