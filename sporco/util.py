@@ -94,11 +94,11 @@ def grid_search(fn, grd, fmin=True, nproc=None):
     :mod:`pyfftw` with multi-threading enabled (the
     `bug <https://github.com/pyFFTW/pyFFTW/issues/135>`_ has been
     reported).
-    When using the FFT functions in :mod:`sporco.linalg`,
+    When using the FFT functions in :mod:`sporco.fft`,
     multi-threading can be disabled by including the following code::
 
-      import sporco.linalg
-      sporco.linalg.pyfftw_threads = 1
+      import sporco.fft
+      sporco.fft.pyfftw_threads = 1
 
 
     Parameters
