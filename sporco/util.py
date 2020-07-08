@@ -132,9 +132,9 @@ def grid_search(fn, grd, fmin=True, nproc=None):
     """
 
     if fmin:
-        slct = np.argmin
+        slct = np.nanargmin
     else:
-        slct = np.argmax
+        slct = np.nanargmax
     fprm = itertools.product(*grd)
     if platform.system() == 'Windows':
         fval = list(map(fn, fprm))
@@ -159,7 +159,6 @@ def grid_search(fn, grd, fmin=True, nproc=None):
         sfvl = fvmx[sidx]
 
     return sprm, sfvl, fvmx, sidx
-
 
 
 

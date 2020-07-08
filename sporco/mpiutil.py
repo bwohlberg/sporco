@@ -155,9 +155,9 @@ def grid_search(fn, grid, comm=None, mpidtype=None, fmin=True):
 
     # Proceed as regular grid_search (all processes execute this)
     if fmin:
-        slct = np.argmin
+        slct = np.nanargmin
     else:
-        slct = np.argmax
+        slct = np.nanargmax
 
     if isinstance(fval[0], (tuple, list, np.ndarray)):
         nfnv = len(fval[0])
