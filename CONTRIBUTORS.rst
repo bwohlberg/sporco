@@ -13,7 +13,7 @@
 • Erik Skau
 
   - Parallel CBPDN module and example scripts
-  - Utility functions extractblocks, averageblocks, and combineblocks
+  - Utility functions extract_blocks, average_blocks, and combine_blocks
   - Comments, suggestions, and bug reports
 
 • Frank Cwitkowitz
