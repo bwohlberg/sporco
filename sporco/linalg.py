@@ -30,8 +30,8 @@ __author__ = """Brendt Wohlberg <brendt@ieee.org>"""
 
 
 
-__all__ = ['inner', 'dot', 'solvedbi_sm', 'solvedbi_sm_c', 'solvedbd_sm',
-           'solvedbd_sm_c', 'solvemdbi_ism', 'solvemdbi_rsm',
+__all__ = ['inner', 'dot', 'valid_adjoint', 'solvedbi_sm', 'solvedbi_sm_c',
+           'solvedbd_sm', 'solvedbd_sm_c', 'solvemdbi_ism', 'solvemdbi_rsm',
            'solvemdbi_cg', 'lu_factor', 'lu_solve_ATAI', 'lu_solve_AATI',
            'cho_factor', 'cho_solve_ATAI', 'cho_solve_AATI',
            'block_circulant', 'rrs', 'pca', 'nkp', 'kpsvd',
@@ -142,6 +142,61 @@ def dot(a, b, axis=-2):
     idxexp[axis + 1] = 0
     # Compute and return product
     return np.sum(ax * bx, axis=axis+1, keepdims=True)[tuple(idxexp)]
+
+
+
+def valid_adjoint(A, AT, Ashape, ATshape, eps=1e-7):
+    r"""Validate a transform and adjoint transform pair.
+
+    Check whether transform `AT` is the adjoint of `A`. The test exploits
+    the identity
+
+    .. math::
+      \mathbf{y}^T (A \mathbf{x}) = (\mathbf{y}^T (A) \mathbf{x} =
+      (A^T \mathbf{y})^T \mathbf{x}
+
+    by computing :math:`\mathbf{u} = A \mathbf{x}` and
+    :math:`\mathbf{v} = A^T \mathbf{y}` for random :math:`\mathbf{x}`
+    and :math:`\mathbf{y}` and confirming that
+
+    .. math::
+      \mathbf{y}^T \mathbf{u} = \mathbf{y}^T (A \mathbf{x}) =
+      (A^T \mathbf{y})^T \mathbf{x} = \mathbf{v}^T \mathbf{x} \;.
+
+
+    Parameters
+    ----------
+    A : function
+      Primary function
+    AT : function
+      Adjoint function
+    Ashape : tuple
+      Shape of input array expected by function `A`
+    ATshape : tuple
+      Shape of input array expected by function `AT`
+    eps : float or None, optional (default 1e-7)
+      Error threshold for validation of `AT` as adjoint of `A`. If
+      None, the relative error is returned instead of a boolean value.
+
+    Returns
+    -------
+    err : boolean or float
+      Boolean value indicating that validation passed, or relative error
+      of test, depending on type of parameter `eps`
+    """
+
+    x0 = np.random.randn(*Ashape)
+    x1 = np.random.randn(*ATshape)
+    y0 = A(x0)
+    y1 = AT(x1)
+    x1y0 = np.dot(x1.flatten(), y0.flatten())
+    y1x0 = np.dot(y1.flatten(), x0.flatten())
+    err = np.linalg.norm(x1y0 - y1x0) / max(np.linalg.norm(x1y0),
+                                            np.linalg.norm(y1x0))
+    if eps is None:
+        return err
+    else:
+        return err < eps
 
 
 

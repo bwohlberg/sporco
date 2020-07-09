@@ -368,3 +368,15 @@ class TestSet01(object):
         A = kronsum(S, B[..., 0:2], C[..., 0:2])
         assert mse(A0, A) < 1e-12
 
+
+    def test_28(self):
+        Amx = np.random.randn(7, 6)
+        ATmx = Amx.T.copy()
+        A = lambda x : Amx @ x
+        AT = lambda x : ATmx @ x
+        assert linalg.valid_adjoint(A, AT, (Amx.shape[1],), (Amx.shape[0],))
+        ATmx[0, 1] *= 2
+        AT = lambda x : ATmx @ x
+        assert not linalg.valid_adjoint(A, AT, (Amx.shape[1],),
+                                        (Amx.shape[0],))
+
