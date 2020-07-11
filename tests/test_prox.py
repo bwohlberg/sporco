@@ -40,7 +40,7 @@ def proj_solve(v, v0, f, gamma, axis=None):
     cns = ({'type': 'ineq', 'fun': lambda x: gamma - f(x.reshape(v.shape),
                                                        axis=axis)})
     fmn = optim.minimize(fnc, v0.ravel(), method='SLSQP', constraints=cns,
-                         options={'maxiter': 2500, 'ftol': 1e-9})
+                         options={'maxiter': 3000, 'ftol': 1e-12})
     return fmn.x.reshape(v.shape), fmn.fun
 
 
@@ -50,7 +50,7 @@ def proj_test(v, nrm, prj, gamma):
     mx, mf = proj_solve(v, pj, nrm, gamma)
     assert nrm(pj) - gamma <= 1e-12
     assert pf - mf <= 1e-6
-    assert np.linalg.norm(pj - mx) <= 1e-4
+    assert np.linalg.norm(pj - mx) <= 1e-3
 
 
 
