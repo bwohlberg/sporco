@@ -376,7 +376,7 @@ class TestSet01(object):
         AT = lambda x : np.matmul(ATmx, x)
         assert linalg.valid_adjoint(A, AT, (Amx.shape[1],), (Amx.shape[0],))
         ATmx[0, 1] *= 2
-        AT = lambda x : ATmx @ x
+        AT = lambda x : np.matmul(ATmx, x)
         assert not linalg.valid_adjoint(A, AT, (Amx.shape[1],),
                                         (Amx.shape[0],))
 
