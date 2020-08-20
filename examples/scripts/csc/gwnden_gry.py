@@ -23,9 +23,10 @@ import pyfftw   # See https://github.com/pyFFTW/pyFFTW/issues/40
 import numpy as np
 
 from sporco import util
+from sporco import signal
+from sporco import fft
+from sporco import metric
 from sporco import plot
-import sporco.signal as spl
-import sporco.metric as sm
 from sporco.admm import cbpdn
 
 
@@ -62,7 +63,7 @@ Highpass filter test image.
 
 npd = 16
 fltlmbd = 5.0
-imgnl, imgnh = spl.tikhonov_filter(imgn, fltlmbd, npd)
+imgnl, imgnh = signal.tikhonov_filter(imgn, fltlmbd, npd)
 
 
 """
@@ -76,9 +77,9 @@ D = util.convdicts()['G:8x8x128']
 Set solver options. See Section 8 of :cite:`wohlberg-2017-convolutional2` for details of construction of $\ell_1$ weighting matrix $W$.
 """
 
-imgnpl, imgnph = spl.tikhonov_filter(pad(imgn), fltlmbd, npd)
-W = spl.irfftn(np.conj(spl.rfftn(D, imgnph.shape, (0, 1))) *
-               spl.rfftn(imgnph[..., np.newaxis], None, (0, 1)),
+imgnpl, imgnph = signal.tikhonov_filter(pad(imgn), fltlmbd, npd)
+W = fft.irfftn(np.conj(fft.rfftn(D, imgnph.shape, (0, 1))) *
+               fft.rfftn(imgnph[..., np.newaxis], None, (0, 1)),
                imgnph.shape, (0,1))
 W = W**2
 W = 1.0/(np.maximum(np.abs(W), 1e-8))
@@ -111,8 +112,8 @@ Display solve time and denoising performance.
 """
 
 print("ConvBPDN solve time: %5.2f s" % b.timer.elapsed('solve'))
-print("Noisy image PSNR:    %5.2f dB" % sm.psnr(img, imgn))
-print("Denoised image PSNR: %5.2f dB" % sm.psnr(img, imgd))
+print("Noisy image PSNR:    %5.2f dB" % metric.psnr(img, imgn))
+print("Denoised image PSNR: %5.2f dB" % metric.psnr(img, imgd))
 
 
 """
