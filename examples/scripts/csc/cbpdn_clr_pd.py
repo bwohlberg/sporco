@@ -107,7 +107,7 @@ print("ConvProdDictBPDN solve time: %.2fs" % b.timer.elapsed('solve'))
 Compute partial and full reconstructions from sparse representation $X$ with respect to convolutional dictionary $D$ and standard dictionary $B$. The partial reconstructions are $DX$ and $XB$, and the full reconstruction is $DXB$.
 """
 
-DX = fft.fftconv(D[..., np.newaxis, np.newaxis, :], X)
+DX = fft.fftconv(D[..., np.newaxis, np.newaxis, :], X, axes=(0, 1))
 XB = linalg.dot(B, X, axis=2)
 shr = cp2np(b.reconstruct().squeeze())
 imgr = slc + shr

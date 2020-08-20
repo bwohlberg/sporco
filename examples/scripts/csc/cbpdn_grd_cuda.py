@@ -98,7 +98,7 @@ print('Solve time: %.2f s' % t)
 Reconstruct the image from the sparse representation.
 """
 
-imgr = np.sum(fft.fftconv(D, X), axis=2)
+imgr = np.sum(fft.fftconv(D, X, axes=(0, 1)), axis=2)
 print("Reconstruction PSNR: %.2fdB\n" % metric.psnr(img, imgr))
 
 

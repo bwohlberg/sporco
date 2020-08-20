@@ -124,7 +124,7 @@ if cuda.device_count() > 0:
     with sys_pipes(), util.ContextTimer(tm):
         X = cuda.cbpdngrdmsk(Di, imgwp, mskp, lmbda, mu, opt)
     t = tm.elapsed()
-    imgr = crop(np.sum(fftconv(Di, X), axis=-1))
+    imgr = crop(np.sum(fftconv(Di, X, axes=(0, 1)), axis=-1))
 else:
     opt['L1Weight'] = wl1i
     opt['GradWeight'] = wgri

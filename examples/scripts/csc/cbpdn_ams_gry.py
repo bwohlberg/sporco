@@ -112,7 +112,7 @@ if cuda.device_count() > 0:
     with sys_pipes(), util.ContextTimer(tm):
         X = cuda.cbpdnmsk(D, sh, mskp, lmbda, opt)
     t = tm.elapsed()
-    imgr = crop(sl + np.sum(fftconv(D, X), axis=-1))
+    imgr = crop(sl + np.sum(fftconv(D, X, axes=(0, 1)), axis=-1))
 else:
     ams = cbpdn.AddMaskSim(cbpdn.ConvBPDN, D, sh, mskp, lmbda, opt=opt)
     X = ams.solve()

@@ -32,7 +32,7 @@ class TestSet01(object):
         x = np.array([[0, 1], [2, 3]])
         y = np.array([[4, 5], [6, 7]])
         xy = np.array([[38, 36], [30, 28]])
-        assert np.allclose(fft.fftconv(x, y), xy)
+        assert np.allclose(fft.fftconv(x, y, axes=(0, 1)), xy)
 
 
     def test_04(self):
