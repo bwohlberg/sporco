@@ -20,11 +20,12 @@ import numpy as np
 
 from sporco import util
 from sporco import signal
+from sporco import fft
+from sporco import metric
 from sporco import plot
 from sporco import cuda
 from sporco.admm import cbpdn
-import sporco.signal as spl
-import sporco.metric as spm
+
 
 # If running in a notebook, try to use wurlitzer so that output from the CUDA
 # code will be properly captured in the notebook.
@@ -87,9 +88,9 @@ print('Solve time: %.2f s' % t)
 Reconstruct the image from the sparse representation.
 """
 
-shr = np.sum(spl.fftconv(D, X), axis=2)
+shr = np.sum(fft.fftconv(D, X), axis=2)
 imgr = sl + shr
-print("Reconstruction PSNR: %.2fdB\n" % spm.psnr(img, imgr))
+print("Reconstruction PSNR: %.2fdB\n" % metric.psnr(img, imgr))
 
 
 """

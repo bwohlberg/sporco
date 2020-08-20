@@ -19,11 +19,11 @@ import pyfftw   # See https://github.com/pyFFTW/pyFFTW/issues/40
 import numpy as np
 
 from sporco import util
+from sporco import fft
+from sporco import metric
 from sporco import plot
 from sporco import cuda
 from sporco.admm import cbpdn
-import sporco.signal as spl
-import sporco.metric as spm
 
 # If running in a notebook, try to use wurlitzer so that output from the CUDA
 # code will be properly captured in the notebook.
@@ -98,8 +98,8 @@ print('Solve time: %.2f s' % t)
 Reconstruct the image from the sparse representation.
 """
 
-imgr = np.sum(spl.fftconv(D, X), axis=2)
-print("Reconstruction PSNR: %.2fdB\n" % spm.psnr(img, imgr))
+imgr = np.sum(fft.fftconv(D, X), axis=2)
+print("Reconstruction PSNR: %.2fdB\n" % metric.psnr(img, imgr))
 
 
 """
