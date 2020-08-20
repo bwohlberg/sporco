@@ -11,6 +11,7 @@ Version 0.1.13   (not yet released)
   and sporco.signal, and functions nkp, kpsvd, tikhonov_filter,
   gaussian, and local_contrast_normalise moved from sporco.util to
   sporco.linalg
+• Significant change to interface of fft.fftconv function
 
 
 

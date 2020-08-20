@@ -162,7 +162,7 @@ class TestSet01(object):
         xr = np.random.randn(N, N, M)
         xp = np.abs(xr) > 3
         X0[xp] = np.random.randn(X0[xp].size)
-        S = np.sum(fftconv(D, X0), axis=2)
+        S = np.sum(fftconv(D, X0, axes=(0, 1)), axis=2)
         lmbda = 1e-4
         rho = 1e-1
         opt = cbpdn.ConvBPDN.Options({'Verbose': False, 'MaxMainIter': 500,
@@ -393,7 +393,7 @@ class TestSet01(object):
         xr = np.random.randn(N, N, M)
         xp = np.abs(xr) > 3
         X0[xp] = np.random.randn(X0[xp].size)
-        S = np.sum(fftconv(D, X0), axis=2)
+        S = np.sum(fftconv(D, X0, axes=(0, 1)), axis=2)
         lmbda = 1e-3
         opt = cbpdn.ConvBPDN.Options({'Verbose': False, 'MaxMainIter': 500,
                          'RelStopTol': 1e-5, 'rho': 5e-1,
