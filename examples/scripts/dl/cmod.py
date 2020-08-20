@@ -8,7 +8,7 @@
 Constained MOD
 ==============
 
-This example demonstrates the use of :class:`.cmod.CnstrMOD` for computing a dictionary update via a constrained variant of the method of optimal directions :cite:`engan-1999-method`. This problem is mainly useful as a component within dictionary learning, but its use is demonstrated here since a user may wish to construct such objects as part of a custom dictionary learning algorithm, using :class:`.dictlrn.DictLearn`.
+This example demonstrates the use of :class:`.admm.cmod.CnstrMOD` for computing a dictionary update via a constrained variant of the method of optimal directions :cite:`engan-1999-method`. This problem is mainly useful as a component within dictionary learning, but its use is demonstrated here since a user may wish to construct such objects as part of a custom dictionary learning algorithm, using :class:`.dictlrn.DictLearn`.
 """
 
 
