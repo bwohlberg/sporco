@@ -367,7 +367,7 @@ def idctii(x, axes=None):
 
 
 @renamed_function(depname='fftconv', depmod='sporco.linalg')
-def fftconv(a, b, axes=(0, 1), origin=None):
+def fftconv(a, b, axes=None, origin=None):
     """Multi-dimensional convolution via the Discrete Fourier Transform.
 
     Compute a multi-dimensional convolution via the Discrete Fourier
@@ -381,8 +381,9 @@ def fftconv(a, b, axes=(0, 1), origin=None):
       Input array
     b : array_like
       Input array
-    axes : sequence of ints, optional (default (0, 1))
-      Axes on which to perform convolution
+    axes : sequence of ints or None optional (default None)
+      Axes on which to perform convolution. The default of None
+      selects all axes of `a`
     origin : sequence of ints or None optional (default None)
       Indices of centre of `a` filter. The default of None corresponds
       to a centre at 0 on all axes of `a`
@@ -393,6 +394,8 @@ def fftconv(a, b, axes=(0, 1), origin=None):
       Convolution of input arrays, `a` and `b`, along specified `axes`
     """
 
+    if axes is None:
+        axes = tuple(range(a.ndim))
     if np.isrealobj(a) and np.isrealobj(b):
         fft = rfftn
         ifft = irfftn
