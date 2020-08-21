@@ -1393,8 +1393,8 @@ class ADMMTwoBlockCnstrnt(ADMM):
             self._cnst_c0 = self.cnst_c0()
         if not hasattr(self, '_cnst_c1'):
             self._cnst_c1 = self.cnst_c1()
-        return AX - self.block_cat(self.var_y0() + self._cnst_c0,
-                                   self.var_y1() + self._cnst_c1)
+        return AX - self.block_cat(self.block_sep0(Y) + self._cnst_c0,
+                                   self.block_sep1(Y) + self._cnst_c1)
 
 
 
