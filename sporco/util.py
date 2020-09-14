@@ -128,7 +128,8 @@ def grid_search(fn, grd, fmin=True, nproc=None):
     fvmx : ndarray
       Function value(s) on search grid
     sidx : tuple of int or tuple of ndarray
-      Indices of optimal values on parameter grid
+      Indices of optimal values on parameter grid (note that
+      `sfvl` = `fvmx[sidx]`)
     """
 
     if fmin:
