@@ -84,7 +84,7 @@ setup(
     install_requires = install_requires,
     extras_require   = {
         'tests': tests_require,
-        'docs': ['sphinx >=1.6', 'numpydoc', 'sphinxcontrib-bibtex',
+        'docs': ['sphinx >=2.2', 'numpydoc', 'sphinxcontrib-bibtex',
                  'sphinx_tabs', 'sphinx_fontawesome', 'jonga',
                  'ipython >=6.3.1', 'jupyter', 'py2jn', 'pypandoc'],
         'gpu': ['cupy', 'gputil', 'wurlitzer'],
@@ -94,7 +94,6 @@ setup(
     'Development Status :: 4 - Beta',
     'Intended Audience :: Education',
     'Intended Audience :: Science/Research',
-    'License :: OSI Approved :: BSD License',
     'Operating System :: OS Independent',
     'Programming Language :: Python :: 2.7',
     'Programming Language :: Python :: 3',
