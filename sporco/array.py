@@ -40,7 +40,7 @@ def ntpl2array(ntpl):
     """
 
     return np.asarray((np.hstack([col for col in ntpl]), ntpl._fields,
-                       ntpl.__class__.__name__))
+                       ntpl.__class__.__name__), dtype=object)
 
 
 
