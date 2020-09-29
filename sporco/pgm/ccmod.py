@@ -6,14 +6,14 @@
 # and user license can be found in the 'LICENSE.txt' file distributed
 # with the package.
 
-"""FISTA algorithms for the CCMOD problem"""
+"""PGM algorithms for the CCMOD problem"""
 
 from __future__ import division, absolute_import
 
 import copy
 import numpy as np
 
-from sporco.fista import fista
+from sporco.pgm import pgm
 from sporco.array import atleast_nd
 from sporco.fft import (rfftn, irfftn, empty_aligned, rfftn_empty_aligned,
                         rfl2norm2)
@@ -25,9 +25,9 @@ __author__ = """Cristina Garcia-Cardona <cgarciac@lanl.gov>"""
 
 
 
-class ConvCnstrMOD(fista.FISTADFT):
+class ConvCnstrMOD(pgm.PGMDFT):
     r"""
-    Base class for FISTA algorithm for Convolutional Constrained MOD
+    Base class for PGM algorithm for Convolutional Constrained MOD
     problem :cite:`garcia-2018-convolutional1`.
 
     |
@@ -45,7 +45,7 @@ class ConvCnstrMOD(fista.FISTADFT):
        \mathbf{s}_k \right\|_2^2 \quad \text{such that} \quad
        \mathbf{d}_m \in C
 
-    via the FISTA problem
+    via the PGM problem
 
     .. math::
        \mathrm{argmin}_\mathbf{d} \;
@@ -95,11 +95,11 @@ class ConvCnstrMOD(fista.FISTADFT):
 
 
 
-    class Options(fista.FISTADFT.Options):
+    class Options(pgm.PGMDFT.Options):
         r"""ConvCnstrMOD algorithm options
 
         Options include all of those defined in
-        :class:`.fista.FISTADFT.Options`, together with
+        :class:`.pgm.PGMDFT.Options`, together with
         additional options:
 
           ``ZeroMean`` : Flag indicating whether the solution
@@ -107,7 +107,7 @@ class ConvCnstrMOD(fista.FISTADFT):
           components.
         """
 
-        defaults = copy.deepcopy(fista.FISTADFT.Options.defaults)
+        defaults = copy.deepcopy(pgm.PGMDFT.Options.defaults)
         defaults.update({'ZeroMean': False})
 
 
@@ -121,13 +121,13 @@ class ConvCnstrMOD(fista.FISTADFT):
 
             if opt is None:
                 opt = {}
-            fista.FISTADFT.Options.__init__(self, opt)
+            pgm.PGMDFT.Options.__init__(self, opt)
 
 
         def __setitem__(self, key, value):
             """Set options."""
 
-            fista.FISTADFT.Options.__setitem__(self, key, value)
+            pgm.PGMDFT.Options.__setitem__(self, key, value)
 
 
     itstat_fields_objfn = ('DFid', 'Cnstr')
@@ -141,7 +141,7 @@ class ConvCnstrMOD(fista.FISTADFT):
         This class supports an arbitrary number of spatial dimensions,
         `dimN`, with a default of 2. The input coefficient map array `Z`
         (usually labelled X, but renamed here to avoid confusion with
-        the X and Y variables in the FISTA base class) is expected to
+        the X and Y variables in the PGM base class) is expected to
         be in standard form as computed by the GenericConvBPDN class.
 
         The input signal set `S` is either `dimN` dimensional (no
@@ -177,6 +177,17 @@ class ConvCnstrMOD(fista.FISTADFT):
         of :func:`.cnvrep.bcrop`.
 
 
+        |
+
+        **Call graph**
+
+        .. image:: ../_static/jonga/ccmodpgm_init.svg
+           :width: 20%
+           :target: ../_static/jonga/ccmodpgm_init.svg
+
+        |
+
+
         Parameters
         ----------
         Z : array_like
@@ -202,7 +213,9 @@ class ConvCnstrMOD(fista.FISTADFT):
 
         # Call parent class __init__
         xshape = self.cri.shpD
-        super(ConvCnstrMOD, self).__init__(xshape, S.dtype, opt)
+        Nv = self.cri.Nv
+        axisN = self.cri.axisN
+        super(ConvCnstrMOD, self).__init__(xshape, Nv, axisN, S.dtype, opt)
 
         # Set gradient step parameter
         self.set_attr('L', opt['L'], dval=self.cri.K * 14.0, dtype=self.dtype)
@@ -216,8 +229,9 @@ class ConvCnstrMOD(fista.FISTADFT):
         # simplest way to handle this is to just reshape so that the
         # channels also appear on the multiple image index.
         if self.cri.Cd == 1 and self.cri.C > 1:
-            self.S = S.reshape(self.cri.Nv + (1,) +
-                               (self.cri.C * self.cri.K,) + (1,))
+            self.S = S.reshape(self.cri.Nv + (1,)
+                               + (self.cri.C * self.cri.K,)
+                               + (1,))
         else:
             self.S = S.reshape(self.cri.shpS)
         self.S = np.asarray(self.S, dtype=self.dtype)
@@ -241,11 +255,7 @@ class ConvCnstrMOD(fista.FISTADFT):
 
         self.Xf = rfftn(self.X, None, self.cri.axisN)
         self.Yf = self.Xf
-        self.store_prev()
         self.Yfprv = self.Yf.copy() + 1e5
-
-        # Initialization needed for back tracking (if selected)
-        self.postinitialization_backtracking_DFT()
 
         if Z is not None:
             self.setcoef(Z)
@@ -262,8 +272,9 @@ class ConvCnstrMOD(fista.FISTADFT):
         # simplest way to handle this is to just reshape so that the
         # channels also appear on the multiple image index.
         if self.cri.Cd == 1 and self.cri.C > 1:
-            Z = Z.reshape(self.cri.Nv + (1,) + (self.cri.Cx * self.cri.K,) +
-                          (self.cri.M,))
+            Z = Z.reshape(self.cri.Nv + (1,)
+                          + (self.cri.Cx * self.cri.K,)
+                          + (self.cri.M,))
         self.Z = np.asarray(Z, dtype=self.dtype)
 
         self.Zf = rfftn(self.Z, self.cri.Nv, self.cri.axisN)
@@ -282,11 +293,13 @@ class ConvCnstrMOD(fista.FISTADFT):
 
 
 
-    def eval_grad(self):
+    def grad_f(self, Vf=None):
         """Compute gradient in Fourier domain."""
 
-        # Compute X D - S
-        Ryf = self.eval_Rf(self.Yf)
+        if Vf is None:
+            Vf = self.Yf
+        # Compute Zf Vf - Sf
+        Ryf = self.eval_Rf(Vf)
 
         gradf = inner(np.conj(self.Zf), Ryf, axis=self.cri.axisK)
 
@@ -305,10 +318,24 @@ class ConvCnstrMOD(fista.FISTADFT):
 
 
 
-    def eval_proxop(self, V):
+    def prox_g(self, V):
         """Compute proximal operator of :math:`g`."""
 
         return self.Pcn(V)
+
+
+
+    def hessian_f(self, V):
+        """Compute Hessian of :math:`f` applied to V."""
+
+        hessfv = inner(self.Zf, V, axis=self.cri.axisM)
+        hessfv = inner(np.conj(self.Zf), hessfv, axis=self.cri.axisK)
+
+        # Multiple channel signal, single channel dictionary
+        if self.cri.C > 1 and self.cri.Cd == 1:
+            hessfv = np.sum(hessfv, axis=self.cri.axisC, keepdims=True)
+
+        return hessfv
 
 
 
@@ -381,7 +408,7 @@ class ConvCnstrMOD(fista.FISTADFT):
 
 class ConvCnstrMODMask(ConvCnstrMOD):
     r"""
-    FISTA algorithm for Convolutional Constrained MOD problem
+    PGM algorithm for Convolutional Constrained MOD problem
     with a spatial mask :cite:`garcia-2018-convolutional1`.
 
     |
@@ -401,7 +428,7 @@ class ConvCnstrMODMask(ConvCnstrMOD):
 
     where :math:`C` is the feasible set consisting of filters with unit
     norm and constrained support, and :math:`W` is a mask array, via the
-    FISTA problem
+    PGM problem
 
     .. math::
        \mathrm{argmin}_{\mathbf{d}} \; (1/2) \left\|  W \left(X
@@ -420,7 +447,7 @@ class ConvCnstrMODMask(ConvCnstrMOD):
         """ConvCnstrMODMask algorithm options
 
         Options include all of those defined in
-        :class:`.fista.FISTA.Options`.
+        :class:`.pgm.PGM.Options`.
         """
 
         defaults = copy.deepcopy(ConvCnstrMOD.Options.defaults)
@@ -441,6 +468,18 @@ class ConvCnstrMODMask(ConvCnstrMOD):
 
     def __init__(self, Z, S, W, dsz, opt=None, dimK=None, dimN=2):
         """
+
+        |
+
+        **Call graph**
+
+        .. image:: ../_static/jonga/ccmodmdpgm_init.svg
+           :width: 20%
+           :target: ../_static/jonga/ccmodmdpgm_init.svg
+
+        |
+
+
         Parameters
         ----------
         Z : array_like
@@ -496,9 +535,9 @@ class ConvCnstrMODMask(ConvCnstrMOD):
                 else:
                     shpw[self.cri.axisC] = self.cri.C
                 W = np.broadcast_to(W, shpw)
-            self.W = W.reshape(
-                W.shape[0:self.cri.dimN] +
-                (1, W.shape[self.cri.axisC] * W.shape[self.cri.axisK], 1))
+            self.W = W.reshape(W.shape[0:self.cri.dimN]
+                               + (1, W.shape[self.cri.axisC]
+                               * W.shape[self.cri.axisK], 1))
         else:
             self.W = W
 
@@ -511,11 +550,15 @@ class ConvCnstrMODMask(ConvCnstrMOD):
 
 
 
-    def eval_grad(self):
+    def grad_f(self, Vf=None):
         """Compute gradient in Fourier domain."""
 
-        # Compute X D - S
-        self.Ryf[:] = self.eval_Rf(self.Yf)
+        if Vf is not None:
+            # Compute X V - S
+            self.Ryf[:] = self.eval_Rf(Vf)
+        else:
+            # Compute X D - S
+            self.Ryf[:] = self.eval_Rf(self.Yf)
 
         # Map to spatial domain to multiply by mask
         Ry = irfftn(self.Ryf, self.cri.Nv, self.cri.axisN)

@@ -5,15 +5,16 @@
 # with the package.
 
 """
-FISTA CBPDN Solver
+PGM CBPDN Solver
 ==================
 
-This example demonstrates use of a FISTA solver for a convolutional sparse coding problem with a colour dictionary and a colour signal :cite:`wohlberg-2016-convolutional` :cite:`garcia-2018-convolutional1`
+This example demonstrates the use of a PGM solver for a convolutional sparse coding problem with a greyscale signal :cite:`chalasani-2013-fast` :cite:`wohlberg-2016-efficient`
 
-  $$\mathrm{argmin}_\mathbf{x} \; (1/2) \sum_c \left\| \sum_m \mathbf{d}_{c,m} * \mathbf{x}_m -\mathbf{s}_c \right\|_2^2 + \lambda \sum_m \| \mathbf{x}_m \|_1 \;,$$
+  $$\mathrm{argmin}_\mathbf{x} \; \frac{1}{2} \left\| \sum_m \mathbf{d}_m * \mathbf{x}_{m} - \mathbf{s} \right\|_2^2 + \lambda \sum_m \| \mathbf{x}_{m} \|_1 \;,$$
 
-where $\mathbf{d}_{c,m}$ is channel $c$ of the $m^{\text{th}}$ dictionary filter, $\mathbf{x}_m$ is the coefficient map corresponding to the $m^{\text{th}}$ dictionary filter, and $\mathbf{s}_c$ is channel $c$ of the input image.
+where $\mathbf{d}_{m}$ is the $m^{\text{th}}$ dictionary filter, $\mathbf{x}_{m}$ is the coefficient map corresponding to the $m^{\text{th}}$ dictionary filter, and $\mathbf{s}$ is the input image.
 """
+
 
 
 from __future__ import print_function
@@ -25,16 +26,17 @@ import numpy as np
 from sporco import util
 from sporco import signal
 from sporco import plot
-import sporco.metric as sm
-from sporco.fista import cbpdn
+from sporco.metric import psnr
+from sporco.pgm import cbpdn
+from sporco.pgm.backtrack import *
 
 
 """
 Load example image.
 """
 
-img = util.ExampleImages().image('kodim23.png', scaled=True,
-                                idxexp=np.s_[160:416,60:316])
+img = util.ExampleImages().image('barbara.png', scaled=True, gray=True,
+                                 idxexp=np.s_[10:522, 100:612])
 
 
 """
@@ -47,28 +49,28 @@ sl, sh = signal.tikhonov_filter(img, fltlmbd, npd)
 
 
 """
-Load colour dictionary and display it.
+Load dictionary and display it.
 """
 
-D = util.convdicts()['RGB:8x8x3x64']
+D = util.convdicts()['G:12x12x36']
 plot.imview(util.tiledict(D), fgsz=(7, 7))
 
 
 """
-Set :class:`.fista.cbpdn.ConvBPDN` solver options.
+Set :class:`.pgm.cbpdn.ConvBPDN` solver options.
 """
 
-lmbda = 1e-1
+lmbda = 5e-2
 L = 1e2
 opt = cbpdn.ConvBPDN.Options({'Verbose': True, 'MaxMainIter': 250,
-            'RelStopTol': 8e-5, 'L': L, 'BackTrack': {'Enabled': True }})
+            'RelStopTol': 5e-3, 'L': L, 'Backtrack': {'Enabled': True }})
 
 
 """
 Initialise and run CSC solver.
 """
 
-b = cbpdn.ConvBPDN(D, sh, lmbda, opt)
+b = cbpdn.ConvBPDN(D, sh, lmbda, opt, dimK=0)
 X = b.solve()
 print("ConvBPDN solve time: %.2fs" % b.timer.elapsed('solve'))
 
@@ -79,7 +81,7 @@ Reconstruct image from sparse representation.
 
 shr = b.reconstruct().squeeze()
 imgr = sl + shr
-print("Reconstruction PSNR: %.2fdB\n" % sm.psnr(img, imgr))
+print("Reconstruction PSNR: %.2fdB\n" % psnr(img, imgr))
 
 
 """

@@ -7,7 +7,7 @@ Batch CDL
 .. toc-start
 
 * `Learn a convolutional dictionary (consensus method, greyscale images) <cbpdndl_cns_gry.py>`__
-* `Learn a convolutional dictionary (FISTA method, colour images, multiscale colour dictionary) <cbpdndl_fista_clr.py>`__
+* `Learn a convolutional dictionary (PGM method, colour images, multiscale colour dictionary) <cbpdndl_pgm_clr.py>`__
 * `Learn a convolutional dictionary (parallel consensus method, greyscale images) <cbpdndl_parcns_gry.py>`__
 * `Learn a convolutional dictionary (parallel consensus method, colour images) <cbpdndl_parcns_clr.py>`__
 * `Learn a convolutional dictionary (consensus method, video data) <cbpdndl_video.py>`__

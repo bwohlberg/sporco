@@ -507,18 +507,18 @@ def gengraphs(pth):
 
 
 
-    srcmodflt = '^sporco.fista'
-    fnmsub = ('^sporco.fista.', '')
+    srcmodflt = '^sporco.pgm'
+    fnmsub = ('^sporco.pgm.', '')
     lnksub = (r'^([^\.]*).([^\.]*)(?:(.__init__|.__call__)|(.[^\.]*))',
-              lnkpfx + r'sporco.fista.\1.html#sporco.fista.\1.\2\4')
+              lnkpfx + r'sporco.pgm.\1.html#sporco.pgm.\1.\2\4')
     ct = jonga.CallTracer(srcmodflt=srcmodflt, srcqnmflt=srcqnmflt,
                           dstqnmflt=dstqnmflt, fnmsub=fnmsub,
                           grpflt=grpflt, lnksub=lnksub)
 
 
-    #### fista.cbpdn module
-    from sporco.fista import cbpdn
-    mdnm = 'sporco.fista.cbpdn'
+    #### pgm.cbpdn module
+    from sporco.pgm import cbpdn
+    mdnm = 'sporco.pgm.cbpdn'
 
     D = np.random.randn(4, 4, 16)
     s = np.random.randn(8, 8)
@@ -527,18 +527,18 @@ def gengraphs(pth):
     ## ConvBPDN class
     opt = cbpdn.ConvBPDN.Options({'Verbose': False, 'MaxMainIter': 1})
 
-    with CallGraph(ct, mdnm, pth, 'fista_cbpdn_init.svg', **kwargs):
+    with CallGraph(ct, mdnm, pth, 'pgm_cbpdn_init.svg', **kwargs):
         b = cbpdn.ConvBPDN(D, s, lmbda, opt)
 
-    with CallGraph(ct, mdnm, pth, 'fista_cbpdn_solve.svg', **kwargs):
+    with CallGraph(ct, mdnm, pth, 'pgm_cbpdn_solve.svg', **kwargs):
         b.solve()
 
 
 
 
-    #### fista.ccmod module
-    from sporco.fista import ccmod
-    mdnm = 'sporco.fista.ccmod'
+    #### pgm.ccmod module
+    from sporco.pgm import ccmod
+    mdnm = 'sporco.pgm.ccmod'
 
     X = np.random.randn(8, 8, 1, 2, 1)
     S = np.random.randn(8, 8, 2)
@@ -547,10 +547,10 @@ def gengraphs(pth):
     ## ConvCnstrMOD class
     opt = ccmod.ConvCnstrMOD.Options({'Verbose': False, 'MaxMainIter': 1})
 
-    with CallGraph(ct, mdnm, pth, 'ccmodfista_init.svg', **kwargs):
+    with CallGraph(ct, mdnm, pth, 'ccmodpgm_init.svg', **kwargs):
         b = ccmod.ConvCnstrMOD(X, S, dsz=dsz, opt=opt)
 
-    with CallGraph(ct, mdnm, pth, 'ccmodfista_solve.svg', **kwargs):
+    with CallGraph(ct, mdnm, pth, 'ccmodpgm_solve.svg', **kwargs):
         b.solve()
 
 
@@ -558,10 +558,10 @@ def gengraphs(pth):
     opt = ccmod.ConvCnstrMODMask.Options({'Verbose': False,
                                           'MaxMainIter': 1})
 
-    with CallGraph(ct, mdnm, pth, 'ccmodmdfista_init.svg', **kwargs):
+    with CallGraph(ct, mdnm, pth, 'ccmodmdpgm_init.svg', **kwargs):
         b = ccmod.ConvCnstrMODMask(X, S, W, dsz=dsz, opt=opt)
 
-    with CallGraph(ct, mdnm, pth, 'ccmodmdfista_solve.svg', **kwargs):
+    with CallGraph(ct, mdnm, pth, 'ccmodmdpgm_solve.svg', **kwargs):
         b.solve()
 
 
@@ -713,9 +713,9 @@ def insert_solve_docs():
         'sporco.admm.tvl1.TVL1Deconv': 'tvl1dcn_solve.svg',
         'sporco.admm.tvl2.TVL2Denoise': 'tvl2den_solve.svg',
         'sporco.admm.tvl2.TVL2Deconv': 'tvl2dcn_solve.svg',
-        'sporco.fista.cbpdn.ConvBPDN': 'fista_cbpdn_solve.svg',
-        'sporco.fista.ccmod.ConvCnstrMOD': 'ccmodfista_solve.svg',
-        'sporco.fista.ccmod.ConvCnstrMODMask': 'ccmodmdfista_solve.svg'
+        'sporco.pgm.cbpdn.ConvBPDN': 'pgm_cbpdn_solve.svg',
+        'sporco.pgm.ccmod.ConvCnstrMOD': 'ccmodpgm_solve.svg',
+        'sporco.pgm.ccmod.ConvCnstrMODMask': 'ccmodmdpgm_solve.svg'
     }
 
     # Iterate over fully qualified class names in class/call graph image dict

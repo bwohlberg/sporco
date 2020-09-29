@@ -8,7 +8,7 @@
 Convolutional Dictionary Learning
 =================================
 
-This example demonstrates the use of :class:`.cbpdndl.ConvBPDNDictLearn` for learning a convolutional dictionary from a set of colour training images :cite:`wohlberg-2016-convolutional`, using FISTA solvers for both sparse coding :cite:`chalasani-2013-fast` :cite:`wohlberg-2016-efficient` and dictionary update steps :cite:`garcia-2018-convolutional1`.
+This example demonstrates the use of :class:`.cbpdndl.ConvBPDNDictLearn` for learning a convolutional dictionary from a set of colour training images :cite:`wohlberg-2016-convolutional`, using PGM solvers for both sparse coding :cite:`chalasani-2013-fast` :cite:`wohlberg-2016-efficient` and dictionary update steps :cite:`garcia-2018-convolutional1`.
 """
 
 
@@ -22,6 +22,7 @@ from sporco.dictlrn import cbpdndl
 from sporco import util
 from sporco import signal
 from sporco import plot
+from sporco.pgm.backtrack import *
 
 
 """
@@ -62,17 +63,17 @@ L_du = 50.0
 dsz = ((8, 8, 3, 32), (12, 12, 3, 32), (16, 16, 3, 32))
 opt = cbpdndl.ConvBPDNDictLearn.Options({
                 'Verbose': True, 'MaxMainIter': 200, 'DictSize': dsz,
-                'CBPDN': {'BackTrack': {'Enabled': True }, 'L': L_sc},
-                'CCMOD': {'BackTrack': {'Enabled': True }, 'L': L_du}},
-                xmethod='fista', dmethod='fista')
+                'CBPDN': {'Backtrack': {'Enabled': True }, 'L': L_sc},
+                'CCMOD': {'Backtrack': {'Enabled': True }, 'L': L_du}},
+                xmethod='pgm', dmethod='pgm')
 
 
 """
 Create solver object and solve.
 """
 
-d = cbpdndl.ConvBPDNDictLearn(D0, sh, lmbda, opt, xmethod='fista',
-                              dmethod='fista')
+d = cbpdndl.ConvBPDNDictLearn(D0, sh, lmbda, opt, xmethod='pgm',
+                              dmethod='pgm')
 D1 = d.solve()
 print("ConvBPDNDictLearn solve time: %.2fs" % d.timer.elapsed('solve'))
 

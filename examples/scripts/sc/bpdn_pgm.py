@@ -8,7 +8,7 @@
 Basis Pursuit DeNoising
 =======================
 
-This example demonstrates the use of class :class:`.fista.bpdn.BPDN` to solve the Basis Pursuit DeNoising (BPDN) problem :cite:`chen-1998-atomic`
+This example demonstrates the use of class :class:`.pgm.bpdn.BPDN` to solve the Basis Pursuit DeNoising (BPDN) problem :cite:`chen-1998-atomic`
 
   $$\mathrm{argmin}_\mathbf{x} \; (1/2) \| D \mathbf{x} - \mathbf{s} \|_2^2 + \lambda \| \mathbf{x} \|_1 \;,$$
 
@@ -21,8 +21,9 @@ from builtins import input
 
 import numpy as np
 
-from sporco.fista import bpdn
+from sporco.pgm import bpdn
 from sporco import plot
+from sporco.pgm.backtrack import *
 
 
 """
@@ -52,12 +53,12 @@ s = s0 + sigma*np.random.randn(N,1)
 
 
 """
-Set BPDN solver with standard FISTA backtracking.
+Set BPDN solver with standard PGM backtracking.
 """
 
 L_sc = 9.e2
 opt = bpdn.BPDN.Options({'Verbose': True, 'MaxMainIter': 50,
-                    'BackTrack': {'Enabled': True }, 'L': L_sc})
+                    'Backtrack': {'Enabled': True }, 'L': L_sc})
 
 
 lmbda = 2.98e1
@@ -66,7 +67,7 @@ print("")
 b = bpdn.BPDN(D, s, lmbda, opt)
 x = b.solve()
 
-print("BPDN standard FISTA backtracking solve time: %.2fs" %
+print("BPDN standard PGM backtracking solve time: %.2fs" %
       b.timer.elapsed('solve'))
 print("")
 
@@ -75,7 +76,7 @@ print("")
 Plot comparison of reference and recovered representations.
 """
 
-plot.plot(np.hstack((x0, x)), title='Sparse representation (standard FISTA)',
+plot.plot(np.hstack((x0, x)), title='Sparse representation (standard PGM)',
           lgnd=['Reference', 'Reconstructed'])
 
 
@@ -92,22 +93,24 @@ plot.plot(its.Rsdl, ptyp='semilogy', xlbl='Iterations', ylbl='Residual',
           fig=fig)
 plot.subplot(1, 3, 3)
 plot.plot(its.L, xlbl='Iterations',
-          ylbl='Inverse of Step Size (Standard FISTA)', fig=fig)
+          ylbl='Inverse of Step Size (Standard PGM)', fig=fig)
 fig.show()
 
 
 """
-Repeat for BPDN solver with robust FISTA backtracking.
+Repeat for BPDN solver with robust PGM backtracking.
 """
 
+opt_bck = Backtrack_Robust.Options(Backtrack_Robust.defaults)
 opt = bpdn.BPDN.Options({'Verbose': True, 'MaxMainIter': 50,
-            'BackTrack': {'Enabled': True, 'Robust' : True }, 'L': L_sc})
+            'Backtrack': {'Enabled': True, 'Class' : Backtrack_Robust, 'Options': opt_bck },
+                         'L': L_sc})
 
 
 b = bpdn.BPDN(D, s, lmbda, opt)
 x = b.solve()
 
-print("BPDN robust FISTA backtracking solve time: %.2fs" %
+print("BPDN robust PGM backtracking solve time: %.2fs" %
       b.timer.elapsed('solve'))
 
 
@@ -115,7 +118,7 @@ print("BPDN robust FISTA backtracking solve time: %.2fs" %
 Plot comparison of reference and recovered representations.
 """
 
-plot.plot(np.hstack((x0, x)), title='Sparse representation (robust FISTA)',
+plot.plot(np.hstack((x0, x)), title='Sparse representation (robust PGM)',
           lgnd=['Reference', 'Reconstructed'])
 
 
@@ -132,7 +135,7 @@ plot.plot(its.Rsdl, ptyp='semilogy', xlbl='Iterations', ylbl='Residual',
           fig=fig)
 plot.subplot(1, 3, 3)
 plot.plot(its.L, xlbl='Iterations',
-          ylbl='Inverse of Step Size (robust FISTA)', fig=fig)
+          ylbl='Inverse of Step Size (robust PGM)', fig=fig)
 fig.show()
 
 

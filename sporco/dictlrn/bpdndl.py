@@ -38,7 +38,7 @@ class BPDNDictLearn(dictlrn.DictLearn):
        X \|_1 \quad \text{such that} \quad \|\mathbf{d}_m\|_2 = 1
 
     via interleaved alternation between the ADMM steps of the
-    :class:`.admm.bpdn.BPDN` and :class:`.CnstrMOD` problems.
+    :class:`.admm.bpdn.BPDN` and :class:`.admm.cmod.CnstrMOD` problems.
 
     After termination of the :meth:`solve` method, attribute :attr:`itstat`
     is a list of tuples representing statistics of each iteration. The

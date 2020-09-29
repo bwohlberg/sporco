@@ -61,7 +61,7 @@ The ``sporco.cupy`` subpackage currently provides `CuPy <https://cupy.chainer.or
 ``sporco.cupy.admm.rpca``          :mod:`sporco.admm.rpca`
 ``sporco.cupy.admm.tvl1``          :mod:`sporco.admm.tvl1`
 ``sporco.cupy.admm.tvl2``          :mod:`sporco.admm.tvl2`
-``sporco.cupy.fista.cbpdn``        :mod:`sporco.fista.cbpdn`
+``sporco.cupy.pgm.cbpdn``          :mod:`sporco.pgm.cbpdn`
 ``sporco.cupy.dictlrn.onlinecdl``  :mod:`sporco.dictlrn.onlinecdl`
 =================================  ===============================
 

@@ -33,11 +33,15 @@ API Reference
    sporco.admm.rpca
    sporco.admm.spline
    sporco.admm.ppp
-   sporco.fista.fista
-   sporco.fista.bpdn
-   sporco.fista.cbpdn
-   sporco.fista.ccmod
-   sporco.fista.ppp
+   sporco.pgm.stepsize
+   sporco.pgm.momentum
+   sporco.pgm.backtrack
+   sporco.pgm.pgm
+   sporco.pgm.bpdn
+   sporco.pgm.cmod
+   sporco.pgm.cbpdn
+   sporco.pgm.ccmod
+   sporco.pgm.ppp
    sporco.dictlrn.common
    sporco.dictlrn.dictlrn
    sporco.dictlrn.bpdndl
@@ -95,11 +99,15 @@ API Reference
    sporco.admm.rpca
    sporco.admm.spline
    sporco.admm.ppp
-   sporco.fista.fista
-   sporco.fista.bpdn
-   sporco.fista.cbpdn
-   sporco.fista.ccmod
-   sporco.fista.ppp
+   sporco.pgm.stepsize
+   sporco.pgm.momentum
+   sporco.pgm.backtrack
+   sporco.pgm.pgm
+   sporco.pgm.bpdn
+   sporco.pgm.cmod
+   sporco.pgm.cbpdn
+   sporco.pgm.ccmod
+   sporco.pgm.ppp
    sporco.dictlrn.common
    sporco.dictlrn.dictlrn
    sporco.dictlrn.bpdndl
@@ -109,3 +117,9 @@ API Reference
    sporco.dictlrn.onlinecdl
    sporco.cuda
    sporco.cupy
+   sporco.fista.bpdn
+   sporco.fista.cbpdn
+   sporco.fista.cmod
+   sporco.fista.ccmod
+   sporco.fista.fista
+   sporco.fista.ppp

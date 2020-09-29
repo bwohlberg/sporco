@@ -8,7 +8,7 @@ SPORCO Documentation
    install
    invprob/index
    admm/index
-   fista/index
+   pgm/index
    util
    examples/index
    notes
