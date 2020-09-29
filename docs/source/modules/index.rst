@@ -119,7 +119,6 @@ API Reference
    sporco.cupy
    sporco.fista.bpdn
    sporco.fista.cbpdn
-   sporco.fista.cmod
    sporco.fista.ccmod
    sporco.fista.fista
    sporco.fista.ppp
