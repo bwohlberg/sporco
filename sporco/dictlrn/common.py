@@ -53,7 +53,7 @@ def isdmap(dmethod):
                'D_Q_Btrack': 'Q_Btrack', 'D_ItBt': 'IterBTrack',
                'D_L': 'L', 'D_Rsdl': 'Rsdl'}
     else:
-        isd = {'Cnstr':  'Cnstr', 'DPrRsdl': 'PrimalRsdl',
+        isd = {'Cnstr': 'Cnstr', 'DPrRsdl': 'PrimalRsdl',
                'DDlRsdl': 'DualRsdl', 'DRho': 'Rho'}
     return isd
 
@@ -67,7 +67,7 @@ def isfld(xmethod, dmethod, opt):
     if xmethod == 'admm':
         fld.extend(['XPrRsdl', 'XDlRsdl', 'XRho'])
     else:
-        if opt['CBPDN', 'Backtrack', 'Enabled']:
+        if opt['CBPDN', 'Backtrack'] is not None:
             fld.extend(['X_F_Btrack', 'X_Q_Btrack', 'X_ItBt', 'X_L',
                         'X_Rsdl'])
         else:
@@ -75,7 +75,7 @@ def isfld(xmethod, dmethod, opt):
     if dmethod != 'pgm':
         fld.extend(['DPrRsdl', 'DDlRsdl', 'DRho'])
     else:
-        if opt['CCMOD', 'Backtrack', 'Enabled']:
+        if opt['CCMOD', 'Backtrack'] is not None:
             fld.extend(['D_F_Btrack', 'D_Q_Btrack', 'D_ItBt', 'D_L',
                         'D_Rsdl'])
         else:
@@ -93,14 +93,14 @@ def hdrtxt(xmethod, dmethod, opt):
     if xmethod == 'admm':
         txt.extend(['r_X', 's_X', u('ρ_X')])
     else:
-        if opt['CBPDN', 'Backtrack', 'Enabled']:
+        if opt['CBPDN', 'Backtrack'] is not None:
             txt.extend(['F_X', 'Q_X', 'It_X', 'L_X'])
         else:
             txt.append('L_X')
     if dmethod != 'pgm':
         txt.extend(['r_D', 's_D', u('ρ_D')])
     else:
-        if opt['CCMOD', 'Backtrack', 'Enabled']:
+        if opt['CCMOD', 'Backtrack'] is not None:
             txt.extend(['F_D', 'Q_D', 'It_D', 'L_D'])
         else:
             txt.append('L_D')
@@ -117,7 +117,7 @@ def hdrmap(xmethod, dmethod, opt):
     if xmethod == 'admm':
         hdr.update({'r_X': 'XPrRsdl', 's_X': 'XDlRsdl', u('ρ_X'): 'XRho'})
     else:
-        if opt['CBPDN', 'Backtrack', 'Enabled']:
+        if opt['CBPDN', 'Backtrack'] is not None:
             hdr.update({'F_X': 'X_F_Btrack', 'Q_X': 'X_Q_Btrack',
                         'It_X': 'X_ItBt', 'L_X': 'X_L'})
         else:
@@ -125,7 +125,7 @@ def hdrmap(xmethod, dmethod, opt):
     if dmethod != 'pgm':
         hdr.update({'r_D': 'DPrRsdl', 's_D': 'DDlRsdl', u('ρ_D'): 'DRho'})
     else:
-        if opt['CCMOD', 'Backtrack', 'Enabled']:
+        if opt['CCMOD', 'Backtrack'] is not None:
             hdr.update({'F_D': 'D_F_Btrack', 'Q_D': 'D_Q_Btrack',
                         'It_D': 'D_ItBt', 'L_D': 'D_L'})
         else:

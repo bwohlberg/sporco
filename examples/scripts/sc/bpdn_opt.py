@@ -57,7 +57,7 @@ Set BPDN solver class options.
 """
 
 opt = bpdn.BPDN.Options({'Verbose': False, 'MaxMainIter': 500,
-                    'RelStopTol': 1e-3, 'AutoRho': {'RsdlTarget': 1.0}})
+                         'RelStopTol': 1e-3, 'AutoRho': {'RsdlTarget': 1.0}})
 
 
 """

@@ -36,11 +36,11 @@ Backtrack Classes
 The PGM backtrack functionality is defined by the following classes:
 
 
-* :class:`.Backtrack_Standard`
+* :class:`.BacktrackStandard`
 
  This implements the standard PGM variant from :cite:`beck-2009-fast`.
 
-* :class:`.Backtrack_Robust`
+* :class:`.BacktrackRobust`
 
  This implements the robust PGM variant from :cite:`florea-2017-robust`.
 

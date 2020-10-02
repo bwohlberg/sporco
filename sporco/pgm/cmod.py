@@ -198,18 +198,20 @@ class CnstrMOD(pgm.PGM):
         contribution to objective function.
         """
 
-        dfd = self.obfn_dfd()
+        dfd = self.obfn_f()
         cns = self.obfn_cns()
         return (dfd, cns)
 
 
 
-    def obfn_dfd(self):
+    def obfn_f(self, X=None):
         r"""Compute data fidelity term :math:`(1/2) \| D \mathbf{x} -
         \mathbf{s} \|_2^2`.
         """
 
-        return 0.5 * np.linalg.norm((self.Y.dot(self.Z) - self.S).ravel())**2
+        if X is None:
+            X = self.X
+        return 0.5 * np.linalg.norm((X.dot(self.Z) - self.S).ravel())**2
 
 
 
@@ -323,13 +325,15 @@ class WeightedCnstrMOD(CnstrMOD):
 
 
 
-    def obfn_dfd(self):
+    def obfn_f(self, X=None):
         r"""Compute data fidelity term :math:`(1/2) \| D \mathbf{x} -
         \mathbf{s} \|_W^2`.
         """
 
+        if X is None:
+            X = self.X
         return 0.5 * np.linalg.norm(
-            (np.sqrt(self.W) * (self.Y.dot(self.Z) - self.S)).ravel())**2
+            (np.sqrt(self.W) * (X.dot(self.Z) - self.S)).ravel())**2
 
 
 

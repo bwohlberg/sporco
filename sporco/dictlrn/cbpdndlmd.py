@@ -24,7 +24,6 @@ import sporco.dictlrn.common as dc
 from sporco.common import _fix_dynamic_class_lookup
 from sporco.fft import rfftn, irfftn
 from sporco.linalg import inner
-from sporco.pgm import backtrack as bck
 
 
 __author__ = """Brendt Wohlberg <brendt@ieee.org>"""
@@ -55,8 +54,7 @@ def ConvBPDNMaskOptionsDefaults(method='admm'):
                       'RsdlRatio': 10.0, 'Scaling': 2.0,
                       'RsdlTarget': 1.0}})
     else:
-        dflt.update({'MaxMainIter': 1, 'Backtrack':
-                     {'Options': bck.BacktrackBase.Options()}})
+        dflt.update({'MaxMainIter': 1})
     return dflt
 
 
@@ -147,8 +145,7 @@ def ConvCnstrMODMaskOptionsDefaults(method='pgm'):
 
     dflt = copy.deepcopy(ccmodmsk_class_label_lookup(method).Options.defaults)
     if method == 'pgm':
-        dflt.update({'MaxMainIter': 1, 'Backtrack':
-                     {'Options': bck.BacktrackBase.Options()}})
+        dflt.update({'MaxMainIter': 1})
     else:
         dflt.update({'MaxMainIter': 1, 'AutoRho':
                      {'Period': 10, 'AutoScaling': False,

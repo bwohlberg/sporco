@@ -12,8 +12,6 @@ from __future__ import division, print_function
 
 import numpy as np
 
-from sporco.cdict import ConstrainedDict
-
 
 __author__ = """Cristina Garcia-Cardona <cgarciac@lanl.gov>"""
 
@@ -30,47 +28,7 @@ class MomentumBase(object):
     momentum coefficient is returned.
     """
 
-    class Options(ConstrainedDict):
-        """Momentum coefficient options.
-
-        Options:
-
-          ``a`` : float, used by :class:`Momentum_GenLinear`
-
-          ``b`` : float, used by :class:`Momentum_Linear` and
-            :class:`Momentum_GenLinear`
-        """
-
-        defaults = {'a': 50., 'b': 2.}
-
-        def __init__(self, opt=None):
-            """
-            Parameters
-            ----------
-            opt : dict or None, optional (default None)
-              PGM momentum coefficient options
-            """
-
-            if opt is None:
-                opt = {}
-            ConstrainedDict.__init__(self, opt)
-
-
-
-    def __init__(self, opt=None):
-        """
-        Parameters
-        ----------
-        opt : :class:`MomentumBase.Options` object
-          Momentum coefficient options
-        """
-
-        if opt is None:
-            opt = MomentumBase.Options()
-        if not isinstance(opt, MomentumBase.Options):
-            raise TypeError('Parameter opt must be an instance of '
-                            'MomentumBase.Options')
-            self.opt = opt
+    def __init__(self):
         super(MomentumBase, self).__init__()
 
 
@@ -87,24 +45,20 @@ class MomentumBase(object):
 
 
 
-class Momentum_Nesterov(MomentumBase):
-    """Nesterov's momentum coefficient :cite:`beck-2009-fast`
+class MomentumNesterov(MomentumBase):
+    r"""Nesterov's momentum coefficient :cite:`beck-2009-fast`
+
+    Applies the update
+
+    .. math::
+      t^{(k+1)} = \frac{1}{2} \left( 1
+      + \sqrt{1 + 4 \; (t^{(k)})^2} \right) \;,
+
+    with :math:`k` iteration.
     """
 
-    def __init__(self, opt=None):
-        """
-        Parameters
-        ----------
-        opt : :class:`MomentumBase.Options` object
-          Momentum coefficient options
-        """
-
-        if opt is None:
-            opt = MomentumBase.Options()
-        if not isinstance(opt, MomentumBase.Options):
-            raise TypeError('Parameter opt must be an instance of '
-                            'MomentumBase.Options')
-        super(Momentum_Nesterov, self).__init__(opt)
+    def __init__(self):
+        super(MomentumNesterov, self).__init__()
 
 
 
@@ -117,62 +71,72 @@ class Momentum_Nesterov(MomentumBase):
 
 
 
-class Momentum_Linear(MomentumBase):
-    """Linear momentum coefficient :cite:`chambolle-2015-convergence`
+class MomentumLinear(MomentumBase):
+    r"""Linear momentum coefficient :cite:`chambolle-2015-convergence`
+
+    Applies the update
+
+    .. math::
+       t^{(k+1)} = \frac{k + b}{b} \;,
+
+    with :math:`b` corresponding to a positive constant such
+    that :math:`b \geq 2` and :math:`k` iteration.
     """
 
-    def __init__(self, opt=None):
+    def __init__(self, b=2.):
         """
         Parameters
         ----------
-        opt : :class:`MomentumBase.Options` object
-          Momentum coefficient options
+        b : float
+          Summand in numerator and factor in
+          denominator of update.
         """
 
-        if opt is None:
-            opt = MomentumBase.Options()
-        if not isinstance(opt, MomentumBase.Options):
-            raise TypeError('Parameter opt must be an instance of '
-                            'MomentumBase.Options')
-        super(Momentum_Linear, self).__init__(opt)
-        self.b = opt['b']
+        super(MomentumLinear, self).__init__()
+        self.b = b
 
 
 
     def update(self, k):
         """Update momentum coefficient"""
 
-        return ((k + 1.) - 1. + self.b) / self.b
+        return (k + self.b) / self.b
 
 
 
 
 
-class Momentum_GenLinear(MomentumBase):
-    """Generalized linear momentum coefficient
+class MomentumGenLinear(MomentumBase):
+    r"""Generalized linear momentum coefficient
     :cite:`rodriguez-2019-convergence`
+
+    Applies the update
+
+    .. math::
+       t^{(k+1)} = \frac{k + a}{b} \;,
+
+    with :math:`a, b` corresponding to postive constants such
+    that :math:`a \geq b - 1` and :math:`b \geq 2`, and :math:`k`
+    iteration.
     """
 
-    def __init__(self, opt=None):
+    def __init__(self, a=50., b=2.):
         """
         Parameters
         ----------
-        opt : :class:`MomentumBase.Options` object
-          Momentum coefficient options
+        a : float
+          Summand in numerator of update.
+        b : float
+          Factor in denominator of update.
         """
 
-        if opt is None:
-            opt = MomentumBase.Options()
-        if not isinstance(opt, MomentumBase.Options):
-            raise TypeError('Parameter opt must be an instance of '
-                            'MomentumBase.Options')
-        super(Momentum_GenLinear, self).__init__(opt)
-        self.a = opt['a']
-        self.b = opt['b']
+        super(MomentumGenLinear, self).__init__()
+        self.a = a
+        self.b = b
 
 
 
     def update(self, k):
         """Update momentum coefficient"""
 
-        return ((k + 1.) - 1. + self.a) / self.b
+        return (k + self.a) / self.b

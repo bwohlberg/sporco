@@ -21,7 +21,7 @@ Step Size Classes
 The step size adaptation functionality is defined by the following classes:
 
 
-* :class:`.StepSizePolicy_Cauchy`
+* :class:`.StepSizePolicyCauchy`
 
  This implements the step size adaptation based on Cauchy's method as
 
@@ -32,7 +32,7 @@ The step size adaptation functionality is defined by the following classes:
 with :math:`L = 1 / \alpha`.
 
 
-* :class:`.StepSizePolicy_BB`
+* :class:`.StepSizePolicyBB`
 
  This implements the step size adaptation based on Barzilai-Borwein method from :cite:`barzilai-1988-stepsize` as
 

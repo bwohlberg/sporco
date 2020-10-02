@@ -5,9 +5,8 @@ import numpy as np
 
 from sporco.pgm import cmod
 
-from sporco.pgm.momentum import *
-from sporco.pgm.stepsize import *
-from sporco.pgm.backtrack import *
+from sporco.pgm.momentum import MomentumLinear, MomentumGenLinear
+from sporco.pgm.stepsize import StepSizePolicyBB, StepSizePolicyCauchy
 
 
 class TestSet01(object):
@@ -94,8 +93,8 @@ class TestSet01(object):
         X = np.random.randn(M, K)
         S = np.random.randn(N, K)
         dt = np.float64
-        opt = cmod.CnstrMOD.Options({'Verbose': False, 'MaxMainIter': 20,
-                                     'DataType': dt})
+        opt = cmod.CnstrMOD.Options({'Verbose': False,
+                                     'MaxMainIter': 20, 'DataType': dt})
         b = cmod.CnstrMOD(X, S, opt=opt)
         b.solve()
         assert b.X.dtype == dt
@@ -110,7 +109,7 @@ class TestSet01(object):
         S = np.random.randn(N, K)
         opt = cmod.CnstrMOD.Options(
             {'Verbose': False, 'MaxMainIter': 200, 'RelStopTol': 1e-4,
-             'L': 100.0, 'Momentum': {'Class': Momentum_Linear}})
+             'L': 100.0, 'Momentum': MomentumLinear()})
         b = cmod.CnstrMOD(X, S, (N, M), opt=opt)
         b.solve()
         assert np.array(b.getitstat().Rsdl).min() < 1e-4
@@ -124,7 +123,7 @@ class TestSet01(object):
         S = np.random.randn(N, K)
         opt = cmod.CnstrMOD.Options(
             {'Verbose': False, 'MaxMainIter': 200, 'RelStopTol': 1e-4,
-             'L': 100.0, 'Momentum': {'Class': Momentum_GenLinear}})
+             'L': 100.0, 'Momentum': MomentumGenLinear()})
         b = cmod.CnstrMOD(X, S, (N, M), opt=opt)
         b.solve()
         assert np.array(b.getitstat().Rsdl).min() < 1e-4
@@ -138,7 +137,7 @@ class TestSet01(object):
         S = np.random.randn(N, K)
         opt = cmod.CnstrMOD.Options(
             {'Verbose': False, 'MaxMainIter': 50, 'RelStopTol': 1e-4,
-             'L': 100.0, 'StepSizePolicy': {'Enabled': True}})
+             'L': 100.0, 'StepSizePolicy': StepSizePolicyBB()})
         b = cmod.CnstrMOD(X, S, (N, M), opt=opt)
         b.solve()
         assert np.array(b.getitstat().Rsdl).min() < 1e-4
@@ -150,10 +149,11 @@ class TestSet01(object):
         K = 8
         X = np.random.randn(M, K)
         S = np.random.randn(N, K)
-        opt = cmod.CnstrMOD.Options(
-            {'Verbose': False, 'MaxMainIter': 100, 'RelStopTol': 1e-4,
-             'L': 10.0, 'StepSizePolicy': {'Enabled': True,
-                                           'Class': StepSizePolicy_Cauchy}})
+        opt = cmod.CnstrMOD.Options({'Verbose': False,
+                                     'MaxMainIter': 100,
+                                     'RelStopTol': 1e-4,
+                                     'L': 10.0,
+                                     'StepSizePolicy': StepSizePolicyCauchy()})
         try:
             b = cmod.CnstrMOD(X, S, (N, M), opt=opt)
             b.solve()
@@ -168,9 +168,11 @@ class TestSet01(object):
         K = 8
         X = np.random.randn(M, K)
         S = np.random.randn(N, K)
-        opt = cmod.CnstrMOD.Options(
-              {'Verbose': False, 'MaxMainIter': 500, 'RelStopTol': 1e-4,
-               'L': 250.0, 'Monotone': True})
+        opt = cmod.CnstrMOD.Options({'Verbose': False,
+                                     'MaxMainIter': 500,
+                                     'RelStopTol': 1e-4,
+                                     'L': 250.0,
+                                     'Monotone': True})
         b = cmod.CnstrMOD(X, S, (N, M), opt=opt)
         b.solve()
         assert np.array(b.getitstat().Rsdl).min() < 2e-4

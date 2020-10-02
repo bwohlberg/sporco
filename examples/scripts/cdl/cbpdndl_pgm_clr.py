@@ -22,7 +22,7 @@ from sporco.dictlrn import cbpdndl
 from sporco import util
 from sporco import signal
 from sporco import plot
-from sporco.pgm.backtrack import *
+from sporco.pgm.backtrack import BacktrackStandard
 
 
 """
@@ -54,17 +54,17 @@ D0 = np.random.randn(16, 16, 3, 96)
 
 
 """
-Set regularization parameter and options for dictionary learning solver. Note the multi-scale dictionary filter sizes.
+Set regularization parameter and options for dictionary learning solver. Note the multi-scale dictionary filter sizes. Also note the possibility of changing parameters in the backtracking algorithm.
 """
 
 lmbda = 0.2
-L_sc = 360.0
+L_sc = 36.0
 L_du = 50.0
 dsz = ((8, 8, 3, 32), (12, 12, 3, 32), (16, 16, 3, 32))
 opt = cbpdndl.ConvBPDNDictLearn.Options({
                 'Verbose': True, 'MaxMainIter': 200, 'DictSize': dsz,
-                'CBPDN': {'Backtrack': {'Enabled': True }, 'L': L_sc},
-                'CCMOD': {'Backtrack': {'Enabled': True }, 'L': L_du}},
+                'CBPDN': {'Backtrack': BacktrackStandard(gamma_u=1.1), 'L': L_sc},
+                'CCMOD': {'Backtrack': BacktrackStandard(), 'L': L_du}},
                 xmethod='pgm', dmethod='pgm')
 
 

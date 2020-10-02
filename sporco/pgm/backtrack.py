@@ -10,10 +10,7 @@
 
 from __future__ import division, print_function
 
-import copy
 import numpy as np
-
-from sporco.cdict import ConstrainedDict
 
 
 __author__ = """Cristina Garcia-Cardona <cgarciac@lanl.gov>"""
@@ -32,63 +29,9 @@ class BacktrackBase(object):
     This also updates all the supporting variables.
     """
 
-    class Options(ConstrainedDict):
-        r"""Backtracking options.
-
-        Options:
-
-          ``gamma_d`` : Multiplier applied to decrease L when
-          backtracking in robust PGM (:math:`\gamma_d` in
-          :cite:`florea-2017-robust`).
-
-          ``gamma_u`` : Multiplier applied to increase L when
-          backtracking in standard PGM (corresponding to
-          :math:`\eta` in :cite:`beck-2009-fast`) or in robust
-          PGM (corresponding Total :math:`\gamma_u` in
-          :cite:`florea-2017-robust`).
-
-          ``MaxIter`` : Maximum iterations of updating L when
-          backtracking.
-
-          ``Enabled`` : Flag determining whether iteration status
-          is displayed.
-        """
-
-        defaults = {'gamma_d': 0.9, 'gamma_u': 1.2,
-                    'MaxIter': 50, 'Enabled': True}
-
-        def __init__(self, opt=None):
-            """
-            Parameters
-            ----------
-            opt : dict or None, optional (default None)
-              PGM Backtracking algorithm options
-            """
-            if opt is None:
-                opt = {}
-            ConstrainedDict.__init__(self, opt)
-
-
-
-    def __init__(self, opt=None):
-        """
-        Parameters
-        ----------
-        opt : :class:`BacktrackBase.Options` object Backtracking options
-        """
-
-        if opt is None:
-            opt = BacktrackBase.Options()
-        if not isinstance(opt, BacktrackBase.Options):
-            raise TypeError('Parameter opt must be an instance of '
-                            'BacktrackBase.Options')
+    def __init__(self):
 
         super(BacktrackBase, self).__init__()
-
-        # Initialise attributes controlling the backtracking
-        self.gamma_d = opt['gamma_d']
-        self.gamma_u = opt['gamma_u']
-        self.maxiter = opt['MaxIter']
 
 
 
@@ -104,7 +47,7 @@ class BacktrackBase(object):
 
 
 
-class Backtrack_Standard(BacktrackBase):
+class BacktrackStandard(BacktrackBase):
     """Class to estimate step size L by computing a linesearch
     that guarantees that F <= Q according to the standard PGM
     backtracking strategy in :cite:`beck-2009-fast`.
@@ -114,26 +57,23 @@ class Backtrack_Standard(BacktrackBase):
     This also updates all the supporting variables.
     """
 
-    defaults = copy.deepcopy(BacktrackBase.Options.defaults)
-    defaults.update({'gamma_u': 1.2})
-
-
-    def __init__(self, opt=None):
-        """
+    def __init__(self, gamma_u=1.2, MaxIter=50):
+        r"""
         Parameters
         ----------
-        opt : :class:`BacktrackBase.Options` object Backtrack options
-        """
-        if opt is None:
-            opt = BacktrackBase.Options()
+        gamma_u : float
+          Multiplier applied to increase L when backtracking
+          in standard PGM (corresponding to :math:`\eta` in
+          :cite:`beck-2009-fast`).
 
-        if not isinstance(opt, BacktrackBase.Options):
-            raise TypeError('Parameter opt must be an instance of '
-                            'BacktrackingBase.Options')
-        super(Backtrack_Standard, self).__init__(opt)
+        MaxIter : int
+          Maximum iterations of updating L when backtracking.
+        """
+
+        super(BacktrackStandard, self).__init__()
         # Initialise attributes controlling the backtracking
-        self.gamma_u = opt['gamma_u']
-        self.maxiter = opt['MaxIter']
+        self.gamma_u = gamma_u
+        self.maxiter = MaxIter
 
 
 
@@ -179,7 +119,7 @@ class Backtrack_Standard(BacktrackBase):
 
 
 
-class Backtrack_Robust(BacktrackBase):
+class BacktrackRobust(BacktrackBase):
     """Class to estimate step size L by computing a linesearch
     that guarantees that F <= Q according to the robust PGM
     backtracking strategy in :cite:`florea-2017-robust`.
@@ -189,29 +129,30 @@ class Backtrack_Robust(BacktrackBase):
     This also updates all the supporting variables.
     """
 
-    defaults = copy.deepcopy(BacktrackBase.Options.defaults)
-    defaults.update({'gamma_u': 2.0})
-
-    def __init__(self, opt=None):
-        """
+    def __init__(self, gamma_d=0.9, gamma_u=2.0, MaxIter=50):
+        r"""
         Parameters
         ----------
-        opt : :class:`BacktrackBase.Options` object Backtrack options
+        gamma_d : float
+          Multiplier applied to decrease L when
+          backtracking in robust PGM (:math:`\gamma_d` in
+          :cite:`florea-2017-robust`).
+
+        gamma_u : float
+          Multiplier applied to increase L when
+          backtracking in robust PGM (corresponding
+          Total :math:`\gamma_u` in :cite:`florea-2017-robust`).
+
+        MaxIter : int
+          Maximum iterations of updating L when backtracking.
         """
 
-        if opt is None:
-            opt = BacktrackBase.Options()
-
-        if not isinstance(opt, BacktrackBase.Options):
-            raise TypeError('Parameter opt must be an instance of '
-                            'BacktrackBase.Options')
-
-        super(Backtrack_Robust, self).__init__(opt)
+        super(BacktrackRobust, self).__init__()
 
         # Initialise attributes controlling the backtracking
-        self.gamma_d = opt['gamma_d']
-        self.gamma_u = opt['gamma_u']
-        self.maxiter = opt['MaxIter']
+        self.gamma_d = gamma_d
+        self.gamma_u = gamma_u
+        self.maxiter = MaxIter
 
         self.Tk = 0.
         self.Zrb = None

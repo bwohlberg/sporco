@@ -46,7 +46,7 @@ class StepSizePolicyBase(object):
 
 
 
-class StepSizePolicy_Cauchy(StepSizePolicyBase):
+class StepSizePolicyCauchy(StepSizePolicyBase):
     r"""Class for computing step size policy for
     accelerated proximal gradient based on Cauchy
     method :cite:`yuan-2008-stepsize`
@@ -58,8 +58,8 @@ class StepSizePolicy_Cauchy(StepSizePolicyBase):
     """
 
     def __init__(self):
-        """Create an StepSizePolicy_Cauchy object"""
-        super(StepSizePolicy_Cauchy, self).__init__()
+        """Create an StepSizePolicyCauchy object"""
+        super(StepSizePolicyCauchy, self).__init__()
 
 
 
@@ -84,7 +84,7 @@ class StepSizePolicy_Cauchy(StepSizePolicyBase):
 
 
 
-class StepSizePolicy_BB(StepSizePolicyBase):
+class StepSizePolicyBB(StepSizePolicyBase):
     r"""Class for computing step size policy for
     accelerated proximal gradient based on
     Barzilai-Borwein method :cite:`barzilai-1988-stepsize`
@@ -97,8 +97,8 @@ class StepSizePolicy_BB(StepSizePolicyBase):
     """
 
     def __init__(self):
-        """Create an StepSizePolicy_BB object"""
-        super(StepSizePolicy_BB, self).__init__()
+        """Create an StepSizePolicyBB object"""
+        super(StepSizePolicyBB, self).__init__()
         self.xprv = []
         self.gradprv = []
 

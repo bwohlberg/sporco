@@ -12,7 +12,7 @@ except ImportError:
     pytest.skip("cupy not installed", allow_module_level=True)
 
 
-from sporco.cupy.fista import cbpdn
+from sporco.cupy.pgm import cbpdn
 from sporco.cupy.array import list2array
 from sporco.cupy.fft import complex_dtype, fftn, ifftn
 from sporco.cupy.linalg import rrs

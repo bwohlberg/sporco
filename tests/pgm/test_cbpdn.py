@@ -8,9 +8,10 @@ from sporco.pgm import cbpdn
 import sporco.linalg as sl
 from sporco.fft import fftn, ifftn
 
-from sporco.pgm.momentum import *
-from sporco.pgm.stepsize import *
-from sporco.pgm.backtrack import *
+from sporco.pgm.momentum import MomentumLinear, MomentumGenLinear
+from sporco.pgm.stepsize import StepSizePolicyBB, StepSizePolicyCauchy
+from sporco.pgm.backtrack import BacktrackStandard
+
 
 class TestSet01(object):
 
@@ -94,7 +95,7 @@ class TestSet01(object):
         s = np.random.randn(N, N, K)
         dt = np.float32
         opt = cbpdn.ConvBPDN.Options({'Verbose': False, 'MaxMainIter': 20,
-                                      'Backtrack': {'Enabled': True},
+                                      'Backtrack': BacktrackStandard(),
                                       'DataType': dt})
         lmbda = 1e-1
         b = cbpdn.ConvBPDN(D, s, lmbda, opt=opt)
@@ -113,7 +114,7 @@ class TestSet01(object):
         s = np.random.randn(N, N, K)
         dt = np.float64
         opt = cbpdn.ConvBPDN.Options({'Verbose': False, 'MaxMainIter': 20,
-                                      'Backtrack': {'Enabled': True},
+                                      'Backtrack': BacktrackStandard(),
                                       'DataType': dt})
         lmbda = 1e-1
         b = cbpdn.ConvBPDN(D, s, lmbda, opt=opt)
@@ -160,14 +161,13 @@ class TestSet01(object):
         xr = np.random.randn(N, N, M)
         xp = np.abs(xr) > 3
         X0[xp] = np.random.randn(X0[xp].size)
-        S = np.sum(ifftn(fftn(D, (N, N), (0, 1)) *
-                         fftn(X0, None, (0, 1)), None, (0, 1)).real,
-                   axis=2)
+        S = np.sum(ifftn(fftn(D, (N, N), (0, 1)) * fftn(
+            X0, None, (0, 1)), None, (0, 1)).real, axis=2)
         lmbda = 1e-2
         L = 1e3
         opt = cbpdn.ConvBPDN.Options({'Verbose': False, 'MaxMainIter': 2000,
                                       'RelStopTol': 1e-9, 'L': L,
-                                      'Backtrack': {'Enabled': False}})
+                                      'Backtrack': BacktrackStandard()})
         b = cbpdn.ConvBPDN(D, S, lmbda, opt)
         b.solve()
         X1 = b.X.squeeze()
@@ -185,14 +185,13 @@ class TestSet01(object):
         xr = np.random.randn(N, N, M)
         xp = np.abs(xr) > 3
         X0[xp] = np.random.randn(X0[xp].size)
-        S = np.sum(ifftn(fftn(D, (N, N), (0, 1)) *
-                         fftn(X0, None, (0, 1)), None, (0, 1)).real,
-                   axis=2)
+        S = np.sum(ifftn(fftn(D, (N, N), (0, 1)) * fftn(
+            X0, None, (0, 1)), None, (0, 1)).real, axis=2)
         lmbda = 1e-2
         L = 1e3
         opt = cbpdn.ConvBPDN.Options({'Verbose': False, 'MaxMainIter': 2000,
                                       'RelStopTol': 1e-9, 'L': L,
-                                      'Backtrack': {'Enabled': False}})
+                                      'Backtrack': BacktrackStandard()})
         b = cbpdn.ConvBPDN(D, S, lmbda, opt)
         b.solve()
         X1 = b.X.squeeze()
@@ -245,7 +244,7 @@ class TestSet01(object):
         lmbda = 1e-1
         L = 1e3
         try:
-            opt = cbpdn.ConvBPDN.Options({'Momentum': {'Class': Momentum_Linear}, 'L': L})
+            opt = cbpdn.ConvBPDN.Options({'Momentum': MomentumLinear(), 'L': L})
             b = cbpdn.ConvBPDN(D, s, lmbda, opt=opt, dimK=0)
             b.solve()
         except Exception as e:
@@ -265,7 +264,7 @@ class TestSet01(object):
         L = 1e3
         try:
             opt = cbpdn.ConvBPDN.Options(
-                {'Momentum': {'Class': Momentum_GenLinear}, 'L': L})
+                {'Momentum': MomentumGenLinear(), 'L': L})
             b = cbpdn.ConvBPDN(D, s, lmbda, opt=opt, dimK=0)
             b.solve()
         except Exception as e:
@@ -285,8 +284,7 @@ class TestSet01(object):
         L = 1e3
         try:
             opt = cbpdn.ConvBPDN.Options(
-                {'StepSizePolicy': {'Enabled': True,
-                                    'Class': StepSizePolicy_Cauchy}, 'L': L})
+                {'StepSizePolicy': StepSizePolicyCauchy(), 'L': L})
             b = cbpdn.ConvBPDN(D, s, lmbda, opt=opt, dimK=0)
             b.solve()
         except Exception as e:
@@ -306,8 +304,7 @@ class TestSet01(object):
         L = 1e3
         try:
             opt = cbpdn.ConvBPDN.Options(
-                {'StepSizePolicy': {'Enabled': True,
-                                    'Class': StepSizePolicy_BB}, 'L': L})
+                {'StepSizePolicy': StepSizePolicyBB(), 'L': L})
             b = cbpdn.ConvBPDN(D, s, lmbda, opt=opt, dimK=0)
             b.solve()
         except Exception as e:

@@ -28,15 +28,15 @@ from sporco import signal
 from sporco import plot
 from sporco.metric import psnr
 from sporco.pgm import cbpdn
-from sporco.pgm.backtrack import *
+from sporco.pgm.backtrack import BacktrackStandard
 
 
 """
 Load example image.
 """
 
-img = util.ExampleImages().image('barbara.png', scaled=True, gray=True,
-                                 idxexp=np.s_[10:522, 100:612])
+img = util.ExampleImages().image('kodim23.png', scaled=True, gray=True,
+                                 idxexp=np.s_[160:416,60:316])
 
 
 """
@@ -57,13 +57,13 @@ plot.imview(util.tiledict(D), fgsz=(7, 7))
 
 
 """
-Set :class:`.pgm.cbpdn.ConvBPDN` solver options.
+Set :class:`.pgm.cbpdn.ConvBPDN` solver options. Note the possibility of changing parameters in the backtracking algorithm.
 """
 
 lmbda = 5e-2
-L = 1e2
+L = 1.
 opt = cbpdn.ConvBPDN.Options({'Verbose': True, 'MaxMainIter': 250,
-            'RelStopTol': 5e-3, 'L': L, 'Backtrack': {'Enabled': True }})
+            'RelStopTol': 1e-4, 'L': L, 'Backtrack': BacktrackStandard(MaxIter=15)})
 
 
 """
@@ -110,7 +110,7 @@ fig.show()
 
 
 """
-Get iterations statistics from solver object and plot functional value, ADMM primary and dual residuals, and automatically adjusted ADMM penalty parameter against the iteration number.
+Get iterations statistics from solver object and plot functional value, residual, and inverse step size parameter against the iteration number.
 """
 
 its = b.getitstat()
@@ -121,8 +121,7 @@ plot.subplot(1, 3, 2)
 plot.plot(its.Rsdl, ptyp='semilogy', xlbl='Iterations', ylbl='Residual',
           fig=fig)
 plot.subplot(1, 3, 3)
-plot.plot(its.L, xlbl='Iterations',
-          ylbl='Inverse of Gradient Step Parameter', fig=fig)
+plot.plot(its.L, xlbl='Iterations', ylbl='L', fig=fig)
 fig.show()
 
 

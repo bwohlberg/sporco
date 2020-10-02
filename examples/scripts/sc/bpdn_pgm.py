@@ -23,7 +23,7 @@ import numpy as np
 
 from sporco.pgm import bpdn
 from sporco import plot
-from sporco.pgm.backtrack import *
+from sporco.pgm.backtrack import BacktrackStandard, BacktrackRobust
 
 
 """
@@ -53,91 +53,76 @@ s = s0 + sigma*np.random.randn(N,1)
 
 
 """
-Set BPDN solver with standard PGM backtracking.
+Set regularisation parameter and options for BPDN solver with standard PGM backtracking.
 """
-
-L_sc = 9.e2
-opt = bpdn.BPDN.Options({'Verbose': True, 'MaxMainIter': 50,
-                    'Backtrack': {'Enabled': True }, 'L': L_sc})
-
 
 lmbda = 2.98e1
+L_sc = 9.e2
+opt = bpdn.BPDN.Options({'Verbose': True, 'MaxMainIter': 50,
+                         'Backtrack': BacktrackStandard(), 'L': L_sc})
 
-print("")
-b = bpdn.BPDN(D, s, lmbda, opt)
-x = b.solve()
+
+"""
+Initialise and run BPDN object
+"""
+
+b1 = bpdn.BPDN(D, s, lmbda, opt)
+x1 = b1.solve()
 
 print("BPDN standard PGM backtracking solve time: %.2fs" %
-      b.timer.elapsed('solve'))
-print("")
+      b1.timer.elapsed('solve'))
 
 
 """
-Plot comparison of reference and recovered representations.
+Set options for BPDN solver with robust PGM backtracking.
 """
 
-plot.plot(np.hstack((x0, x)), title='Sparse representation (standard PGM)',
-          lgnd=['Reference', 'Reconstructed'])
-
-
-"""
-Plot lmbda error curve, functional value, residuals, and rho
-"""
-
-its = b.getitstat()
-fig = plot.figure(figsize=(21, 7))
-plot.subplot(1, 3, 1)
-plot.plot(its.ObjFun, xlbl='Iterations', ylbl='Functional', fig=fig)
-plot.subplot(1, 3, 2)
-plot.plot(its.Rsdl, ptyp='semilogy', xlbl='Iterations', ylbl='Residual',
-          fig=fig)
-plot.subplot(1, 3, 3)
-plot.plot(its.L, xlbl='Iterations',
-          ylbl='Inverse of Step Size (Standard PGM)', fig=fig)
-fig.show()
+opt = bpdn.BPDN.Options({'Verbose': True, 'MaxMainIter': 50, 'L': L_sc,
+            'Backtrack': BacktrackRobust()})
 
 
 """
-Repeat for BPDN solver with robust PGM backtracking.
+Initialise and run BPDN object
 """
 
-opt_bck = Backtrack_Robust.Options(Backtrack_Robust.defaults)
-opt = bpdn.BPDN.Options({'Verbose': True, 'MaxMainIter': 50,
-            'Backtrack': {'Enabled': True, 'Class' : Backtrack_Robust, 'Options': opt_bck },
-                         'L': L_sc})
-
-
-b = bpdn.BPDN(D, s, lmbda, opt)
-x = b.solve()
+b2 = bpdn.BPDN(D, s, lmbda, opt)
+x2 = b2.solve()
 
 print("BPDN robust PGM backtracking solve time: %.2fs" %
-      b.timer.elapsed('solve'))
+      b2.timer.elapsed('solve'))
+
 
 
 """
 Plot comparison of reference and recovered representations.
 """
 
-plot.plot(np.hstack((x0, x)), title='Sparse representation (robust PGM)',
-          lgnd=['Reference', 'Reconstructed'])
+plot.plot(np.hstack((x0, x1, x2)), alpha=0.5, title='Sparse representation',
+          lgnd=['Reference', 'Reconstructed (Std Backtrack)',
+                'Reconstructed (Robust Backtrack)'])
 
 
 """
-Plot lmbda error curve, functional value, residuals, and rho
+Plot functional value, residual, and L
 """
 
-its = b.getitstat()
+its1 = b1.getitstat()
+its2 = b2.getitstat()
 fig = plot.figure(figsize=(21, 7))
 plot.subplot(1, 3, 1)
-plot.plot(its.ObjFun, xlbl='Iterations', ylbl='Functional', fig=fig)
+plot.plot(its1.ObjFun, xlbl='Iterations', ylbl='Functional', fig=fig)
+plot.plot(its2.ObjFun, xlbl='Iterations', ylbl='Functional',
+          lgnd=['Std Backtrack', 'Robust Backtrack'], fig=fig)
 plot.subplot(1, 3, 2)
-plot.plot(its.Rsdl, ptyp='semilogy', xlbl='Iterations', ylbl='Residual',
+plot.plot(its1.Rsdl, ptyp='semilogy', xlbl='Iterations', ylbl='Residual',
           fig=fig)
+plot.plot(its2.Rsdl, ptyp='semilogy', xlbl='Iterations', ylbl='Residual',
+          lgnd=['Std Backtrack', 'Robust Backtrack'], fig=fig)
 plot.subplot(1, 3, 3)
-plot.plot(its.L, xlbl='Iterations',
-          ylbl='Inverse of Step Size (robust PGM)', fig=fig)
+plot.plot(its1.L, xlbl='Iterations', ylbl='Inverse of Step Size', fig=fig)
+plot.plot(its2.L, xlbl='Iterations', ylbl='Inverse of Step Size',
+          lgnd=['Std Backtrack', 'Robust Backtrack'], fig=fig)
 fig.show()
-
 
 
 # Wait for enter on keyboard

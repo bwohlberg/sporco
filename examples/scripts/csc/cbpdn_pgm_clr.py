@@ -27,7 +27,7 @@ from sporco import signal
 from sporco import plot
 import sporco.metric as sm
 from sporco.pgm import cbpdn
-from sporco.pgm.backtrack import *
+from sporco.pgm.backtrack import BacktrackStandard
 
 """
 Load example image.
@@ -55,13 +55,13 @@ plot.imview(util.tiledict(D), fgsz=(7, 7))
 
 
 """
-Set :class:`.pgm.cbpdn.ConvBPDN` solver options.
+Set :class:`.pgm.cbpdn.ConvBPDN` solver options. Note the possibility of changing parameters in the backtracking algorithm.
 """
 
 lmbda = 1e-1
-L = 1e2
+L = 1e1
 opt = cbpdn.ConvBPDN.Options({'Verbose': True, 'MaxMainIter': 250,
-            'RelStopTol': 8e-5, 'L': L, 'Backtrack': {'Enabled': True }})
+            'RelStopTol': 8e-5, 'L': L, 'Backtrack': BacktrackStandard(MaxIter=15)})
 
 
 """
@@ -108,7 +108,7 @@ fig.show()
 
 
 """
-Get iterations statistics from solver object and plot functional value, ADMM primary and dual residuals, and automatically adjusted ADMM penalty parameter against the iteration number.
+Get iterations statistics from solver object and plot functional value, residual, and inverse step size parameter against the iteration number.
 """
 
 its = b.getitstat()

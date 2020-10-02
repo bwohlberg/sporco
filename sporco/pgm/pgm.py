@@ -123,48 +123,35 @@ class PGM(IterativeSolver):
             (:math:`\tau_0` in :cite:`liu-2018-first`).
 
           ``Monotone`` : Flag determining whether a monotone PGM version
-          from :cite:`beck-2009-tv` is used.
+          from :cite:`beck-2009-tv` is used. Default is False.
 
-          ``Momentum`` : Options for adapting momentum coefficients
-          (Nesterov strategy from :cite:`beck-2009-fast`, linear as
-          in :cite:`chambolle-2015-convergence` or generalized linear
-          as in :cite:`rodriguez-2019-convergence`).
+          ``Momentum`` : Momentum coefficient adaptation object. Standard
+          options are Nesterov :cite:`beck-2009-fast`
+          (:class:`.MomentumNesterov`), Linear
+          :cite:`chambolle-2015-convergence`
+          (:class:`.MomentumLinear`), and GenLinear
+          :cite:`rodriguez-2019-convergence`
+          (:class:`.MomentumGenLinear`), but a custom class derived
+          from :class:`.MomentumBase` may also be specified. Default
+          is :class:`.MomentumNesterov`.
 
-            ``Class`` : Class for momentum coefficient adaptation.
-            Nesterov (as in :cite:`beck-2009-fast`), Linear (as in
-            :cite:`chambolle-2015-convergence`) or GenLinear
-            (as in :cite:`rodriguez-2019-convergence`) class.
+          ``StepSizePolicy`` : non-iterative L adaptation object.
+          Standard options are Cauchy :cite:`yuan-2008-stepsize`
+          Sec. 3 (:class:`.StepSizePolicyCauchy`), and Barzilai-Borwein
+          :cite:`barzilai-1988-stepsize`
+          (:class:`.StepSizePolicyBB`), but a custom class derived
+          from :class:`.StepSizePolicyBase` may also be specified.
+          Default is None, no non-iterative L adaptation. Note that in
+          case that both step size and Backtrack strategies are enabled
+          only Backtrack will be used.
 
-            ``Options`` : Object for momentum coefficient adaptation
-            options.
-
-          ``StepSizePolicy`` : Options for non-iterative adaptive L
-          strategy (Cauchy-based, Sec. 3 of :cite:`yuan-2008-stepsize`
-          or Barzilai-Borwein as in :cite:`barzilai-1988-stepsize`).
-          Note that in case that both step size and Backtrack strategies
+          ``Backtrack`` : PGM backtracking options. Options are Standard
+          :cite:`beck-2009-fast` (:class:`.BacktrackStandard`) and
+          Robust :cite:`florea-2017-robust` (:class:`.BacktrackRobust`),
+          but a custom class derived from :class:`.BacktrackBase` may
+          also be specified. Default is None, no backtracking. Note that
+          in case that both step size and Backtrack strategies
           are enabled only Backtrack will be used.
-
-            ``Enabled`` : Flag determining whether non-iterative
-            adaptive step size parameter strategy is enabled.
-
-            ``Class`` : Class for PGM step size policy. Cauchy
-            (as in :cite:`yuan-2008-stepsize`) or BB
-            (as in :cite:`barzilai-1988-stepsize`) class.
-
-          ``Backtrack`` : Options for adaptive L strategy (backtracking,
-          see Sec. 4 of :cite:`beck-2009-fast` or Robust PGM
-          in :cite:`florea-2017-robust`). Note that in case that
-          both step size and Backtrack strategies are enabled only
-          Backtrack will be used.
-
-            ``Enabled`` : Flag determining whether adaptive inverse step
-            size parameter strategy based on backtracking is enabled.
-
-            ``Class`` : Class for PGM backtracking. Standard
-            (as in :cite:`beck-2009-fast`) or Robust PGM backtracking
-            (as in :cite:`florea-2017-robust`) class.
-
-            ``Options`` : Object for backtracking options.
 
         """
 
@@ -175,13 +162,9 @@ class PGM(IterativeSolver):
                     'RelStopTol': 1e-3, 'L': None,
                     'AutoStop': {'Enabled': False, 'Tau0': 1e-2},
                     'Monotone': False,
-                    'Momentum': {'Class': Momentum_Nesterov,
-                                 'Options': Momentum_Nesterov.Options()},
-                    'StepSizePolicy': {'Enabled': False,
-                                       'Class': StepSizePolicy_BB},
-                    'Backtrack':
-                    {'Enabled': False, 'Class': Backtrack_Standard,
-                     'Options': Backtrack_Standard.Options()}}
+                    'Momentum': MomentumNesterov(),
+                    'StepSizePolicy': None,
+                    'Backtrack': None}
 
         def __init__(self, opt=None):
             """
@@ -261,16 +244,12 @@ class PGM(IterativeSolver):
 
         # Configure policy for step size
         # Step size policy is turned off if Backtrack is enabled
-        self.stepsizepolicy = None
-        if (self.opt['StepSizePolicy', 'Enabled'] and not
-           self.opt['Backtrack', 'Enabled']):
-            cls_ssp = self.opt['StepSizePolicy', 'Class']
-            self.stepsizepolicy = cls_ssp()
+        self.stepsizepolicy = self.opt['StepSizePolicy']
+        if self.opt['Backtrack'] is not None:
+            self.stepsizepolicy = None
 
         # Configure Momentum coefficients
-        cls_momentum = self.opt['Momentum', 'Class']
-        opt_momentum = self.opt['Momentum', 'Options']
-        self.momentum = cls_momentum(opt_momentum)
+        self.momentum = self.opt['Momentum']
 
         # If using adaptative stop criterion, set tau0 parameter
         if self.opt['AutoStop', 'Enabled']:
@@ -283,16 +262,10 @@ class PGM(IterativeSolver):
             self.X = self.opt['X0'].astype(self.dtype, copy=True)
 
         # Default values for variables created only if Backtrack is enabled
-        # Step-size policy is turned off if Backtrack is enabled
         self.F = None
         self.Q = None
         self.iterBTrack = None
-        self.backtrack = None
-        if self.opt['Backtrack', 'Enabled']:
-            cls_bck = self.opt['Backtrack', 'Class']
-            opt_bck = self.opt['Backtrack', 'Options']
-            self.backtrack = cls_bck(opt_bck)
-            self.stepsizepolicy = None
+        self.backtrack = self.opt['Backtrack']
 
         self.Y = None
 
@@ -359,7 +332,7 @@ class PGM(IterativeSolver):
             self.on_iteration_start()
 
             # Compute backtracking
-            if self.opt['Backtrack', 'Enabled'] and self.k >= 0:
+            if self.opt['Backtrack'] is not None and self.k >= 0:
                 self.timer.stop('solve_wo_btrack')
                 # Compute backtracking
                 self.backtrack.update(self)
@@ -430,7 +403,7 @@ class PGM(IterativeSolver):
         if self.stepsizepolicy is not None:
             if self.k > 1:
                 self.L = self.stepsizepolicy.update(self, grad)
-            if isinstance(self.stepsizepolicy, StepSizePolicy_BB):
+            if isinstance(self.stepsizepolicy, StepSizePolicyBB):
                 # BB variants are two-point methods
                 self.stepsizepolicy.store_prev_state(self.X, grad)
 
@@ -515,7 +488,7 @@ class PGM(IterativeSolver):
 
         self.Xprv = self.X.copy()
         if (not self.opt['FastSolve'] or isinstance(self.backtrack,
-                                                    Backtrack_Robust)):
+                                                    BacktrackRobust)):
             self.Yprv = self.Y.copy()
 
         if self.opt['Monotone']:
@@ -620,7 +593,7 @@ class PGM(IterativeSolver):
         if self.opt['Verbose']:
             # If backtracking option enabled F, Q, itBT, L are
             # included in iteration status
-            if self.opt['Backtrack', 'Enabled']:
+            if self.opt['Backtrack'] is not None:
                 hdrtxt = type(self).hdrtxt()
             else:
                 hdrtxt = type(self).hdrtxt()[0:-4]
@@ -648,7 +621,7 @@ class PGM(IterativeSolver):
             hdrtxt = type(self).hdrtxt()
             hdrval = type(self).hdrval()
             itdsp = tuple([getattr(itst, hdrval[col]) for col in hdrtxt])
-            if not self.opt['Backtrack', 'Enabled']:
+            if self.opt['Backtrack'] is None:
                 itdsp = itdsp[0:-4]
 
             print(fmtstr % itdsp)
@@ -691,7 +664,7 @@ class PGM(IterativeSolver):
         """Most momentum coefficient methods require iteration but Nesterov
            requires current t."""
 
-        if isinstance(self.momentum, Momentum_Nesterov):
+        if isinstance(self.momentum, MomentumNesterov):
             return self.t
         return self.k
 
@@ -724,7 +697,7 @@ class PGM(IterativeSolver):
     def rsdl(self):
         """Compute fixed point residual (see Sec. 4.3 of
         :cite:`liu-2018-first`)."""
-    
+
         if self.opt['Monotone'] and self.k > 0:
             return np.linalg.norm((self.X - self.Y).ravel())
         return np.linalg.norm((self.X - self.Yprv).ravel())
@@ -817,7 +790,7 @@ class PGMDFT(PGM):
         if self.stepsizepolicy is not None:
             if self.k > 1:
                 self.L = self.stepsizepolicy.update(self, gradf)
-            if isinstance(self.stepsizepolicy, StepSizePolicy_BB):
+            if isinstance(self.stepsizepolicy, StepSizePolicyBB):
                 # BB variants are two-point methods
                 self.stepsizepolicy.store_prev_state(self.Xf, gradf)
 
@@ -865,7 +838,7 @@ class PGMDFT(PGM):
 
         self.Xfprv = self.Xf.copy()
         if (not self.opt['FastSolve'] or isinstance(self.backtrack,
-                                                    Backtrack_Robust)):
+                                                    BacktrackRobust)):
             self.Yfprv = self.Yf.copy()
 
         if self.opt['Monotone']:
