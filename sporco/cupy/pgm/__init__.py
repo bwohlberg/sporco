@@ -26,10 +26,23 @@ from sporco.cupy import cnvrep
 # Construct sporco.cupy.pgm
 pgm = sporco_cupy_patch_module('sporco.pgm')
 
+# Construct cupy versions of sporco.pgm auxiliary modules
+pgm.backtrack = sporco_cupy_patch_module('sporco.pgm.backtrack')
+pgm.momentum = sporco_cupy_patch_module('sporco.pgm.momentum')
+pgm.stepsize = sporco_cupy_patch_module('sporco.pgm.stepsize')
+
 # Construct sporco.cupy.pgm.pgm
 pgm.pgm = sporco_cupy_patch_module('sporco.pgm.pgm',
              {'IterativeSolver': common.IterativeSolver,
-              'rfftn': fft.rfftn, 'irfftn': fft.irfftn})
+              'rfftn': fft.rfftn, 'irfftn': fft.irfftn,
+              'BacktrackStandard': pgm.backtrack.BacktrackStandard,
+              'BacktrackRobust': pgm.backtrack.BacktrackRobust,
+              'MomentumNesterov': pgm.momentum.MomentumNesterov,
+              'MomentumLinear': pgm.momentum.MomentumLinear,
+              'MomentumGenLinear': pgm.momentum.MomentumGenLinear,
+              'StepSizePolicyCauchy': pgm.stepsize.StepSizePolicyCauchy,
+              'StepSizePolicyBB': pgm.stepsize.StepSizePolicyBB
+              })
 
 
 # Record current entries in sys.modules and then replace them with
