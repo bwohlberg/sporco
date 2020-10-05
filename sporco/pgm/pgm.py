@@ -20,10 +20,9 @@ from sporco.fft import rfftn, irfftn
 from sporco.array import transpose_ntpl_list
 from sporco.util import Timer
 
-from .momentum import *
-from .stepsize import *
-from .backtrack import *
-
+from .backtrack import BacktrackStandard, BacktrackRobust
+from .momentum import MomentumNesterov, MomentumLinear, MomentumGenLinear
+from .stepsize import StepSizePolicyCauchy, StepSizePolicyBB
 
 __author__ = """Cristina Garcia-Cardona <cgarciac@lanl.gov>"""
 
