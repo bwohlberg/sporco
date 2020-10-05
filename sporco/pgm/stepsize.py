@@ -30,6 +30,7 @@ class StepSizePolicyBase(object):
 
     def __init__(self):
         """Create an StepSizePolicyBase object"""
+
         super(StepSizePolicyBase, self).__init__()
 
 
@@ -98,6 +99,7 @@ class StepSizePolicyBB(StepSizePolicyBase):
 
     def __init__(self):
         """Create an StepSizePolicyBB object"""
+
         super(StepSizePolicyBB, self).__init__()
         self.xprv = []
         self.gradprv = []
@@ -113,6 +115,7 @@ class StepSizePolicyBB(StepSizePolicyBase):
         gradprv : ndarray
           array containing the evaluation of gradient in previous state.
         """
+
         self.xprv = xprv
         self.gradprv = gradprv
 
@@ -127,6 +130,7 @@ class StepSizePolicyBB(StepSizePolicyBase):
         grad : ndarray
           array containing the evaluation of gradient in current state.
         """
+
         if grad is None:
             grad = solverobj.grad_f()
         dx = solverobj.var_x() - self.xprv
