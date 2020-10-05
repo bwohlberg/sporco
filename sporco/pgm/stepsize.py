@@ -101,8 +101,8 @@ class StepSizePolicyBB(StepSizePolicyBase):
         """Create an StepSizePolicyBB object"""
 
         super(StepSizePolicyBB, self).__init__()
-        self.xprv = []
-        self.gradprv = []
+        self.xprv = 0.0
+        self.gradprv = 0.0
 
 
 
