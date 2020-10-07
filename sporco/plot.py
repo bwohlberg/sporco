@@ -403,8 +403,8 @@ def surf(z, x=None, y=None, elev=None, azim=None, xlbl=None, ylbl=None,
 
 
 def contour(z, x=None, y=None, v=5, xlog=False, ylog=False, xlbl=None,
-            ylbl=None, title=None, cfntsz=10, lfntsz=None, alpha=1.0,
-            cmap=None, vmin=None, vmax=None, fgsz=None, fgnm=None,
+            ylbl=None, title=None, cfmt=None, cfntsz=10, lfntsz=None,
+            alpha=1.0, cmap=None, vmin=None, vmax=None, fgsz=None, fgnm=None,
             fig=None, ax=None):
     """
     Contour plot of a 2D surface. If a figure object is specified then the
@@ -432,6 +432,8 @@ def contour(z, x=None, y=None, v=5, xlog=False, ylog=False, xlbl=None,
         Label for y-axis
     title : string, optional (default None)
         Figure title
+    cfmt : string, optional (default None)
+        Format string for contour labels.
     cfntsz : int or None, optional (default 10)
         Contour label font size. No contour labels are displayed if
         set to 0 or None.
@@ -488,8 +490,13 @@ def contour(z, x=None, y=None, v=5, xlog=False, ylog=False, xlbl=None,
     xg, yg = np.meshgrid(x, y)
 
     cntr = ax.contour(xg, yg, z, v, colors='black')
+    kwargs = {}
     if cfntsz is not None and cfntsz > 0:
-        plt.clabel(cntr, inline=True, fontsize=cfntsz)
+        kwargs['fontsize'] = cfntsz
+    if cfmt is not None:
+        kwargs['fmt'] = cfmt
+    if kwargs:
+        plt.clabel(cntr, inline=True, **kwargs)
     pc = ax.pcolormesh(xg, yg, z, cmap=cmap, vmin=vmin, vmax=vmax, alpha=alpha,
                        shading='gouraud', clim=(vmin, vmax))
 
