@@ -13,10 +13,7 @@ import sys
 import re
 
 from sporco.cupy import sporco_cupy_patch_module
-from sporco.cupy import cp
-from sporco.cupy import util
 from sporco.cupy import common
-from sporco.cupy import array
 from sporco.cupy import linalg
 from sporco.cupy import fft
 from sporco.cupy import prox

@@ -365,5 +365,5 @@ class WeightedBPDN(BPDN):
         """
         if X is None:
             X = self.X
-        return 0.5 * np.linalg.norm((np.sqrt(self.W) *
-                                     (self.D.dot(X) - self.S)).ravel())**2
+        return 0.5 * np.linalg.norm(
+            (np.sqrt(self.W) * (self.D.dot(X) - self.S)).ravel())**2

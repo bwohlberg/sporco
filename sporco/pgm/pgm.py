@@ -6,7 +6,7 @@
 # and user license can be found in the 'LICENSE.txt' file distributed
 # with the package.
 
-"""Base classes for PGM algorithms"""
+"""Base classes for PGM algorithms."""
 
 from __future__ import division, print_function
 from builtins import range
@@ -20,9 +20,9 @@ from sporco.fft import rfftn, irfftn
 from sporco.array import transpose_ntpl_list
 from sporco.util import Timer
 
-from .backtrack import BacktrackStandard, BacktrackRobust
-from .momentum import MomentumNesterov, MomentumLinear, MomentumGenLinear
-from .stepsize import StepSizePolicyCauchy, StepSizePolicyBB
+from .backtrack import BacktrackRobust
+from .momentum import MomentumNesterov
+from .stepsize import StepSizePolicyBB
 
 __author__ = """Cristina Garcia-Cardona <cgarciac@lanl.gov>"""
 
