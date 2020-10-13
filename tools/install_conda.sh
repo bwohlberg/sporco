@@ -60,9 +60,9 @@ conda info -a
 conda config --add channels conda-forge
 conda config --append channels bjornfjohansson # For mpldatacursor
 
-conda create -n py37 python=3.7
+conda create -n py38 python=3.8
 
-source activate py37
+source activate py38
 conda install future numpy scipy imageio pyfftw numexpr matplotlib \
       mpldatacursor psutil pytest pytest-runner ipython jupyter sphinx \
       pygraphviz numpydoc cython mpi4py pyhamcrest sphinxcontrib-bibtex \
@@ -85,8 +85,8 @@ if [ "`which nvcc`" != '' ]; then
     cudaversion=`nvcc --version | grep -o 'release [0-9][0-9]*\.[[0-9][0-9]*' \
                                 | sed -e 's/release //' -e 's/\.//'`
     source deactivate
-    conda create --name py37cu --clone py37
-    source activate py37cu
+    conda create --name py38cu --clone py38
+    source activate py38cu
     conda install wurlitzer
     pip install gputil
     # Conda cupy package is currently only version 4.x
@@ -111,10 +111,10 @@ echo "Add the following to your .bashrc or .bash_aliases file"
 echo "  export CONDAHOME=$CONDAHOME"
 echo "  export PATH=\$PATH:\$CONDAHOME/bin"
 echo "Activate the conda environment with the command"
-echo "  source activate py37"
+echo "  source activate py38"
 if [ "$cupy_installed" = 'True' ]; then
     echo "or"
-    echo "  source activate py37cu"
+    echo "  source activate py38cu"
 fi
 echo "The environment can be deactivated with the command"
 echo "  conda deactivate"
