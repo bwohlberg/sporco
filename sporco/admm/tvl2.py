@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2015-2019 by Brendt Wohlberg <brendt@ieee.org>
+# Copyright (C) 2015-2020 by Brendt Wohlberg <brendt@ieee.org>
 # All rights reserved. BSD 3-clause License.
 # This file is part of the SPORCO package. Details of the copyright
 # and user license can be found in the 'LICENSE.txt' file distributed
@@ -47,10 +47,20 @@ class TVL2Denoise(admm.ADMM):
        \left( \begin{array}{c} G_r \\ G_c \end{array} \right) \mathbf{x}
        - \left( \begin{array}{c} \mathbf{y}_r \\ \mathbf{y}_c \end{array}
        \right) = \left( \begin{array}{c} \mathbf{0} \\
-       \mathbf{0} \end{array} \right) \;\;.
+       \mathbf{0} \end{array} \right) \;\;,
 
-    After termination of the :meth:`solve` method, attribute :attr:`itstat` is
-    a list of tuples representing statistics of each iteration. The
+    where :math:`G_r` and :math:`G_c` are gradient operators along array
+    rows and columns respectively, and :math:`W_{\mathrm{df}}` and
+    :math:`W_{\mathrm{tv}}` are diagonal weighting matrices.
+
+    While these equations describe the default behaviour of regularisation
+    in two dimensions, this class supports an arbitrary number of
+    dimensions. For example, for 3D TV regularisation in a 3D array,
+    the object should be initialised with parameter `axes` set to
+    `(0, 1, 2)`.
+
+    After termination of the :meth:`solve` method, attribute :attr:`itstat`
+    is a list of tuples representing statistics of each iteration. The
     fields of the named tuple ``IterationStats`` are:
 
        ``Iter`` : Iteration number
@@ -161,7 +171,7 @@ class TVL2Denoise(admm.ADMM):
           Regularisation parameter
         opt : TVL2Denoise.Options object
           Algorithm options
-        axes : tuple or list
+        axes : tuple, optional (default (0, 1))
           Axes on which TV regularisation is to be applied
         caxis : int or None, optional (default None)
           Axis on which channels of a multi-channel image are stacked.
@@ -368,7 +378,10 @@ class TVL2Deconv(admm.ADMM):
              (G_c \mathbf{x})^2} \right\|_1 \;\;,
 
     where :math:`H` denotes the linear operator corresponding to a
-    convolution, via the ADMM problem
+    convolution, :math:`G_r` and :math:`G_c` are gradient operators
+    along array rows and columns respectively, and
+    :math:`W_{\mathrm{df}}` and :math:`W_{\mathrm{tv}}` are diagonal
+    weighting matrices, via the ADMM problem
 
     .. math::
        \mathrm{argmin}_{\mathbf{x},\mathbf{y}_r,\mathbf{y}_c} \;
@@ -380,12 +393,19 @@ class TVL2Deconv(admm.ADMM):
        \right) = \left( \begin{array}{c} \mathbf{0} \\
        \mathbf{0} \end{array} \right) \;\;.
 
-    Note that the convolution is implemented in the frequency domain, having
-    the same phase offset as :func:`.fftconv`, which differs from that of
-    :func:`scipy.ndimage.convolve` with the default ``origin`` parameter.
+    While these equations describe the default behaviour of regularisation
+    in two dimensions, this class supports an arbitrary number of
+    dimensions. For example, for 3D TV regularisation in a 3D array,
+    the object should be initialised with parameter `axes` set to
+    `(0, 1, 2)`.
 
-    After termination of the :meth:`solve` method, attribute :attr:`itstat` is
-    a list of tuples representing statistics of each iteration. The
+    Note that the convolution is implemented in the frequency domain,
+    having the same phase offset as :func:`.fftconv`, which differs from
+    that of :func:`scipy.ndimage.convolve` with the default ``origin``
+    parameter.
+
+    After termination of the :meth:`solve` method, attribute :attr:`itstat`
+    is a list of tuples representing statistics of each iteration. The
     fields of the named tuple ``IterationStats`` are:
 
        ``Iter`` : Iteration number
@@ -490,7 +510,7 @@ class TVL2Deconv(admm.ADMM):
           Regularisation parameter
         opt : TVL2Deconv.Options object
           Algorithm options
-        axes : tuple or list
+        axes : tuple, optional (default (0, 1))
           Axes on which TV regularisation is to be applied
         caxis : int or None, optional (default None)
           Axis on which channels of a multi-channel image are stacked.
