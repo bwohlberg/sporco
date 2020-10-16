@@ -530,12 +530,12 @@ class PGM(IterativeSolver):
         IterationStats entries.
         """
 
-        dict = {'Itn': 'Iter'}
-        dict.update(cls.hdrval_objfun)
-        dict.update({'Rsdl': 'Rsdl', 'F': 'F_Btrack', 'Q': 'Q_Btrack',
+        hdr = {'Itn': 'Iter'}
+        hdr.update(cls.hdrval_objfun)
+        hdr.update({'Rsdl': 'Rsdl', 'F': 'F_Btrack', 'Q': 'Q_Btrack',
                      'It_Bt': 'IterBTrack', 'L': 'L'})
 
-        return dict
+        return hdr
 
 
 

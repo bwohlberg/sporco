@@ -57,7 +57,7 @@ class BacktrackStandard(BacktrackBase):
     This also updates all the supporting variables.
     """
 
-    def __init__(self, gamma_u=1.2, MaxIter=50):
+    def __init__(self, gamma_u=1.2, maxiter=50):
         r"""
         Parameters
         ----------
@@ -66,14 +66,14 @@ class BacktrackStandard(BacktrackBase):
           in standard PGM (corresponding to :math:`\eta` in
           :cite:`beck-2009-fast`).
 
-        MaxIter : int
+        maxiter : int
           Maximum iterations of updating L when backtracking.
         """
 
         super(BacktrackStandard, self).__init__()
         # Initialise attributes controlling the backtracking
         self.gamma_u = gamma_u
-        self.maxiter = MaxIter
+        self.maxiter = maxiter
 
 
 
@@ -129,7 +129,7 @@ class BacktrackRobust(BacktrackBase):
     This also updates all the supporting variables.
     """
 
-    def __init__(self, gamma_d=0.9, gamma_u=2.0, MaxIter=50):
+    def __init__(self, gamma_d=0.9, gamma_u=2.0, maxiter=50):
         r"""
         Parameters
         ----------
@@ -143,7 +143,7 @@ class BacktrackRobust(BacktrackBase):
           backtracking in robust PGM (corresponding
           Total :math:`\gamma_u` in :cite:`florea-2017-robust`).
 
-        MaxIter : int
+        maxiter : int
           Maximum iterations of updating L when backtracking.
         """
 
@@ -152,7 +152,7 @@ class BacktrackRobust(BacktrackBase):
         # Initialise attributes controlling the backtracking
         self.gamma_d = gamma_d
         self.gamma_u = gamma_u
-        self.maxiter = MaxIter
+        self.maxiter = maxiter
 
         self.Tk = 0.
         self.Zrb = None

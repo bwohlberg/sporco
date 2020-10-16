@@ -229,9 +229,8 @@ class ConvCnstrMOD(pgm.PGMDFT):
         # simplest way to handle this is to just reshape so that the
         # channels also appear on the multiple image index.
         if self.cri.Cd == 1 and self.cri.C > 1:
-            self.S = S.reshape(self.cri.Nv + (1,)
-                               + (self.cri.C * self.cri.K,)
-                               + (1,))
+            self.S = S.reshape(self.cri.Nv + (1,) +
+                               (self.cri.C * self.cri.K,) + (1,))
         else:
             self.S = S.reshape(self.cri.shpS)
         self.S = np.asarray(self.S, dtype=self.dtype)
@@ -535,9 +534,9 @@ class ConvCnstrMODMask(ConvCnstrMOD):
                 else:
                     shpw[self.cri.axisC] = self.cri.C
                 W = np.broadcast_to(W, shpw)
-            self.W = W.reshape(W.shape[0:self.cri.dimN]
-                               + (1, W.shape[self.cri.axisC]
-                               * W.shape[self.cri.axisK], 1))
+            self.W = W.reshape(
+                W.shape[0:self.cri.dimN] + (1, W.shape[self.cri.axisC] *
+                                            W.shape[self.cri.axisK], 1))
         else:
             self.W = W
 

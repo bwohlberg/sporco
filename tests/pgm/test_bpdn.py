@@ -75,7 +75,7 @@ class TestSet01(object):
         try:
             opt = bpdn.BPDN.Options(
                 {'Verbose': False, 'MaxMainIter': 50, 'RelStopTol': 1e-4,
-                 'Backtrack': BacktrackRobust(MaxIter=20)})
+                 'Backtrack': BacktrackRobust(maxiter=20)})
             b = bpdn.BPDN(D, s, lmbda=1.0, opt=opt)
             b.solve()
         except Exception as e:

@@ -62,8 +62,9 @@ Set :class:`.pgm.cbpdn.ConvBPDN` solver options. Note the possibility of changin
 
 lmbda = 5e-2
 L = 1.
-opt = cbpdn.ConvBPDN.Options({'Verbose': True, 'MaxMainIter': 250,
-            'RelStopTol': 1e-4, 'L': L, 'Backtrack': BacktrackStandard(MaxIter=15)})
+opt = cbpdn.ConvBPDN.Options({
+    'Verbose': True, 'MaxMainIter': 250, 'RelStopTol': 1e-4, 'L': L,
+    'Backtrack': BacktrackStandard(maxiter=15)})
 
 
 """
