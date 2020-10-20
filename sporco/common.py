@@ -149,11 +149,15 @@ class IterativeSolver(with_metaclass(_IterSolver_Meta, object)):
         method. No changes are made if the `dtype` attribute already
         exists and has a value other than 'None'.
 
+        Note that the `dtype` attribute is expected to have type
+        `numpy.dtype` rather than `type`, e.g. for float32 values, it
+        should be `np.dtype(np.float32)` rather than `np.float32`.
+
         Parameters
         ----------
         opt : :class:`cdict.ConstrainedDict` object
           Algorithm options
-        dtype : data-type
+        dtype : numpy.dtype
           Data type for working variables (overridden by 'DataType' option)
         """
 
@@ -161,7 +165,10 @@ class IterativeSolver(with_metaclass(_IterSolver_Meta, object)):
         if not hasattr(self, 'dtype') or self.dtype is None:
             # DataType option overrides explicitly specified data type
             if opt['DataType'] is None:
-                self.dtype = dtype
+                # We expect dtype to already be an instance of np.dtype,
+                # but explicitly convert it in case it was incorrectly
+                # specified as an instance of type
+                self.dtype = np.dtype(dtype)
             else:
                 self.dtype = np.dtype(opt['DataType'])
 
