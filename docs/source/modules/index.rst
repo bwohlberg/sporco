@@ -45,6 +45,7 @@ API Reference
    sporco.dictlrn.common
    sporco.dictlrn.dictlrn
    sporco.dictlrn.bpdndl
+   sporco.dictlrn.wbpdndl
    sporco.dictlrn.cbpdndl
    sporco.dictlrn.cbpdndlmd
    sporco.dictlrn.prlcnscdl
@@ -111,6 +112,7 @@ API Reference
    sporco.dictlrn.common
    sporco.dictlrn.dictlrn
    sporco.dictlrn.bpdndl
+   sporco.dictlrn.wbpdndl
    sporco.dictlrn.cbpdndl
    sporco.dictlrn.cbpdndlmd
    sporco.dictlrn.prlcnscdl
