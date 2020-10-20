@@ -2,7 +2,7 @@ from builtins import object
 
 import numpy as np
 
-from sporco.fista import ppp
+from sporco.pgm import ppp
 import sporco.prox as sp
 import sporco.metric as sm
 

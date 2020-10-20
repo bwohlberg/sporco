@@ -1,7 +1,7 @@
 Module cmod
 ===========
 
-This module includes the :class:`.CnstrMOD` class for solving the
+This module includes the :class:`.admm.cmod.CnstrMOD` class for solving the
 problem
 
     .. math::

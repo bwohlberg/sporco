@@ -17,8 +17,8 @@ import numpy as np
 import sporco.cnvrep as cr
 import sporco.admm.cbpdn as admm_cbpdn
 import sporco.admm.ccmodmd as admm_ccmod
-import sporco.fista.cbpdn as fista_cbpdn
-import sporco.fista.ccmod as fista_ccmod
+import sporco.pgm.cbpdn as pgm_cbpdn
+import sporco.pgm.ccmod as pgm_ccmod
 from sporco.dictlrn import dictlrn
 import sporco.dictlrn.common as dc
 from sporco.common import _fix_dynamic_class_lookup
@@ -34,7 +34,7 @@ def cbpdnmsk_class_label_lookup(label):
     """Get a ConvBPDNMask class from a label string."""
 
     clsmod = {'admm': admm_cbpdn.ConvBPDNMaskDcpl,
-              'fista': fista_cbpdn.ConvBPDNMask}
+              'pgm': pgm_cbpdn.ConvBPDNMask}
     if label in clsmod:
         return clsmod[label]
     else:
@@ -54,8 +54,7 @@ def ConvBPDNMaskOptionsDefaults(method='admm'):
                       'RsdlRatio': 10.0, 'Scaling': 2.0,
                       'RsdlTarget': 1.0}})
     else:
-        dflt.update({'MaxMainIter': 1, 'BackTrack':
-                     {'gamma_u': 1.2, 'MaxIter': 50}})
+        dflt.update({'MaxMainIter': 1})
     return dflt
 
 
@@ -100,8 +99,8 @@ def ConvBPDNMask(*args, **kwargs):
 
     - ``'admm'`` :
       Use the implementation defined in :class:`.admm.cbpdn.ConvBPDNMaskDcpl`.
-    - ``'fista'`` :
-      Use the implementation defined in :class:`.fista.cbpdn.ConvBPDNMask`.
+    - ``'pgm'`` :
+      Use the implementation defined in :class:`.pgm.cbpdn.ConvBPDNMask`.
 
     The default value is ``'admm'``.
     """
@@ -131,7 +130,7 @@ def ccmodmsk_class_label_lookup(label):
     clsmod = {'ism': admm_ccmod.ConvCnstrMODMaskDcpl_IterSM,
               'cg': admm_ccmod.ConvCnstrMODMaskDcpl_CG,
               'cns': admm_ccmod.ConvCnstrMODMaskDcpl_Consensus,
-              'fista': fista_ccmod.ConvCnstrMODMask}
+              'pgm': pgm_ccmod.ConvCnstrMODMask}
     if label in clsmod:
         return clsmod[label]
     else:
@@ -139,15 +138,14 @@ def ccmodmsk_class_label_lookup(label):
 
 
 
-def ConvCnstrMODMaskOptionsDefaults(method='fista'):
+def ConvCnstrMODMaskOptionsDefaults(method='pgm'):
     """Get defaults dict for the ConvCnstrMODMask class specified by the
     ``method`` parameter.
     """
 
     dflt = copy.deepcopy(ccmodmsk_class_label_lookup(method).Options.defaults)
-    if method == 'fista':
-        dflt.update({'MaxMainIter': 1, 'BackTrack':
-                     {'gamma_u': 1.2, 'MaxIter': 50}})
+    if method == 'pgm':
+        dflt.update({'MaxMainIter': 1})
     else:
         dflt.update({'MaxMainIter': 1, 'AutoRho':
                      {'Period': 10, 'AutoScaling': False,
@@ -157,7 +155,7 @@ def ConvCnstrMODMaskOptionsDefaults(method='fista'):
 
 
 
-def ConvCnstrMODMaskOptions(opt=None, method='fista'):
+def ConvCnstrMODMaskOptions(opt=None, method='pgm'):
     """A wrapper function that dynamically defines a class derived from
     the Options class associated with one of the implementations of
     the Convolutional Constrained MOD problem, and returns an object
@@ -207,15 +205,15 @@ def ConvCnstrMODMask(*args, **kwargs):
       Use the implementation defined in
       :class:`.ConvCnstrMODMaskDcpl_Consensus`.
       This method is a good choice for large training sets.
-    - ``'fista'`` :
-      Use the implementation defined in :class:`.fista.ccmod.ConvCnstrMODMask`.
+    - ``'pgm'`` :
+      Use the implementation defined in :class:`.pgm.ccmod.ConvCnstrMODMask`.
       This method is the best choice for large training sets.
 
-    The default value is ``'fista'``.
+    The default value is ``'pgm'``.
     """
 
     # Extract method selection argument or set default
-    method = kwargs.pop('method', 'fista')
+    method = kwargs.pop('method', 'pgm')
 
     # Assign base class depending on method selection argument
     base = ccmodmsk_class_label_lookup(method)
@@ -249,9 +247,9 @@ class ConvBPDNMaskDictLearn(dictlrn.DictLearn):
 
     The sparse coding is performed using
     :class:`.admm.cbpdn.ConvBPDNMaskDcpl` (see :cite:`heide-2015-fast`) or
-    :class:`.fista.cbpdn.ConvBPDNMask` (see :cite:`chalasani-2013-fast` and
+    :class:`.pgm.cbpdn.ConvBPDNMask` (see :cite:`chalasani-2013-fast` and
     :cite:`wohlberg-2016-efficient`), and the dictionary update is computed
-    using :class:`.fista.ccmod.ConvCnstrMODMask` (see
+    using :class:`.pgm.ccmod.ConvCnstrMODMask` (see
     :cite:`garcia-2018-convolutional1`) or one of the solver classes in
     :mod:`.admm.ccmodmd` (see :cite:`wohlberg-2016-efficient` and
     :cite:`garcia-2018-convolutional1`). The coupling between sparse coding
@@ -298,7 +296,7 @@ class ConvBPDNMaskDictLearn(dictlrn.DictLearn):
 
            ``XRho`` : X penalty parameter
 
-       *If the FISTA solver is selected for sparse coding:*
+       *If the PGM solver is selected for sparse coding:*
 
            ``X_F_Btrack`` : Value of objective function for CSC problem
 
@@ -316,7 +314,7 @@ class ConvBPDNMaskDictLearn(dictlrn.DictLearn):
 
            ``DRho`` : D penalty parameter
 
-       *If the FISTA solver is selected for the dictionary update:*
+       *If the PGM solver is selected for the dictionary update:*
 
            ``D_F_Btrack`` : Value of objective function for CDU problem
 
@@ -365,7 +363,7 @@ class ConvBPDNMaskDictLearn(dictlrn.DictLearn):
             if xmethod is None:
                 xmethod = 'admm'
             if dmethod is None:
-                dmethod = 'fista'
+                dmethod = 'pgm'
 
             self.xmethod = xmethod
             self.dmethod = dmethod
@@ -425,7 +423,7 @@ class ConvBPDNMaskDictLearn(dictlrn.DictLearn):
         xmethod : string, optional (default 'admm')
           String selecting sparse coding solver. Valid values are
           documented in function :func:`.ConvBPDNMask`.
-        dmethod : string, optional (default 'fista')
+        dmethod : string, optional (default 'pgm')
           String selecting dictionary update solver. Valid values are
           documented in function :func:`.ConvCnstrMODMask`.
         dimK : int, optional (default 1)
@@ -470,7 +468,7 @@ class ConvBPDNMaskDictLearn(dictlrn.DictLearn):
         else:
             Y0b0 = np.zeros(cri.Nv + (1, 1, cri.C * cri.K))
         Y0b1 = cr.zpad(cr.stdformD(D0, cri.Cd, cri.M, dimN), cri.Nv)
-        if dmethod == 'fista':
+        if dmethod == 'pgm':
             opt['CCMOD'].update({'X0': Y0b1})
         else:
             if dmethod == 'cns':
@@ -531,7 +529,7 @@ class ConvBPDNMaskDictLearn(dictlrn.DictLearn):
             DX = self.reconstruct()
             S = self.xstep.S
             dfd = (np.linalg.norm(self.xstep.W * (DX - S))**2) / 2.0
-            if self.xmethod == 'fista':
+            if self.xmethod == 'pgm':
                 X = self.xstep.getcoef()
             else:
                 X = self.xstep.var_y1()

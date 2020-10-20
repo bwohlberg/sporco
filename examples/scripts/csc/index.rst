@@ -12,7 +12,7 @@ Greyscale Images
 * `Convolutional sparse coding (ADMM solver) <cbpdn_gry.py>`__
 * `Convolutional sparse coding using the parallel ADMM solver <parcbpdn_gry.py>`__
 * `Convolutional sparse coding using the CUDA solver <cbpdn_cuda.py>`__
-* `Convolutional sparse coding (FISTA solver) <cbpdn_fista_gry.py>`__
+* `Convolutional sparse coding (PGM solver) <cbpdn_pgm_gry.py>`__
 * `Convolutional sparse coding (constrained data fidelity) <cminl1_gry.py>`__
 * `Convolutional sparse coding (constrained penalty term) <cprjl1_gry.py>`__
 * `Convolutional sparse coding with gradient penalty using the CUDA solver <cbpdn_grd_cuda.py>`__
@@ -28,7 +28,7 @@ Colour Images
 .. toc-start
 
 * `Convolutional sparse coding of a colour image with a colour dictionary <cbpdn_clr_cd.py>`__
-* `Convolutional sparse coding of a colour image with a colour dictionary (FISTA solver) <cbpdn_fista_clr.py>`__
+* `Convolutional sparse coding of a colour image with a colour dictionary (PGM solver) <cbpdn_pgm_clr.py>`__
 * `Convolutional sparse coding of a colour image with a greyscale dictionary <cbpdn_clr_gd.py>`__
 * `Convolutional sparse coding of a colour image with a greyscale dictionary and a joint sparsity term <cbpdn_jnt_clr.py>`__
 * `Convolutional sparse coding of a colour image with a product dictionary <cbpdn_clr_pd.py>`__

@@ -2,11 +2,14 @@ from builtins import object
 
 import numpy as np
 
-from sporco.fista import ccmod
+from sporco.pgm import ccmod
 from sporco.fft import complex_dtype, fftn, ifftn
 from sporco.linalg import rrs
 import sporco.cnvrep as cr
 
+from sporco.pgm.momentum import MomentumLinear, MomentumGenLinear
+from sporco.pgm.stepsize import StepSizePolicyBB, StepSizePolicyCauchy
+from sporco.pgm.backtrack import BacktrackStandard, BacktrackRobust
 
 
 class TestSet01(object):
@@ -70,7 +73,7 @@ class TestSet01(object):
         dt = np.float32
         opt = ccmod.ConvCnstrMOD.Options(
             {'Verbose': False, 'MaxMainIter': 20,
-             'BackTrack': {'Enabled': True},
+             'Backtrack': BacktrackStandard(),
              'DataType': dt})
         c = ccmod.ConvCnstrMOD(X, S, (Nd, Nd, M), opt=opt)
         c.solve()
@@ -88,7 +91,7 @@ class TestSet01(object):
         dt = np.float64
         opt = ccmod.ConvCnstrMOD.Options(
             {'Verbose': False, 'MaxMainIter': 20,
-             'BackTrack': {'Enabled': True},
+             'Backtrack': BacktrackStandard(),
              'DataType': dt})
         c = ccmod.ConvCnstrMOD(X, S, (Nd, Nd, M), opt=opt)
         c.solve()
@@ -198,12 +201,12 @@ class TestSet01(object):
         xr = np.random.randn(N, N, M)
         xp = np.abs(xr) > 3
         X[xp] = np.random.randn(X[xp].size)
-        S = np.sum(ifftn(fftn(D0, (N, N), (0, 1)) *
-                         fftn(X, None, (0, 1)), None, (0, 1)).real, axis=2)
+        S = np.sum(ifftn(fftn(D0, (N, N), (0, 1)) * fftn(
+            X, None, (0, 1)), None, (0, 1)).real, axis=2)
         L = 2.5
         opt = ccmod.ConvCnstrMOD.Options(
             {'Verbose': False, 'MaxMainIter': 3000, 'ZeroMean': True,
-             'RelStopTol': 0., 'L': L, 'BackTrack': {'Enabled': False}})
+             'RelStopTol': 0., 'L': L, 'Backtrack': BacktrackStandard()})
         Xr = X.reshape(X.shape[0:2] + (1, 1,) + X.shape[2:])
         Sr = S.reshape(S.shape + (1,))
         c = ccmod.ConvCnstrMOD(Xr, Sr, D0.shape, opt)
@@ -223,12 +226,12 @@ class TestSet01(object):
         xr = np.random.randn(N, N, M)
         xp = np.abs(xr) > 3
         X[xp] = np.random.randn(X[xp].size)
-        S = np.sum(ifftn(fftn(D0, (N, N), (0, 1)) *
-                         fftn(X, None, (0, 1)), None, (0, 1)).real, axis=2)
+        S = np.sum(ifftn(fftn(D0, (N, N), (0, 1)) * fftn(
+            X, None, (0, 1)), None, (0, 1)).real, axis=2)
         L = 0.5
         opt = ccmod.ConvCnstrMOD.Options(
             {'Verbose': False, 'MaxMainIter': 3000, 'ZeroMean': True,
-             'RelStopTol': 0, 'L': L, 'BackTrack': {'Enabled': True}})
+             'RelStopTol': 0, 'L': L, 'Backtrack': BacktrackStandard()})
         Xr = X.reshape(X.shape[0:2] + (1, 1,) + X.shape[2:])
         Sr = S.reshape(S.shape + (1,))
         c = ccmod.ConvCnstrMOD(Xr, Sr, D0.shape, opt)
@@ -248,13 +251,12 @@ class TestSet01(object):
         xr = np.random.randn(N, N, M)
         xp = np.abs(xr) > 3
         X[xp] = np.random.randn(X[xp].size)
-        S = np.sum(ifftn(fftn(D0, (N, N), (0, 1)) *
-                         fftn(X, None, (0, 1)), None, (0, 1)).real,
-                   axis=2)
+        S = np.sum(ifftn(fftn(D0, (N, N), (0, 1)) * fftn(
+            X, None, (0, 1)), None, (0, 1)).real, axis=2)
         L = 0.5
         opt = ccmod.ConvCnstrMOD.Options(
             {'Verbose': False, 'MaxMainIter': 3000, 'ZeroMean': True,
-             'RelStopTol': 0., 'L': L, 'BackTrack': {'Enabled': True}})
+             'RelStopTol': 0., 'L': L, 'Backtrack': BacktrackStandard()})
         Xr = X.reshape(X.shape[0:2] + (1, 1,) + X.shape[2:])
         Sr = S.reshape(S.shape + (1,))
         c = ccmod.ConvCnstrMOD(Xr, Sr, D0.shape, opt)
@@ -266,6 +268,135 @@ class TestSet01(object):
 
 
     def test_14(self):
+        N = 32
+        M = 4
+        Nd = 5
+        D0 = cr.normalise(cr.zeromean(
+            np.random.randn(Nd, Nd, M), (Nd, Nd, M), dimN=2), dimN=2)
+        X = np.zeros((N, N, M))
+        xr = np.random.randn(N, N, M)
+        xp = np.abs(xr) > 3
+        X[xp] = np.random.randn(X[xp].size)
+        S = np.sum(ifftn(fftn(D0, (N, N), (0, 1)) * fftn(
+            X, None, (0, 1)), None, (0, 1)).real, axis=2)
+        L = 2.5
+        opt = ccmod.ConvCnstrMOD.Options(
+            {'Verbose': False, 'MaxMainIter': 3000, 'ZeroMean': True,
+             'RelStopTol': 0., 'L': L, 'Momentum': MomentumLinear()})
+        Xr = X.reshape(X.shape[0:2] + (1, 1,) + X.shape[2:])
+        Sr = S.reshape(S.shape + (1,))
+        c = ccmod.ConvCnstrMOD(Xr, Sr, D0.shape, opt)
+        c.solve()
+        D1 = cr.bcrop(c.X, D0.shape).squeeze()
+        assert rrs(D0, D1) < 1e-4
+        assert np.array(c.getitstat().Rsdl)[-1] < 1e-5
+
+
+    def test_15(self):
+        N = 32
+        M = 4
+        Nd = 5
+        D0 = cr.normalise(cr.zeromean(
+            np.random.randn(Nd, Nd, M), (Nd, Nd, M), dimN=2), dimN=2)
+        X = np.zeros((N, N, M))
+        xr = np.random.randn(N, N, M)
+        xp = np.abs(xr) > 3
+        X[xp] = np.random.randn(X[xp].size)
+        S = np.sum(ifftn(fftn(D0, (N, N), (0, 1)) * fftn(
+            X, None, (0, 1)), None, (0, 1)).real, axis=2)
+        L = 2.5
+        opt = ccmod.ConvCnstrMOD.Options(
+            {'Verbose': False, 'MaxMainIter': 3000, 'ZeroMean': True,
+             'RelStopTol': 0., 'L': L, 'Momentum': MomentumGenLinear()})
+        Xr = X.reshape(X.shape[0:2] + (1, 1,) + X.shape[2:])
+        Sr = S.reshape(S.shape + (1,))
+        c = ccmod.ConvCnstrMOD(Xr, Sr, D0.shape, opt)
+        c.solve()
+        D1 = cr.bcrop(c.X, D0.shape).squeeze()
+        assert rrs(D0, D1) < 1e-4
+        assert np.array(c.getitstat().Rsdl)[-1] < 1e-5
+
+
+    def test_16(self):
+        N = 64
+        M = 4
+        Nd = 8
+        D0 = cr.normalise(cr.zeromean(
+            np.random.randn(Nd, Nd, M), (Nd, Nd, M), dimN=2), dimN=2)
+        X = np.zeros((N, N, M))
+        xr = np.random.randn(N, N, M)
+        xp = np.abs(xr) > 3
+        X[xp] = np.random.randn(X[xp].size)
+        S = np.sum(ifftn(fftn(D0, (N, N), (0, 1)) * fftn(
+            X, None, (0, 1)), None, (0, 1)).real, axis=2)
+        L = 0.5
+        opt = ccmod.ConvCnstrMOD.Options(
+            {'Verbose': False, 'MaxMainIter': 3000, 'ZeroMean': True,
+             'RelStopTol': 0., 'L': L, 'StepSizePolicy': StepSizePolicyBB()})
+        Xr = X.reshape(X.shape[0:2] + (1, 1,) + X.shape[2:])
+        Sr = S.reshape(S.shape + (1,))
+        c = ccmod.ConvCnstrMOD(Xr, Sr, D0.shape, opt)
+        c.solve()
+        D1 = cr.bcrop(c.X, D0.shape).squeeze()
+
+        assert rrs(D0, D1) < 1e-4
+        assert np.array(c.getitstat().Rsdl)[-1] < 1e-5
+
+
+    def test_17(self):
+        N = 64
+        M = 4
+        Nd = 8
+        D0 = cr.normalise(cr.zeromean(
+            np.random.randn(Nd, Nd, M), (Nd, Nd, M), dimN=2), dimN=2)
+        X = np.zeros((N, N, M))
+        xr = np.random.randn(N, N, M)
+        xp = np.abs(xr) > 3
+        X[xp] = np.random.randn(X[xp].size)
+        S = np.sum(ifftn(fftn(D0, (N, N), (0, 1)) * fftn(
+            X, None, (0, 1)), None, (0, 1)).real, axis=2)
+        L = 0.5
+        opt = ccmod.ConvCnstrMOD.Options(
+            {'Verbose': False, 'MaxMainIter': 3000,
+             'ZeroMean': True, 'RelStopTol': 0., 'L': L,
+             'StepSizePolicy': StepSizePolicyCauchy()})
+        Xr = X.reshape(X.shape[0:2] + (1, 1,) + X.shape[2:])
+        Sr = S.reshape(S.shape + (1,))
+        c = ccmod.ConvCnstrMOD(Xr, Sr, D0.shape, opt)
+        c.solve()
+        D1 = cr.bcrop(c.X, D0.shape).squeeze()
+
+        assert rrs(D0, D1) < 1e-4
+        assert np.array(c.getitstat().Rsdl)[-1] < 1e-5
+
+
+    def test_18(self):
+        N = 64
+        M = 4
+        Nd = 8
+        D0 = cr.normalise(cr.zeromean(
+            np.random.randn(Nd, Nd, M), (Nd, Nd, M), dimN=2), dimN=2)
+        X = np.zeros((N, N, M))
+        xr = np.random.randn(N, N, M)
+        xp = np.abs(xr) > 3
+        X[xp] = np.random.randn(X[xp].size)
+        S = np.sum(ifftn(fftn(D0, (N, N), (0, 1)) * fftn(
+            X, None, (0, 1)), None, (0, 1)).real, axis=2)
+        L = 50.0
+        opt = ccmod.ConvCnstrMOD.Options(
+            {'Verbose': False, 'MaxMainIter': 3000, 'ZeroMean': True,
+             'RelStopTol': 0., 'L': L, 'Monotone': True})
+        Xr = X.reshape(X.shape[0:2] + (1, 1,) + X.shape[2:])
+        Sr = S.reshape(S.shape + (1,))
+        c = ccmod.ConvCnstrMOD(Xr, Sr, D0.shape, opt)
+        c.solve()
+        D1 = cr.bcrop(c.X, D0.shape).squeeze()
+
+        assert rrs(D0, D1) < 1e-4
+        assert np.array(c.getitstat().Rsdl)[-1] < 1e-5
+
+
+    def test_19(self):
         N = 16
         M = 4
         Nd = 8
@@ -283,7 +414,7 @@ class TestSet01(object):
             assert 0
 
 
-    def test_15(self):
+    def test_20(self):
         N = 16
         M = 4
         Nd = 8
@@ -301,7 +432,7 @@ class TestSet01(object):
             assert 0
 
 
-    def test_16(self):
+    def test_21(self):
         N = 16
         K = 3
         M = 4
@@ -319,7 +450,7 @@ class TestSet01(object):
             assert 0
 
 
-    def test_17(self):
+    def test_22(self):
         N = 16
         K = 3
         M = 4
@@ -337,7 +468,7 @@ class TestSet01(object):
             assert 0
 
 
-    def test_18(self):
+    def test_23(self):
         N = 16
         M = 4
         Nc = 3
@@ -356,7 +487,7 @@ class TestSet01(object):
             assert 0
 
 
-    def test_19(self):
+    def test_24(self):
         N = 16
         M = 4
         K = 2
@@ -375,7 +506,7 @@ class TestSet01(object):
             assert 0
 
 
-    def test_20(self):
+    def test_25(self):
         N = 16
         M = 4
         K = 2
@@ -394,7 +525,7 @@ class TestSet01(object):
             assert 0
 
 
-    def test_21(self):
+    def test_26(self):
         N = 16
         M = 4
         K = 2
@@ -413,7 +544,7 @@ class TestSet01(object):
             assert 0
 
 
-    def test_22(self):
+    def test_27(self):
         N = 16
         M = 4
         K = 2
@@ -432,7 +563,7 @@ class TestSet01(object):
             assert 0
 
 
-    def test_23(self):
+    def test_28(self):
         N = 16
         M = 4
         Nc = 3
@@ -453,7 +584,7 @@ class TestSet01(object):
         assert np.array(c.getitstat().Rsdl)[-1] < 5e-3
 
 
-    def test_24(self):
+    def test_29(self):
         N = 16
         M = 4
         Nc = 3
@@ -465,7 +596,7 @@ class TestSet01(object):
         try:
             opt = ccmod.ConvCnstrMODMask.Options(
                 {'Verbose': False, 'MaxMainIter': 200, 'L': L,
-                 'BackTrack': {'Enabled': True, 'Robust': True}})
+                 'Backtrack': BacktrackRobust()})
             c = ccmod.ConvCnstrMODMask(X, S, W, (Nd, Nd, 1, M),
                                        opt=opt, dimK=0)
             c.solve()

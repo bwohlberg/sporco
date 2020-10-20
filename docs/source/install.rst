@@ -259,5 +259,5 @@ Optional Package   Features Supported
 |mpi4py|           Parallel computation of the grid search in
 		   :mod:`sporco.mpiutil`
 |bm3d|             Required by :ref:`demo scripts <examples_ppp_index>`
-		   for :mod:`.admm.ppp` and :mod:`.fista.ppp`
+		   for :mod:`.admm.ppp` and :mod:`.pgm.ppp`
 =================  ======================================================

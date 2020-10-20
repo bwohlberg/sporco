@@ -5,10 +5,10 @@
 # with the package.
 
 """
-FISTA CBPDN Solver
+PGM CBPDN Solver
 ==================
 
-This example demonstrates the use of a FISTA solver for a convolutional sparse coding problem with a greyscale signal :cite:`chalasani-2013-fast` :cite:`wohlberg-2016-efficient`
+This example demonstrates the use of a PGM solver for a convolutional sparse coding problem with a greyscale signal :cite:`chalasani-2013-fast` :cite:`wohlberg-2016-efficient`
 
   $$\mathrm{argmin}_\mathbf{x} \; \frac{1}{2} \left\| \sum_m \mathbf{d}_m * \mathbf{x}_{m} - \mathbf{s} \right\|_2^2 + \lambda \sum_m \| \mathbf{x}_{m} \|_1 \;,$$
 
@@ -27,15 +27,16 @@ from sporco import util
 from sporco import signal
 from sporco import plot
 from sporco.metric import psnr
-from sporco.fista import cbpdn
+from sporco.pgm import cbpdn
+from sporco.pgm.backtrack import BacktrackStandard
 
 
 """
 Load example image.
 """
 
-img = util.ExampleImages().image('barbara.png', scaled=True, gray=True,
-                                 idxexp=np.s_[10:522, 100:612])
+img = util.ExampleImages().image('kodim23.png', scaled=True, gray=True,
+                                 idxexp=np.s_[160:416,60:316])
 
 
 """
@@ -56,13 +57,14 @@ plot.imview(util.tiledict(D), fgsz=(7, 7))
 
 
 """
-Set :class:`.fista.cbpdn.ConvBPDN` solver options.
+Set :class:`.pgm.cbpdn.ConvBPDN` solver options. Note the possibility of changing parameters in the backtracking algorithm.
 """
 
 lmbda = 5e-2
-L = 1e2
-opt = cbpdn.ConvBPDN.Options({'Verbose': True, 'MaxMainIter': 250,
-            'RelStopTol': 5e-3, 'L': L, 'BackTrack': {'Enabled': True }})
+L = 1.
+opt = cbpdn.ConvBPDN.Options({
+    'Verbose': True, 'MaxMainIter': 250, 'RelStopTol': 1e-4, 'L': L,
+    'Backtrack': BacktrackStandard(maxiter=15)})
 
 
 """
@@ -109,7 +111,7 @@ fig.show()
 
 
 """
-Get iterations statistics from solver object and plot functional value, ADMM primary and dual residuals, and automatically adjusted ADMM penalty parameter against the iteration number.
+Get iterations statistics from solver object and plot functional value, residual, and inverse step size parameter against the iteration number.
 """
 
 its = b.getitstat()
@@ -120,8 +122,7 @@ plot.subplot(1, 3, 2)
 plot.plot(its.Rsdl, ptyp='semilogy', xlbl='Iterations', ylbl='Residual',
           fig=fig)
 plot.subplot(1, 3, 3)
-plot.plot(its.L, xlbl='Iterations',
-          ylbl='Inverse of Gradient Step Parameter', fig=fig)
+plot.plot(its.L, xlbl='Iterations', ylbl='L', fig=fig)
 fig.show()
 
 
