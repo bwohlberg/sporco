@@ -23,7 +23,7 @@ with open(os.path.join(name, '__init__.py')) as f:
         lambda line: line.startswith('__version__'),
         f))).body[0].value.s
 
-packages = ['sporco', 'sporco.prox', 'sporco.admm', 'sporco.fista',
+packages = ['sporco', 'sporco.prox', 'sporco.admm', 'sporco.pgm',
             'sporco.dictlrn']
 
 docdirbase = 'share/doc/%s-%s' % (name, version)
@@ -45,7 +45,7 @@ sparse coding and dictionary learning, but there is also support for
 other problems such as Total Variation regularisation and Robust
 PCA. The optimisation algorithms in the current version are based
 on the Alternating Direction Method of Multipliers (ADMM) or on
-the Fast Iterative Shrinkage-Thresholding Algorithm (FISTA).
+the Fast Iterative Shrinkage-Thresholding Algorithm (PGM).
 """
 
 install_requires = ['future', 'numpy', 'scipy', 'imageio', 'matplotlib']
@@ -69,7 +69,7 @@ setup(
                         'Dictionary Learning',
                         'Convolutional Sparse Representations',
                         'Convolutional Sparse Coding', 'Optimization',
-                        'ADMM', 'FISTA'],
+                        'ADMM', 'PGM'],
     platforms        = 'Any',
     license          = 'BSD',
     url              = 'https://github.com/bwohlberg/sporco',

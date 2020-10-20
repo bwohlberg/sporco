@@ -35,7 +35,7 @@ Load example image.
 """
 
 img = util.ExampleImages().image('kodim23.png', scaled=True, gray=True,
-                                idxexp=np.s_[160:416,60:316])
+                                 idxexp=np.s_[160:416,60:316])
 
 
 """

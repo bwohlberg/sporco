@@ -1,7 +1,7 @@
 Modules ccmod and ccmodmd
 =========================
 
-Modules :mod:`.admm.ccmod` and :mod:`.fista.ccmod` include classes for
+Modules :mod:`.admm.ccmod` and :mod:`.pgm.ccmod` include classes for
 solving the problem
 
 .. math::
@@ -22,7 +22,7 @@ A :ref:`usage example <examples_cdl_ccmod_cns_gry>` is available.
 
 |
 
-Modules :mod:`.admm.ccmodmd` and :mod:`.fista.ccmod` include classes for solving the problem
+Modules :mod:`.admm.ccmodmd` and :mod:`.pgm.ccmod` include classes for solving the problem
 
 .. math::
    \mathrm{argmin}_\mathbf{d} \;

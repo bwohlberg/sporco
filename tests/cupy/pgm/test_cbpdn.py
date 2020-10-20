@@ -12,7 +12,10 @@ except ImportError:
     pytest.skip("cupy not installed", allow_module_level=True)
 
 
-from sporco.cupy.fista import cbpdn
+from sporco.cupy.pgm import cbpdn
+from sporco.cupy.pgm.momentum import MomentumLinear, MomentumGenLinear
+from sporco.cupy.pgm.stepsize import StepSizePolicyBB, StepSizePolicyCauchy
+from sporco.cupy.pgm.backtrack import BacktrackStandard
 from sporco.cupy.array import list2array
 from sporco.cupy.fft import complex_dtype, fftn, ifftn
 from sporco.cupy.linalg import rrs
@@ -99,9 +102,9 @@ class TestSet01(object):
         D = cp.random.randn(Nd, Nd, M)
         s = cp.random.randn(N, N, K)
         dt = cp.float32
-        opt = cbpdn.ConvBPDN.Options(
-            {'Verbose': False, 'MaxMainIter': 20, 'BackTrack':
-             {'Enabled': True}, 'DataType': dt})
+        opt = cbpdn.ConvBPDN.Options({'Verbose': False, 'MaxMainIter': 20,
+                                      'Backtrack': BacktrackStandard(),
+                                      'DataType': dt})
         lmbda = 1e-1
         b = cbpdn.ConvBPDN(D, s, lmbda, opt=opt)
         b.solve()
@@ -118,9 +121,9 @@ class TestSet01(object):
         D = cp.random.randn(Nd, Nd, M)
         s = cp.random.randn(N, N, K)
         dt = cp.float64
-        opt = cbpdn.ConvBPDN.Options(
-            {'Verbose': False, 'MaxMainIter': 20, 'BackTrack':
-             {'Enabled': True}, 'DataType': dt})
+        opt = cbpdn.ConvBPDN.Options({'Verbose': False, 'MaxMainIter': 20,
+                                      'Backtrack': BacktrackStandard(),
+                                      'DataType': dt})
         lmbda = 1e-1
         b = cbpdn.ConvBPDN(D, s, lmbda, opt=opt)
         b.solve()
@@ -173,7 +176,7 @@ class TestSet01(object):
         L = 1e3
         opt = cbpdn.ConvBPDN.Options({'Verbose': False, 'MaxMainIter': 2000,
                                       'RelStopTol': 1e-9, 'L': L,
-                                      'BackTrack': {'Enabled': False}})
+                                      'Backtrack': BacktrackStandard()})
         b = cbpdn.ConvBPDN(D, S, lmbda, opt)
         b.solve()
         X1 = b.X.squeeze()
@@ -198,7 +201,7 @@ class TestSet01(object):
         L = 1e3
         opt = cbpdn.ConvBPDN.Options({'Verbose': False, 'MaxMainIter': 2000,
                                       'RelStopTol': 1e-9, 'L': L,
-                                      'BackTrack': {'Enabled': False}})
+                                      'Backtrack': BacktrackStandard()})
         b = cbpdn.ConvBPDN(D, S, lmbda, opt)
         b.solve()
         X1 = b.X.squeeze()
@@ -244,6 +247,105 @@ class TestSet01(object):
     def test_14(self):
         N = 16
         Nd = 5
+        Cs = 3
+        M = 4
+        D = cp.random.randn(Nd, Nd, M)
+        s = cp.random.randn(N, N, Cs)
+        lmbda = 1e-1
+        L = 1e3
+        try:
+            opt = cbpdn.ConvBPDN.Options(
+                {'Momentum': MomentumLinear(), 'L': L})
+            b = cbpdn.ConvBPDN(D, s, lmbda, opt=opt, dimK=0)
+            b.solve()
+        except Exception as e:
+            print(e)
+            assert 0
+        assert list2array(b.getitstat().Rsdl)[-1] < 1e-3
+
+
+    def test_15(self):
+        N = 16
+        Nd = 5
+        Cs = 3
+        M = 4
+        D = cp.random.randn(Nd, Nd, M)
+        s = cp.random.randn(N, N, Cs)
+        lmbda = 1e-1
+        L = 1e3
+        try:
+            opt = cbpdn.ConvBPDN.Options(
+                {'Momentum': MomentumGenLinear(), 'L': L})
+            b = cbpdn.ConvBPDN(D, s, lmbda, opt=opt, dimK=0)
+            b.solve()
+        except Exception as e:
+            print(e)
+            assert 0
+        assert list2array(b.getitstat().Rsdl)[-1] < 1e-3
+
+
+    def test_16(self):
+        N = 16
+        Nd = 5
+        Cs = 3
+        M = 4
+        D = cp.random.randn(Nd, Nd, M)
+        s = cp.random.randn(N, N, Cs)
+        lmbda = 1e-1
+        L = 1e3
+        try:
+            opt = cbpdn.ConvBPDN.Options(
+                {'StepSizePolicy': StepSizePolicyCauchy(), 'L': L})
+            b = cbpdn.ConvBPDN(D, s, lmbda, opt=opt, dimK=0)
+            b.solve()
+        except Exception as e:
+            print(e)
+            assert 0
+        assert list2array(b.getitstat().Rsdl)[-1] < 1e-3
+
+
+    def test_17(self):
+        N = 16
+        Nd = 5
+        Cs = 3
+        M = 4
+        D = cp.random.randn(Nd, Nd, M)
+        s = cp.random.randn(N, N, Cs)
+        lmbda = 1e-1
+        L = 1e3
+        try:
+            opt = cbpdn.ConvBPDN.Options(
+                {'StepSizePolicy': StepSizePolicyBB(), 'L': L})
+            b = cbpdn.ConvBPDN(D, s, lmbda, opt=opt, dimK=0)
+            b.solve()
+        except Exception as e:
+            print(e)
+            assert 0
+        assert list2array(b.getitstat().Rsdl)[-1] < 1e-3
+
+
+    def test_18(self):
+        N = 16
+        Nd = 5
+        Cs = 3
+        M = 4
+        D = cp.random.randn(Nd, Nd, M)
+        s = cp.random.randn(N, N, Cs)
+        lmbda = 1e-1
+        L = 1e3
+        try:
+            opt = cbpdn.ConvBPDN.Options({'Monotone': True, 'L': L})
+            b = cbpdn.ConvBPDN(D, s, lmbda, opt=opt, dimK=0)
+            b.solve()
+        except Exception as e:
+            print(e)
+            assert 0
+        assert list2array(b.getitstat().Rsdl)[-1] < 1e-3
+
+
+    def test_19(self):
+        N = 16
+        Nd = 5
         M = 4
         D = cp.random.randn(Nd, Nd, M)
         s = cp.random.randn(N, N)
@@ -256,7 +358,7 @@ class TestSet01(object):
             assert 0
 
 
-    def test_15(self):
+    def test_20(self):
         N = 16
         Nd = 5
         M = 4

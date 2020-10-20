@@ -12,6 +12,7 @@ Version 0.1.13   (not yet released)
   gaussian, and local_contrast_normalise moved from sporco.util to
   sporco.linalg
 • Significant change to interface of fft.fftconv function
+• Major restructuring of sporco.fista modules, now renamed to sporco.pgm
 
 
 

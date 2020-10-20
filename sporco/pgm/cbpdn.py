@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2016-2019 by Brendt Wohlberg <brendt@ieee.org>
+# Copyright (C) 2016-2020 by Brendt Wohlberg <brendt@ieee.org>
 #                            Cristina Garcia-Cardona <cgarciac@lanl.gov>
 # All rights reserved. BSD 3-clause License.
 # This file is part of the SPORCO package. Details of the copyright
 # and user license can be found in the 'LICENSE.txt' file distributed
 # with the package.
 
-"""Classes for FISTA algorithm for the Convolutional BPDN problem"""
+"""Classes for PGM algorithm for the Convolutional BPDN problem"""
 
 from __future__ import division, absolute_import, print_function
 
@@ -19,16 +19,16 @@ from sporco.linalg import inner
 from sporco.fft import (rfftn, irfftn, empty_aligned, rfftn_empty_aligned,
                         rfl2norm2)
 from sporco.prox import prox_l1
-from sporco.fista import fista
+from sporco.pgm import pgm
 
 
 __author__ = """Cristina Garcia-Cardona <cgarciac@lanl.gov>"""
 
 
 
-class ConvBPDN(fista.FISTADFT):
+class ConvBPDN(pgm.PGMDFT):
     r"""
-    Base class for FISTA algorithm for the Convolutional BPDN (CBPDN)
+    Base class for PGM algorithm for the Convolutional BPDN (CBPDN)
     :cite:`garcia-2018-convolutional1` problem.
 
     |
@@ -49,7 +49,7 @@ class ConvBPDN(fista.FISTADFT):
     term or the indicator function of a constraint; with input
     image :math:`\mathbf{s}`, dictionary filters :math:`\mathbf{d}_m`,
     and coefficient maps :math:`\mathbf{x}_m`. It is solved via the
-    FISTA formulation
+    PGM formulation
 
     Proximal step
 
@@ -88,11 +88,11 @@ class ConvBPDN(fista.FISTADFT):
     """
 
 
-    class Options(fista.FISTADFT.Options):
+    class Options(pgm.PGMDFT.Options):
         r"""ConvBPDN algorithm options
 
         Options include all of those defined in
-        :class:`.fista.FISTADFT.Options`, together with
+        :class:`.pgm.PGMDFT.Options`, together with
         additional options:
 
           ``NonNegCoef`` : Flag indicating whether to force solution to
@@ -112,7 +112,7 @@ class ConvBPDN(fista.FISTADFT):
 
         """
 
-        defaults = copy.deepcopy(fista.FISTADFT.Options.defaults)
+        defaults = copy.deepcopy(pgm.PGMDFT.Options.defaults)
         defaults.update({'NonNegCoef': False, 'NoBndryCross': False})
         defaults.update({'L1Weight': 1.0})
         defaults.update({'L': 500.0})
@@ -128,14 +128,14 @@ class ConvBPDN(fista.FISTADFT):
 
             if opt is None:
                 opt = {}
-            fista.FISTADFT.Options.__init__(self, opt)
+            pgm.PGMDFT.Options.__init__(self, opt)
 
 
 
         def __setitem__(self, key, value):
             """Set options."""
 
-            fista.FISTADFT.Options.__setitem__(self, key, value)
+            pgm.PGMDFT.Options.__setitem__(self, key, value)
 
 
     itstat_fields_objfn = ('ObjFun', 'DFid', 'RegL1')
@@ -158,6 +158,17 @@ class ConvBPDN(fista.FISTADFT):
         signals), or `dimN` + 2 dimensional (multiple channels and
         multiple signals). Determination of problem dimensions is
         handled by :class:`.cnvrep.CSC_ConvRepIndexing`.
+
+
+        |
+
+        **Call graph**
+
+        .. image:: ../_static/jonga/pgm_cbpdn_init.svg
+           :width: 20%
+           :target: ../_static/jonga/pgm_cbpdn_init.svg
+
+        |
 
 
         Parameters
@@ -203,7 +214,9 @@ class ConvBPDN(fista.FISTADFT):
         # Call parent class __init__
         self.Xf = None
         xshape = self.cri.shpX
-        super(ConvBPDN, self).__init__(xshape, S.dtype, opt)
+        Nv = self.cri.Nv
+        axisN = self.cri.axisN
+        super(ConvBPDN, self).__init__(xshape, Nv, axisN, S.dtype, opt)
 
         # Reshape D and S to standard layout
         self.D = np.asarray(D.reshape(self.cri.shpD), dtype=self.dtype)
@@ -225,13 +238,9 @@ class ConvBPDN(fista.FISTADFT):
 
         self.Xf = rfftn(self.X, None, self.cri.axisN)
         self.Yf = self.Xf.copy()
-        self.store_prev()
         self.Yfprv = self.Yf.copy() + 1e5
 
         self.setdict()
-
-        # Initialization needed for back tracking (if selected)
-        self.postinitialization_backtracking_DFT()
 
 
 
@@ -251,11 +260,13 @@ class ConvBPDN(fista.FISTADFT):
 
 
 
-    def eval_grad(self):
+    def grad_f(self, Vf=None):
         """Compute gradient in Fourier domain."""
 
-        # Compute D X - S
-        Ryf = self.eval_Rf(self.Yf)
+        if Vf is None:
+            Vf = self.Yf
+        # Compute Df Vf - Sf
+        Ryf = self.eval_Rf(Vf)
         # Compute D^H Ryf
         gradf = np.conj(self.Df) * Ryf
 
@@ -274,10 +285,29 @@ class ConvBPDN(fista.FISTADFT):
 
 
 
-    def eval_proxop(self, V):
+    def prox_g(self, V):
         """Compute proximal operator of :math:`g`."""
 
-        return prox_l1(V, (self.lmbda / self.L) * self.wl1)
+        U = prox_l1(V, (self.lmbda / self.L) * self.wl1)
+        if self.opt['NonNegCoef']:
+            U[U < 0.0] = 0.0
+        if self.opt['NoBndryCross']:
+            for n in range(0, self.cri.dimN):
+                U[(slice(None),) * n +
+                  (slice(1 - self.D.shape[n], None),)] = 0.0
+        return U
+
+
+
+    def hessian_f(self, V):
+        """Compute Hessian of :math:`f` applied to V."""
+
+        hessfv = np.conj(self.Df) * inner(self.Df, V, axis=self.cri.axisM)
+        # Multiple channel signal, multiple channel dictionary
+        if self.cri.Cd > 1:
+            hessfv = np.sum(hessfv, axis=self.cri.axisC, keepdims=True)
+
+        return hessfv
 
 
 
@@ -356,7 +386,7 @@ class ConvBPDN(fista.FISTADFT):
 
 class ConvBPDNMask(ConvBPDN):
     r"""
-    FISTA algorithm for Convolutional BPDN with a spatial mask.
+    PGM algorithm for Convolutional BPDN with a spatial mask.
 
     |
 
@@ -421,11 +451,15 @@ class ConvBPDNMask(ConvBPDN):
 
 
 
-    def eval_grad(self):
+    def grad_f(self, Vf=None):
         """Compute gradient in Fourier domain."""
 
-        # Compute D X - S
-        self.Ryf[:] = self.eval_Rf(self.Yf)
+        if Vf is not None:
+            # Compute D V - S
+            self.Ryf[:] = self.eval_Rf(Vf)
+        else:
+            # Compute D X - S
+            self.Ryf[:] = self.eval_Rf(self.Yf)
 
         # Map to spatial domain to multiply by mask
         Ry = irfftn(self.Ryf, self.cri.Nv, self.cri.axisN)

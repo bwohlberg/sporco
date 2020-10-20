@@ -5,10 +5,10 @@
 # with the package.
 
 """
-FISTA CBPDN Solver
+PGM CBPDN Solver
 ==================
 
-This example demonstrates use of a FISTA solver for a convolutional sparse coding problem with a colour dictionary and a colour signal :cite:`wohlberg-2016-convolutional` :cite:`garcia-2018-convolutional1`
+This example demonstrates use of a PGM solver for a convolutional sparse coding problem with a colour dictionary and a colour signal :cite:`wohlberg-2016-convolutional` :cite:`garcia-2018-convolutional1`
 
   $$\mathrm{argmin}_\mathbf{x} \; (1/2) \sum_c \left\| \sum_m \mathbf{d}_{c,m} * \mathbf{x}_m -\mathbf{s}_c \right\|_2^2 + \lambda \sum_m \| \mathbf{x}_m \|_1 \;,$$
 
@@ -26,8 +26,8 @@ from sporco import util
 from sporco import signal
 from sporco import plot
 import sporco.metric as sm
-from sporco.fista import cbpdn
-
+from sporco.pgm import cbpdn
+from sporco.pgm.backtrack import BacktrackStandard
 
 """
 Load example image.
@@ -55,13 +55,14 @@ plot.imview(util.tiledict(D), fgsz=(7, 7))
 
 
 """
-Set :class:`.fista.cbpdn.ConvBPDN` solver options.
+Set :class:`.pgm.cbpdn.ConvBPDN` solver options. Note the possibility of changing parameters in the backtracking algorithm.
 """
 
 lmbda = 1e-1
-L = 1e2
-opt = cbpdn.ConvBPDN.Options({'Verbose': True, 'MaxMainIter': 250,
-            'RelStopTol': 8e-5, 'L': L, 'BackTrack': {'Enabled': True }})
+L = 1e1
+opt = cbpdn.ConvBPDN.Options({
+    'Verbose': True, 'MaxMainIter': 250, 'RelStopTol': 8e-5, 'L': L,
+    'Backtrack': BacktrackStandard(maxiter=15)})
 
 
 """
@@ -108,7 +109,7 @@ fig.show()
 
 
 """
-Get iterations statistics from solver object and plot functional value, ADMM primary and dual residuals, and automatically adjusted ADMM penalty parameter against the iteration number.
+Get iterations statistics from solver object and plot functional value, residual, and inverse step size parameter against the iteration number.
 """
 
 its = b.getitstat()

@@ -119,10 +119,10 @@ class TestSet01(object):
     def test_08(self):
         lmbda = 1e-1
         opt = cbpdndl.ConvBPDNDictLearn.Options({'MaxMainIter': 10},
-                                                dmethod='fista')
+                                                dmethod='pgm')
         try:
             b = cbpdndl.ConvBPDNDictLearn(self.D0, self.S, lmbda, opt=opt,
-                                          dmethod='fista')
+                                          dmethod='pgm')
             b.solve()
         except Exception as e:
             print(e)
@@ -133,10 +133,10 @@ class TestSet01(object):
     def test_09(self):
         lmbda = 1e-1
         opt = cbpdndl.ConvBPDNDictLearn.Options({'MaxMainIter': 10},
-                                                xmethod='fista')
+                                                xmethod='pgm')
         try:
             b = cbpdndl.ConvBPDNDictLearn(self.D0, self.S, lmbda, opt=opt,
-                                          xmethod='fista')
+                                          xmethod='pgm')
             b.solve()
         except Exception as e:
             print(e)
@@ -147,10 +147,10 @@ class TestSet01(object):
     def test_10(self):
         lmbda = 1e-1
         opt = cbpdndl.ConvBPDNDictLearn.Options({'MaxMainIter': 10},
-                                                xmethod='fista', dmethod='cns')
+                                                xmethod='pgm', dmethod='cns')
         try:
             b = cbpdndl.ConvBPDNDictLearn(self.D0, self.S, lmbda, opt=opt,
-                                          xmethod='fista', dmethod='cns')
+                                          xmethod='pgm', dmethod='cns')
             b.solve()
         except Exception as e:
             print(e)

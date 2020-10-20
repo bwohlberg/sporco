@@ -126,7 +126,7 @@ class IterativeSolver(with_metaclass(_IterSolver_Meta, object)):
     """Fields in IterationStats associated with the objective function"""
     itstat_fields_alg = ()
     """Fields in IterationStats associated with the specific solver
-    algorithm, e.g. ADMM or FISTA"""
+    algorithm, e.g. ADMM or PGM"""
     itstat_fields_extra = ()
     """Non-standard fields in IterationStats"""
 

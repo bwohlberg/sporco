@@ -5,10 +5,10 @@
 # with the package.
 
 """
-Plug-and-Play FISTA Demosaicing
+Plug-and-Play PGM Demosaicing
 ===============================
 
-This example demonstrates the use of class :class:`.fista.ppp.PPP` for solving a raw image demosaicing problem via the FISTA Plug and Play Priors (PPP) algorithm :cite:`kamilov-2017-plugandplay`.
+This example demonstrates the use of class :class:`.pgm.ppp.PPP` for solving a raw image demosaicing problem via the PGM Plug and Play Priors (PPP) algorithm :cite:`kamilov-2017-plugandplay`.
 """
 
 
@@ -19,7 +19,7 @@ import numpy as np
 
 from bm3d import bm3d_rgb
 
-from sporco.fista.ppp import PPP
+from sporco.pgm.ppp import PPP
 from sporco.interp import bilinear_demosaic
 from sporco import metric
 from sporco import util
@@ -132,8 +132,8 @@ imgp = b.solve()
 Display solve time and demosaicing performance.
 """
 
-print("PPP FISTA solve time:       %5.2f s" % b.timer.elapsed('solve'))
-print("Bilinear demosaicing PSNR:  %5.2f dB" % metric.psnr(img, imgb))
+print("PPP PGM solve time:        %5.2f s" % b.timer.elapsed('solve'))
+print("Baseline demosaicing PSNR:  %5.2f dB" % metric.psnr(img, imgb))
 print("PPP demosaicing PSNR:       %5.2f dB" % metric.psnr(img, imgp))
 
 
