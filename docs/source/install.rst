@@ -244,6 +244,7 @@ additional features when installed:
 .. |gputil| replace:: `GPUtil <https://github.com/anderskm/gputil>`__
 .. |mpi4py| replace:: `mpi4py <https://github.com/mpi4py/mpi4py>`__
 .. |bm3d| replace:: `bm3d <https://pypi.org/project/bm3d>`__
+.. |cdmsc| replace:: `colour_demosaicing <https://github.com/colour-science/colour-demosaicing>`__
 
 
 =================  ======================================================
@@ -259,5 +260,7 @@ Optional Package   Features Supported
 |mpi4py|           Parallel computation of the grid search in
 		   :mod:`sporco.mpiutil`
 |bm3d|             Required by :ref:`demo scripts <examples_ppp_index>`
+		   for :mod:`.admm.ppp` and :mod:`.pgm.ppp`
+|cdmsc|            Required by :ref:`demo scripts <examples_ppp_index>`
 		   for :mod:`.admm.ppp` and :mod:`.pgm.ppp`
 =================  ======================================================

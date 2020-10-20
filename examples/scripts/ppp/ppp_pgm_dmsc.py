@@ -18,6 +18,12 @@ from builtins import input, range
 import numpy as np
 
 from bm3d import bm3d_rgb
+try:
+    from colour_demosaicing import demosaicing_CFA_Bayer_Menon2007
+except ImportError:
+    have_demosaic = False
+else:
+    have_demosaic = True
 
 from sporco.pgm.ppp import PPP
 from sporco.interp import bilinear_demosaic
@@ -56,6 +62,17 @@ def AT(x):
     y[0::2, 0::2, 2] = x[0::2, 0::2]
     return y
 
+
+"""
+Define baseline demosaicing function. If package [colour_demosaicing](https://github.com/colour-science/colour-demosaicing) is installed, use the demosaicing algorithm of Menon et al. (doi:10.1109/TIP.2006.884928), othewise use simple bilinear demosaicing.
+"""
+
+if have_demosaic:
+    def demosaic(cfaimg):
+        return demosaicing_CFA_Bayer_Menon2007(cfaimg, pattern='BGGR')
+else:
+    def demosaic(cfaimg):
+        return bilinear_demosaic(cfaimg)
 
 
 """
@@ -109,7 +126,7 @@ def proxg(x, L):
 Construct a baseline solution and initaliser for the PPP solution by BM3D denoising of a simple bilinear demosaicing solution. The `3 * nsigma` denoising parameter for BM3D is chosen empirically for best performance.
 """
 
-imgb = bm3d_rgb(bilinear_demosaic(sn), 3 * nsigma)
+imgb = bm3d_rgb(demosaic(sn), 3 * nsigma)
 
 
 """
@@ -144,7 +161,7 @@ Display reference and demosaiced images.
 fig, ax = plot.subplots(nrows=1, ncols=3, sharex=True, sharey=True,
                         figsize=(21, 7))
 plot.imview(img, title='Reference', fig=fig, ax=ax[0])
-plot.imview(imgb, title='Bilinear demoisac: %.2f (dB)' %
+plot.imview(imgb, title='Baseline demoisac: %.2f (dB)' %
             metric.psnr(img, imgb), fig=fig, ax=ax[1])
 plot.imview(imgp, title='PPP demoisac: %.2f (dB)' %
             metric.psnr(img, imgp), fig=fig, ax=ax[2])
