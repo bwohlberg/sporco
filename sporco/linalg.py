@@ -157,12 +157,14 @@ def valid_adjoint(A, AT, Ashape, ATshape, eps=1e-7):
 
     by computing :math:`\mathbf{u} = A \mathbf{x}` and
     :math:`\mathbf{v} = A^T \mathbf{y}` for random :math:`\mathbf{x}`
-    and :math:`\mathbf{y}` and confirming that
+    and :math:`\mathbf{y}` and confirming that :math:`\| \mathbf{y}^T
+    \mathbf{u} - \mathbf{v}^T \mathbf{x} \|_2 < \epsilon` since
 
     .. math::
       \mathbf{y}^T \mathbf{u} = \mathbf{y}^T (A \mathbf{x}) =
-      (A^T \mathbf{y})^T \mathbf{x} = \mathbf{v}^T \mathbf{x} \;.
+      (A^T \mathbf{y})^T \mathbf{x} = \mathbf{v}^T \mathbf{x}
 
+    when :math:`A^T` is a valid adjoint of :math:`A`.
 
     Parameters
     ----------
