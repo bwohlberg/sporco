@@ -34,8 +34,8 @@ __all__ = ['inner', 'dot', 'valid_adjoint', 'solvedbi_sm', 'solvedbi_sm_c',
            'solvedbd_sm', 'solvedbd_sm_c', 'solvemdbi_ism', 'solvemdbi_rsm',
            'solvemdbi_cg', 'lu_factor', 'lu_solve_ATAI', 'lu_solve_AATI',
            'cho_factor', 'cho_solve_ATAI', 'cho_solve_AATI',
-           'block_circulant', 'rrs', 'pca', 'nkp', 'kpsvd',
-           'proj_l2ball']
+           'solve_symmetric_sylvester', 'block_circulant', 'rrs', 'pca',
+           'nkp', 'kpsvd', 'proj_l2ball']
 
 
 
@@ -816,6 +816,74 @@ def cho_solve_AATI(A, rho, b, c, lwr=False, check_finite=True):
     else:
         x = linalg.cho_solve((c, lwr), b.T, check_finite=check_finite).T
     return x
+
+
+
+def solve_symmetric_sylvester(A, B, C, alpha):
+    r"""Solve a variant of the Sylvester equation with symmetric matrices.
+
+    Solve for :math:`X` in the equation :math:`A X B + \alpha X = C`,
+    where :math:`A` and :math:`B` are diagonal or real symmetric matrices.
+
+    Parameters
+    ----------
+    A : array_like or tuple
+      Matrix :math:`A`. If :math:`A` is diagonal, this should be a 1d
+      array or a :math:`N \times 1` 2d array representing the diagonal.
+      If :math:`A` is symmetric, this should be a 2d array or a tuple
+      (LambdaA, QA) representing the eigenvalue decomposition of
+      :math:`A` such that :math:`Q_A \Lambda_A Q_A^T = A`
+    B : array_like or tuple
+      Matrix :math:`B`. If :math:`B` is diagonal, this should be a 1d
+      array or a :math:`1 \times M` 2d array representing the diagonal.
+      If :math:`B` is symmetric, this should be a 2d array or a tuple
+      (LambdaB, QB) representing the eigenvalue decomposition of
+      :math:`B` such that :math:`Q_B \Lambda_B Q_B^T = B`
+    C : array_like
+      Matrix :math:`C` as a 2d array
+    alpha : float
+      Scalar :math:`\alpha`
+
+    Returns
+    -------
+    X : ndarray
+      Solution to the linear system
+    """
+
+    if isinstance(A, tuple) and len(A) == 2:
+        LambdaA = A[0]
+        QA = A[1]
+    else:
+        if A.ndim <= 1 or A.shape[1] == 1:
+            LambdaA, QA = A, None
+        else:
+            LambdaA, QA = np.linalg.eigh(A)
+            LambdaA = np.abs(LambdaA)
+    if LambdaA.ndim == 1:
+        LambdaA = LambdaA[:, np.newaxis]
+    if isinstance(B, tuple) and len(B) == 2:
+        LambdaB = B[0]
+        QB = B[1]
+    else:
+        if B.ndim <= 1 or B.shape[0] == 1:
+            LambdaB, QB = B, None
+        else:
+            LambdaB, QB = np.linalg.eigh(B)
+            LambdaB = np.abs(LambdaB)
+    if LambdaB.ndim == 1:
+        LambdaB = LambdaB[np.newaxis]
+
+    QATCQB = C.copy()
+    if QA is not None:
+        np.dot(QA.T, QATCQB, out=QATCQB)
+    if QB is not None:
+        np.dot(QATCQB, QB, out=QATCQB)
+    QATXQB = QATCQB / (LambdaB * LambdaA + alpha)
+    if QA is not None:
+        np.dot(QA, QATXQB, out=QATXQB)
+    if QB is not None:
+        np.dot(QATXQB, QB.T, out=QATXQB)
+    return QATXQB
 
 
 

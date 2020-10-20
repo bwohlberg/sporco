@@ -370,6 +370,73 @@ class TestSet01(object):
 
 
     def test_28(self):
+        alpha = np.random.randn()
+        N = 7
+        M = 10
+        X0 = np.random.randn(N, M)
+        A = np.random.randn(N, 1)
+        B = np.random.randn(1, M)
+        C = A * X0 * B + alpha * X0
+        X1 = linalg.solve_symmetric_sylvester(A, B, C, alpha)
+        assert mse(X0, X1) < 1e-14
+        A = A[:, 0]
+        B = B[0]
+        X1 = linalg.solve_symmetric_sylvester(A, B, C, alpha)
+        assert mse(X0, X1) < 1e-14
+
+
+    def test_29(self):
+        alpha = np.random.randn()
+        N = 7
+        M = 10
+        X0 = np.random.randn(N, M)
+        A = np.random.randn(N, 1)
+        Bg = np.random.randn(M, 4)
+        B = Bg.dot(Bg.T)
+        C = A * X0.dot(B) + alpha * X0
+        X1 = linalg.solve_symmetric_sylvester(A, B, C, alpha)
+        assert mse(X0, X1) < 1e-12
+        Lambda, Q = np.linalg.eigh(B)
+        X1 = linalg.solve_symmetric_sylvester(A, (Lambda, Q), C, alpha)
+        assert mse(X0, X1) < 1e-12
+
+
+    def test_30(self):
+        alpha = np.random.randn()
+        N = 7
+        M = 10
+        X0 = np.random.randn(N, M)
+        Ag = np.random.randn(4, N)
+        A = Ag.T.dot(Ag)
+        B = np.random.randn(1, M)
+        C = A.dot(X0) * B + alpha * X0
+        X1 = linalg.solve_symmetric_sylvester(A, B, C, alpha)
+        assert mse(X0, X1) < 1e-12
+        Lambda, Q = np.linalg.eigh(A)
+        X1 = linalg.solve_symmetric_sylvester((Lambda, Q), B, C, alpha)
+        assert mse(X0, X1) < 1e-12
+
+
+    def test_31(self):
+        alpha = np.random.randn()
+        N = 8
+        M = 11
+        X0 = np.random.randn(N, M)
+        Ag = np.random.randn(4, N)
+        A = Ag.T.dot(Ag)
+        Bg = np.random.randn(M, 4)
+        B = Bg.dot(Bg.T)
+        C = A.dot(X0).dot(B) + alpha * X0
+        X1 = linalg.solve_symmetric_sylvester(A, B, C, alpha)
+        assert mse(X0, X1) < 1e-12
+        LambdaA, QA = np.linalg.eigh(A)
+        LambdaB, QB = np.linalg.eigh(B)
+        X1 = linalg.solve_symmetric_sylvester((LambdaA, QA), (LambdaB, QB),
+                                              C, alpha)
+        assert mse(X0, X1) < 1e-12
+
+
+    def test_32(self):
         Amx = np.random.randn(7, 6)
         ATmx = Amx.T.copy()
         A = lambda x : np.matmul(Amx, x)
