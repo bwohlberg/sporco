@@ -14,6 +14,7 @@ Batch CDL
 * `Learn a convolutional dictionary with spatial masking (consensus method, greyscale images) <cbpdndl_md_gry.py>`__
 * `Learn a convolutional dictionary with spatial masking (consensus method, colour images) <cbpdndl_md_clr.py>`__
 * `Learn a convolutional dictionary from colour images using custom sparse coding and dictionary update <cbpdndl_jnt_clr.py>`__
+* `Learn a convolutional dictionary without preprocessing of training data by inclusion of a gradient term in the optimisation problem <cbpdndl_grd.py>`__
 * `Compute a convolutional dictionary update via the convolutional constrained MOD problem (consensus method, greyscale images) <ccmod_cns_gry.py>`__
 * `Compute a convolutional dictionary update via the convolutional constrained MOD problem (PGM algorithms, greyscale images) <ccmod_pgm_gry.py>`__
 
