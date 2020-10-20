@@ -17,7 +17,7 @@ ignore:
   - "test_*.py"
   - "sporco/cupy"
   - "sporco/cuda"
-
+  - "sporco/fista"
 
 parsers:
   gcov:
