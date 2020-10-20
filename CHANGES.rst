@@ -13,6 +13,8 @@ Version 0.1.13   (not yet released)
   sporco.linalg
 • Significant change to interface of fft.fftconv function
 • Major restructuring of sporco.fista modules, now renamed to sporco.pgm
+• New classes for sparse coding and dictionary learning with a weighted ℓ2
+  data fidelity term
 
 
 
