@@ -27,10 +27,10 @@ Notes
   :mod:`pyfftw` that can lead to programs hanging if used within
   processes created by :mod:`multiprocessing`. A work-around is to
   disable multi-threading for the :mod:`pyfftw`-based FFT functions in
-  :mod:`sporco.linalg` by including the following code::
+  :mod:`sporco.fft` by including the following code::
 
-      import sporco.linalg
-      sporco.linalg.pyfftw_threads = 1
+      import sporco.fft
+      sporco.fft.pyfftw_threads = 1
 
 * When run with option `Verbose` enabled, the :doc:`inverse problems
   <../invprob/index>` generate output in utf8 encoding, which may result
