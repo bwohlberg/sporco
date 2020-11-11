@@ -118,15 +118,46 @@ def rgb2gray(rgb):
 
 
 @renamed_function(depname='grad', depmod='sporco.linalg')
-def grad(x, ax):
-    """Compute gradient of `x` along axis `ax`.
+def grad(x, axis, zero_pad=False):
+    r"""Compute gradient of `x` along axis `axis`.
+
+    The form of the gradient operator depends on parameter `zero_pad`.
+    If it is False, the operator is of the form
+
+    .. math::
+
+      \left(\begin{array}{rrrrr}
+      -1 & 1 & 0 & \ldots & 0\\
+      0 & -1 & 1 & \ldots & 0\\
+      \vdots & \vdots & \ddots & \ddots & \vdots\\
+      0 & 0 & \ldots & -1 & 1\\
+      0 & 0 & \dots & 0 & 0
+      \end{array}\right) \;,
+
+    mapping :math:`\mathbb{R}^N \rightarrow \mathbb{R}^N`. If parameter
+    `zero_pad` is True, the operator is of the form
+
+    .. math::
+
+      \left(\begin{array}{rrrrr}
+      1 & 0 & 0 & \ldots & 0\\
+      -1 & 1 & 0 & \ldots & 0\\
+      0 & -1 & 1 & \ldots & 0\\
+      \vdots & \vdots & \ddots & \ddots & \vdots\\
+      0 & 0 & \ldots & -1 & 1\\
+      0 & 0 & \ldots & 0 & -1
+      \end{array}\right) \;,
+
+    mapping :math:`\mathbb{R}^N \rightarrow \mathbb{R}^{N + 1}`.
 
     Parameters
     ----------
     x : array_like
       Input array
-    ax : int
+    axis : int
       Axis on which gradient is to be computed
+    zero_pad : boolean
+      Flag selecting type of gradient
 
     Returns
     -------
@@ -134,23 +165,31 @@ def grad(x, ax):
       Output array
     """
 
-    slc = (slice(None),)*ax + (slice(-1, None),)
-    xg = np.roll(x, -1, axis=ax) - x
-    xg[slc] = 0.0
+    if zero_pad:
+        xg = np.diff(x, axis=axis, prepend=0, append=0)
+    else:
+        slc = (slice(None),)*axis + (slice(-1, None),)
+        xg = np.roll(x, -1, axis=axis) - x
+        xg[slc] = 0.0
     return xg
 
 
 
 @renamed_function(depname='gradT', depmod='sporco.linalg')
-def gradT(x, ax):
-    """Compute transpose of gradient of `x` along axis `ax`.
+def gradT(x, axis, zero_pad=False):
+    """Compute transpose of gradient of `x` along axis `axis`.
+
+    See :func:`grad` for a description of the dependency of the gradient
+    operator on parameter `zero_pad`.
 
     Parameters
     ----------
     x : array_like
       Input array
-    ax : int
+    axis : int
       Axis on which gradient transpose is to be computed
+    zero_pad : boolean
+      Flag selecting type of gradient
 
     Returns
     -------
@@ -158,10 +197,13 @@ def gradT(x, ax):
       Output array
     """
 
-    slc0 = (slice(None),) * ax
-    xg = np.roll(x, 1, axis=ax) - x
-    xg[slc0 + (slice(0, 1),)] = -x[slc0 + (slice(0, 1),)]
-    xg[slc0 + (slice(-1, None),)] = x[slc0 + (slice(-2, -1),)]
+    if zero_pad:
+        xg = -np.diff(x, axis=axis)
+    else:
+        slc0 = (slice(None),) * axis
+        xg = np.roll(x, 1, axis=axis) - x
+        xg[slc0 + (slice(0, 1),)] = -x[slc0 + (slice(0, 1),)]
+        xg[slc0 + (slice(-1, None),)] = x[slc0 + (slice(-2, -1),)]
     return xg
 
 

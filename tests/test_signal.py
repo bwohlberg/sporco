@@ -62,3 +62,30 @@ class TestSet01(object):
         s = np.random.rand(16, 17, 3)
         scn, smn, snrm = signal.local_contrast_normalise(s)
         assert np.linalg.norm(snrm * scn + smn - s) < 1e-7
+
+
+    def test_10(self):
+        x = np.random.randn(9, 10)
+        y = np.random.randn(9, 10)
+        u = signal.grad(x, 0)
+        v = signal.gradT(y, 0)
+        err = np.dot(x.ravel(), v.ravel()) - np.dot(y.ravel(), u.ravel())
+        assert np.abs(err) < 5e-14
+        u = signal.grad(x, 1)
+        v = signal.gradT(y, 1)
+        err = np.dot(x.ravel(), v.ravel()) - np.dot(y.ravel(), u.ravel())
+        assert np.abs(err) < 5e-14
+
+
+    def test_11(self):
+        x = np.random.randn(9, 10)
+        y = np.random.randn(10, 10)
+        u = signal.grad(x, 0, zero_pad=True)
+        v = signal.gradT(y, 0, zero_pad=True)
+        err = np.dot(x.ravel(), v.ravel()) - np.dot(y.ravel(), u.ravel())
+        assert np.abs(err) < 1e-14
+        y = np.random.randn(9, 11)
+        u = signal.grad(x, 1, zero_pad=True)
+        v = signal.gradT(y, 1, zero_pad=True)
+        err = np.dot(x.ravel(), v.ravel()) - np.dot(y.ravel(), u.ravel())
+        assert np.abs(err) < 1e-14
