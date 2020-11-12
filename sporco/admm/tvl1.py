@@ -555,7 +555,7 @@ class TVL1Deconv(admm.ADMM):
         self.set_dtype(opt, S.dtype)
 
         self.axes = axes
-        self.axsz = tuple(np.asarray(S.shape)[list(axes)])
+        self.axsz = tuple([S.shape[i] for i in axes])
         if caxis is None:
             self.saxes = (-1,)
         else:
