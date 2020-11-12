@@ -176,6 +176,30 @@ class TestSet01(object):
         assert rrs(S, Sr) < 1e-4
 
 
+    def test_10cplx(self):
+        N = 64
+        M = 4
+        Nd = 8
+        D = np.random.randn(Nd, Nd, M) + 1j * np.random.randn(Nd, Nd, M)
+        X0 = np.zeros((N, N, M)) + 1j * np.zeros((N, N, M))
+        xr = np.random.randn(N, N, M)
+        xp = np.abs(xr) > 3
+        X0[xp] = (np.random.randn(X0[xp].size) +
+                  1j * np.random.randn(X0[xp].size))
+        S = np.sum(fftconv(D, X0, axes=(0, 1)), axis=2)
+        lmbda = 1e-4
+        rho = 1e-1
+        opt = cbpdn.ConvBPDN.Options({'Verbose': False, 'MaxMainIter': 500,
+                                      'RelStopTol': 1e-3, 'rho': rho,
+                                      'AutoRho': {'Enabled': False}})
+        b = cbpdn.ConvBPDN(D, S, lmbda, opt)
+        b.solve()
+        X1 = b.Y.squeeze()
+        assert rrs(X0, X1) < 5e-5
+        Sr = b.reconstruct().squeeze()
+        assert rrs(S, Sr) < 1e-4
+
+
     def test_11(self):
         N = 63
         M = 4

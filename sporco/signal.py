@@ -13,7 +13,7 @@ from builtins import range
 import numpy as np
 
 from sporco._util import renamed_function
-from sporco.fft import rfftn, irfftn, fftconv
+from sporco.fft import fftn, ifftn, rfftn, irfftn, fftconv
 from sporco import array
 
 
@@ -284,18 +284,24 @@ def tikhonov_filter(s, lmbda, npd=16):
       Highpass image or array of images.
     """
 
+    if np.isrealobj(s):
+        fft = rfftn
+        ifft = irfftn
+    else:
+        fft = fftn
+        ifft = ifftn
     grv = np.array([-1.0, 1.0]).reshape([2, 1])
     gcv = np.array([-1.0, 1.0]).reshape([1, 2])
-    Gr = rfftn(grv, (s.shape[0] + 2*npd, s.shape[1] + 2*npd), (0, 1))
-    Gc = rfftn(gcv, (s.shape[0] + 2*npd, s.shape[1] + 2*npd), (0, 1))
+    Gr = fft(grv, (s.shape[0] + 2*npd, s.shape[1] + 2*npd), (0, 1))
+    Gc = fft(gcv, (s.shape[0] + 2*npd, s.shape[1] + 2*npd), (0, 1))
     A = 1.0 + lmbda * (np.conj(Gr)*Gr + np.conj(Gc)*Gc).real
     if s.ndim > 2:
         A = A[(slice(None),)*2 + (np.newaxis,)*(s.ndim-2)]
     sp = np.pad(s, ((npd, npd),)*2 + ((0, 0),)*(s.ndim-2), 'symmetric')
     spshp = sp.shape
-    sp = rfftn(sp, axes=(0, 1))
+    sp = fft(sp, axes=(0, 1))
     sp /= A
-    sp = irfftn(sp, s=spshp[0:2], axes=(0, 1))
+    sp = ifft(sp, s=spshp[0:2], axes=(0, 1))
     slp = sp[npd:(sp.shape[0] - npd), npd:(sp.shape[1] - npd)]
     shp = s - slp
     return slp.astype(s.dtype), shp.astype(s.dtype)

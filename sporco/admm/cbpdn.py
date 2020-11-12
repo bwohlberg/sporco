@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2015-2019 by Brendt Wohlberg <brendt@ieee.org>
+# Copyright (C) 2015-2020 by Brendt Wohlberg <brendt@ieee.org>
 # All rights reserved. BSD 3-clause License.
 # This file is part of the SPORCO package. Details of the copyright
 # and user license can be found in the 'LICENSE.txt' file distributed
@@ -19,8 +19,8 @@ import sporco.cnvrep as cr
 import sporco.linalg as sl
 import sporco.prox as sp
 from sporco.util import u
-from sporco.fft import (rfftn, irfftn, empty_aligned, rfftn_empty_aligned,
-                        rfl2norm2)
+from sporco.fft import (empty_aligned, real_dtype, empty_aligned_func,
+                        fftn_func, ifftn_func, fl2norm2_func)
 from sporco.signal import gradient_filters
 
 
@@ -207,6 +207,15 @@ class GenericConvBPDN(admm.ADMMEqual):
         if opt is None:
             opt = GenericConvBPDN.Options()
 
+        # Set flag indicating whether problem involves real or complex
+        # values, and get appropriate versions of functions from fft
+        # module
+        self.real_dtype = np.isrealobj(D) and np.isrealobj(S)
+        self.empty_aligned = empty_aligned_func(self.real_dtype)
+        self.fftn = fftn_func(self.real_dtype)
+        self.ifftn = ifftn_func(self.real_dtype)
+        self.fl2norm2 = fl2norm2_func(self.real_dtype)
+
         # Infer problem dimensions and set relevant attributes of self
         if not hasattr(self, 'cri'):
             self.cri = cr.CSC_ConvRepIndexing(D, S, dimK=dimK, dimN=dimN)
@@ -219,12 +228,12 @@ class GenericConvBPDN(admm.ADMMEqual):
         self.S = np.asarray(S.reshape(self.cri.shpS), dtype=self.dtype)
 
         # Compute signal in DFT domain
-        self.Sf = rfftn(self.S, None, self.cri.axisN)
+        self.Sf = self.fftn(self.S, None, self.cri.axisN)
 
         # Initialise byte-aligned arrays for pyfftw
         self.YU = empty_aligned(self.Y.shape, dtype=self.dtype)
-        self.Xf = rfftn_empty_aligned(self.Y.shape, self.cri.axisN,
-                                      self.dtype)
+        self.Xf = self.empty_aligned(self.Y.shape, self.cri.axisN,
+                                     self.dtype)
 
         self.setdict()
 
@@ -235,7 +244,7 @@ class GenericConvBPDN(admm.ADMMEqual):
 
         if D is not None:
             self.D = np.asarray(D, dtype=self.dtype)
-        self.Df = rfftn(self.D, self.cri.Nv, self.cri.axisN)
+        self.Df = self.fftn(self.D, self.cri.Nv, self.cri.axisN)
         # Compute D^H S
         self.DSf = np.conj(self.Df) * self.Sf
         if self.cri.Cd > 1:
@@ -261,7 +270,7 @@ class GenericConvBPDN(admm.ADMMEqual):
 
         self.YU[:] = self.Y - self.U
 
-        b = self.DSf + self.rho * rfftn(self.YU, None, self.cri.axisN)
+        b = self.DSf + self.rho * self.fftn(self.YU, None, self.cri.axisN)
         if self.cri.Cd == 1:
             self.Xf[:] = sl.solvedbi_sm(self.Df, self.rho, b, self.c,
                                         self.cri.axisM)
@@ -269,7 +278,7 @@ class GenericConvBPDN(admm.ADMMEqual):
             self.Xf[:] = sl.solvemdbi_ism(self.Df, self.rho, b, self.cri.axisM,
                                           self.cri.axisC)
 
-        self.X = irfftn(self.Xf, self.cri.Nv, self.cri.axisN)
+        self.X = self.ifftn(self.Xf, self.cri.Nv, self.cri.axisN)
 
         if self.opt['LinSolveCheck']:
             Dop = lambda x: sl.inner(self.Df, x, axis=self.cri.axisM)
@@ -309,7 +318,7 @@ class GenericConvBPDN(admm.ADMMEqual):
         """
 
         return self.Xf if self.opt['fEvalX'] else \
-            rfftn(self.Y, None, self.cri.axisN)
+            self.fftn(self.Y, None, self.cri.axisN)
 
 
 
@@ -332,7 +341,7 @@ class GenericConvBPDN(admm.ADMMEqual):
 
         Ef = sl.inner(self.Df, self.obfn_fvarf(), axis=self.cri.axisM) - \
             self.Sf
-        return rfl2norm2(Ef, self.S.shape, axis=self.cri.axisN) / 2.0
+        return self.fl2norm2(Ef, self.S.shape, axis=self.cri.axisN) / 2.0
 
 
 
@@ -366,9 +375,9 @@ class GenericConvBPDN(admm.ADMMEqual):
 
         if X is None:
             X = self.Y
-        Xf = rfftn(X, None, self.cri.axisN)
+        Xf = self.fftn(X, None, self.cri.axisN)
         Sf = np.sum(self.Df * Xf, axis=self.cri.axisM)
-        return irfftn(Sf, self.cri.Nv, self.cri.axisN)
+        return self.ifftn(Sf, self.cri.Nv, self.cri.axisN)
 
 
 
@@ -557,20 +566,23 @@ class ConvBPDN(GenericConvBPDN):
         # Set dtype attribute based on S.dtype and opt['DataType']
         self.set_dtype(opt, S.dtype)
 
+        # Call parent class __init__
+        super(ConvBPDN, self).__init__(D, S, opt, dimK, dimN)
+
         # Set default lambda value if not specified
         if lmbda is None:
             cri = cr.CSC_ConvRepIndexing(D, S, dimK=dimK, dimN=dimN)
-            Df = rfftn(D.reshape(cri.shpD), cri.Nv, axes=cri.axisN)
-            Sf = rfftn(S.reshape(cri.shpS), axes=cri.axisN)
+            Df = self.fftn(D.reshape(cri.shpD), cri.Nv, axes=cri.axisN)
+            Sf = self.fftn(S.reshape(cri.shpS), axes=cri.axisN)
             b = np.conj(Df) * Sf
             lmbda = 0.1 * abs(b).max()
 
         # Set l1 term scaling
-        self.lmbda = self.dtype.type(lmbda)
+        self.lmbda = real_dtype(self.dtype).type(lmbda)
 
         # Set penalty parameter
         self.set_attr('rho', opt['rho'], dval=(50.0 * self.lmbda + 1.0),
-                      dtype=self.dtype)
+                      dtype=real_dtype(self.dtype))
 
         # Set rho_xi attribute (see Sec. VI.C of wohlberg-2015-adaptive)
         if self.lmbda != 0.0:
@@ -578,13 +590,10 @@ class ConvBPDN(GenericConvBPDN):
         else:
             rho_xi = 1.0
         self.set_attr('rho_xi', opt['AutoRho', 'RsdlTarget'], dval=rho_xi,
-                      dtype=self.dtype)
-
-        # Call parent class __init__
-        super(ConvBPDN, self).__init__(D, S, opt, dimK, dimN)
+                      dtype=real_dtype(self.dtype))
 
         # Set l1 term weight array
-        self.wl1 = np.asarray(opt['L1Weight'], dtype=self.dtype)
+        self.wl1 = np.asarray(opt['L1Weight'], dtype=real_dtype(self.dtype))
         self.wl1 = self.wl1.reshape(cr.l1Wshape(self.wl1, self.cri))
 
 
@@ -923,7 +932,7 @@ class ConvElasticNet(ConvBPDN):
 
         if D is not None:
             self.D = np.asarray(D, dtype=self.dtype)
-        self.Df = rfftn(self.D, self.cri.Nv, self.cri.axisN)
+        self.Df = self.fftn(self.D, self.cri.Nv, self.cri.axisN)
         # Compute D^H S
         self.DSf = np.conj(self.Df) * self.Sf
         if self.cri.Cd > 1:
@@ -943,7 +952,7 @@ class ConvElasticNet(ConvBPDN):
 
         self.YU[:] = self.Y - self.U
 
-        b = self.DSf + self.rho*rfftn(self.YU, None, self.cri.axisN)
+        b = self.DSf + self.rho*self.fftn(self.YU, None, self.cri.axisN)
         if self.cri.Cd == 1:
             self.Xf[:] = sl.solvedbi_sm(self.Df, self.mu + self.rho,
                                         b, self.c, self.cri.axisM)
@@ -951,7 +960,7 @@ class ConvElasticNet(ConvBPDN):
             self.Xf[:] = sl.solvemdbi_ism(self.Df, self.mu + self.rho, b,
                                           self.cri.axisM, self.cri.axisC)
 
-        self.X = irfftn(self.Xf, self.cri.Nv, self.cri.axisN)
+        self.X = self.ifftn(self.Xf, self.cri.Nv, self.cri.axisN)
 
         if self.opt['LinSolveCheck']:
             Dop = lambda x: sl.inner(self.Df, x, axis=self.cri.axisM)
@@ -1147,7 +1156,7 @@ class ConvBPDNGradReg(ConvBPDN):
 
         if D is not None:
             self.D = np.asarray(D, dtype=self.dtype)
-        self.Df = rfftn(self.D, self.cri.Nv, self.cri.axisN)
+        self.Df = self.fftn(self.D, self.cri.Nv, self.cri.axisN)
         # Compute D^H S
         self.DSf = np.conj(self.Df) * self.Sf
         if self.cri.Cd > 1:
@@ -1168,7 +1177,7 @@ class ConvBPDNGradReg(ConvBPDN):
 
         self.YU[:] = self.Y - self.U
 
-        b = self.DSf + self.rho*rfftn(self.YU, None, self.cri.axisN)
+        b = self.DSf + self.rho*self.fftn(self.YU, None, self.cri.axisN)
         if self.cri.Cd == 1:
             self.Xf[:] = sl.solvedbd_sm(self.Df, self.mu*self.GHGf + self.rho,
                                         b, self.c, self.cri.axisM)
@@ -1177,7 +1186,7 @@ class ConvBPDNGradReg(ConvBPDN):
                                           self.rho, b, self.cri.axisM,
                                           self.cri.axisC)
 
-        self.X = irfftn(self.Xf, self.cri.Nv, self.cri.axisN)
+        self.X = self.ifftn(self.Xf, self.cri.Nv, self.cri.axisN)
 
         if self.opt['LinSolveCheck']:
             Dop = lambda x: sl.inner(self.Df, x, axis=self.cri.axisM)
@@ -1200,8 +1209,8 @@ class ConvBPDNGradReg(ConvBPDN):
 
         fvf = self.obfn_fvarf()
         rl1 = np.linalg.norm((self.wl1 * self.obfn_gvar()).ravel(), 1)
-        rgr = rfl2norm2(np.sqrt(self.GHGf*np.conj(fvf)*fvf), self.cri.Nv,
-                           self.cri.axisN)/2.0
+        rgr = self.fl2norm2(np.sqrt(self.GHGf*np.conj(fvf)*fvf), self.cri.Nv,
+                            self.cri.axisN)/2.0
         return (self.lmbda*rl1 + self.mu*rgr, rl1, rgr)
 
 
@@ -1540,6 +1549,15 @@ class ConvTwoBlockCnstrnt(admm.ADMMTwoBlockCnstrnt):
           Number of spatial dimensions
         """
 
+        # Set flag indicating whether problem involves real or complex
+        # values, and get appropriate versions of functions from fft
+        # module
+        self.real_dtype = np.isrealobj(D) and np.isrealobj(S)
+        self.empty_aligned = empty_aligned_func(self.real_dtype)
+        self.fftn = fftn_func(self.real_dtype)
+        self.ifftn = ifftn_func(self.real_dtype)
+        self.fl2norm2 = fl2norm2_func(self.real_dtype)
+
         # Infer problem dimensions and set relevant attributes of self
         self.cri = cr.CSC_ConvRepIndexing(D, S, dimK=dimK, dimN=dimN)
 
@@ -1561,8 +1579,8 @@ class ConvTwoBlockCnstrnt(admm.ADMMTwoBlockCnstrnt):
 
         # Initialise byte-aligned arrays for pyfftw
         self.YU = empty_aligned(self.Y.shape, dtype=self.dtype)
-        self.Xf = rfftn_empty_aligned(self.cri.shpX, self.cri.axisN,
-                                      self.dtype)
+        self.Xf = self.empty_aligned(self.cri.shpX, self.cri.axisN,
+                                     self.dtype)
 
         self.setdict()
 
@@ -1573,7 +1591,7 @@ class ConvTwoBlockCnstrnt(admm.ADMMTwoBlockCnstrnt):
 
         if D is not None:
             self.D = np.asarray(D, dtype=self.dtype)
-        self.Df = rfftn(self.D, self.cri.Nv, self.cri.axisN)
+        self.Df = self.fftn(self.D, self.cri.Nv, self.cri.axisN)
         if self.opt['HighMemSolve'] and self.cri.Cd == 1:
             self.c = sl.solvedbi_sm_c(self.Df, np.conj(self.Df), 1.0,
                                       self.cri.axisM)
@@ -1596,7 +1614,7 @@ class ConvTwoBlockCnstrnt(admm.ADMMTwoBlockCnstrnt):
 
         self.YU[:] = self.Y - self.U
         self.block_sep0(self.YU)[:] += self.S
-        YUf = rfftn(self.YU, None, self.cri.axisN)
+        YUf = self.fftn(self.YU, None, self.cri.axisN)
         if self.cri.Cd == 1:
             b = np.conj(self.Df) * self.block_sep0(YUf) + self.block_sep1(YUf)
         else:
@@ -1610,7 +1628,7 @@ class ConvTwoBlockCnstrnt(admm.ADMMTwoBlockCnstrnt):
             self.Xf[:] = sl.solvemdbi_ism(self.Df, 1.0, b, self.cri.axisM,
                                           self.cri.axisC)
 
-        self.X = irfftn(self.Xf, self.cri.Nv, self.cri.axisN)
+        self.X = self.ifftn(self.Xf, self.cri.Nv, self.cri.axisN)
 
         if self.opt['LinSolveCheck']:
             Dop = lambda x: sl.inner(self.Df, x, axis=self.cri.axisM)
@@ -1727,9 +1745,9 @@ class ConvTwoBlockCnstrnt(admm.ADMMTwoBlockCnstrnt):
         # when Xf is None (i.e. the function is not being applied to
         # self.X).
         if Xf is None:
-            Xf = rfftn(X, None, self.cri.axisN)
-        return irfftn(sl.inner(self.Df, Xf, axis=self.cri.axisM),
-                      self.cri.Nv, self.cri.axisN)
+            Xf = self.fftn(X, None, self.cri.axisN)
+        return self.ifftn(sl.inner(self.Df, Xf, axis=self.cri.axisM),
+                          self.cri.Nv, self.cri.axisN)
 
 
 
@@ -1741,12 +1759,12 @@ class ConvTwoBlockCnstrnt(admm.ADMMTwoBlockCnstrnt):
         # This calculation involves non-negligible computational cost. It
         # should be possible to disable relevant diagnostic information
         # (dual residual) to avoid this cost.
-        Y0f = rfftn(Y0, None, self.cri.axisN)
+        Y0f = self.fftn(Y0, None, self.cri.axisN)
         if self.cri.Cd == 1:
-            return irfftn(np.conj(self.Df) * Y0f, self.cri.Nv,
-                          self.cri.axisN)
+            return self.ifftn(np.conj(self.Df) * Y0f, self.cri.Nv,
+                              self.cri.axisN)
         else:
-            return irfftn(sl.inner(
+            return self.ifftn(sl.inner(
                 np.conj(self.Df), Y0f, axis=self.cri.axisC),
                 self.cri.Nv, self.cri.axisN)
 
@@ -1786,10 +1804,10 @@ class ConvTwoBlockCnstrnt(admm.ADMMTwoBlockCnstrnt):
         if X is None:
             Xf = self.Xf
         else:
-            Xf = rfftn(X, None, self.cri.axisN)
+            Xf = self.fftn(X, None, self.cri.axisN)
 
         Sf = np.sum(self.Df * Xf, axis=self.cri.axisM)
-        return irfftn(Sf, self.cri.Nv, self.cri.axisN)
+        return self.ifftn(Sf, self.cri.Nv, self.cri.axisN)
 
 
 
@@ -2448,13 +2466,13 @@ class AddMaskSim(object):
         if X is None:
             X = self.cbpdn.Y[self.index_primary()]
         # FFT of coefficient array
-        Xf = rfftn(X, None, self.cri.axisN)
+        Xf = self.cbpdn.fftn(X, None, self.cri.axisN)
         # Multiply in frequency domain with non-impulse component of
         # dictionary
         Sf = np.sum(self.cbpdn.Df[..., 0:-self.cri.Cd] * Xf,
                     axis=self.cri.axisM)
         # Transform to spatial domain and return result
-        return irfftn(Sf, self.cri.Nv, self.cri.axisN)
+        return self.cbpdn.ifftn(Sf, self.cri.Nv, self.cri.axisN)
 
 
 
@@ -2645,7 +2663,7 @@ class ConvL1L1Grd(ConvBPDNMaskDcpl):
 
         if D is not None:
             self.D = np.asarray(D, dtype=self.dtype)
-        self.Df = rfftn(self.D, self.cri.Nv, self.cri.axisN)
+        self.Df = self.fftn(self.D, self.cri.Nv, self.cri.axisN)
         if self.opt['HighMemSolve'] and self.cri.Cd == 1:
             self.c = sl.solvedbd_sm_c(
                 self.Df, np.conj(self.Df),
@@ -2662,7 +2680,7 @@ class ConvL1L1Grd(ConvBPDNMaskDcpl):
 
         self.YU[:] = self.Y - self.U
         self.block_sep0(self.YU)[:] += self.S
-        YUf = rfftn(self.YU, None, self.cri.axisN)
+        YUf = self.fftn(self.YU, None, self.cri.axisN)
         if self.cri.Cd == 1:
             b = np.conj(self.Df) * self.block_sep0(YUf) + self.block_sep1(YUf)
         else:
@@ -2678,7 +2696,7 @@ class ConvL1L1Grd(ConvBPDNMaskDcpl):
                 self.Df, (self.mu / self.rho) * self.GHGf + 1.0, b,
                 self.cri.axisM, self.cri.axisC)
 
-        self.X = irfftn(self.Xf, self.cri.Nv, self.cri.axisN)
+        self.X = self.ifftn(self.Xf, self.cri.Nv, self.cri.axisN)
 
         if self.opt['LinSolveCheck']:
             Dop = lambda x: sl.inner(self.Df, x, axis=self.cri.axisM)
@@ -2716,8 +2734,8 @@ class ConvL1L1Grd(ConvBPDNMaskDcpl):
 
         g0v = self.obfn_g0(self.obfn_g0var())
         g1v = self.obfn_g1(self.obfn_g1var())
-        rgr = rfl2norm2(np.sqrt(self.GHGf * np.conj(self.Xf) * self.Xf),
-                           self.cri.Nv, self.cri.axisN)/2.0
+        rgr = self.fl2norm2(np.sqrt(self.GHGf * np.conj(self.Xf) * self.Xf),
+                            self.cri.Nv, self.cri.axisN)/2.0
         obj = g0v + self.lmbda*g1v + self.mu*rgr
         return (obj, g0v, g1v, rgr)
 
@@ -2884,4 +2902,4 @@ class MultiDictConvBPDN(object):
         slc = (slice(None),)*self.dimN + \
               (slice(self.chncs[b], self.chncs[b+1]),)
         Sf = np.sum(self.cbpdn.Df[slc] * Xf, axis=self.cbpdn.cri.axisM)
-        return irfftn(Sf, self.cbpdn.cri.Nv, self.cbpdn.cri.axisN)
+        return self.cbpdn.ifftn(Sf, self.cbpdn.cri.Nv, self.cbpdn.cri.axisN)

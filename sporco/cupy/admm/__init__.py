@@ -115,8 +115,8 @@ admm.cbpdn = sporco_cupy_patch_module('sporco.admm.cbpdn',
                 {'admm': admm.admm, 'cr': cnvrep, 'sl': linalg, 'sp': prox,
                  'rfftn': fft.rfftn, 'irfftn': fft.irfftn,
                  'empty_aligned': fft.empty_aligned,
-                 'rfftn_empty_aligned': fft.rfftn_empty_aligned,
-                 'rfl2norm2': fft.rfl2norm2,
+                 'empty_aligned_func': fft.empty_aligned_func,
+                 'fftn_func': fft.fftn_func, 'ifftn_func': fft.ifftn_func,
                  'gradient_filters': signal.gradient_filters})
 
 

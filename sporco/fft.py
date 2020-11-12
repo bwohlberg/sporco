@@ -105,7 +105,7 @@ def byte_aligned(array, dtype=None, n=None):
 
     Returns
     -------
-    a :  ndarray
+    ndarray
       Array with required byte-alignment
     """
 
@@ -134,7 +134,7 @@ def empty_aligned(shape, dtype, order='C', n=None):
 
     Returns
     -------
-    a :  ndarray
+    ndarray
       Empty array with required byte-alignment
     """
 
@@ -171,7 +171,7 @@ def rfftn_empty_aligned(shape, axes, dtype, order='C', n=None):
 
     Returns
     -------
-    a :  ndarray
+    ndarray
       Empty array with required byte-alignment
     """
 
@@ -203,7 +203,7 @@ def fftn(a, s=None, axes=None):
 
     Returns
     -------
-    af : complex ndarray
+    complex ndarray
       DFT of input array
     """
 
@@ -233,7 +233,7 @@ def ifftn(a, s=None, axes=None):
 
     Returns
     -------
-    af : complex ndarray
+    complex ndarray
       Inverse DFT of input array
     """
 
@@ -263,7 +263,7 @@ def rfftn(a, s=None, axes=None):
 
     Returns
     -------
-    af : complex ndarray
+    complex ndarray
       DFT of input array
     """
 
@@ -296,7 +296,7 @@ def irfftn(a, s, axes=None):
 
     Returns
     -------
-    af : ndarray
+    ndarray
       Inverse DFT of input array
     """
 
@@ -324,7 +324,7 @@ def dctii(x, axes=None):
 
     Returns
     -------
-    y : ndarray
+    ndarray
       DCT-II of input array
     """
 
@@ -354,7 +354,7 @@ def idctii(x, axes=None):
 
     Returns
     -------
-    y : ndarray
+    ndarray
       Inverse DCT-II of input array
     """
 
@@ -390,7 +390,7 @@ def fftconv(a, b, axes=None, origin=None):
 
     Returns
     -------
-    ab : ndarray
+    ndarray
       Convolution of input arrays, `a` and `b`, along specified `axes`
     """
 
@@ -430,7 +430,7 @@ def fl2norm2(xf, axis=(0, 1)):
 
     Returns
     -------
-    x : float
+    float
       :math:`\|\mathbf{x}\|_2^2` where the input array is the result of
       applying :func:`fftn` to the specified axes of multi-dimensional
       array :math:`\mathbf{x}`
@@ -462,7 +462,7 @@ def rfl2norm2(xf, xs, axis=(0, 1)):
 
     Returns
     -------
-    x : float
+    float
       :math:`\|\mathbf{x}\|_2^2` where the input array is the result of
       applying :func:`rfftn` to the specified axes of multi-dimensional
       array :math:`\mathbf{x}`
@@ -479,6 +479,109 @@ def rfl2norm2(xf, xs, axis=(0, 1)):
         nrm2 = 0.0
     return scl*(nrm0**2 + 2.0*nrm1**2 + nrm2**2)
 
+
+
+def empty_aligned_func(real=False):
+    """Get a reference to :func:`empty_aligned` or :func:`rfftn_empty_aligned`.
+
+    If `real` is True, return a reference to :func:`rfftn_empty_aligned`,
+    otherwise return a reference to  a wrapper function of
+    :func:`empty_aligned` that has the same signature as
+    :func:`rfftn_empty_aligned` (i.e. including a dummy `axes` parameter).
+
+    Parameters
+    ----------
+    real : bool, optional (default False)
+      Flag indicating which function reference to return
+
+    Returns
+    -------
+    function
+      Reference to selected function
+    """
+
+    if real:
+        return rfftn_empty_aligned
+    else:
+        def empty_aligned_wrapper(shape, axes, dtype, order='C', n=None):
+            return empty_aligned(shape, dtype, order=order, n=n)
+        return empty_aligned_wrapper
+
+
+
+def fftn_func(real=False):
+    """Get a reference to :func:`fftn` or :func:`rfftn`.
+
+    If `real` is True, return a reference to :func:`rfftn`, otherwise
+    return a reference to :func:`fftn`.
+
+    Parameters
+    ----------
+    real : bool, optional (default False)
+      Flag indicating which function reference to return
+
+    Returns
+    -------
+    function
+      Reference to selected function
+    """
+
+    if real:
+        return rfftn
+    else:
+        return fftn
+
+
+
+def ifftn_func(real=False):
+    """Get a reference to :func:`ifftn` or :func:`irfftn`.
+
+    If `real` is True, return a reference to :func:`irfftn`, otherwise
+    return a reference to :func:`ifftn`.
+
+    Parameters
+    ----------
+    real : bool, optional (default False)
+      Flag indicating which function reference to return
+
+    Returns
+    -------
+    function
+      Reference to selected function
+    """
+
+    if real:
+        return irfftn
+    else:
+        return ifftn
+
+
+
+def fl2norm2_func(real=False):
+    """Get a reference to :func:`fl2norm2` or :func:`rfl2norm2`.
+
+    If `real` is True, return a reference to :func:`rfl2norm2`, otherwise
+    return a reference to a wrapper function of :func:`fl2norm2` that has
+    the same signature as :func:`rfl2norm2` (i.e. including a dummy `xs`
+    parameter).
+
+    Parameters
+    ----------
+    real : bool, optional (default False)
+      Flag indicating which function reference to return
+
+    Returns
+    -------
+    function
+      Reference to selected function
+    """
+
+    if real:
+        return rfl2norm2
+    else:
+        def fl2norm2_wrapper(xf, xs, axis=(0, 1)):
+            return fl2norm2(xf, axis=axis)
+        return fl2norm2_wrapper
 
 
 

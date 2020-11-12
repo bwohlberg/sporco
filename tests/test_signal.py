@@ -43,28 +43,40 @@ class TestSet01(object):
     def test_05(self):
         img = np.random.randn(64, 64)
         iml, imh = signal.tikhonov_filter(img, 5.0)
-        assert iml.shape == img.shape and imh.shape == img.shape
+        assert np.isrealobj(iml) and np.isrealobj(imh)
 
 
     def test_06(self):
+        img = np.random.randn(64, 64) + 1j * np.random.randn(64, 64)
+        iml, imh = signal.tikhonov_filter(img, 5.0)
+        assert np.iscomplexobj(iml) and np.iscomplexobj(imh)
+
+
+    def test_07(self):
+        img = np.random.randn(64, 64)
+        iml, imh = signal.tikhonov_filter(img, 5.0)
+        assert np.isrealobj(iml) and np.isrealobj(imh)
+
+
+    def test_08(self):
         img = np.random.randn(16, 16, 16)
         iml, imh = signal.tikhonov_filter(img, 2.0, npd=8)
         assert iml.shape == img.shape and imh.shape == img.shape
 
 
-    def test_08(self):
+    def test_10(self):
         shape = (7, 5, 6)
         g = signal.gaussian(shape)
         assert g.shape == shape
 
 
-    def test_09(self):
+    def test_11(self):
         s = np.random.rand(16, 17, 3)
         scn, smn, snrm = signal.local_contrast_normalise(s)
         assert np.linalg.norm(snrm * scn + smn - s) < 1e-7
 
 
-    def test_10(self):
+    def test_12(self):
         x = np.random.randn(9, 10)
         y = np.random.randn(9, 10)
         u = signal.grad(x, 0)
