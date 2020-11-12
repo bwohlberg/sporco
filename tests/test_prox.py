@@ -116,10 +116,10 @@ class TestSet01(object):
     def test_19(self):
         V2_a2, rsi = prox.ndto2d(self.V2, axis=2)
         V2_r = prox.ndfrom2d(V2_a2, rsi)
-        assert(metric.mse(self.V2, V2_r) < 1e-14)
+        assert metric.mse(self.V2, V2_r) < 1e-14
         V2_a1, rsi = prox.ndto2d(self.V2, axis=1)
         V2_r = prox.ndfrom2d(V2_a1, rsi)
-        assert(metric.mse(self.V2, V2_r) < 1e-14)
+        assert metric.mse(self.V2, V2_r) < 1e-14
         V2_a0, rsi = prox.ndto2d(self.V2, axis=0)
         V2_r = prox.ndfrom2d(V2_a0, rsi)
-        assert(metric.mse(self.V2, V2_r) < 1e-14)
+        assert metric.mse(self.V2, V2_r) < 1e-14
