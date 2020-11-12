@@ -146,11 +146,13 @@ A summary of the most significant changes between SPORCO releases can be found i
 Extensions
 ----------
 
-Some additional components of SPORCO are made available as separate extension packages:
+Some additional components of SPORCO are made available in separate repositories:
 
 * `SPORCO-CUDA <https://github.com/bwohlberg/sporco-cuda>`__: GPU-accelerated versions of selected convolutional sparse coding algorithms
 
 * `SPORCO Notebooks <https://github.com/bwohlberg/sporco-notebooks>`__: Jupyter Notebook versions of the example scripts distributed with SPORCO
+
+* `SPORCO Extra <https://github.com/bwohlberg/sporco-extra>`__: Additional examples, data, and contributed code
 
 
 License
