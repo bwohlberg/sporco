@@ -641,7 +641,7 @@ class TVL2Deconv(admm.ADMM):
 
     def cnst_A(self, X, Xf=None):
         r"""Compute :math:`A \mathbf{x}` component of ADMM problem
-        constraint.  In this case :math:`A \mathbf{x} = (G_r^T \;\;
+        constraint. In this case :math:`A \mathbf{x} = (G_r^T \;\;
         G_c^T)^T \mathbf{x}`.
         """
 
@@ -666,7 +666,7 @@ class TVL2Deconv(admm.ADMM):
 
     def cnst_B(self, Y):
         r"""Compute :math:`B \mathbf{y}` component of ADMM problem
-        constraint.  In this case :math:`B \mathbf{y} = -\mathbf{y}`.
+        constraint. In this case :math:`B \mathbf{y} = -\mathbf{y}`.
         """
 
         return -Y
