@@ -38,7 +38,7 @@ class TestSet01(object):
     def test_02(self):
         lmbda = 3
         try:
-            b = tvl1.TVL1Deconv(cp.ones((1, )), self.D, lmbda)
+            b = tvl1.TVL1Deconv(cp.ones((1, 1)), self.D, lmbda)
             b.solve()
         except Exception as e:
             print(e)
