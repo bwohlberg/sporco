@@ -5,7 +5,7 @@ import numpy as np
 import sporco.cnvrep as cr
 from sporco.admm import ccmod
 from sporco.linalg import rrs
-from sporco.fft import fftn, ifftn
+from sporco.fft import fftconv
 
 
 
@@ -13,84 +13,113 @@ class TestSet01(object):
 
     def setup_method(self, method):
         np.random.seed(12345)
-
-
-    def test_01(self):
         N = 32
         M = 4
         Nd = 5
-        D0 = cr.normalise(cr.zeromean(
+        self.D0 = cr.normalise(cr.zeromean(
             np.random.randn(Nd, Nd, M), (Nd, Nd, M), dimN=2), dimN=2)
-        X = np.zeros((N, N, M))
+        self.X = np.zeros((N, N, M))
         xr = np.random.randn(N, N, M)
         xp = np.abs(xr) > 3
-        X[xp] = np.random.randn(X[xp].size)
-        S = np.sum(ifftn(fftn(D0, (N, N), (0, 1)) *
-                   fftn(X, None, (0, 1)), None, (0, 1)).real, axis=2)
+        self.X[xp] = np.random.randn(self.X[xp].size)
+        self.S = np.sum(fftconv(self.X, self.D0, axes=(0, 1)).real, axis=2)
+        d0c = np.random.randn(Nd, Nd, M) + 1j * np.random.randn(Nd, Nd, M)
+        self.D0c = cr.normalise(cr.zeromean(d0c, (Nd, Nd, M), dimN=2), dimN=2)
+        self.Xc = np.zeros((N, N, M)) + 1j * np.zeros((N, N, M))
+        self.Xc[xp] = (np.random.randn(self.Xc[xp].size) +
+                      1j * np.random.randn(self.Xc[xp].size))
+        self.Sc = np.sum(fftconv(self.Xc, self.D0c, axes=(0, 1)), axis=2)
+
+
+    def test_01(self):
         rho = 1e-1
         opt = ccmod.ConvCnstrMOD_IterSM.Options({'Verbose': False,
                     'MaxMainIter': 500, 'LinSolveCheck': True,
                     'ZeroMean': True, 'RelStopTol': 1e-5, 'rho': rho,
                     'AutoRho': {'Enabled': False}})
-        Xr = X.reshape(X.shape[0:2] + (1, 1,) + X.shape[2:])
-        Sr = S.reshape(S.shape + (1,))
-        c = ccmod.ConvCnstrMOD_IterSM(Xr, Sr, D0.shape, opt)
+        Xr = self.X.reshape(self.X.shape[0:2] + (1, 1,) + self.X.shape[2:])
+        Sr = self.S.reshape(self.S.shape + (1,))
+        c = ccmod.ConvCnstrMOD_IterSM(Xr, Sr, self.D0.shape, opt)
         c.solve()
-        D1 = cr.bcrop(c.Y, D0.shape).squeeze()
-        assert rrs(D0, D1) < 1e-5
+        D1 = cr.bcrop(c.Y, self.D0.shape).squeeze()
+        assert rrs(self.D0, D1) < 1e-5
+        assert np.array(c.getitstat().XSlvRelRes).max() < 1e-5
+
+
+    def test_01cplx(self):
+        rho = 1e-1
+        opt = ccmod.ConvCnstrMOD_IterSM.Options({'Verbose': False,
+                    'MaxMainIter': 500, 'LinSolveCheck': True,
+                    'ZeroMean': True, 'RelStopTol': 1e-5, 'rho': rho,
+                    'AutoRho': {'Enabled': False}})
+        Xr = self.Xc.reshape(self.Xc.shape[0:2] + (1, 1,) + self.Xc.shape[2:])
+        Sr = self.Sc.reshape(self.Sc.shape + (1,))
+        c = ccmod.ConvCnstrMOD_IterSM(Xr, Sr, self.D0c.shape, opt)
+        c.solve()
+        D1 = cr.bcrop(c.Y, self.D0c.shape).squeeze()
+        assert rrs(self.D0c, D1) < 1e-4
         assert np.array(c.getitstat().XSlvRelRes).max() < 1e-5
 
 
     def test_02(self):
-        N = 32
-        M = 4
-        Nd = 5
-        D0 = cr.normalise(cr.zeromean(
-            np.random.randn(Nd, Nd, M), (Nd, Nd, M), dimN=2), dimN=2)
-        X = np.zeros((N, N, M))
-        xr = np.random.randn(N, N, M)
-        xp = np.abs(xr) > 3
-        X[xp] = np.random.randn(X[xp].size)
-        S = np.sum(ifftn(fftn(D0, (N, N), (0, 1)) *
-                   fftn(X, None, (0, 1)), None, (0, 1)).real, axis=2)
         rho = 1e-1
         opt = ccmod.ConvCnstrMOD_CG.Options({'Verbose': False,
                     'MaxMainIter': 500, 'LinSolveCheck': True,
                     'ZeroMean': True, 'RelStopTol': 1e-5, 'rho': rho,
                     'AutoRho': {'Enabled': False},
                     'CG': {'StopTol': 1e-5}})
-        Xr = X.reshape(X.shape[0:2] + (1, 1,) + X.shape[2:])
-        Sr = S.reshape(S.shape + (1,))
-        c = ccmod.ConvCnstrMOD_CG(Xr, Sr, D0.shape, opt)
+        Xr = self.X.reshape(self.X.shape[0:2] + (1, 1,) + self.X.shape[2:])
+        Sr = self.S.reshape(self.S.shape + (1,))
+        c = ccmod.ConvCnstrMOD_CG(Xr, Sr, self.D0.shape, opt)
         c.solve()
-        D1 = cr.bcrop(c.Y, D0.shape).squeeze()
-        assert rrs(D0, D1) < 1e-4
+        D1 = cr.bcrop(c.Y, self.D0.shape).squeeze()
+        assert rrs(self.D0, D1) < 1e-4
+        assert np.array(c.getitstat().XSlvRelRes).max() < 1e-3
+
+
+    def test_02cplx(self):
+        rho = 1e-1
+        opt = ccmod.ConvCnstrMOD_CG.Options({'Verbose': False,
+                    'MaxMainIter': 500, 'LinSolveCheck': True,
+                    'ZeroMean': True, 'RelStopTol': 1e-5, 'rho': rho,
+                    'AutoRho': {'Enabled': False},
+                    'CG': {'StopTol': 1e-5}})
+        Xr = self.Xc.reshape(self.Xc.shape[0:2] + (1, 1,) + self.Xc.shape[2:])
+        Sr = self.Sc.reshape(self.Sc.shape + (1,))
+        c = ccmod.ConvCnstrMOD_CG(Xr, Sr, self.D0c.shape, opt)
+        c.solve()
+        D1 = cr.bcrop(c.Y, self.D0c.shape).squeeze()
+        assert rrs(self.D0c, D1) < 1e-3
         assert np.array(c.getitstat().XSlvRelRes).max() < 1e-3
 
 
     def test_03(self):
-        N = 64
-        M = 4
-        Nd = 8
-        D0 = cr.normalise(cr.zeromean(
-            np.random.randn(Nd, Nd, M), (Nd, Nd, M), dimN=2), dimN=2)
-        X = np.zeros((N, N, M))
-        xr = np.random.randn(N, N, M)
-        xp = np.abs(xr) > 3
-        X[xp] = np.random.randn(X[xp].size)
-        S = np.sum(ifftn(fftn(D0, (N, N), (0, 1)) *
-                   fftn(X, None, (0, 1)), None, (0, 1)).real, axis=2)
-        rho = 1e1
+        rho = 1e-1
         opt = ccmod.ConvCnstrMOD_Consensus.Options({'Verbose': False,
                     'MaxMainIter': 500, 'LinSolveCheck': True,
-                    'ZeroMean': True, 'RelStopTol': 1e-3, 'rho': rho,
+                    'ZeroMean': True, 'RelStopTol': 1e-4, 'rho': rho,
                     'AutoRho': {'Enabled': False}})
-        Xr = X.reshape(X.shape[0:2] + (1, 1,) + X.shape[2:])
-        Sr = S.reshape(S.shape + (1,))
-        c = ccmod.ConvCnstrMOD_Consensus(Xr, Sr, D0.shape, opt)
+        Xr = self.X.reshape(self.X.shape[0:2] + (1, 1,) + self.X.shape[2:])
+        Sr = self.S.reshape(self.S.shape + (1,))
+        c = ccmod.ConvCnstrMOD_Consensus(Xr, Sr, self.D0.shape, opt)
         c.solve()
-        D1 = cr.bcrop(c.Y, D0.shape).squeeze()
-        assert rrs(D0, D1) < 1e-5
+        D1 = cr.bcrop(c.Y, self.D0.shape).squeeze()
+        assert rrs(self.D0, D1) < 1e-5
+        assert np.array(c.getitstat().XSlvRelRes).max() < 1e-5
+
+
+    def test_03cplx(self):
+        rho = 1e-1
+        opt = ccmod.ConvCnstrMOD_Consensus.Options({'Verbose': False,
+                    'MaxMainIter': 500, 'LinSolveCheck': True,
+                    'ZeroMean': True, 'RelStopTol': 1e-4, 'rho': rho,
+                    'AutoRho': {'Enabled': False}})
+        Xr = self.Xc.reshape(self.Xc.shape[0:2] + (1, 1,) + self.Xc.shape[2:])
+        Sr = self.Sc.reshape(self.Sc.shape + (1,))
+        c = ccmod.ConvCnstrMOD_Consensus(Xr, Sr, self.D0c.shape, opt)
+        c.solve()
+        D1 = cr.bcrop(c.Y, self.D0c.shape).squeeze()
+        assert rrs(self.D0c, D1) < 1e-4
         assert np.array(c.getitstat().XSlvRelRes).max() < 1e-5
 
 

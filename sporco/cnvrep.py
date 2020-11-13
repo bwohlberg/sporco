@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2015-2019 by Brendt Wohlberg <brendt@ieee.org>
+# Copyright (C) 2015-2020 by Brendt Wohlberg <brendt@ieee.org>
 # All rights reserved. BSD 3-clause License.
 # This file is part of the SPORCO package. Details of the copyright
 # and user license can be found in the 'LICENSE.txt' file distributed
@@ -692,7 +692,10 @@ def normalise(v, dimN=2):
     """
 
     axisN = tuple(range(0, dimN))
-    vn = np.sqrt(np.sum(v**2, axisN, keepdims=True))
+    if np.isrealobj(v):
+        vn = np.sqrt(np.sum(v**2, axisN, keepdims=True))
+    else:
+        vn = np.sqrt(np.sum(np.abs(v)**2, axisN, keepdims=True))
     vn[vn == 0] = 1.0
     return np.asarray(v / vn, dtype=v.dtype)
 
