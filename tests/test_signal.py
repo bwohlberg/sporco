@@ -18,6 +18,10 @@ def fnv(prm):
 
 class TestSet01(object):
 
+    def setup_method(self, method):
+        np.random.seed(12345)
+
+
     def test_01(self):
         img = np.random.randn(64, 64)
         imgn = signal.spnoise(img, 0.5)
