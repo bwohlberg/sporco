@@ -15,7 +15,7 @@ import numpy as np
 
 from sporco.admm import admm
 from sporco.array import zpad, atleast_nd, zdivide
-from sporco.fft import rfftn, irfftn, rfl2norm2
+from sporco.fft import real_dtype, fftn_func, ifftn_func, fl2norm2_func
 from sporco.signal import gradient_filters, grad, gradT
 from sporco.linalg import rrs
 from sporco.prox import prox_l2
@@ -183,6 +183,10 @@ class TVL2Denoise(admm.ADMM):
         if opt is None:
             opt = TVL2Denoise.Options()
 
+        # Set flag indicating whether problem involves real or complex
+        # values
+        self.real_dtype = np.isrealobj(S)
+
         # Set dtype attribute based on S.dtype and opt['DataType']
         self.set_dtype(opt, S.dtype)
 
@@ -192,11 +196,11 @@ class TVL2Denoise(admm.ADMM):
             self.saxes = (-1,)
         else:
             self.saxes = (caxis, -1)
-        self.lmbda = self.dtype.type(lmbda)
+        self.lmbda = real_dtype(self.dtype).type(lmbda)
 
         # Set penalty parameter
         self.set_attr('rho', opt['rho'], dval=(2.0*self.lmbda + 0.1),
-                      dtype=self.dtype)
+                      dtype=real_dtype(self.dtype))
 
         yshape = S.shape + (len(axes),)
         super(TVL2Denoise, self).__init__(S.size, yshape, yshape, S.dtype, opt)
@@ -204,7 +208,8 @@ class TVL2Denoise(admm.ADMM):
         self.Wdf = np.asarray(self.opt['DFidWeight'], dtype=self.dtype)
         self.Wdf2 = self.Wdf**2
         self.lcw = self.LaplaceCentreWeight()
-        self.Wtv = np.asarray(self.opt['TVWeight'], dtype=self.dtype)
+        self.Wtv = np.asarray(self.opt['TVWeight'],
+                              dtype=real_dtype(self.dtype))
         if hasattr(self.Wtv, 'ndim') and self.Wtv.ndim == S.ndim:
             self.Wtvna = self.Wtv[..., np.newaxis]
         else:
@@ -282,8 +287,11 @@ class TVL2Denoise(admm.ADMM):
         """
 
         dfd = 0.5*(np.linalg.norm(self.Wdf * (self.X - self.S))**2)
-        reg = np.sum(self.Wtv * np.sqrt(np.sum(self.obfn_gvar()**2,
-                                               axis=self.saxes)))
+        if self.real_dtype:
+            gv = self.obfn_gvar()
+        else:
+            gv = np.abs(self.obfn_gvar())
+        reg = np.sum(self.Wtv * np.sqrt(np.sum(gv**2, axis=self.saxes)))
         obj = dfd + self.lmbda*reg
         return (obj, dfd, reg)
 
@@ -522,6 +530,14 @@ class TVL2Deconv(admm.ADMM):
         if opt is None:
             opt = TVL2Deconv.Options()
 
+        # Set flag indicating whether problem involves real or complex
+        # values, and get appropriate versions of functions from fft
+        # module
+        self.real_dtype = np.isrealobj(S)
+        self.fftn = fftn_func(self.real_dtype)
+        self.ifftn = ifftn_func(self.real_dtype)
+        self.fl2norm2 = fl2norm2_func(self.real_dtype)
+
         # Set dtype attribute based on S.dtype and opt['DataType']
         self.set_dtype(opt, S.dtype)
 
@@ -532,23 +548,24 @@ class TVL2Deconv(admm.ADMM):
             self.saxes = (-1,)
         else:
             self.saxes = (caxis, -1)
-        self.lmbda = self.dtype.type(lmbda)
+        self.lmbda = real_dtype(self.dtype).type(lmbda)
 
         # Set penalty parameter
         self.set_attr('rho', opt['rho'], dval=(2.0*self.lmbda + 0.1),
-                      dtype=self.dtype)
+                      dtype=real_dtype(self.dtype))
 
         yshape = S.shape + (len(axes),)
         super(TVL2Deconv, self).__init__(S.size, yshape, yshape, S.dtype, opt)
 
         self.axshp = tuple([S.shape[k] for k in axes])
         self.A = atleast_nd(S.ndim, A.astype(self.dtype))
-        self.Af = rfftn(self.A, self.axshp, axes=axes)
-        self.Sf = rfftn(self.S, axes=axes)
+        self.Af = self.fftn(self.A, self.axshp, axes=axes)
+        self.Sf = self.fftn(self.S, axes=axes)
         self.AHAf = np.conj(self.Af)*self.Af
         self.AHSf = np.conj(self.Af)*self.Sf
 
-        self.Wtv = np.asarray(self.opt['TVWeight'], dtype=self.dtype)
+        self.Wtv = np.asarray(self.opt['TVWeight'],
+                              dtype=real_dtype(self.dtype))
         if hasattr(self.Wtv, 'ndim') and self.Wtv.ndim == S.ndim:
             self.Wtvna = self.Wtv[..., np.newaxis]
         else:
@@ -580,10 +597,10 @@ class TVL2Deconv(admm.ADMM):
         """
 
         b = self.AHSf + self.rho*np.sum(
-            np.conj(self.Gf)*rfftn(self.Y-self.U, axes=self.axes),
+            np.conj(self.Gf)*self.fftn(self.Y-self.U, axes=self.axes),
             axis=self.Y.ndim-1)
         self.Xf = b / (self.AHAf + self.rho*self.GHGf)
-        self.X = irfftn(self.Xf, self.axsz, axes=self.axes)
+        self.X = self.ifftn(self.Xf, self.axsz, axes=self.axes)
 
         if self.opt['LinSolveCheck']:
             ax = (self.AHAf + self.rho*self.GHGf)*self.Xf
@@ -624,9 +641,12 @@ class TVL2Deconv(admm.ADMM):
         """
 
         Ef = self.Af * self.Xf - self.Sf
-        dfd = rfl2norm2(Ef, self.S.shape, axis=self.axes) / 2.0
-        reg = np.sum(self.Wtv * np.sqrt(np.sum(self.obfn_gvar()**2,
-                                               axis=self.saxes)))
+        dfd = self.fl2norm2(Ef, self.S.shape, axis=self.axes) / 2.0
+        if self.real_dtype:
+            gv = self.obfn_gvar()
+        else:
+            gv = np.abs(self.obfn_gvar())
+        reg = np.sum(self.Wtv * np.sqrt(np.sum(gv**2, axis=self.saxes)))
         obj = dfd + self.lmbda*reg
         return (obj, dfd, reg)
 
@@ -646,9 +666,9 @@ class TVL2Deconv(admm.ADMM):
         """
 
         if Xf is None:
-            Xf = rfftn(X, axes=self.axes)
-        return irfftn(self.Gf*Xf[..., np.newaxis], self.axsz,
-                         axes=self.axes)
+            Xf = self.fftn(X, axes=self.axes)
+        return self.ifftn(self.Gf*Xf[..., np.newaxis], self.axsz,
+                          axes=self.axes)
 
 
 
@@ -658,9 +678,9 @@ class TVL2Deconv(admm.ADMM):
         :math:`A^T \mathbf{x} = (G_r^T \;\; G_c^T) \mathbf{x}`.
         """
 
-        Xf = rfftn(X, axes=self.axes)
-        return np.sum(irfftn(np.conj(self.Gf)*Xf, self.axsz,
-                                axes=self.axes), axis=self.Y.ndim-1)
+        Xf = self.fftn(X, axes=self.axes)
+        return np.sum(self.ifftn(np.conj(self.Gf)*Xf, self.axsz,
+                                 axes=self.axes), axis=self.Y.ndim-1)
 
 
 

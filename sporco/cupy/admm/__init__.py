@@ -93,7 +93,7 @@ admm.tvl1 = sporco_cupy_patch_module('sporco.admm.tvl1',
             {'admm': admm.admm, 'rrs': linalg.rrs, 'prox_l1': prox.prox_l1,
              'prox_l2': prox.prox_l2, 'zpad': array.zpad,
              'atleast_nd': array.atleast_nd, 'zdivide': array.zdivide,
-             'rfftn': fft.rfftn, 'irfftn': fft.irfftn,
+             'fftn_func': fft.fftn_func, 'ifftn_func': fft.ifftn_func,
              'gradient_filters': signal.gradient_filters,
              'grad': signal.grad, 'gradT': signal.gradT})
 
@@ -101,8 +101,8 @@ admm.tvl1 = sporco_cupy_patch_module('sporco.admm.tvl1',
 admm.tvl2 = sporco_cupy_patch_module('sporco.admm.tvl2',
             {'admm': admm.admm, 'rrs': linalg.rrs, 'prox_l2': prox.prox_l2,
              'zpad': array.zpad, 'atleast_nd': array.atleast_nd,
-             'zdivide': array.zdivide, 'rfftn': fft.rfftn,
-             'irfftn': fft.irfftn, 'rfl2norm2': fft.rfl2norm2,
+             'zdivide': array.zdivide,
+             'fftn_func': fft.fftn_func, 'ifftn_func': fft.ifftn_func,
              'gradient_filters': signal.gradient_filters,
              'grad': signal.grad, 'gradT': signal.gradT})
 
