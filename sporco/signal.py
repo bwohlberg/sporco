@@ -13,7 +13,7 @@ from builtins import range
 import numpy as np
 
 from sporco._util import renamed_function
-from sporco.fft import fftn, ifftn, rfftn, irfftn, fftconv
+from sporco.fft import is_complex_dtype, fftn, ifftn, rfftn, irfftn, fftconv
 from sporco import array
 
 
@@ -222,7 +222,7 @@ def gradient_filters(ndim, axes, axshp, dtype=None):
       Axes on which gradients are to be computed
     axshp : tuple of integers
       Shape of axes on which gradients are to be computed
-    dtype : dtype
+    dtype : dtype, optional (default np.float32)
       Data type of output arrays
 
     Returns
@@ -240,7 +240,10 @@ def gradient_filters(ndim, axes, axshp, dtype=None):
     for k in axes:
         g[(0,) * k + (slice(None),) + (0,) * (g.ndim - 2 - k) + (k,)] = \
             np.array([1, -1])
-    Gf = rfftn(g, axshp, axes=axes)
+    if is_complex_dtype(dtype):
+        Gf = fftn(g, axshp, axes=axes)
+    else:
+        Gf = rfftn(g, axshp, axes=axes)
     GHGf = np.sum(np.conj(Gf) * Gf, axis=-1).real
     return Gf, GHGf
 

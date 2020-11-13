@@ -42,6 +42,24 @@ pyfftw_planner_effort = 'FFTW_MEASURE'
 """FFTW planning rigor flag used in :mod:`pyfftw` computations"""
 
 
+def is_complex_dtype(dtype):
+    """Determine whether a dtype is complex.
+
+    Parameters
+    ----------
+    dtype : dtype
+      A dtype, e.g. np.float32, np.float64, np.complex128
+
+    Returns
+    -------
+    bool
+      True if the dtype is complex, otherwise False
+    """
+
+    return dtype.kind == 'c'
+
+
+
 @renamed_function(depname='complex_dtype', depmod='sporco.linalg')
 def complex_dtype(dtype):
     """Construct the corresponding complex dtype for a given real dtype.
@@ -57,7 +75,7 @@ def complex_dtype(dtype):
 
     Returns
     -------
-    cdtype : dtype
+    dtype
       The complex dtype corresponding to the input dtype
     """
 
@@ -79,7 +97,7 @@ def real_dtype(dtype):
 
     Returns
     -------
-    cdtype : dtype
+    dtype
       The real dtype corresponding to the input dtype
     """
 

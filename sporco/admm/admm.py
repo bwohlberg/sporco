@@ -569,7 +569,7 @@ class ADMM(common.IterativeSolver):
                     rsf = rhomlt
                 elif s > (mu / xi) * r:
                     rsf = 1.0 / rhomlt
-                self.rho *= self.dtype.type(rsf)
+                self.rho *= real_dtype(self.dtype).type(rsf)
                 self.U /= rsf
                 if rsf != 1.0:
                     self.rhochange()

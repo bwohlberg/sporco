@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2016-2017 by Brendt Wohlberg <brendt@ieee.org>
+# Copyright (C) 2016-2020 by Brendt Wohlberg <brendt@ieee.org>
 # All rights reserved. BSD 3-clause License.
 # This file is part of the SPORCO package. Details of the copyright
 # and user license can be found in the 'LICENSE.txt' file distributed
@@ -51,8 +51,12 @@ def mae(vref, vcmp):
       MAE between `vref` and `vcmp`
     """
 
-    r = np.asarray(vref, dtype=np.float64).ravel()
-    c = np.asarray(vcmp, dtype=np.float64).ravel()
+    if np.iscomplexobj(vref) or np.iscomplexobj(vcmp):
+        dtype = np.complex128
+    else:
+        dtype = np.float64
+    r = np.asarray(vref, dtype=dtype).ravel()
+    c = np.asarray(vcmp, dtype=dtype).ravel()
     return np.mean(np.abs(r - c))
 
 
@@ -74,8 +78,12 @@ def mse(vref, vcmp):
       MSE between `vref` and `vcmp`
     """
 
-    r = np.asarray(vref, dtype=np.float64).ravel()
-    c = np.asarray(vcmp, dtype=np.float64).ravel()
+    if np.iscomplexobj(vref) or np.iscomplexobj(vcmp):
+        dtype = np.complex128
+    else:
+        dtype = np.float64
+    r = np.asarray(vref, dtype=dtype).ravel()
+    c = np.asarray(vcmp, dtype=dtype).ravel()
     return np.mean(np.abs(r - c)**2)
 
 
@@ -129,7 +137,7 @@ def psnr(vref, vcmp, rng=None):
     """
 
     if rng is None:
-        rng = vref.max() - vref.min()
+        rng = np.abs(vref.max() - vref.min())
     dv = (rng + 0.0)**2
     with np.errstate(divide='ignore'):
         rt = dv / mse(vref, vcmp)
