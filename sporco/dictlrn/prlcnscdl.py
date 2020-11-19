@@ -24,7 +24,7 @@ import sporco.fft
 sporco.fft.pyfftw_threads = 1
 from sporco.dictlrn import cbpdndl
 from sporco.dictlrn import cbpdndlmd
-from sporco.fft import rfftn, irfftn, rfl2norm2
+from sporco.fft import fftn_func, ifftn_func, fl2norm2_func
 from sporco.array import transpose_ntpl_list
 import sporco.cnvrep as cr
 from sporco.util import u
@@ -56,6 +56,12 @@ mp_Z_U = None    # Lagrange multiplier of X update
 mp_D_X = None    # Primary variable of D update
 mp_D_Y = None    # Auxiliary variable of D update
 mp_D_U = None    # Lagrange multiplier of D update
+
+# Global references to appropriate functions from sporco.fft
+real_dtype = None
+fftn = None
+ifftn = None
+fl2norm2 = None
 
 
 
@@ -133,12 +139,12 @@ def cbpdn_setdict():
     global mp_DSf
     # Set working dictionary for cbpdn step and compute DFT of dictionary
     # D and of D^T S
-    mp_Df[:] = rfftn(mp_D_Y, mp_cri.Nv, mp_cri.axisN)
+    mp_Df[:] = fftn(mp_D_Y, mp_cri.Nv, mp_cri.axisN)
     if mp_cri.Cd == 1:
         mp_DSf[:] = np.conj(mp_Df) * mp_Sf
     else:
         mp_DSf[:] = sl.inner(np.conj(mp_Df[np.newaxis, ...]), mp_Sf,
-                              axis=mp_cri.axisC+1)
+                             axis=mp_cri.axisC+1)
 
 
 
@@ -149,12 +155,12 @@ def cbpdn_xstep(k):
     """
 
     YU = mp_Z_Y[k] - mp_Z_U[k]
-    b = mp_DSf[k] + mp_xrho * rfftn(YU, None, mp_cri.axisN)
+    b = mp_DSf[k] + mp_xrho * fftn(YU, None, mp_cri.axisN)
     if mp_cri.Cd == 1:
         Xf = sl.solvedbi_sm(mp_Df, mp_xrho, b, axis=mp_cri.axisM)
     else:
         Xf = sl.solvemdbi_ism(mp_Df, mp_xrho, b, mp_cri.axisM, mp_cri.axisC)
-    mp_Z_X[k] = irfftn(Xf, mp_cri.Nv, mp_cri.axisN)
+    mp_Z_X[k] = ifftn(Xf, mp_cri.Nv, mp_cri.axisN)
 
 
 
@@ -197,7 +203,7 @@ def ccmod_setcoef(k):
 
     # Set working coefficient maps for ccmod step and compute DFT of
     # coefficient maps Z and Z^T S
-    mp_Zf[k] = rfftn(mp_Z_Y[k], mp_cri.Nv, mp_cri.axisN)
+    mp_Zf[k] = fftn(mp_Z_Y[k], mp_cri.Nv, mp_cri.axisN)
     mp_ZSf[k] = np.conj(mp_Zf[k]) * mp_Sf[k]
 
 
@@ -209,9 +215,9 @@ def ccmod_xstep(k):
     """
 
     YU = mp_D_Y - mp_D_U[k]
-    b = mp_ZSf[k] + mp_drho * rfftn(YU, None, mp_cri.axisN)
+    b = mp_ZSf[k] + mp_drho * fftn(YU, None, mp_cri.axisN)
     Xf = sl.solvedbi_sm(mp_Zf[k], mp_drho, b, axis=mp_cri.axisM)
-    mp_D_X[k] = irfftn(Xf, mp_cri.Nv, mp_cri.axisN)
+    mp_D_X[k] = ifftn(Xf, mp_cri.Nv, mp_cri.axisN)
 
 
 
@@ -391,6 +397,15 @@ class ConvBPDNDictLearn_Consensus(cbpdndl.ConvBPDNDictLearn):
             self.nproc = min(mp.cpu_count(), S.shape[-1])
         else:
             self.nproc = nproc
+
+        # Set flag indicating whether problem involves real or complex
+        # values, and get appropriate versions of functions from fft
+        # module
+        global real_dtype, fftn, ifftn, fl2norm2
+        real_dtype = np.isrealobj(D0) and np.isrealobj(S)
+        fftn = fftn_func(real_dtype)
+        ifftn = ifftn_func(real_dtype)
+        fl2norm2 = fl2norm2_func(real_dtype)
 
         # Call parent constructor
         super(ConvBPDNDictLearn_Consensus, self).__init__(
@@ -612,10 +627,9 @@ class ConvBPDNDictLearn_Consensus(cbpdndl.ConvBPDNDictLearn):
         Df = mp_Df
         Sf = mp_Sf
         Ef = sl.inner(Df[np.newaxis, ...], Xf,
-                       axis=self.xstep.cri.axisM+1) - Sf
+                      axis=self.xstep.cri.axisM+1) - Sf
         Ef = np.swapaxes(Ef, 0, self.xstep.cri.axisK+1)[0]
-        dfd = rfl2norm2(Ef, self.xstep.S.shape,
-                        axis=self.xstep.cri.axisN)/2.0
+        dfd = fl2norm2(Ef, self.xstep.S.shape, axis=self.xstep.cri.axisN)/2.0
         rl1 = np.sum(np.abs(X))
         obj = dfd + self.xstep.lmbda*rl1
         return (obj, dfd, rl1)
@@ -657,7 +671,7 @@ def cbpdnmd_setdict():
     """
 
     # Set working dictionary for cbpdn step and compute DFT of dictionary D
-    mp_Df[:] = rfftn(mp_D_Y0, mp_cri.Nv, mp_cri.axisN)
+    mp_Df[:] = fftn(mp_D_Y0, mp_cri.Nv, mp_cri.axisN)
 
 
 
@@ -670,16 +684,15 @@ def cbpdnmd_xstep(k):
     YU0 = mp_Z_Y0[k] + mp_S[k] - mp_Z_U0[k]
     YU1 = mp_Z_Y1[k] - mp_Z_U1[k]
     if mp_cri.Cd == 1:
-        b = np.conj(mp_Df) * rfftn(YU0, None, mp_cri.axisN) + \
-            rfftn(YU1, None, mp_cri.axisN)
+        b = np.conj(mp_Df) * fftn(YU0, None, mp_cri.axisN) + \
+            fftn(YU1, None, mp_cri.axisN)
         Xf = sl.solvedbi_sm(mp_Df, 1.0, b, axis=mp_cri.axisM)
     else:
-        b = sl.inner(np.conj(mp_Df), rfftn(YU0, None, mp_cri.axisN),
-                      axis=mp_cri.axisC) + \
-            rfftn(YU1, None, mp_cri.axisN)
+        b = sl.inner(np.conj(mp_Df), fftn(YU0, None, mp_cri.axisN),
+                     axis=mp_cri.axisC) + fftn(YU1, None, mp_cri.axisN)
         Xf = sl.solvemdbi_ism(mp_Df, 1.0, b, mp_cri.axisM, mp_cri.axisC)
-    mp_Z_X[k] = irfftn(Xf, mp_cri.Nv, mp_cri.axisN)
-    mp_DX[k] = irfftn(sl.inner(mp_Df, Xf), mp_cri.Nv, mp_cri.axisN)
+    mp_Z_X[k] = ifftn(Xf, mp_cri.Nv, mp_cri.axisN)
+    mp_DX[k] = ifftn(sl.inner(mp_Df, Xf), mp_cri.Nv, mp_cri.axisN)
 
 
 
@@ -730,7 +743,7 @@ def ccmodmd_setcoef(k):
 
     # Set working coefficient maps for ccmod step and compute DFT of
     # coefficient maps Z
-    mp_Zf[k] = rfftn(mp_Z_Y1[k], mp_cri.Nv, mp_cri.axisN)
+    mp_Zf[k] = fftn(mp_Z_Y1[k], mp_cri.Nv, mp_cri.axisN)
 
 
 
@@ -742,11 +755,11 @@ def ccmodmd_xstep(k):
 
     YU0 = mp_D_Y0 - mp_D_U0[k]
     YU1 = mp_D_Y1[k] + mp_S[k] - mp_D_U1[k]
-    b = rfftn(YU0, None, mp_cri.axisN) + \
-      np.conj(mp_Zf[k]) * rfftn(YU1, None, mp_cri.axisN)
+    b = fftn(YU0, None, mp_cri.axisN) + \
+        np.conj(mp_Zf[k]) * fftn(YU1, None, mp_cri.axisN)
     Xf = sl.solvedbi_sm(mp_Zf[k], 1.0, b, axis=mp_cri.axisM)
-    mp_D_X[k] = irfftn(Xf, mp_cri.Nv, mp_cri.axisN)
-    mp_DX[k] = irfftn(sl.inner(Xf, mp_Zf[k]), mp_cri.Nv, mp_cri.axisN)
+    mp_D_X[k] = ifftn(Xf, mp_cri.Nv, mp_cri.axisN)
+    mp_DX[k] = ifftn(sl.inner(Xf, mp_Zf[k]), mp_cri.Nv, mp_cri.axisN)
 
 
 
@@ -939,6 +952,15 @@ class ConvBPDNMaskDcplDictLearn_Consensus(cbpdndlmd.ConvBPDNMaskDictLearn):
             self.nproc = min(mp.cpu_count(), S.shape[-1])
         else:
             self.nproc = nproc
+
+        # Set flag indicating whether problem involves real or complex
+        # values, and get appropriate versions of functions from fft
+        # module
+        global real_dtype, fftn, ifftn, fl2norm2
+        real_dtype = np.isrealobj(D0) and np.isrealobj(S)
+        fftn = fftn_func(real_dtype)
+        ifftn = ifftn_func(real_dtype)
+        fl2norm2 = fl2norm2_func(real_dtype)
 
         # Call parent constructor
         super(ConvBPDNMaskDcplDictLearn_Consensus, self).__init__(
@@ -1175,10 +1197,9 @@ class ConvBPDNMaskDcplDictLearn_Consensus(cbpdndlmd.ConvBPDNMaskDictLearn):
             S = mp_S
             Xf = mp_Zf
             Df = mp_Df
-            DX = irfftn(sl.inner(
-                Df[np.newaxis, ...], Xf, axis=self.xstep.cri.axisM+1),
-                            self.xstep.cri.Nv,
-                            np.array(self.xstep.cri.axisN) + 1)
+            DX = ifftn(sl.inner(Df[np.newaxis, ...], Xf,
+                                axis=self.xstep.cri.axisM+1),
+                       self.xstep.cri.Nv, np.array(self.xstep.cri.axisN) + 1)
 
         dfd = (np.linalg.norm(W * (DX - S))**2) / 2.0
         rl1 = np.sum(np.abs(self.getcoef()))
