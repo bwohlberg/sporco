@@ -50,8 +50,8 @@ def attach_keypress(fig, scaling=1.1):
     Parameters
     ----------
     fig : :class:`matplotlib.figure.Figure` object
-        Figure to which event handling is to be attached
-   scaling : float, optional (default 1.1)
+      Figure to which event handling is to be attached
+    scaling : float, optional (default 1.1)
       Scaling factor for figure size changes
 
     Returns
