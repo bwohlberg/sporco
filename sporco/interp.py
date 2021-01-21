@@ -177,3 +177,117 @@ def lstmaxdev(A, b):
         raise ValueError('scipy.optimize.linprog failed with status %d' %
                          res.status)
     return res.x[1:]
+
+
+
+@renamed_function(depname='lanczos_kernel', depmod='sporco.util')
+def lanczos_kernel(x, a=3):
+    r"""Lanczos interpolation kernel.
+
+    Compute the `Lanczos interpolation kernel
+    <https://en.wikipedia.org/wiki/Lanczos_resampling>`__
+
+    .. math::
+      L(x) = \left\{ \begin{array}{ll} \mathrm{sinc}(x)\,
+      \mathrm{sinc}(x/a) & \;\text{if}\; -a < x < a \\ 0 &
+      \text{otherwise} \;, \end{array} \right.
+
+    where :math:`a \in \mathbb{Z}^+`.
+
+    Parameters
+    ----------
+    x : float or ndarray
+      Sampling point(s) at which to compute the kernel
+    a : int, optional (default 3)
+      Kernel size parameter
+
+    Returns
+    -------
+    y : float or ndarray
+      Kernel evaluated at sampling point(s)
+    """
+
+    return np.logical_and(x > -a, x < a) * np.sinc(x) * np.sinc(x / a)
+
+
+
+@renamed_function(depname='interpolation_points', depmod='sporco.util')
+def interpolation_points(N, include_zero=True):
+    """Evenly spaced interpolation points.
+
+    Construct a set of `N` evenly spaced interpolation points for
+    samples on an integer grid.
+
+    Parameters
+    ----------
+    N : int
+      Number of interpolation points
+    include_zero : bool, optional (default True)
+      Flag indicating whether to include zero in the set of points
+
+    Returns
+    -------
+    y : ndarray
+      Array of interpolation points
+    """
+
+    if include_zero:
+        return np.arange(-((N - 1) // 2), (N // 2) + 1) / float(N)
+    else:
+        return np.hstack((np.arange(-(N // 2), 0),
+                          np.arange(1, ((N + 1) // 2) + 1))) / (N + 1.0)
+
+
+
+@renamed_function(depname='lanczos_filters', depmod='sporco.util')
+def lanczos_filters(sz, a=3, collapse_axes=True):
+    """Multi-dimensional Lanczos interpolation filters.
+
+    Construct a set of `Lanczos interpolation filters
+    <https://en.wikipedia.org/wiki/Lanczos_resampling>`__.
+    Multi-dimensional filters are constructed as tensor products of
+    one-dimensional filters.
+
+    Parameters
+    ----------
+    sz : tuple of int or tuple of array_like
+      Tuple specifying the resampling points for each filter dimension.
+      Each entry may be an array of resampling points or an integer, in
+      which case the resampling grid consists of the specified number of
+      equi-spaced points
+    a : int, optional (default 3)
+      Kernel size parameter
+    collapse_axes : bool, optional (default True)
+      Flag indicating whether to collapse the output axes corresponding
+      to different filters for each filter dimension
+
+    Returns
+    -------
+    y : ndarray
+      Array of interpolation filters
+    """
+
+    if isinstance(sz, int):
+        sz = (sz,)
+    ndim = len(sz)
+    h = 1.0
+    for n in range(ndim):
+        if isinstance(sz[n], int):
+            x = interpolation_points(sz[n])
+        else:
+            x = np.array(sz[n])
+            if x.ndim != 1:
+                raise ValueError('Size tuple entry not an integer or 1d array')
+            if x.min() < -1.0 or x.max() > 1.0:
+                raise ValueError('Interpolation points must be in [-1, 1]')
+        gx = np.arange(-a, a + 1)[:, np.newaxis] + x[np.newaxis, :]
+        hn = lanczos_kernel(gx, a=a)
+        hn /= np.sum(hn, axis=0, keepdims=True)
+        shp = (1,) * n + (hn.shape[0],) + (1,) * (ndim - n - 1) + \
+              (1,) * n + (hn.shape[1],) + (1,) * (ndim - n - 1)
+        h = h * hn.reshape(shp)
+
+    if collapse_axes:
+        h = h.reshape(h.shape[0:ndim] + (-1,))
+
+    return h
