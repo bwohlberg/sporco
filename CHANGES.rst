@@ -11,8 +11,10 @@ Version 0.1.13   (not yet released)
   and sporco.signal, and functions nkp, kpsvd, tikhonov_filter,
   gaussian, and local_contrast_normalise moved from sporco.util to
   sporco.linalg
-• Significant change to interface of fft.fftconv function
+• Added new functions prox.norm_dl1l2 and prox.prox_dl1l2 for difference of
+  ℓ1 and ℓ2 norms and corresponding proximal operator
 • Major restructuring of sporco.fista modules, now renamed to sporco.pgm
+• Significant change to interface of fft.fftconv function
 • New classes for sparse coding and dictionary learning with a weighted ℓ2
   data fidelity term
 

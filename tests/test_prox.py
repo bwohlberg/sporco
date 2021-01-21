@@ -1,6 +1,8 @@
 from __future__ import division
 from builtins import object
 
+import functools
+
 import numpy as np
 import scipy.optimize as optim
 from sporco import prox
@@ -100,7 +102,32 @@ class TestSet01(object):
             proj_test(self.V1, nrm, prj, gamma)
 
 
+    def test_09(self):
+        for beta in [0.0, 0.5, 1.0]:
+            nrm = functools.partial(prox.norm_dl1l2, beta=beta)
+            prx = functools.partial(prox.prox_dl1l2, beta=beta)
+            for alpha in self.alpha:
+                prox_test(self.V1, nrm, prx, alpha)
+
+
     def test_10(self):
+        for beta in [0.0, 0.5, 1.0]:
+            for alpha in self.alpha:
+                pV1 = prox.prox_dl1l2(self.V1, alpha, beta=beta, axis=1)
+                for k in range(pV1.shape[0]):
+                    pV1k = prox.prox_dl1l2(self.V1[k], alpha, beta=beta)
+                    assert metric.mse(pV1[k], pV1k) < 1e-12
+
+
+    def test_11(self):
+        for beta in [0.0, 0.5, 1.0]:
+            for alpha in self.alpha:
+                pV1 = prox.prox_dl1l2(self.V1, alpha, beta=beta, axis=0)
+                for k in range(pV1.shape[1]):
+                    pV1k = prox.prox_dl1l2(self.V1[:, k], alpha, beta=beta)
+                    assert metric.mse(pV1[:, k], pV1k) < 1e-12
+
+    def test_13(self):
         nrm = prox.norm_l21
         prx = prox.prox_l2
         for alpha in self.alpha:
@@ -108,7 +135,7 @@ class TestSet01(object):
             prox_test_axes(self.V2, nrm, prx, alpha)
 
 
-    def test_12(self):
+    def test_14(self):
         assert np.sum(np.abs(prox.prox_sl1l2(self.V1, 1e-2, 1e-2))) > 0
         assert prox.norm_nuclear(self.V1) > 0
 
@@ -116,10 +143,10 @@ class TestSet01(object):
     def test_19(self):
         V2_a2, rsi = prox.ndto2d(self.V2, axis=2)
         V2_r = prox.ndfrom2d(V2_a2, rsi)
-        assert(metric.mse(self.V2, V2_r) < 1e-14)
+        assert metric.mse(self.V2, V2_r) < 1e-14
         V2_a1, rsi = prox.ndto2d(self.V2, axis=1)
         V2_r = prox.ndfrom2d(V2_a1, rsi)
-        assert(metric.mse(self.V2, V2_r) < 1e-14)
+        assert metric.mse(self.V2, V2_r) < 1e-14
         V2_a0, rsi = prox.ndto2d(self.V2, axis=0)
         V2_r = prox.ndfrom2d(V2_a0, rsi)
-        assert(metric.mse(self.V2, V2_r) < 1e-14)
+        assert metric.mse(self.V2, V2_r) < 1e-14
