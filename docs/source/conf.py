@@ -74,6 +74,8 @@ extensions = [
 ]
 
 
+bibtex_bibfiles = ['references.bib']
+
 
 # Copied from scikit-learn sphinx configuration
 if os.environ.get('NO_MATHJAX'):
