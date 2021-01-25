@@ -12,7 +12,7 @@ matrix:
   include:
   - os: osx
     language: generic
-    env: PYTHON=3.6.6
+    env: PYTHON=3.8.7
 
 notifications:
   email: false
@@ -52,14 +52,14 @@ before_install:
 
 install:
     - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
-         export PYTHON_VERSION=3.6.6;
+         export PYTHON_VERSION=3.8.7;
       else
          export PYTHON_VERSION=$TRAVIS_PYTHON_VERSION;
       fi;
       conda create --yes -q -n test-env python=$PYTHON_VERSION future numpy scipy pillow matplotlib
     - source activate test-env
     - conda install -c conda-forge pytest pytest-runner pyfftw mpi4py
-    - if [[ "$TRAVIS_OS_NAME" != "osx" && "$TRAVIS_PYTHON_VERSION" == "3.7" ]]; then
+    - if [[ "$TRAVIS_OS_NAME" != "osx" && "$TRAVIS_PYTHON_VERSION" == "3.8" ]]; then
          conda install -c conda-forge codecov;
       fi
     - python setup.py build
@@ -67,7 +67,7 @@ install:
 
 script:
     - 'echo "backend: Agg" > matplotlibrc'
-    - if [[ "$TRAVIS_PYTHON_VERSION" == "3.7" ]]; then
+    - if [[ "$TRAVIS_PYTHON_VERSION" == "3.8" ]]; then
         coverage run --source sporco -m py.test;
       else
         python setup.py test;
@@ -75,7 +75,7 @@ script:
     - rm -f matplotlibrc
 
 after_success:
-    - if [[ "$TRAVIS_PYTHON_VERSION" == "3.7" ]]; then
+    - if [[ "$TRAVIS_PYTHON_VERSION" == "3.8" ]]; then
         codecov;
       fi
 
