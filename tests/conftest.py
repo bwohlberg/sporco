@@ -23,7 +23,7 @@ except ImportError:
     collect_ignore.append('test_mpiutil.py')
 
 # Ignore tests of modules depending on multiprocessing fork ability
-# on Windows platform
-if platform.system() == 'Windows':
+# on Windows and MacOS platform
+if platform.system() == 'Windows' or platform.system() == 'Darwin':
     collect_ignore.extend(['admm/test_parcbpdn.py',
                            'dictlrn/test_prlcnscdl.py'])

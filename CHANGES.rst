@@ -17,6 +17,9 @@ Version 0.1.13   (not yet released)
 • Significant change to interface of fft.fftconv function
 • New classes for sparse coding and dictionary learning with a weighted ℓ2
   data fidelity term
+• Functionality depending on use of fork in multiprocessing (modules
+  admm.parcbpdn and dictlrn.prlcnscdl, and parallel computation of
+  util.grid_search) no longer supported under MacOS
 
 
 
