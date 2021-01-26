@@ -13,7 +13,7 @@ matrix:
   - os: osx
     osx_image: xcode12.2
     language: generic
-    env: PYTHON=3.8.7
+    env: PYTHON=3.8.5
 
 notifications:
   email: false
@@ -53,7 +53,7 @@ before_install:
 
 install:
     - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
-         export PYTHON_VERSION=3.8.7;
+         export PYTHON_VERSION=3.8.5;
       else
          export PYTHON_VERSION=$TRAVIS_PYTHON_VERSION;
       fi;
