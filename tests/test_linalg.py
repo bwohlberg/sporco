@@ -3,6 +3,8 @@ from builtins import object
 
 import numpy as np
 import pytest
+import platform
+
 from sporco import linalg
 from sporco.signal import complex_randn
 from sporco.metric import mse
