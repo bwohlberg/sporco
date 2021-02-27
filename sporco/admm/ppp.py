@@ -148,3 +148,152 @@ class PPP(GenericPPP):
         self.f = f
         self.proxf = proxf
         self.proxg = proxg
+
+
+
+
+
+class GenericPPPConsensus(admm.WeightedADMMConsensus):
+    """Base class for Plug and Play Priors (PPP) ADMM Consensus solvers
+
+    This class solves the Multi-Agent Consensus Equilibrium problem
+    :cite:`buzzard-2018-plug` via ADMM Consensus instead of the
+    Douglas-Rachford algorithm used in :cite:`buzzard-2018-plug`. It can
+    also be viewed as a variant of the Plug and Play Priors (PPP)
+    approach :cite:`venkatakrishnan-2013-plugandplay2`
+    :cite:`sreehari-2016-plug` based on a weighted version of the ADMM
+    Consensus (see Ch. 7 of :cite:`boyd-2010-distributed`) problem
+    instead of the simpler ADMM problem of the original PPP approach.
+    """
+
+    def __init__(self, xshape, Nb, mu=None, opt=None):
+        """
+        Parameters
+        ----------
+        xshape : tuple of ints
+          Shape of working variable X
+        Nb : int
+          Number of consensus blocks
+        mu : array_like
+          Array of scalar weights
+        opt : :class:`GenericPPPConsensus.Options` object
+          Algorithm options
+        """
+
+        if mu is None:
+            mu = np.ones((Nb,))
+        if opt is None:
+            opt = GenericPPPConsensus.Options()
+
+        # Set dtype attribute, default is np.float32
+        self.set_dtype(opt, np.dtype(np.float32))
+
+        mu = np.array(mu, dtype=self.dtype)
+
+        super(GenericPPPConsensus, self).__init__(Nb, mu, xshape,
+                                                   self.dtype, opt)
+
+        # Initialise working variable
+        self.X = np.zeros(self.xshape)
+
+
+
+    itstat_fields_objfn = ()
+    hdrtxt_objfn = ()
+    hdrval_objfun = {}
+
+
+
+    def eval_objfn(self):
+        """Compute components of objective function as well as total
+        contribution to objective function.
+
+        In this case we assume that there are no components that can be
+        computed.
+        """
+
+        return ()
+
+
+
+    def xistep(self, i):
+        r"""Minimise Augmented Lagrangian with respect to
+        ADMM Consensus component :math:`\mathbf{x}_i`.
+        """
+
+        self.X[..., i] = self.prox_fi(self.Y - self.U[..., i], self.rho, i)
+
+
+
+    def prox_fi(self, X, rho):
+        r"""Compute the proximal operator of
+        :math:`\rho^{-1} f_i(\cdot)`.
+
+        Overriding this method is required. Note that this method
+        should compute the proximal operator of
+        :math:`\rho^{-1} f_i(\cdot)`, *not* the proximal operator
+        of :math:`\rho f_i(\cdot)`.
+        """
+
+        raise NotImplementedError()
+
+
+
+    def prox_g(self, X, rho):
+        r"""Compute the proximal operator of :math:`\rho^{-1} g(\cdot)`.
+
+        If this method is not overridden, the default is to assume
+        :math:`g(\mathbf{y}) = 0`, so that the corresponding proximal
+        operator is the identity mapping. Note that this method
+        should compute the proximal operator of
+        :math:`\rho^{-1} g(\cdot)`, *not* the proximal operator
+        of :math:`\rho g(\cdot)`.
+        """
+
+        return X
+
+
+
+
+class PPPConsensus(GenericPPPConsensus):
+    """Plug and Play Priors (PPP) ADMM Consensus solver that can be used
+    without the need to derive a new class.
+
+    This class solves the Multi-Agent Consensus Equilibrium problem
+    :cite:`buzzard-2018-plug` via ADMM Consensus instead of the
+    Douglas-Rachford algorithm used in :cite:`buzzard-2018-plug`.
+    """
+
+    def __init__(self, xshape, proxfi, proxg=None, mu=None, opt=None):
+        """
+        Parameters
+        ----------
+        xshape : tuple of ints
+          Shape of working variable X
+        proxfi : tuple of functions
+          Tuple of functions that compute the proximal operators for
+          each consensus block
+        proxg : function
+          Function computing the proximal operator of the regularisation
+          term
+        opt : :class:`PPPConsensus.Options` object
+          Algorithm options
+        """
+
+        if opt is None:
+            opt = PPPConsensus.Options()
+
+        self._proxfi = proxfi
+        if proxg is not None:
+            self.prox_g = proxg
+
+        super(PPPConsensus, self).__init__(xshape, len(proxfi), mu, opt)
+
+
+
+    def prox_fi(self, Xi, rho, i):
+        r"""Compute the proximal operator of
+        :math:`\rho^{-1} f_i(\cdot)`.
+        """
+
+        return self._proxfi[i](Xi, rho)
