@@ -80,7 +80,7 @@ is system dependent:
 
    .. group-tab:: :fa:`linux` Linux
 
-      Under Ubuntu Linux 18.04, the following commands should be sufficient for Python 2
+      Under Ubuntu Linux 20.04, the following commands should be sufficient for Python 2
 
       ::
 
