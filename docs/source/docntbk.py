@@ -823,8 +823,9 @@ class CrossReferenceLookup(object):
             # the cite key is in the sphinx environment bibtex cache.
             # If it is, construct the url from the cite key, otherwise
             # raise an exception
-            if name not in self.env.bibtex_cache.get_all_cited_keys():
-                raise KeyError('cite key %s not found' % name, 'cite', 0)
+            if hasattr(self.env, 'bibtex_cache'):
+                if name not in self.env.bibtex_cache.get_all_cited_keys():
+                    raise KeyError('cite key %s not found' % name, 'cite', 0)
             url = self.baseurl + 'zreferences.html#' + name
         elif role == 'ref':
             try:
