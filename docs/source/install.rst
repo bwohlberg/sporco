@@ -80,15 +80,7 @@ is system dependent:
 
    .. group-tab:: :fa:`linux` Linux
 
-      Under Ubuntu Linux 20.04, the following commands should be sufficient for Python 2
-
-      ::
-
-	sudo apt-get -y install python-numpy python-scipy python-numexpr python-matplotlib \
-				python-imageio python-pip python-future libfftw3-dev python-pytest
-	sudo -H pip install pyfftw pytest-runner
-
-      or Python 3
+      Under Ubuntu Linux 20.04, the following commands should be sufficient for Python 3
 
       ::
 
@@ -118,13 +110,7 @@ is system dependent:
 
    .. group-tab:: :fa:`apple` Mac OS
 
-      The first step is to install Python 2.7
-
-      ::
-
-	brew install python
-
-      or the current version of Python 3.x
+      The first step is to install Python 3.x
 
       ::
 
@@ -141,12 +127,9 @@ is system dependent:
 
       ::
 
-	pip install numpy scipy imageio matplotlib pyfftw
-	pip install six future python-dateutil pyparsing cycler
-	pip install pytz pytest pytest-runner
-
-      (For Python 3, replace `pip` above with `pip3`.)
-
+	pip3 install numpy scipy imageio matplotlib pyfftw
+	pip3 install six future python-dateutil pyparsing cycler
+	pip3 install pytz pytest pytest-runner
 
       The following optional dependency is required only for the
       :ref:`PPP <invprob_ppp>` usage examples, for which Python 3 is required
