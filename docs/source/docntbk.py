@@ -815,9 +815,11 @@ class CrossReferenceLookup(object):
         # bibtex_cache attribute. In this case, extract citation data
         # from env.domaindata
         self.citenum = {}
+        self.citeid = {}
         if not hasattr(env, 'bibtex_cache'):
             for cite in env.domaindata['cite']['citations']:
                 self.citenum[cite.key] = cite.label
+                self.citeid[cite.key] = cite.citation_id
 
 
     def get_docs_url(self, role, name):
@@ -831,9 +833,12 @@ class CrossReferenceLookup(object):
             # If it is, construct the url from the cite key, otherwise
             # raise an exception
             if hasattr(self.env, 'bibtex_cache'):
+                id = name
                 if name not in self.env.bibtex_cache.get_all_cited_keys():
                     raise KeyError('cite key %s not found' % name, 'cite', 0)
-            url = self.baseurl + 'zreferences.html#' + name
+            else:
+                id = self.citeid[name]
+            url = self.baseurl + 'zreferences.html#' + id
         elif role == 'ref':
             try:
                 reftpl = self.env.domaindata['std']['labels'][name]
