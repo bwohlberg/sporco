@@ -1,6 +1,8 @@
 Installation
 ============
 
+SPORCO is currently supported under Python 2.7 and Python 3.x, but note that support under Python 2.7 is expected to end in the near future.
+
 The simplest way to install the most recent release of SPORCO from
 `PyPI <https://pypi.python.org/pypi/sporco/>`_ is
 
