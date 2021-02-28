@@ -110,7 +110,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'SPORCO'
-copyright = u'2015-2020, Brendt Wohlberg'
+copyright = u'2015-2021, Brendt Wohlberg'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
