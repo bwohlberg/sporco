@@ -1,6 +1,6 @@
 from __future__ import absolute_import
 
-__version__ = '0.1.13b1'
+__version__ = '0.1.13b2'
 
 
 # This is a temporary solution to the circular imports resulting from the
