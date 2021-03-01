@@ -3,8 +3,8 @@ SPORCO Release Notes
 ====================
 
 
-Version 0.1.13   (not yet released)
------------------------------------
+Version 0.2.0   (2021-03-01)
+----------------------------
 
 • Major support module restructuring: numerous functions from sporco.util
   and sporco.linalg moved to new modules sporco.array, sporco.fft,
