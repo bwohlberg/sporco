@@ -74,6 +74,8 @@ extensions = [
 ]
 
 
+bibtex_bibfiles = ['references.bib']
+
 
 # Copied from scikit-learn sphinx configuration
 if os.environ.get('NO_MATHJAX'):
@@ -108,7 +110,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'SPORCO'
-copyright = u'2015-2020, Brendt Wohlberg'
+copyright = u'2015-2021, Brendt Wohlberg'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -310,11 +312,11 @@ latex_documents = [
 
 # Intersphinx mapping
 intersphinx_mapping = {'https://docs.python.org/3/': None,
-                       'https://docs.scipy.org/doc/numpy/': None,
+                       'https://numpy.org/doc/stable/': None,
                        'https://docs.scipy.org/doc/scipy/reference/': None,
                        'https://matplotlib.org/': None,
                        'http://hgomersall.github.io/pyFFTW/': None,
-                       'http://docs-cupy.chainer.org/en/stable': None
+                       'https://docs.cupy.dev/en/stable/': None
                       }
 # Added timeout due to periodic scipy.org down time
 #intersphinx_timeout = 30

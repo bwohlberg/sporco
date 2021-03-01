@@ -547,6 +547,13 @@ def solvemdbi_cg(ah, rho, b, axisM, axisK, tol=1e-5, mit=1000, isn=None):
     :math:`M` and :math:`K` axes of the corresponding multi-dimensional
     arrays; the solutions are independent over the other axes.
 
+    |
+
+    **Warning:** This function is not supported under Windows due to
+    an access violation error of unknown origin.
+
+    |
+
     Parameters
     ----------
     ah : array_like

@@ -803,14 +803,23 @@ class CrossReferenceLookup(object):
         # entry in the list is for the intersphinx inventory for the
         # package for which we are building sphinx docs
         self.invlst = [IntersphinxInventory(inv, baseurl, addbase=True),]
+
+        self.env = env
         # Add additional entries to the list for each external package
         # docs set included by intersphinx
         for b in env.intersphinx_cache:
             self.invlst.append(IntersphinxInventory(
                 env.intersphinx_cache[b][2], b))
 
-        self.env = env
-
+        # Recent versions of sphinx environment do not have a
+        # bibtex_cache attribute. In this case, extract citation data
+        # from env.domaindata
+        self.citenum = {}
+        self.citeid = {}
+        if not hasattr(env, 'bibtex_cache'):
+            for cite in env.domaindata['cite']['citations']:
+                self.citenum[cite.key] = cite.label
+                self.citeid[cite.key] = cite.citation_id
 
 
     def get_docs_url(self, role, name):
@@ -823,9 +832,13 @@ class CrossReferenceLookup(object):
             # the cite key is in the sphinx environment bibtex cache.
             # If it is, construct the url from the cite key, otherwise
             # raise an exception
-            if name not in self.env.bibtex_cache.get_all_cited_keys():
-                raise KeyError('cite key %s not found' % name, 'cite', 0)
-            url = self.baseurl + 'zreferences.html#' + name
+            if hasattr(self.env, 'bibtex_cache'):
+                id = name
+                if name not in self.env.bibtex_cache.get_all_cited_keys():
+                    raise KeyError('cite key %s not found' % name, 'cite', 0)
+            else:
+                id = self.citeid[name]
+            url = self.baseurl + 'zreferences.html#' + id
         elif role == 'ref':
             try:
                 reftpl = self.env.domaindata['std']['labels'][name]
@@ -862,10 +875,16 @@ class CrossReferenceLookup(object):
 
         if role == 'cite':
             # Get the string used as the citation label in the text
-            try:
-                cstr = self.env.bibtex_cache.get_label_from_key(name)
-            except Exception:
-                raise KeyError('cite key %s not found' % name, 'cite', 0)
+            if hasattr(self.env, 'bibtex_cache'):
+                try:
+                    cstr = self.env.bibtex_cache.get_label_from_key(name)
+                except Exception:
+                    raise KeyError('cite key %s not found' % name, 'cite', 0)
+            else:
+                try:
+                    cstr = self.citenum[name]
+                except KeyError:
+                    raise KeyError('cite key %s not found' % name, 'cite', 0)
             # The link label is the citation label (number) enclosed
             # in square brackets
             return '[%s]' % cstr

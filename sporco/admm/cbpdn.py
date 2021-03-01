@@ -2387,7 +2387,7 @@ class AddMaskSim(object):
         self.inner_ystep()
         # Apply mask to AMS component and insert into Y from inner
         # cbpdn object
-        Yi[np.where(self.W.astype(np.bool))] = 0.0
+        Yi[np.where(self.W.astype(bool))] = 0.0
         self.cbpdn.Y[amidx] = Yi
 
 

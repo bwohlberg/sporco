@@ -64,7 +64,7 @@ def AT(x):
 
 
 """
-Define baseline demosaicing function. If package [colour_demosaicing](https://github.com/colour-science/colour-demosaicing) is installed, use the demosaicing algorithm of Menon et al. (doi:10.1109/TIP.2006.884928), othewise use simple bilinear demosaicing.
+Define baseline demosaicing function. If package [colour_demosaicing](https://github.com/colour-science/colour-demosaicing) is installed, use the demosaicing algorithm of :cite:`menon-2007-demosaicing`, othewise use simple bilinear demosaicing.
 """
 
 if have_demosaic:

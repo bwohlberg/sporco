@@ -3,20 +3,27 @@ SPORCO Release Notes
 ====================
 
 
-Version 0.1.13   (not yet released)
------------------------------------
+• Added support for complex signals in admm.cbpdn, admm.tvl1, and admm.tvl2
+  modules
+
+
+Version 0.2.0   (2021-03-01)
+----------------------------
 
 • Major support module restructuring: numerous functions from sporco.util
   and sporco.linalg moved to new modules sporco.array, sporco.fft,
   and sporco.signal, and functions nkp, kpsvd, tikhonov_filter,
   gaussian, and local_contrast_normalise moved from sporco.util to
   sporco.linalg
-• Significant change to interface of fft.fftconv function
+• Added new functions prox.norm_dl1l2 and prox.prox_dl1l2 for difference of
+  ℓ1 and ℓ2 norms and corresponding proximal operator
 • Major restructuring of sporco.fista modules, now renamed to sporco.pgm
+• Significant change to interface of fft.fftconv function
 • New classes for sparse coding and dictionary learning with a weighted ℓ2
   data fidelity term
-• Added support for complex signals in admm.cbpdn, admm.tvl1, and admm.tvl2
-  modules
+• Functionality depending on use of fork in multiprocessing (modules
+  admm.parcbpdn and dictlrn.prlcnscdl, and parallel computation of
+  util.grid_search) no longer supported under MacOS
 
 
 

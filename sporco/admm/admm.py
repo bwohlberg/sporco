@@ -1705,3 +1705,168 @@ class ADMMConsensus(ADMM):
         """Compute dual residual normalisation term."""
 
         return self.rho * np.linalg.norm(U)
+
+
+
+
+
+class WeightedADMMConsensus(ADMMConsensus):
+    r"""
+    Base class for ADMM algorithms with a global variable consensus
+    structure (see Ch. 7 of :cite:`boyd-2010-distributed`), including
+    scalar weighting of each component as in Equ. (2) in
+    :cite:`buzzard-2018-plug`
+
+    |
+
+     .. inheritance-diagram:: WeightedADMMConsensus
+        :parts: 2
+
+    |
+
+    Solve optimisation problems of the form
+
+    .. math::
+       \mathrm{argmin}_{\mathbf{x}} \; \sum_i \alpha_i f_i(\mathbf{x}) +
+       g(\mathbf{x})
+
+    via an ADMM problem of the form
+
+    .. math::
+       \mathrm{argmin}_{\mathbf{x}_i,\mathbf{y}} \;
+       \sum_i \alpha_i f(\mathbf{x}_i) + g(\mathbf{y})
+       \;\mathrm{such\;that}\; \left( \begin{array}{c} \sqrt{\alpha_0}
+       \mathbf{x}_0 \\ \sqrt{\alpha_1} \mathbf{x}_1 \\
+       \vdots \end{array} \right) = \left( \begin{array}{c}
+       \sqrt{\alpha_0} I \\ \sqrt{\alpha_1} I \\ \vdots \end{array}
+       \right) \mathbf{y} \;\;.
+
+    This class specialises class ADMMConsensus, but remains a base class
+    for other classes that specialise to specific optimisation problems.
+    """
+
+    class Options(ADMMConsensus.Options):
+        """WeightedADMMConsensus algorithm options.
+
+        Options are the same as those defined in
+        :class:`ADMMConsensus.Options`.
+        """
+
+        defaults = copy.deepcopy(ADMMConsensus.Options.defaults)
+
+
+        def __init__(self, opt=None):
+            """
+            Parameters
+            ----------
+            opt : dict or None, optional (default None)
+              WeightedADMMConsensus algorithm options
+            """
+
+            if opt is None:
+                opt = {}
+            ADMMConsensus.Options.__init__(self, opt)
+
+
+
+    def __init__(self, Nb, alpha, yshape, dtype, opt=None):
+        r"""
+        Parameters
+        ----------
+        yshape : tuple
+          Shape of variable :math:`\mathbf{y}` in objective function
+        Nb : int
+          Number of blocks / consensus components
+        alpha : array_like
+          Array of component weights
+        opt : :class:`WeightedADMMConsensus.Options` object
+          Algorithm options
+        """
+
+        if opt is None:
+            opt = WeightedADMMConsensus.Options()
+        self.alpha = alpha
+        super(WeightedADMMConsensus, self).__init__(Nb, yshape, dtype, opt)
+        self.alphaxd = alpha.reshape((1,) * (self.U.ndim-1) + (alpha.size,))
+
+
+
+    def ystep(self):
+        r"""Minimise Augmented Lagrangian with respect to :math:`\mathbf{y}`.
+        """
+
+        asum = np.sum(self.alpha)
+        rho = asum * self.rho
+        wmAXU = np.average(self.AX + self.U, axis=-1, weights=self.alpha)
+        self.Y[:] = self.prox_g(wmAXU, rho)
+
+
+
+    def ustep(self):
+        """Dual variable update."""
+
+        self.U += self.AX - self.Y[..., np.newaxis]
+
+
+
+    def obfn_gvar(self):
+        r"""Variable to be evaluated in computing :math:`g(\cdot)`,
+        depending on the ``gEvalY`` option value.
+        """
+
+        return self.Y if self.opt['gEvalY'] else \
+            np.average(self.X, axis=-1, weights=self.alpha)
+
+
+
+    def obfn_f(self):
+        r"""Compute :math:`f(\mathbf{x}) = \sum_i \alpha_i
+        f(\mathbf{x}_i)` component of ADMM objective function.
+        """
+
+        obf = 0.0
+        for i in range(self.Nb):
+            obf += self.alpha[i] * self.obfn_fi(self.obfn_fvar(i), i)
+        return obf
+
+
+
+    def rsdl_r(self, AX, Y):
+        """Compute primal residual vector."""
+
+        return np.sqrt(self.alphaxd) * (AX - Y[..., np.newaxis])
+
+
+
+    def rsdl_s(self, Yprev, Y):
+        """Compute dual residual vector."""
+
+        # Since s = rho A^T B (y^(k+1) - y^(k)) and (without scaling
+        # factors alpha) B = -(I I I ...)^T, the correct calculation
+        # here would involve replicating (Yprev - Y) on the axis on
+        # which the blocks of X are stacked. Since this would require
+        # allocating additional memory, and since it is only the norm
+        # of s that is required, instead of replicating the vector it is
+        # scaled to have the same l2 norm as the replicated vector
+        return self.rho * np.sqrt(np.sum(self.alpha**2)) * (Yprev - Y)
+
+
+
+    def rsdl_rn(self, AX, Y):
+        """Compute primal residual normalisation term."""
+
+        # The primal residual normalisation term is
+        # max( ||A x^(k)||_2, ||B y^(k)||_2 ) and (without scaling
+        # factors alpha) B = -(I I I ...)^T.
+        # The scaling by factor for the l2 norm of Y accounts for the
+        # block replication introduced by multiplication by the B
+        # including the alpha weighting factors
+        return max((np.linalg.norm(np.sqrt(self.alphaxd) * AX),
+                    np.sqrt(np.sum(self.alpha**2)) * np.linalg.norm(Y)))
+
+
+
+    def rsdl_sn(self, U):
+        """Compute dual residual normalisation term."""
+
+        return self.rho * np.linalg.norm(U)

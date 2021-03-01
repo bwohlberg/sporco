@@ -5,10 +5,10 @@
 # with the package.
 
 """
-Plug-and-Play ADMM Demosaicing
-==============================
+Plug-and-Play ADMM Consensus Demosaicing
+========================================
 
-This example demonstrates the use of class :class:`.admm.ppp.PPP` for solving a raw image demosaicing problem via the ADMM Plug and Play Priors (PPP) algorithm :cite:`venkatakrishnan-2013-plugandplay2` :cite:`sreehari-2016-plug`.
+This example demonstrates the use of class :class:`.admm.ppp.PPPConsensus` for solving a raw image demosaicing problem via an ADMM Consensus implementation of the Multi-Agent Consensus Equilibrium approach :cite:`buzzard-2018-plug`.
 """
 
 
@@ -27,7 +27,7 @@ else:
     have_demosaic = True
 
 from sporco.linalg import _cg_wrapper
-from sporco.admm.ppp import PPP
+from sporco.admm.ppp import PPPConsensus
 from sporco.interp import bilinear_demosaic
 from sporco import metric
 from sporco import util
@@ -99,14 +99,6 @@ sn = s + nsigma * np.random.randn(*s.shape)
 
 
 """
-Define data fidelity term for PPP problem.
-"""
-
-def f(x):
-    return 0.5 * np.linalg.norm((A(x) - sn).ravel())**2
-
-
-"""
 Define proximal operator of data fidelity term for PPP problem.
 """
 
@@ -123,7 +115,7 @@ def proxf(x, rho, tol=1e-3, maxit=100):
 Define proximal operator of (implicit, unknown) regularisation term for PPP problem. In this case we use BM3D :cite:`dabov-2008-image` as the denoiser, using the [code](https://pypi.org/project/bm3d) released with :cite:`makinen-2019-exact`.
 """
 
-bsigma = 6.1e-2  # Denoiser parameter
+bsigma = 7.5e-2  # Denoiser parameter
 
 def proxg(x, rho):
     return bm3d_rgb(x, bsigma)
@@ -140,15 +132,25 @@ imgb = bm3d_rgb(demosaic(sn), 3 * nsigma)
 Set algorithm options for PPP solver, including use of bilinear demosaiced solution as an initial solution.
 """
 
-opt = PPP.Options({'Verbose': True, 'RelStopTol': 1e-3,
-                   'MaxMainIter': 12, 'rho': 1.8e-1, 'Y0': imgb})
+opt = PPPConsensus.Options({'Verbose': True, 'RelStopTol': 1e-3,
+                            'MaxMainIter': 10, 'rho': 1.5e-1, 'Y0': imgb})
 
 
 """
 Create solver object and solve, returning the the demosaiced image ``imgp``.
+
+This problem is not ideal as a demonstration of the utility of the Multi-Agent Consensus Equilibrium approach :cite:`buzzard-2018-plug` because we only have two "agents", corresponding to the proximal operators of the forward and prior models.
+
+It is also worth noting that there are two different ways of implementing this problem as a PPP ADMM Consensus problem. In the first of these, corresponding more closely to the original Multi-Agent Consensus Equilibrium approach, the solver object initialisation would be
+
+```python
+b = PPPConsensus(img.shape, (proxf, proxg), opt=opt)
+```
+
+The second form, below, is used in this example because it exhibits substantially faster convergence for this problem.
 """
 
-b = PPP(img.shape, f, proxf, proxg, opt=opt)
+b = PPPConsensus(img.shape, (proxf,), proxg=proxg, opt=opt)
 imgp = b.solve()
 
 
@@ -156,9 +158,9 @@ imgp = b.solve()
 Display solve time and demosaicing performance.
 """
 
-print("PPP ADMM solve time:        %5.2f s" % b.timer.elapsed('solve'))
-print("Baseline demosaicing PSNR:  %5.2f dB" % metric.psnr(img, imgb))
-print("PPP demosaicing PSNR:       %5.2f dB" % metric.psnr(img, imgp))
+print("PPP ADMM Consensus solve time: %5.2f s" % b.timer.elapsed('solve'))
+print("Baseline demosaicing PSNR:     %5.2f dB" % metric.psnr(img, imgb))
+print("PPP demosaicing PSNR:          %5.2f dB" % metric.psnr(img, imgp))
 
 
 """

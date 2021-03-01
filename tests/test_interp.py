@@ -36,6 +36,27 @@ class TestSet01(object):
 
 
     def test_03(self):
+        y = interp.lanczos_kernel(np.array([-0.5, 0.0, 0.5, 1.0]), a=2)
+        assert np.abs(y[0] - y[2]) < 1e-16
+        assert np.abs(y[1] - 1.0) < 1e-16
+        assert np.abs(y[3]) < 1e-16
+
+
+    def test_04(self):
+        y = interp.lanczos_filters(4, a=2)
+        assert y.shape == (5, 4)
+
+
+    def test_05(self):
+        y = interp.lanczos_filters((3, 4))
+        assert y.shape == (7, 7, 12)
+        y = interp.lanczos_filters((3, 4), collapse_axes=False)
+        assert y.shape == (7, 7, 3, 4)
+        y = interp.lanczos_filters((2, (0.1, 0.2, 0.3)))
+        assert y.shape == (7, 7, 6)
+
+
+    def test_06(self):
         x = np.random.randn(9, 8)
         y = interp.bilinear_demosaic(x)
         assert np.array_equal(x[1::2, 1::2], y[1::2, 1::2, 0])

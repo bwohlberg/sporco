@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2017-2019 by Cristina Garcia-Cardona <cgarciac@lanl.gov>
+# Copyright (C) 2017-2021 by Cristina Garcia-Cardona <cgarciac@lanl.gov>
 #                            Brendt Wohlberg <brendt@ieee.org>
 # All rights reserved. BSD 3-clause License.
 # This file is part of the SPORCO package. Details of the copyright
@@ -144,10 +144,10 @@ def grid_search(fn, grid, comm=None, mpidtype=None, fmin=True):
         # Number of processes to collect from
         sizeW = comm.Get_size()
         # Vector to collect the sizes from each process
-        sizes = np.zeros(sizeW, dtype=np.int)
+        sizes = np.zeros(sizeW, dtype=int)
         comm.Allgather([sizeL, MPI.INT], [sizes, MPI.INT])
         # Vector to collect the offsets for each process
-        offsets = np.zeros(sizeW, dtype=np.int)
+        offsets = np.zeros(sizeW, dtype=int)
         offsets[1:] = np.cumsum(sizes)[:-1]
         # Collecting variable size of vector return values
         comm.Allgatherv(rankfval, [fval, sizes, offsets, mpidtype])

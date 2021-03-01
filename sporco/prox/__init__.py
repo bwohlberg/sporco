@@ -59,11 +59,13 @@ __author__ = """Brendt Wohlberg <brendt@ieee.org>"""
 
 from ._util import *
 from ._lp import *
+from ._dl1l2 import *
 from ._l1proj import *
 from ._l21 import *
 from ._nuclear import *
 
 __all__ = ['ndto2d', 'ndfrom2d', 'norm_l0', 'prox_l0', 'norm_l1',
            'prox_l1', 'proj_l1', 'norm_2l2', 'norm_l2', 'norm_l21',
-           'prox_l2', 'proj_l2', 'prox_sl1l2', 'norm_nuclear',
+           'prox_l2', 'proj_l2', 'norm_dl1l2', 'prox_dl1l2',
+           'prox_sl1l2', 'norm_nuclear',
            'prox_nuclear']

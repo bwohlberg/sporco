@@ -86,9 +86,13 @@ def grid_search(fn, grd, fmin=True, nproc=None):
     identified. If the function returns a tuple of values, each of
     these is taken to define a separate function on the search grid,
     with optimum function values and corresponding parameter values
-    being identified for each of them. On all platforms except Windows
-    (where ``mp.Pool`` usage has some limitations), the computation
-    of the function at the grid points is computed in parallel.
+    being identified for each of them. On Unix platforms the computation
+    of the function at the grid points is computed in parallel. The
+    computation is serial on Windows (where ``mp.Pool`` usage has some
+    limitations) and MacOS (where parallel computation is no longer
+    supported due to a recent
+    `change <https://docs.python.org/3/library/multiprocessing.html#contexts-and-start-methods>`_
+    of the default process start method from `fork` to `spawn`).
 
     **Warning:** This function will hang if `fn` makes use of
     :mod:`pyfftw` with multi-threading enabled (the
@@ -137,7 +141,8 @@ def grid_search(fn, grd, fmin=True, nproc=None):
     else:
         slct = np.nanargmax
     fprm = itertools.product(*grd)
-    if platform.system() == 'Windows':
+    osname = platform.system()
+    if osname == 'Windows' or osname == 'Darwin':
         fval = list(map(fn, fprm))
     else:
         if nproc is None:

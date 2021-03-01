@@ -3,6 +3,8 @@ from builtins import object
 
 import numpy as np
 import pytest
+import platform
+
 from sporco import linalg
 from sporco.signal import complex_randn
 from sporco.metric import mse
@@ -239,6 +241,8 @@ class TestSet01(object):
         assert linalg.rrs(XHop(Xop(Dslv)) + rho*Dslv, XHop(S) + rho*Z) < 1e-11
 
 
+    @pytest.mark.skipif(platform.system() == 'Windows',
+                        reason='Feature not supported under Windows')
     def test_15(self):
         rho = 1e-1
         N = 32
@@ -255,6 +259,8 @@ class TestSet01(object):
         assert linalg.rrs(XHop(Xop(Dslv)) + rho*Dslv, XHop(S) + rho*Z) <= 1e-6
 
 
+    @pytest.mark.skipif(platform.system() == 'Windows',
+                        reason='Feature not supported under Windows')
     def test_16(self):
         rho = 1e-1
         N = 64
