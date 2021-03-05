@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2015-2020 by Brendt Wohlberg <brendt@ieee.org>
+# Copyright (C) 2015-2021 by Brendt Wohlberg <brendt@ieee.org>
 # All rights reserved. BSD 3-clause License.
 # This file is part of the SPORCO package. Details of the copyright
 # and user license can be found in the 'LICENSE.txt' file distributed
@@ -582,7 +582,7 @@ class ConvBPDN(GenericConvBPDN):
 
         # Set penalty parameter
         self.set_attr('rho', opt['rho'], dval=(50.0 * self.lmbda + 1.0),
-                      dtype=real_dtype(self.dtype))
+                      dtype=real_dtype(self.dtype), reset=True)
 
         # Set rho_xi attribute (see Sec. VI.C of wohlberg-2015-adaptive)
         if self.lmbda != 0.0:
@@ -590,7 +590,7 @@ class ConvBPDN(GenericConvBPDN):
         else:
             rho_xi = 1.0
         self.set_attr('rho_xi', opt['AutoRho', 'RsdlTarget'], dval=rho_xi,
-                      dtype=real_dtype(self.dtype))
+                      dtype=real_dtype(self.dtype), reset=True)
 
         # Set l1 term weight array
         self.wl1 = np.asarray(opt['L1Weight'], dtype=real_dtype(self.dtype))
