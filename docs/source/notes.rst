@@ -1,6 +1,10 @@
 Notes
 =====
 
+* Many of the inverse problem solver modules only support problems
+  involving real-valued arrays. Modules :mod:`.admm.cbpdn`,
+  :mod:`.admm.ccmod`, :mod:`.admm.tvl1`, and :mod:`.admm.tvl2` also
+  support complex-valued arrays.
 * Some of the classes derived from :class:`.admm.ADMM` have a
   relatively complicated inheritance structure, designed to allow
   classes for solving new problems to be written with minimal
