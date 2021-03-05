@@ -280,6 +280,38 @@ def _fftconv(a, b, axes=(0, 1)):
     return ifft(af * bf, dims, axes)
 
 
+def _empty_aligned_func(real=False):
+    """Patched version of :func:`sporco.fft.empty_aligned_func`.
+    """
+
+    if real:
+        return _rfftn_empty_aligned
+    else:
+        def empty_aligned_wrapper(shape, axes, dtype, order='C', n=None):
+            return _empty_aligned(shape, dtype, order=order, n=n)
+        return empty_aligned_wrapper
+
+
+def _fftn_func(real=False):
+    """Patched version of :func:`sporco.fft.fftn_func`.
+    """
+
+    if real:
+        return cp.fft.rfftn
+    else:
+        return cp.fft.fftn
+
+
+def _ifftn_func(real=False):
+    """Patched version of :func:`sporco.fft.ifftn_func`.
+    """
+
+    if real:
+        return cp.fft.irfftn
+    else:
+        return cp.fft.ifftn
+
+
 # Construct sporco.cupy.fft
 fft = sporco_cupy_patch_module('sporco.fft',
     {'complex_dtype': _complex_dtype, 'fftn': cp.fft.fftn,
@@ -287,7 +319,8 @@ fft = sporco_cupy_patch_module('sporco.fft',
      'irfftn': cp.fft.irfftn, 'byte_aligned': _byte_aligned,
      'empty_aligned': _empty_aligned,
      'rfftn_empty_aligned': _rfftn_empty_aligned,
-     'fftconv': _fftconv})
+     'fftconv': _fftconv, 'empty_aligned_func': _empty_aligned_func,
+     'fftn_func': _fftn_func, 'ifftn_func': _ifftn_func})
 
 
 def _inner(x, y, axis=-1):
@@ -368,7 +401,9 @@ metric = sporco_cupy_patch_module('sporco.metric')
 
 # Construct sporco.cupy.util
 signal = sporco_cupy_patch_module('sporco.signal',
-            {'rfftn': fft.rfftn, 'irfftn': fft.rfftn, 'fftconv': fft.fftconv})
+            {'fftn': fft.fftn, 'ifftn': fft.ifftn,
+             'rfftn': fft.rfftn, 'irfftn': fft.irfftn,
+             'fftconv': fft.fftconv})
 
 
 # Construct sporco.cupy.util

@@ -17,6 +17,7 @@ from sporco import cdict
 from sporco import util
 from sporco.util import u
 from sporco.array import transpose_ntpl_list
+from sporco.fft import real_dtype
 from sporco import common
 
 
@@ -242,14 +243,15 @@ class ADMM(common.IterativeSolver):
 
         # Initialise attributes representing penalty parameter and other
         # parameters
-        self.set_attr('rho', opt['rho'], dval=1.0, dtype=self.dtype)
+        rdt = real_dtype(self.dtype)
+        self.set_attr('rho', opt['rho'], dval=1.0, dtype=rdt)
         self.set_attr('rho_tau', opt['AutoRho', 'Scaling'], dval=2.0,
-                      dtype=self.dtype)
+                      dtype=rdt)
         self.set_attr('rho_mu', opt['AutoRho', 'RsdlRatio'], dval=10.0,
-                      dtype=self.dtype)
+                      dtype=rdt)
         self.set_attr('rho_xi', opt['AutoRho', 'RsdlTarget'], dval=1.0,
-                      dtype=self.dtype)
-        self.set_attr('rlx', opt['RelaxParam'], dval=1.0, dtype=self.dtype)
+                      dtype=rdt)
+        self.set_attr('rlx', opt['RelaxParam'], dval=1.0, dtype=rdt)
 
 
         # Initialise working variable X
@@ -567,7 +569,7 @@ class ADMM(common.IterativeSolver):
                     rsf = rhomlt
                 elif s > (mu / xi) * r:
                     rsf = 1.0 / rhomlt
-                self.rho *= self.dtype.type(rsf)
+                self.rho *= real_dtype(self.dtype).type(rsf)
                 self.U /= rsf
                 if rsf != 1.0:
                     self.rhochange()

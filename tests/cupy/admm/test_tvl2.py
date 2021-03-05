@@ -23,6 +23,7 @@ class TestSet01(object):
     def setup_method(self, method):
         cp.random.seed(12345)
         self.D = cp.random.randn(16, 15)
+        self.Dc = cp.random.randn(16, 15) + 1j * cp.random.randn(16, 15)
 
 
     def test_01(self):
@@ -35,10 +36,30 @@ class TestSet01(object):
             assert 0
 
 
+    def test_01cplx(self):
+        lmbda = 3
+        try:
+            b = tvl2.TVL2Denoise(self.Dc, lmbda)
+            b.solve()
+        except Exception as e:
+            print(e)
+            assert 0
+
+
     def test_02(self):
         lmbda = 3
         try:
             b = tvl2.TVL2Deconv(cp.ones((1, 1)), self.D, lmbda)
+            b.solve()
+        except Exception as e:
+            print(e)
+            assert 0
+
+
+    def test_02cplx(self):
+        lmbda = 3
+        try:
+            b = tvl2.TVL2Deconv(cp.ones((1, 1)), self.Dc, lmbda)
             b.solve()
         except Exception as e:
             print(e)

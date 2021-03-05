@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2015-2018 by Brendt Wohlberg <brendt@ieee.org>
+# Copyright (C) 2015-2020 by Brendt Wohlberg <brendt@ieee.org>
 # All rights reserved. BSD 3-clause License.
 # This file is part of the SPORCO package. Details of the copyright
 # and user license can be found in the 'LICENSE.txt' file distributed
@@ -17,8 +17,8 @@ from sporco.admm import admm
 import sporco.cnvrep as cr
 import sporco.linalg as sl
 from sporco.common import _fix_dynamic_class_lookup
-from sporco.fft import rfftn, irfftn, empty_aligned, rfftn_empty_aligned
-from sporco.fft import rfl2norm2
+from sporco.fft import (empty_aligned, real_dtype, empty_aligned_func,
+                        fftn_func, ifftn_func, fl2norm2_func)
 
 __author__ = """Brendt Wohlberg <brendt@ieee.org>"""
 
@@ -245,6 +245,15 @@ class ConvCnstrMODBase(admm.ADMMEqual):
         if opt is None:
             opt = ConvCnstrMODBase.Options()
 
+        # Set flag indicating whether problem involves real or complex
+        # values, and get appropriate versions of functions from fft
+        # module
+        self.real_dtype = np.isrealobj(Z) and np.isrealobj(S)
+        self.empty_aligned = empty_aligned_func(self.real_dtype)
+        self.fftn = fftn_func(self.real_dtype)
+        self.ifftn = ifftn_func(self.real_dtype)
+        self.fl2norm2 = fl2norm2_func(self.real_dtype)
+
         # Infer problem dimensions and set relevant attributes of self
         self.cri = cr.CDU_ConvRepIndexing(dsz, S, dimK=dimK, dimN=dimN)
 
@@ -252,7 +261,8 @@ class ConvCnstrMODBase(admm.ADMMEqual):
         super(ConvCnstrMODBase, self).__init__(self.cri.shpD, S.dtype, opt)
 
         # Set penalty parameter
-        self.set_attr('rho', opt['rho'], dval=self.cri.K, dtype=self.dtype)
+        self.set_attr('rho', opt['rho'], dval=self.cri.K,
+                      dtype=real_dtype(self.dtype))
 
         # Reshape S to standard layout (Z, i.e. X in cbpdn, is assumed
         # to be taken from cbpdn, and therefore already in standard
@@ -270,7 +280,7 @@ class ConvCnstrMODBase(admm.ADMMEqual):
         self.S = np.asarray(self.S, dtype=self.dtype)
 
         # Compute signal S in DFT domain
-        self.Sf = rfftn(self.S, None, self.cri.axisN)
+        self.Sf = self.fftn(self.S, None, self.cri.axisN)
 
         # Create constraint set projection function
         self.Pcn = cr.getPcn(dsz, self.cri.Nv, self.cri.dimN, self.cri.dimCd,
@@ -278,8 +288,7 @@ class ConvCnstrMODBase(admm.ADMMEqual):
 
         # Create byte aligned arrays for FFT calls
         self.YU = empty_aligned(self.Y.shape, dtype=self.dtype)
-        self.Xf = rfftn_empty_aligned(self.Y.shape, self.cri.axisN,
-                                      self.dtype)
+        self.Xf = self.empty_aligned(self.Y.shape, self.cri.axisN, self.dtype)
 
         if Z is not None:
             self.setcoef(Z)
@@ -313,7 +322,7 @@ class ConvCnstrMODBase(admm.ADMMEqual):
                           (self.cri.M,))
         self.Z = np.asarray(Z, dtype=self.dtype)
 
-        self.Zf = rfftn(self.Z, self.cri.Nv, self.cri.axisN)
+        self.Zf = self.fftn(self.Z, self.cri.Nv, self.cri.axisN)
         # Compute X^H S
         self.ZSf = sl.inner(np.conj(self.Zf), self.Sf, self.cri.axisK)
 
@@ -364,7 +373,7 @@ class ConvCnstrMODBase(admm.ADMMEqual):
         """
 
         return self.Xf if self.opt['fEvalX'] else \
-            rfftn(self.Y, None, self.cri.axisN)
+            self.fftn(self.Y, None, self.cri.axisN)
 
 
 
@@ -386,7 +395,7 @@ class ConvCnstrMODBase(admm.ADMMEqual):
 
         Ef = sl.inner(self.Zf, self.obfn_fvarf(), axis=self.cri.axisM) - \
           self.Sf
-        return rfl2norm2(Ef, self.S.shape, axis=self.cri.axisN) / 2.0
+        return self.fl2norm2(Ef, self.S.shape, axis=self.cri.axisN) / 2.0
 
 
 
@@ -412,10 +421,10 @@ class ConvCnstrMODBase(admm.ADMMEqual):
         if D is None:
             Df = self.Xf
         else:
-            Df = rfftn(D, None, self.cri.axisN)
+            Df = self.fftn(D, None, self.cri.axisN)
 
         Sf = np.sum(self.Zf * Df, axis=self.cri.axisM)
-        return irfftn(Sf, self.cri.Nv, self.cri.axisN)
+        return self.ifftn(Sf, self.cri.Nv, self.cri.axisN)
 
 
 
@@ -489,10 +498,10 @@ class ConvCnstrMOD_IterSM(ConvCnstrMODBase):
         """
 
         self.YU[:] = self.Y - self.U
-        b = self.ZSf + self.rho*rfftn(self.YU, None, self.cri.axisN)
+        b = self.ZSf + self.rho*self.fftn(self.YU, None, self.cri.axisN)
         self.Xf[:] = sl.solvemdbi_ism(self.Zf, self.rho, b, self.cri.axisM,
                                       self.cri.axisK)
-        self.X = irfftn(self.Xf, self.cri.Nv, self.cri.axisN)
+        self.X = self.ifftn(self.Xf, self.cri.Nv, self.cri.axisN)
         self.xstep_check(b)
 
 
@@ -581,13 +590,13 @@ class ConvCnstrMOD_CG(ConvCnstrMODBase):
 
         self.cgit = None
         self.YU[:] = self.Y - self.U
-        b = self.ZSf + self.rho*rfftn(self.YU, None, self.cri.axisN)
+        b = self.ZSf + self.rho*self.fftn(self.YU, None, self.cri.axisN)
         self.Xf[:], cgit = sl.solvemdbi_cg(self.Zf, self.rho, b,
                                            self.cri.axisM, self.cri.axisK,
                                            self.opt['CG', 'StopTol'],
                                            self.opt['CG', 'MaxIter'], self.Xf)
         self.cgit = cgit
-        self.X = irfftn(self.Xf, self.cri.Nv, self.cri.axisN)
+        self.X = self.ifftn(self.Xf, self.cri.Nv, self.cri.axisN)
         self.xstep_check(b)
 
 
@@ -670,6 +679,15 @@ class ConvCnstrMOD_Consensus(admm.ADMMConsensus):
         if opt is None:
             opt = ConvCnstrMOD_Consensus.Options()
 
+        # Set flag indicating whether problem involves real or complex
+        # values, and get appropriate versions of functions from fft
+        # module
+        self.real_dtype = np.isrealobj(Z) and np.isrealobj(S)
+        self.empty_aligned = empty_aligned_func(self.real_dtype)
+        self.fftn = fftn_func(self.real_dtype)
+        self.ifftn = ifftn_func(self.real_dtype)
+        self.fl2norm2 = fl2norm2_func(self.real_dtype)
+
         # Infer problem dimensions and set relevant attributes of self
         self.cri = cr.CDU_ConvRepIndexing(dsz, S, dimK=dimK, dimN=dimN)
 
@@ -680,7 +698,8 @@ class ConvCnstrMOD_Consensus(admm.ADMMConsensus):
         admm.ADMMConsensus.__init__(self, Nb, self.cri.shpD, S.dtype, opt)
 
         # Set penalty parameter
-        self.set_attr('rho', opt['rho'], dval=self.cri.K, dtype=self.dtype)
+        self.set_attr('rho', opt['rho'], dval=self.cri.K,
+                      dtype=real_dtype(self.dtype))
 
         # Reshape S to standard layout (Z, i.e. X in cbpdn, is assumed
         # to be taken from cbpdn, and therefore already in standard
@@ -698,7 +717,7 @@ class ConvCnstrMOD_Consensus(admm.ADMMConsensus):
         self.S = np.asarray(self.S, dtype=self.dtype)
 
         # Compute signal S in DFT domain
-        self.Sf = rfftn(self.S, None, self.cri.axisN)
+        self.Sf = self.fftn(self.S, None, self.cri.axisN)
 
         # Create constraint set projection function
         self.Pcn = cr.getPcn(dsz, self.cri.Nv, self.cri.dimN, self.cri.dimCd,
@@ -713,8 +732,7 @@ class ConvCnstrMOD_Consensus(admm.ADMMConsensus):
             self.YU = empty_aligned(self.yshape, dtype=self.dtype)
         else:
             self.YU = empty_aligned(self.xshape, dtype=self.dtype)
-        self.Xf = rfftn_empty_aligned(self.xshape, self.cri.axisN,
-                                      self.dtype)
+        self.Xf = self.empty_aligned(self.xshape, self.cri.axisN, self.dtype)
 
 
 
@@ -746,7 +764,7 @@ class ConvCnstrMOD_Consensus(admm.ADMMConsensus):
                           (self.cri.M,))
         self.Z = np.asarray(Z, dtype=self.dtype)
 
-        self.Zf = rfftn(self.Z, self.cri.Nv, self.cri.axisN)
+        self.Zf = self.fftn(self.Z, self.cri.Nv, self.cri.axisN)
         # Compute X^H S
         self.ZSf = np.conj(self.Zf) * self.Sf
 
@@ -781,18 +799,18 @@ class ConvCnstrMOD_Consensus(admm.ADMMConsensus):
         else:
             self.YU[:] = self.Y[..., np.newaxis] - self.U
             b = np.swapaxes(self.ZSf[..., np.newaxis], self.cri.axisK, -1) \
-                + self.rho*rfftn(self.YU, None, self.cri.axisN)
+                + self.rho*self.fftn(self.YU, None, self.cri.axisN)
             for i in range(self.Nb):
                 self.Xf[..., i] = sl.solvedbi_sm(
                     self.Zf[..., [i], :], self.rho, b[..., i],
                     axis=self.cri.axisM)
-            self.X = irfftn(self.Xf, self.cri.Nv, self.cri.axisN)
+            self.X = self.ifftn(self.Xf, self.cri.Nv, self.cri.axisN)
 
 
         if self.opt['LinSolveCheck']:
             ZSfs = np.sum(self.ZSf, axis=self.cri.axisK, keepdims=True)
             YU = np.sum(self.Y[..., np.newaxis] - self.U, axis=-1)
-            b = ZSfs + self.rho*rfftn(YU, None, self.cri.axisN)
+            b = ZSfs + self.rho*self.fftn(YU, None, self.cri.axisN)
             Xf = self.swapaxes(self.Xf)
             Zop = lambda x: sl.inner(self.Zf, x, axis=self.cri.axisM)
             ZHop = lambda x: np.conj(self.Zf) * x
@@ -811,13 +829,13 @@ class ConvCnstrMOD_Consensus(admm.ADMMConsensus):
 
         self.YU[:] = self.Y - self.U[..., i]
         b = np.take(self.ZSf, [i], axis=self.cri.axisK) + \
-            self.rho*rfftn(self.YU, None, self.cri.axisN)
+            self.rho*self.fftn(self.YU, None, self.cri.axisN)
 
         self.Xf[..., i] = sl.solvedbi_sm(np.take(
             self.Zf, [i], axis=self.cri.axisK),
                                          self.rho, b, axis=self.cri.axisM)
-        self.X[..., i] = irfftn(self.Xf[..., i], self.cri.Nv,
-                                self.cri.axisN)
+        self.X[..., i] = self.ifftn(self.Xf[..., i], self.cri.Nv,
+                                    self.cri.axisN)
 
 
 
@@ -859,7 +877,7 @@ class ConvCnstrMOD_Consensus(admm.ADMMConsensus):
         if self.opt['fEvalX']:
             return self.swapaxes(self.Xf)
         else:
-            return rfftn(self.Y, None, self.cri.axisN)
+            return self.fftn(self.Y, None, self.cri.axisN)
 
 
 
@@ -870,7 +888,7 @@ class ConvCnstrMOD_Consensus(admm.ADMMConsensus):
 
         Ef = sl.inner(self.Zf, self.obfn_fvarf(), axis=self.cri.axisM) \
           - self.Sf
-        return rfl2norm2(Ef, self.S.shape, axis=self.cri.axisN) / 2.0
+        return self.fl2norm2(Ef, self.S.shape, axis=self.cri.axisN) / 2.0
 
 
 

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2015-2019 by Brendt Wohlberg <brendt@ieee.org>
+# Copyright (C) 2015-2020 by Brendt Wohlberg <brendt@ieee.org>
 # All rights reserved. BSD 3-clause License.
 # This file is part of the SPORCO package. Details of the copyright
 # and user license can be found in the 'LICENSE.txt' file distributed
@@ -171,12 +171,16 @@ def prox_l1(v, alpha):
       Output array
     """
 
-    if have_numexpr:
-        return ne.evaluate(
-            'where(abs(v)-alpha > 0, where(v >= 0, 1, -1) * (abs(v)-alpha), 0)'
-        )
+    if np.isrealobj(v):
+        if have_numexpr:
+            return ne.evaluate(
+                'where(abs(v)-alpha > 0, where(v >= 0, 1, -1) * '
+                '(abs(v)-alpha), 0)'
+            )
+        else:
+            return np.sign(v) * (np.clip(np.abs(v) - alpha, 0, float('Inf')))
     else:
-        return np.sign(v) * (np.clip(np.abs(v) - alpha, 0, float('Inf')))
+        return (v / np.abs(v)) * (np.clip(np.abs(v) - alpha, 0, float('Inf')))
 
 
 
@@ -205,7 +209,10 @@ def norm_2l2(x, axis=None):
       as a vector
     """
 
-    nl2 = np.sum(x**2, axis=axis, keepdims=True)
+    if np.isrealobj(x):
+        nl2 = np.sum(x**2, axis=axis, keepdims=True)
+    else:
+        nl2 = np.sum(np.abs(x)**2, axis=axis, keepdims=True)
     # If the result has a single element, convert it to a scalar
     if nl2.size == 1:
         nl2 = nl2.ravel()[0]
@@ -274,7 +281,10 @@ def prox_l2(v, alpha, axis=None):
       Output array
     """
 
-    a = np.sqrt(np.sum(v**2, axis=axis, keepdims=True))
+    if np.isrealobj(v):
+        a = np.sqrt(np.sum(v**2, axis=axis, keepdims=True))
+    else:
+        a = np.sqrt(np.sum(np.abs(v)**2, axis=axis, keepdims=True))
     b = np.maximum(0, a - alpha)
     b = zdivide(b, a)
     return np.asarray(b * v, dtype=v.dtype)
@@ -321,7 +331,10 @@ def proj_l2(v, gamma, axis=None):
       Output array
     """
 
-    d = np.sqrt(np.sum(v**2, axis=axis, keepdims=True))
+    if np.isrealobj(v):
+        d = np.sqrt(np.sum(v**2, axis=axis, keepdims=True))
+    else:
+        d = np.sqrt(np.sum(np.abs(v)**2, axis=axis, keepdims=True))
     return np.asarray((d <= gamma) * v +
                       (d > gamma) * (gamma * zdivide(v, d)),
                       dtype=v.dtype)

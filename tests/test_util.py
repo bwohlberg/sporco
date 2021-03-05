@@ -30,6 +30,10 @@ def fnv(prm):
 
 class TestSet01(object):
 
+    def setup_method(self, method):
+        np.random.seed(12345)
+
+
     def test_03(self):
         D = np.random.randn(64, 64)
         im = util.tiledict(D, sz=(8, 8))

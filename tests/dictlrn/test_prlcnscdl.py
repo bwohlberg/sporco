@@ -18,6 +18,8 @@ class TestSet01(object):
         K = 3
         self.D0 = np.random.randn(Nd, Nd, M)
         self.S = np.random.randn(N, N, K)
+        self.D0c = np.random.randn(Nd, Nd, M) + 1j * np.random.randn(Nd, Nd, M)
+        self.Sc = np.random.randn(N, N, K) + 1j * np.random.randn(N, N, K)
 
 
     def test_01(self):
@@ -40,7 +42,22 @@ class TestSet01(object):
         try:
             b = prlcnscdl.ConvBPDNDictLearn_Consensus(self.D0, self.S, lmbda,
                                                       opt=opt, nproc=2)
-            b.solve()
+            D = b.solve()
+            assert np.isrealobj(D)
+        except Exception as e:
+            print(e)
+            assert 0
+
+
+    def test_02cplx(self):
+        lmbda = 1e-1
+        opt = prlcnscdl.ConvBPDNDictLearn_Consensus.Options(
+            {'MaxMainIter': 10})
+        try:
+            b = prlcnscdl.ConvBPDNDictLearn_Consensus(self.D0c, self.Sc, lmbda,
+                                                      opt=opt, nproc=2)
+            D = b.solve()
+            assert np.iscomplexobj(D)
         except Exception as e:
             print(e)
             assert 0
