@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2019 by Brendt Wohlberg <brendt@ieee.org>
+# Copyright (C) 2019-2021 by Brendt Wohlberg <brendt@ieee.org>
 # All rights reserved. BSD 3-clause License.
 # This file is part of the SPORCO package. Details of the copyright
 # and user license can be found in the 'LICENSE.txt' file distributed
@@ -103,7 +103,8 @@ def lstabsdev(A, b):
     problem, but with a least squares rather than a least absolute
     deviations objective. Unlike :func:`numpy.linalg.lstsq`, `b` is
     required to be a 1-d array. The solution is obtained via `mapping to
-    a linear program <https://stats.stackexchange.com/a/12564>`__.
+    a linear program <https://stats.stackexchange.com/a/12564>`__. The
+    current implementation is only suitable for small-scale problems.
 
     Parameters
     ----------
@@ -126,7 +127,7 @@ def lstabsdev(A, b):
     b_ub = np.hstack((-b, b))
     with warnings.catch_warnings():
         warnings.filterwarnings("ignore", category=sco.OptimizeWarning)
-        res = sco.linprog(c, A_ub, b_ub)
+        res = sco.linprog(c, A_ub, b_ub, bounds=(None, None), method='highs')
     if res.success is False:
         raise ValueError('scipy.optimize.linprog failed with status %d' %
                          res.status)
@@ -149,7 +150,8 @@ def lstmaxdev(A, b):
     problem, but with a least squares rather than a least maximum
     error objective. Unlike :func:`numpy.linalg.lstsq`, `b` is required
     to be a 1-d array. The solution is obtained via `mapping to a linear
-    program <https://stats.stackexchange.com/a/12564>`__.
+    program <https://stats.stackexchange.com/a/12564>`__. The
+    current implementation is only suitable for small-scale problems.
 
     Parameters
     ----------
@@ -172,7 +174,7 @@ def lstmaxdev(A, b):
     b_ub = np.hstack((-b, b))
     with warnings.catch_warnings():
         warnings.filterwarnings("ignore", category=sco.OptimizeWarning)
-        res = sco.linprog(c, A_ub, b_ub)
+        res = sco.linprog(c, A_ub, b_ub, bounds=(None, None), method='highs')
     if res.success is False:
         raise ValueError('scipy.optimize.linprog failed with status %d' %
                          res.status)
