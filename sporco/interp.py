@@ -12,6 +12,7 @@ from builtins import range
 
 import warnings
 import numpy as np
+import scipy
 import scipy.optimize as sco
 from scipy.interpolate import interp2d, griddata
 
@@ -88,6 +89,19 @@ def bilinear_demosaic(img):
 
 
 
+# Deal with introduction of new method option for scipy.optimize.linprog
+# in SciPy 1.6.0
+_spv = scipy.__version__.split('.')
+if int(_spv[0]) > 1 or (int(_spv[0]) == 1 and int(_spv[1]) >= 6):
+    def _linprog(*args, **kwargs):
+        kwargs['method'] = 'highs'
+        return sco.linprog(*args, **kwargs)
+else:
+    def _linprog(*args, **kwargs):
+        return sco.linprog(*args, **kwargs)
+
+
+
 @renamed_function(depname='lstabsdev', depmod='sporco.util')
 def lstabsdev(A, b):
     r"""Least absolute deviations (LAD) linear regression.
@@ -127,7 +141,7 @@ def lstabsdev(A, b):
     b_ub = np.hstack((-b, b))
     with warnings.catch_warnings():
         warnings.filterwarnings("ignore", category=sco.OptimizeWarning)
-        res = sco.linprog(c, A_ub, b_ub, bounds=(None, None), method='highs')
+        res = _linprog(c, A_ub, b_ub, bounds=(None, None))
     if res.success is False:
         raise ValueError('scipy.optimize.linprog failed with status %d' %
                          res.status)
@@ -174,7 +188,7 @@ def lstmaxdev(A, b):
     b_ub = np.hstack((-b, b))
     with warnings.catch_warnings():
         warnings.filterwarnings("ignore", category=sco.OptimizeWarning)
-        res = sco.linprog(c, A_ub, b_ub, bounds=(None, None), method='highs')
+        res = _linprog(c, A_ub, b_ub, bounds=(None, None))
     if res.success is False:
         raise ValueError('scipy.optimize.linprog failed with status %d' %
                          res.status)
