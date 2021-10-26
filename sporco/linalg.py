@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2015-2020 by Brendt Wohlberg <brendt@ieee.org>
+# Copyright (C) 2015-2021 by Brendt Wohlberg <brendt@ieee.org>
 # All rights reserved. BSD 3-clause License.
 # This file is part of the SPORCO package. Details of the copyright
 # and user license can be found in the 'LICENSE.txt' file distributed
@@ -152,7 +152,7 @@ def valid_adjoint(A, AT, Ashape, ATshape, eps=1e-7):
     the identity
 
     .. math::
-      \mathbf{y}^T (A \mathbf{x}) = (\mathbf{y}^T (A) \mathbf{x} =
+      \mathbf{y}^T (A \mathbf{x}) = (\mathbf{y}^T A) \mathbf{x} =
       (A^T \mathbf{y})^T \mathbf{x}
 
     by computing :math:`\mathbf{u} = A \mathbf{x}` and
