@@ -91,7 +91,7 @@ mu = 2.7e-1
 
 opt = cbpdn.ConvBPDNJoint.Options({'Verbose': True, 'MaxMainIter': 250,
             'HighMemSolve': True, 'RelStopTol': 3e-3, 'AuxVarObj': False,
-            'L1Weight': cp2np(W), 'AutoRho': {'Enabled': False},
+            'L1Weight': np2cp(W), 'AutoRho': {'Enabled': False},
             'rho': 1e3*lmbda})
 
 
