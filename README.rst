@@ -27,7 +27,7 @@ SParse Optimization Research COde (SPORCO)
 .. image:: https://badge.fury.io/py/sporco.svg
     :target: https://badge.fury.io/py/sporco
     :alt: PyPi Release
-.. image:: https://static.pepy.tech/personalized-badge/sporco?period=total&left_color=black&right_color=green&left_text=downloads
+.. image:: https://static.pepy.tech/personalized-badge/sporco?period=total&left_color=grey&right_color=green&left_text=downloads
     :target: https://pepy.tech/project/sporco
     :alt: PyPi Downloads
 
