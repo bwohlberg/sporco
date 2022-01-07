@@ -43,8 +43,8 @@ class ConvBPDNInhib(cbpdn.ConvBPDN):
        \mathrm{argmin}_\mathbf{x} \;
        (1/2) \left\| \sum_m \mathbf{d}_m * \mathbf{x}_m -
        \mathbf{s} \right\|_2^2 + \lambda \sum_m \| \mathbf{x}_m \|_1
-       + \mu \sum_m \mathbf{\omega}^T_m \| \mathbf{x}_m \| +
-       \gamma \sum_m \mathbf{z}^T_m \| \mathbf{x}_m \|
+       + \mu \sum_m \boldsymbol{\omega}^T_m | \mathbf{x}_m | +
+       \gamma \sum_m \mathbf{z}^T_m | \mathbf{x}_m |
 
     for input image :math:`\mathbf{s}`, dictionary filters
     :math:`\mathbf{d}_m`, and coefficient maps :math:`\mathbf{x}_m`,
@@ -54,13 +54,13 @@ class ConvBPDNInhib(cbpdn.ConvBPDN):
        \mathrm{argmin}_{\mathbf{x}, \mathbf{y}} \;
        (1/2) \left\| \sum_m \mathbf{d}_m * \mathbf{x}_m -
        \mathbf{s} \right\|_2^2 + \lambda \sum_m \| \mathbf{y}_m \|_1 +
-       \mu \sum_m \mathbf{\omega}^T_m \| \mathbf{y}_m \| +
-       \gamma \sum_m \mathbf{z}^T_m \| \mathbf{y}_m \|
+       \mu \sum_m \mathbf{\omega}^T_m | \mathbf{y}_m | +
+       \gamma \sum_m \mathbf{z}^T_m | \mathbf{y}_m |
        \quad \text{such that} \quad \mathbf{x}_m = \mathbf{y}_m \;\;.
 
-    Here, :math:`\mathbf{\omega}^T_m = \sum_n c_{m,n} (\| \mathbf{x}_n *
-    \mathbf{h} \|)^T` and :math:`\mathbf{z}^T_m = \sum_m (\| \mathbf{x}_m
-    * \mathbf{h}' \|)^T`, where :math:`c_{m,n}` is a square matrix with
+    Here, :math:`\boldsymbol{\omega}^T_m = \sum_n c_{m,n} (| \mathbf{x}_n *
+    \mathbf{h} |)^T` and :math:`\mathbf{z}^T_m = \sum_m (| \mathbf{x}_m
+    * \mathbf{h}' |)^T`, where :math:`c_{m,n}` is a square matrix with
     non-zero entries where elements :math:`m` and :math:`n` share the
     same group and :math:`m != n`, :math:`\mathbf{h}` is a spatial
     weighting matrix non-zero around the origin with radius
@@ -82,10 +82,10 @@ class ConvBPDNInhib(cbpdn.ConvBPDN):
        \mathbf{x}_m \|_1`
 
        ``RegLat`` : Value of regularisation term :math:`\sum_m
-       \mathbf{\omega}^T_m \| \mathbf{x}_m \|`
+       \boldsymbol{\omega}^T_m | \mathbf{x}_m |`
 
        ``RegSelf`` : Value of regularisation term :math:`\sum_m
-       \mathbf{z}^T_m \| \mathbf{x}_m \|`
+       \mathbf{z}^T_m | \mathbf{x}_m |`
 
        ``PrimalRsdl`` : Norm of primal residual
 
