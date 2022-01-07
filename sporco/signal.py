@@ -12,7 +12,6 @@ from builtins import range
 
 import numpy as np
 
-from sporco._util import renamed_function
 from sporco.fft import is_complex_dtype, fftn, ifftn, rfftn, irfftn, fftconv
 from sporco import array
 
@@ -21,7 +20,6 @@ __author__ = """Brendt Wohlberg <brendt@ieee.org>"""
 
 
 
-@renamed_function(depname='complex_randn', depmod='sporco.util')
 def complex_randn(*args):
     """Return a complex array of samples drawn from a standard normal
     distribution.
@@ -41,7 +39,6 @@ def complex_randn(*args):
 
 
 
-@renamed_function(depname='spnoise', depmod='sporco.util')
 def spnoise(s, frc, smn=0.0, smx=1.0):
     """Return image with salt & pepper noise imposed on it.
 
@@ -70,7 +67,6 @@ def spnoise(s, frc, smn=0.0, smx=1.0):
 
 
 
-@renamed_function(depname='rndmask', depmod='sporco.util')
 def rndmask(shp, frc, dtype=None):
     r"""Return random mask image with values in :math:`\{0,1\}`.
 
@@ -96,7 +92,6 @@ def rndmask(shp, frc, dtype=None):
 
 
 
-@renamed_function(depname='rgb2gray', depmod='sporco.util')
 def rgb2gray(rgb):
     """Convert an RGB image (or images) to grayscale.
 
@@ -117,7 +112,6 @@ def rgb2gray(rgb):
 
 
 
-@renamed_function(depname='grad', depmod='sporco.linalg')
 def grad(x, axis, zero_pad=False):
     r"""Compute gradient of `x` along axis `axis`.
 
@@ -175,7 +169,6 @@ def grad(x, axis, zero_pad=False):
 
 
 
-@renamed_function(depname='gradT', depmod='sporco.linalg')
 def gradT(x, axis, zero_pad=False):
     """Compute transpose of gradient of `x` along axis `axis`.
 
@@ -208,7 +201,6 @@ def gradT(x, axis, zero_pad=False):
 
 
 
-@renamed_function(depname='gradient_filters', depmod='sporco.linalg')
 def gradient_filters(ndim, axes, axshp, dtype=None):
     r"""Construct a set of filters for computing gradients in the
     frequency domain.
@@ -249,7 +241,6 @@ def gradient_filters(ndim, axes, axshp, dtype=None):
 
 
 
-@renamed_function(depname='tikhonov_filter', depmod='sporco.util')
 def tikhonov_filter(s, lmbda, npd=16):
     r"""Lowpass filter based on Tikhonov regularization.
 
@@ -311,7 +302,6 @@ def tikhonov_filter(s, lmbda, npd=16):
 
 
 
-@renamed_function(depname='gaussian', depmod='sporco.util')
 def gaussian(shape, sd=1.0):
     """Sample a multivariate Gaussian pdf, normalised to have unit sum.
 
@@ -342,7 +332,6 @@ def gaussian(shape, sd=1.0):
 
 
 
-@renamed_function(depname='local_contrast_normalise', depmod='sporco.util')
 def local_contrast_normalise(s, n=7, c=None):
     """Local contrast normalisation of an image.
 

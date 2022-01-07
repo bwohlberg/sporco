@@ -22,7 +22,6 @@ except ImportError:
 else:
     have_numexpr = True
 
-from sporco._util import renamed_function
 from sporco.array import zdivide, subsample_array
 
 
@@ -202,7 +201,6 @@ def valid_adjoint(A, AT, Ashape, ATshape, eps=1e-7):
 
 
 
-@renamed_function(depname='blockcirculant')
 def block_circulant(A):
     """Construct a block circulant matrix from a tuple of arrays.
 
@@ -925,7 +923,6 @@ def rrs(ax, b):
 
 
 
-@renamed_function(depname='pca', depmod='sporco.util')
 def pca(U, centre=False):
     """Compute the PCA basis for columns of input array `U`.
 
@@ -961,7 +958,6 @@ def pca(U, centre=False):
 
 
 
-@renamed_function(depname='nkp', depmod='sporco.util')
 def nkp(A, bshape, cshape):
     r"""Solve the Nearest Kronecker Product problem.
 
@@ -1003,7 +999,6 @@ def nkp(A, bshape, cshape):
 
 
 
-@renamed_function(depname='kpsvd', depmod='sporco.util')
 def kpsvd(A, bshape, cshape):
     r"""Compute the Kronecker Product SVD.
 
