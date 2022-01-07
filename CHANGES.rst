@@ -8,6 +8,8 @@ Version 0.2.1   (not yet released)
 
 • Added support for complex signals in admm.cbpdn, admm.ccmod, admm.tvl1,
   and admm.tvl2 modules
+• Remove deprecated sporco.fista modules
+• Remove deprecation warning redirects for functions renamed in 0.2.0
 
 
 
