@@ -10,11 +10,9 @@ Single-channel CSC With Lateral Inhibition / No Self Inhibition
 
 This example demonstrates solving a convolutional sparse coding problem with a greyscale signal
 
-  $$\mathrm{argmin}_\mathbf{x} \; \frac{1}{2} \left\| \sum_m \mathbf{d}_m * \mathbf{x}_{m} - \mathbf{s} \right\|_2^2 + \lambda \sum_m \| \mathbf{x}_{m} \|_1 + \sum_m \mathbf{\omega}^T_m \| \mathbf{x}_m \| + \sum_m \mathbf{z}^T_m \|
-  \mathbf{x}_m \| \;,$$
+  $$\mathrm{argmin}_\mathbf{x} \; \frac{1}{2} \left\| \sum_m \mathbf{d}_m * \mathbf{x}_{m} - \mathbf{s} \right\|_2^2 + \lambda \sum_m \| \mathbf{x}_{m} \|_1 + \sum_m \boldsymbol{\omega}^T_m | \mathbf{x}_m | + \sum_m \mathbf{z}^T_m | \mathbf{x}_m | \;,$$
 
-where $\mathbf{d}_{m}$ is the $m^{\text{th}}$ dictionary filter, $\mathbf{x}_{m}$ is the coefficient map corresponding to the $m^{\text{th}}$ dictionary filter, $\mathbf{s}$ is the input image, and $\mathbf{\omega}^T_m$ and $\mathbf{z}^T_m$
-are inhibition weights corresponding to lateral and self inhibition, respectively (see :class:`.admm.cbpdnin.ConvBPDNInhib`).
+where $\mathbf{d}_{m}$ is the $m^{\text{th}}$ dictionary filter, $\mathbf{x}_{m}$ is the coefficient map corresponding to the $m^{\text{th}}$ dictionary filter, $\mathbf{s}$ is the input image, and $\boldsymbold{\omega}^T_m$ and $\mathbf{z}^T_m$ are inhibition weights corresponding to lateral and self inhibition, respectively (see :class:`.admm.cbpdnin.ConvBPDNInhib`).
 """
 
 
