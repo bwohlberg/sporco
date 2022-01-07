@@ -253,7 +253,8 @@ class ConvBPDNInhib(cbpdn.ConvBPDN):
             # Create generalized spatial weighting matrix. This matrix
             # is convolved with activations during inhibition to window
             # and enforce locality of inhibition.
-            Whl = np.zeros(self.cri.shpS, dtype=self.dtype)
+            whl_shape = self.cri.Nv + (1,) * 3
+            Whl = np.zeros(whl_shape, dtype=self.dtype)
             # Ensure inhibition sample length is odd for symmetric
             # inhibition and so the origin is the first element of the
             # matrix
@@ -267,6 +268,7 @@ class ConvBPDNInhib(cbpdn.ConvBPDN):
                  for i in range(len(nDimWin))])
             nDimWin = np.power(np.prod(nDimWin, axis=0), 1 / dimN)
             Whl[nDimInd] = np.reshape(nDimWin, Whl[nDimInd].shape)
+
             # Center window around origin in each dimension
             for i in range(dimN):
                 Whl = np.roll(Whl, -Whn // 2 + 1, axis=i)
