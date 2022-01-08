@@ -8,7 +8,7 @@ Version 0.2.1   (not yet released)
 
 • Added support for complex signals in admm.cbpdn, admm.ccmod, admm.tvl1,
   and admm.tvl2 modules
-
+• Fixed bug in admm.cbpdnin when used with multi-signal arrays (K > 1)
 
 
 Version 0.2.0   (2021-03-01)
