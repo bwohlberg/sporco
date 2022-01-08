@@ -54,7 +54,7 @@ class ConvBPDNInhib(cbpdn.ConvBPDN):
        \mathrm{argmin}_{\mathbf{x}, \mathbf{y}} \;
        (1/2) \left\| \sum_m \mathbf{d}_m * \mathbf{x}_m -
        \mathbf{s} \right\|_2^2 + \lambda \sum_m \| \mathbf{y}_m \|_1 +
-       \mu \sum_m \mathbf{\omega}^T_m | \mathbf{y}_m | +
+       \mu \sum_m \boldsymbol{\omega}^T_m | \mathbf{y}_m | +
        \gamma \sum_m \mathbf{z}^T_m | \mathbf{y}_m |
        \quad \text{such that} \quad \mathbf{x}_m = \mathbf{y}_m \;\;.
 
