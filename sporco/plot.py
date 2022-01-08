@@ -290,6 +290,27 @@ def plot(y, x=None, ptyp='plot', xlbl=None, ylbl=None, title=None,
 
 
 
+def _axis_geometry(ax):
+    """
+    This function replaces deprecated method ``get_geometry``
+    of :class:`matplotlib.axes._subplots.AxesSubplot`.
+
+    Parameters
+    ----------
+    ax : :class:`matplotlib.axes.Axes` object, optional (default None)
+        Axis for which geometry is required
+
+    Returns
+    -------
+    geom : tuple
+      Tuple specifying subplot geometry and axis index
+    """
+
+    rows, cols, num1, num2 = ax.get_subplotspec().get_geometry()
+    return rows, cols, num1 + 1
+
+
+
 def surf(z, x=None, y=None, elev=None, azim=None, xlbl=None, ylbl=None,
          zlbl=None, title=None, lblpad=8.0, alpha=1.0, cntr=None,
          cmap=None, fgsz=None, fgnm=None, fig=None, ax=None):
@@ -358,7 +379,7 @@ def surf(z, x=None, y=None, elev=None, azim=None, xlbl=None, ylbl=None,
             #     https://stackoverflow.com/a/35221116
             if ax.name != '3d':
                 ax.remove()
-                ax = fig.add_subplot(*ax.get_geometry(), projection='3d')
+                ax = fig.add_subplot(*_axis_geometry(ax), projection='3d')
 
     if elev is not None or azim is not None:
         ax.view_init(elev=elev, azim=azim)
