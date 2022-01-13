@@ -49,6 +49,24 @@ class TestSet01(object):
 
     def test_03(self):
         D = np.random.randn(4, 4, 32)
+        s = np.random.randn(8, 8, 3)
+        Wg = np.append(np.eye(16), np.eye(16), axis=-1)
+        lmbda = 0.1
+
+        # ConvBPDNInhib class
+        opt = cbpdnin.ConvBPDNInhib.Options(
+            {'Verbose': False, 'MaxMainIter': 10})
+
+        try:
+            b = cbpdnin.ConvBPDNInhib(D, s, Wg=Wg, lmbda=lmbda, opt=opt)
+            b.solve()
+        except Exception as e:
+            print(e)
+            assert 0
+
+
+    def test_04(self):
+        D = np.random.randn(4, 4, 32)
         s = np.random.randn(8, 8)
         lmbda = 0.1
         gamma = 0.01
@@ -65,7 +83,7 @@ class TestSet01(object):
             assert 0
 
 
-    def test_04(self):
+    def test_05(self):
         D = np.random.randn(4, 4, 32)
         s = np.random.randn(8, 8)
         lmbda = 0.1
@@ -83,7 +101,7 @@ class TestSet01(object):
             assert 0
 
 
-    def test_05(self):
+    def test_06(self):
         D = np.random.randn(4, 32)
         s = np.random.randn(64)
         Wg = np.append(np.eye(16), np.eye(16), axis=-1)
