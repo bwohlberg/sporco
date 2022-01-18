@@ -43,8 +43,8 @@ class ConvBPDNInhib(cbpdn.ConvBPDN):
        \mathrm{argmin}_\mathbf{x} \;
        (1/2) \left\| \sum_m \mathbf{d}_m * \mathbf{x}_m -
        \mathbf{s} \right\|_2^2 + \lambda \sum_m \| \mathbf{x}_m \|_1
-       + \mu \sum_m \mathbf{\omega}^T_m \| \mathbf{x}_m \| +
-       \gamma \sum_m \mathbf{z}^T_m \| \mathbf{x}_m \|
+       + \mu \sum_m \boldsymbol{\omega}^T_m | \mathbf{x}_m | +
+       \gamma \sum_m \mathbf{z}^T_m | \mathbf{x}_m |
 
     for input image :math:`\mathbf{s}`, dictionary filters
     :math:`\mathbf{d}_m`, and coefficient maps :math:`\mathbf{x}_m`,
@@ -54,13 +54,13 @@ class ConvBPDNInhib(cbpdn.ConvBPDN):
        \mathrm{argmin}_{\mathbf{x}, \mathbf{y}} \;
        (1/2) \left\| \sum_m \mathbf{d}_m * \mathbf{x}_m -
        \mathbf{s} \right\|_2^2 + \lambda \sum_m \| \mathbf{y}_m \|_1 +
-       \mu \sum_m \mathbf{\omega}^T_m \| \mathbf{y}_m \| +
-       \gamma \sum_m \mathbf{z}^T_m \| \mathbf{y}_m \|
+       \mu \sum_m \boldsymbol{\omega}^T_m | \mathbf{y}_m | +
+       \gamma \sum_m \mathbf{z}^T_m | \mathbf{y}_m |
        \quad \text{such that} \quad \mathbf{x}_m = \mathbf{y}_m \;\;.
 
-    Here, :math:`\mathbf{\omega}^T_m = \sum_n c_{m,n} (\| \mathbf{x}_n *
-    \mathbf{h} \|)^T` and :math:`\mathbf{z}^T_m = \sum_m (\| \mathbf{x}_m
-    * \mathbf{h}' \|)^T`, where :math:`c_{m,n}` is a square matrix with
+    Here, :math:`\boldsymbol{\omega}^T_m = \sum_n c_{m,n} (| \mathbf{x}_n *
+    \mathbf{h} |)^T` and :math:`\mathbf{z}^T_m = \sum_m (| \mathbf{x}_m
+    * \mathbf{h}' |)^T`, where :math:`c_{m,n}` is a square matrix with
     non-zero entries where elements :math:`m` and :math:`n` share the
     same group and :math:`m != n`, :math:`\mathbf{h}` is a spatial
     weighting matrix non-zero around the origin with radius
@@ -82,10 +82,10 @@ class ConvBPDNInhib(cbpdn.ConvBPDN):
        \mathbf{x}_m \|_1`
 
        ``RegLat`` : Value of regularisation term :math:`\sum_m
-       \mathbf{\omega}^T_m \| \mathbf{x}_m \|`
+       \boldsymbol{\omega}^T_m | \mathbf{x}_m |`
 
        ``RegSelf`` : Value of regularisation term :math:`\sum_m
-       \mathbf{z}^T_m \| \mathbf{x}_m \|`
+       \mathbf{z}^T_m | \mathbf{x}_m |`
 
        ``PrimalRsdl`` : Norm of primal residual
 
@@ -253,7 +253,8 @@ class ConvBPDNInhib(cbpdn.ConvBPDN):
             # Create generalized spatial weighting matrix. This matrix
             # is convolved with activations during inhibition to window
             # and enforce locality of inhibition.
-            Whl = np.zeros(self.cri.shpS, dtype=self.dtype)
+            whl_shape = self.cri.Nv + (1,) * 3
+            Whl = np.zeros(whl_shape, dtype=self.dtype)
             # Ensure inhibition sample length is odd for symmetric
             # inhibition and so the origin is the first element of the
             # matrix
@@ -267,6 +268,7 @@ class ConvBPDNInhib(cbpdn.ConvBPDN):
                  for i in range(len(nDimWin))])
             nDimWin = np.power(np.prod(nDimWin, axis=0), 1 / dimN)
             Whl[nDimInd] = np.reshape(nDimWin, Whl[nDimInd].shape)
+
             # Center window around origin in each dimension
             for i in range(dimN):
                 Whl = np.roll(Whl, -Whn // 2 + 1, axis=i)

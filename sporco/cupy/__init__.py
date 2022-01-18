@@ -231,13 +231,16 @@ common = sporco_cupy_patch_module('sporco.common')
 def _complex_dtype(dtype):
     """Patched version of :func:`sporco.fft.complex_dtype`."""
 
+    real_cplx = {'float128': 'complex256', 'float64': 'complex128', 'float32': 'complex64'}
     dt = cp.dtype(dtype)
-    if dt == cp.dtype('float128'):
-        return cp.dtype('complex256')
-    elif dt == cp.dtype('float64'):
-        return cp.dtype('complex128')
-    else:
-        return cp.dtype('complex64')
+    for real, cplx in real_cplx.items():
+        try:
+            cpdt = cp.dtype(real)
+        except TypeError:
+            continue
+        if dt == cpdt:
+            return cp.dtype(cplx)
+    return cp.dtype('complex64')
 
 
 def _byte_aligned(array, dtype=None, n=None):
