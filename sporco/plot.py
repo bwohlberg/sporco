@@ -358,7 +358,7 @@ def surf(z, x=None, y=None, elev=None, azim=None, xlbl=None, ylbl=None,
             #     https://stackoverflow.com/a/35221116
             if ax.name != '3d':
                 ax.remove()
-                ax = fig.add_subplot(*ax.get_geometry(), projection='3d')
+                ax = fig.add_subplot(ax.get_subplotspec(), projection='3d')
 
     if elev is not None or azim is not None:
         ax.view_init(elev=elev, azim=azim)
