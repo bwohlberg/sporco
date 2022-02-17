@@ -1,4 +1,7 @@
-name: pytest
+# Run pytest on windows. See
+#    https://autobencoder.com/2020-08-24-conda-actions/
+
+name: test-windows
 
 on:
   push:
@@ -13,9 +16,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-#       python-version: [3.8, 3.9]
-        python-version: [3.8]
-#       os: [ubuntu-latest, macOS-latest, windows-latest]
+        python-version: [3.8, 3.9]
         os: [windows-latest]
 
     steps:
