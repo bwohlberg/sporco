@@ -11,15 +11,12 @@ SParse Optimization Research COde (SPORCO)
 .. image:: https://readthedocs.org/projects/sporco/badge/?version=latest
     :target: http://sporco.readthedocs.io/en/latest/?badge=latest
     :alt: Documentation Status
-.. image:: https://ci.appveyor.com/api/projects/status/evnk5t9whoh20s33?svg=true
-    :target: https://ci.appveyor.com/project/bwohlberg/sporco
-    :alt: Windows Build Status
+.. image:: https://github.com/bwohlberg/sporco/actions/workflows/pytest.yml/badge.svg
+   :target: https://github.com/bwohlberg/sporco/actions/workflows/pytest.yml
+   :alt: Test status
 .. image:: https://codecov.io/gh/bwohlberg/sporco/branch/master/graph/badge.svg
     :target: https://codecov.io/gh/bwohlberg/sporco
     :alt: Test Coverage
-.. image:: http://mybinder.org/badge.svg
-    :target: https://mybinder.org/v2/gh/bwohlberg/sporco-notebooks/master?filepath=index.ipynb
-    :alt: Binder
 
 .. image:: https://badge.fury.io/py/sporco.svg
     :target: https://badge.fury.io/py/sporco
@@ -34,6 +31,10 @@ SParse Optimization Research COde (SPORCO)
 .. image:: https://img.shields.io/conda/dn/conda-forge/sporco.svg
     :target: https://anaconda.org/conda-forge/sporco
     :alt:  Conda Forge Downloads
+
+.. image:: http://mybinder.org/badge.svg
+    :target: https://mybinder.org/v2/gh/bwohlberg/sporco-notebooks/master?filepath=index.ipynb
+    :alt: Binder
 
 .. image:: https://img.shields.io/badge/DOI-10.25080%2Fshinma--7f4c6e7--001-blue.svg
     :target: https://dx.doi.org/10.25080/shinma-7f4c6e7-001
