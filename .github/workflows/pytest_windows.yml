@@ -1,0 +1,40 @@
+name: pytest
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+#       python-version: [3.8, 3.9]
+        python-version: [3.8]
+#       os: [ubuntu-latest, macOS-latest, windows-latest]
+        os: [windows-latest]
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v1
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          $CONDA\bin\conda config --env --append channels conda-forge
+          $CONDA\bin\conda env update --file requirements.txt --name base
+          $CONDA\bin\python -m pip install --upgrade pip
+          $CONDA\bin\pip install -e .
+      - name: Unit tests
+        run: |
+          $CONDA\bin\pytest
+
+
+
