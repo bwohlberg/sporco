@@ -28,13 +28,14 @@ jobs:
 
       - name: Install dependencies
         run: |
-          $CONDA\bin\conda config --env --append channels conda-forge
-          $CONDA\bin\conda env update --file requirements.txt --name base
-          $CONDA\bin\python -m pip install --upgrade pip
-          $CONDA\bin\pip install -e .
+          C:\Miniconda\condabin\conda.bat config --env --append channels conda-forge
+          C:\Miniconda\condabin\conda.bat env update --file requirements.txt --name base
+          C:\Miniconda\condabin\conda.bat init powershell
       - name: Unit tests
         run: |
-          $CONDA\bin\pytest
+          C:\Miniconda\condabin\conda.bat activate base
+          C:\Miniconda\condabin\conda.bat install pytest
+          pytest
 
 
 
