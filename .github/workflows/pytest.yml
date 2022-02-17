@@ -28,6 +28,7 @@ jobs:
 
       - name: Install dependencies
         run: |
+          $CONDA/bin/conda config --env --append channels conda-forge
           $CONDA/bin/conda env update --file requirements.txt --name base
           $CONDA/bin/conda install pytest-cov
           $CONDA/bin/python -m pip install --upgrade pip
