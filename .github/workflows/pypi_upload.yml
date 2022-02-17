@@ -1,0 +1,37 @@
+# When a tag is pushed, build packages and upload to PyPI
+
+name: pypi
+
+# Trigger when tags are pushed
+on:
+  push:
+    tags:
+      - '*'
+
+  workflow_dispatch:
+
+jobs:
+  build-and-upload:
+    name: Upload package to PyPI
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: recursive
+      - name: Install Python 3
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.8
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          sudo apt-get install -y libfftw3-dev libatlas-dev libatlas-base-dev liblapack-dev libblas-dev gfortran
+          pip install -r requirements.txt
+          pip install wheel
+          python setup.py sdist bdist_wheel
+      - name: Upload package to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          user: __token__
+          password: ${{ secrets.PYPI_API_TOKEN }}
+          verbose: true

@@ -1,5 +1,6 @@
 future
 scipy
+matplotlib
 sphinx>=2.2
 numpydoc
 sphinxcontrib-bibtex

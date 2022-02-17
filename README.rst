@@ -11,18 +11,12 @@ SParse Optimization Research COde (SPORCO)
 .. image:: https://readthedocs.org/projects/sporco/badge/?version=latest
     :target: http://sporco.readthedocs.io/en/latest/?badge=latest
     :alt: Documentation Status
-.. image:: https://travis-ci.org/bwohlberg/sporco.svg?branch=master
-    :target: https://travis-ci.org/bwohlberg/sporco
-    :alt: Linux and OSX Build Status
-.. image:: https://ci.appveyor.com/api/projects/status/evnk5t9whoh20s33?svg=true
-    :target: https://ci.appveyor.com/project/bwohlberg/sporco
-    :alt: Windows Build Status
+.. image:: https://github.com/bwohlberg/sporco/actions/workflows/pytest.yml/badge.svg
+   :target: https://github.com/bwohlberg/sporco/actions/workflows/pytest.yml
+   :alt: Test status
 .. image:: https://codecov.io/gh/bwohlberg/sporco/branch/master/graph/badge.svg
     :target: https://codecov.io/gh/bwohlberg/sporco
     :alt: Test Coverage
-.. image:: http://mybinder.org/badge.svg
-    :target: https://mybinder.org/v2/gh/bwohlberg/sporco-notebooks/master?filepath=index.ipynb
-    :alt: Binder
 
 .. image:: https://badge.fury.io/py/sporco.svg
     :target: https://badge.fury.io/py/sporco
@@ -37,6 +31,10 @@ SParse Optimization Research COde (SPORCO)
 .. image:: https://img.shields.io/conda/dn/conda-forge/sporco.svg
     :target: https://anaconda.org/conda-forge/sporco
     :alt:  Conda Forge Downloads
+
+.. image:: http://mybinder.org/badge.svg
+    :target: https://mybinder.org/v2/gh/bwohlberg/sporco-notebooks/master?filepath=index.ipynb
+    :alt: Binder
 
 .. image:: https://img.shields.io/badge/DOI-10.25080%2Fshinma--7f4c6e7--001-blue.svg
     :target: https://dx.doi.org/10.25080/shinma-7f4c6e7-001
@@ -53,13 +51,13 @@ If you use this software for published work, please `cite it <http://sporco.read
 Documentation
 -------------
 
-`Documentation is available online <http://sporco.rtfd.io/>`_, or can be built from the root directory of the source distribution by the command
+`Documentation <http://sporco.rtfd.io/>`_ is available online, or can be built from the root directory of the source distribution by the command
 
 ::
 
    python setup.py build_sphinx
 
-in which case the HTML documentation can be found in the ``build/sphinx/html`` directory (the top-level document is ``index.html``). Although the SPORCO package itself is compatible with both Python 2.7 and 3.x, building the documention requires Python 3.3 or later due to the use of `Jonga <https://github.com/bwohlberg/jonga>`_ to construct call graph images for the SPORCO optimisation class hierarchies.
+in which case the HTML documentation can be found in the ``build/sphinx/html`` directory (the top-level document is ``index.html``). Although the SPORCO package itself is compatible with Python 3.x, building the documention requires Python 3.3 or later due to the use of `Jonga <https://github.com/bwohlberg/jonga>`_ to construct call graph images for the SPORCO optimisation class hierarchies.
 
 
 An overview of the package design and functionality is also available in

@@ -53,7 +53,7 @@ sys.path.insert(0, rootpath)
 # -- General configuration ------------------------------------------------
 
 # If your documentation needs a minimal Sphinx version, state it here.
-needs_sphinx = '1.5.4'
+needs_sphinx = '2.2'
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
@@ -110,7 +110,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'SPORCO'
-copyright = u'2015-2021, Brendt Wohlberg'
+copyright = u'2015-2022, Brendt Wohlberg'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -369,7 +369,7 @@ texinfo_documents = [
 #texinfo_no_detailmenu = False
 
 
-MOCK_MODULES = ['sporco.cuda', 'sporco.cupy', 'mpi4py']
+MOCK_MODULES = ['sporco.cuda', 'sporco.cupy', 'mpi4py', 'imageio']
 
 if on_rtd:
     print('Building on ReadTheDocs')
