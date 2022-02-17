@@ -9,7 +9,7 @@ In addition to this documentation, an overview of the design and functionality o
 GPU Acceleration
 ----------------
 
-GPU accelerated versions of some of the SPORCO solvers are provided within the :mod:`sporco.cuda` and :mod:`sporco.cupy` subpackages. Use of the former requires installation of the `SPORCO-CUDA <https://github.com/bwohlberg/sporco-cuda>`__ extension package, while the latter requires installation of `CuPy <https://cupy.chainer.org/>`__ :cite:`okuta-2017-cupy`. The :mod:`sporco.cupy` subpackage supports a much wider range of problems than :mod:`sporco.cuda`, which only supports four different variants of convolutional sparse coding. However, the :mod:`sporco.cuda` functions are substantially faster than the corresponding functions in :mod:`sporco.cupy` since those in :mod:`sporco.cuda` are implemented directly in CUDA, while those in :mod:`sporco.cupy` use `CuPy <https://cupy.chainer.org/>`__ as a replacement for `NumPy <http://www.numpy.org/>`__.
+GPU accelerated versions of some of the SPORCO solvers are provided within the :mod:`sporco.cuda` and :mod:`sporco.cupy` subpackages. Use of the former requires installation of the `SPORCO-CUDA <https://github.com/bwohlberg/sporco-cuda>`__ extension package, while the latter requires installation of `CuPy <https://cupy.dev>`__ :cite:`okuta-2017-cupy`. The :mod:`sporco.cupy` subpackage supports a much wider range of problems than :mod:`sporco.cuda`, which only supports four different variants of convolutional sparse coding. However, the :mod:`sporco.cuda` functions are substantially faster than the corresponding functions in :mod:`sporco.cupy` since those in :mod:`sporco.cuda` are implemented directly in CUDA, while those in :mod:`sporco.cupy` use `CuPy <https://cupy.chainer.org/>`__ as a replacement for `NumPy <http://www.numpy.org/>`__.
 
 
 .. _usage-section:
@@ -64,7 +64,7 @@ If you use this library for published work, please cite :cite:`wohlberg-2016-spo
 Contact
 -------
 
-Please submit bug reports, comments, etc. to brendt@ieee.org. Bugs and feature requests can also be reported via the `GitHub Issues interface <https://github.com/bwohlberg/sporco/issues>`_.
+Please submit bug reports, feature requests, etc. via the `GitHub Issues interface <https://github.com/bwohlberg/sporco/issues>`_.
 
 
 
