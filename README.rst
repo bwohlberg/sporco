@@ -53,13 +53,13 @@ If you use this software for published work, please `cite it <http://sporco.read
 Documentation
 -------------
 
-`Documentation is available online <http://sporco.rtfd.io/>`_, or can be built from the root directory of the source distribution by the command
+`Documentation <http://sporco.rtfd.io/>`_ is available online, or can be built from the root directory of the source distribution by the command
 
 ::
 
    python setup.py build_sphinx
 
-in which case the HTML documentation can be found in the ``build/sphinx/html`` directory (the top-level document is ``index.html``). Although the SPORCO package itself is compatible with both Python 2.7 and 3.x, building the documention requires Python 3.3 or later due to the use of `Jonga <https://github.com/bwohlberg/jonga>`_ to construct call graph images for the SPORCO optimisation class hierarchies.
+in which case the HTML documentation can be found in the ``build/sphinx/html`` directory (the top-level document is ``index.html``). Although the SPORCO package itself is compatible with Python 3.x, building the documention requires Python 3.3 or later due to the use of `Jonga <https://github.com/bwohlberg/jonga>`_ to construct call graph images for the SPORCO optimisation class hierarchies.
 
 
 An overview of the package design and functionality is also available in
