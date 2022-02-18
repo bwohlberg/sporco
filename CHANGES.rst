@@ -3,8 +3,8 @@ SPORCO Release Notes
 ====================
 
 
-Version 0.2.1   (not yet released)
-----------------------------------
+Version 0.2.1   (2022-02-17)
+----------------------------
 
 • Added support for complex signals in admm.cbpdn, admm.ccmod, admm.tvl1,
   and admm.tvl2 modules

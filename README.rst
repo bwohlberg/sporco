@@ -33,7 +33,7 @@ SParse Optimization Research COde (SPORCO)
     :alt:  Conda Forge Downloads
 
 .. image:: http://mybinder.org/badge.svg
-    :target: https://mybinder.org/v2/gh/bwohlberg/sporco-notebooks/master?filepath=index.ipynb
+    :target: https://mybinder.org/v2/gh/bwohlberg/sporco-notebooks/v0.2.1?filepath=index.ipynb
     :alt: Binder
 
 .. image:: https://img.shields.io/badge/DOI-10.25080%2Fshinma--7f4c6e7--001-blue.svg
