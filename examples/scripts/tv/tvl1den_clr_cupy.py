@@ -98,11 +98,14 @@ Get iterations statistics from solver object and plot functional value, ADMM pri
 """
 
 its = b.getitstat()
+ObjFun = [float(x) for x in its.ObjFun]
+PrimalRsdl = [float(x) for x in its.PrimalRsdl]
+DualRsdl = [float(x) for x in its.DualRsdl]
 fig = plot.figure(figsize=(20, 5))
 plot.subplot(1, 3, 1)
-plot.plot(its.ObjFun, xlbl='Iterations', ylbl='Functional', fig=fig)
+plot.plot(ObjFun, xlbl='Iterations', ylbl='Functional', fig=fig)
 plot.subplot(1, 3, 2)
-plot.plot(np.vstack((its.PrimalRsdl, its.DualRsdl)).T,
+plot.plot(np.vstack((PrimalRsdl, DualRsdl)).T,
           ptyp='semilogy', xlbl='Iterations', ylbl='Residual',
           lgnd=['Primal', 'Dual'], fig=fig)
 plot.subplot(1, 3, 3)

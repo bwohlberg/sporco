@@ -147,14 +147,17 @@ Plot functional evolution during ADMM iterations.
 """
 
 its = b.getitstat()
-plot.plot(its.ObjFun, xlbl='Iterations', ylbl='Functional')
+ObjFun = [float(x) for x in its.ObjFun]
+plot.plot(ObjFun, xlbl='Iterations', ylbl='Functional')
 
 
 """
 Plot evolution of ADMM residuals and ADMM penalty parameter.
 """
 
-plot.plot(np.vstack((its.PrimalRsdl, its.DualRsdl)).T,
+PrimalRsdl = [float(x) for x in its.PrimalRsdl]
+DualRsdl = [float(x) for x in its.DualRsdl]
+plot.plot(np.vstack((PrimalRsdl, DualRsdl)).T,
           ptyp='semilogy', xlbl='Iterations', ylbl='Residual',
           lgnd=['Primal', 'Dual'])
 plot.plot(its.Rho, xlbl='Iterations', ylbl='Penalty Parameter')
