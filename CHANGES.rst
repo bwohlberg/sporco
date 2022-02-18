@@ -6,7 +6,8 @@ SPORCO Release Notes
 Version 0.2.2   (unreleased)
 ----------------------------
 
-• No changes yet
+• Removed deprecated sporco.fista modules
+• Removed deprecation warning redirects for functions renamed in 0.2.0
 
 
 Version 0.2.1   (2022-02-17)
@@ -15,9 +16,6 @@ Version 0.2.1   (2022-02-17)
 • Added support for complex signals in admm.cbpdn, admm.ccmod, admm.tvl1,
   and admm.tvl2 modules
 • Fixed bug in admm.cbpdnin when used with multi-signal arrays (K > 1)
-• Removed deprecated sporco.fista modules
-• Removed deprecation warning redirects for functions renamed in 0.2.0
-
 
 
 Version 0.2.0   (2021-03-01)
