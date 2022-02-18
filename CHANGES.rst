@@ -3,6 +3,12 @@ SPORCO Release Notes
 ====================
 
 
+Version 0.2.2   (unreleased)
+----------------------------
+
+• No changes yet
+
+
 Version 0.2.1   (2022-02-17)
 ----------------------------
 
