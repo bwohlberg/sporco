@@ -111,8 +111,9 @@ Get iterations statistics from solver object and plot functional value.
 """
 
 its = d.getitstat()
+DeltaD = [float(x) for x in its.DeltaD]
 fig = plot.figure(figsize=(7, 7))
-plot.plot(np.vstack((its.DeltaD, its.Eta)).T, xlbl='Iterations',
+plot.plot(np.vstack((DeltaD, its.Eta)).T, xlbl='Iterations',
           lgnd=('Delta D', 'Eta'), fig=fig)
 fig.show()
 
