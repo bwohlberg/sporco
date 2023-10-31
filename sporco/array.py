@@ -15,8 +15,6 @@ from future.moves.itertools import zip_longest
 
 import numpy as np
 
-from sporco._util import renamed_function
-
 
 __author__ = """Brendt Wohlberg <brendt@ieee.org>"""
 
@@ -94,7 +92,6 @@ def transpose_ntpl_list(lst):
 
 
 
-@renamed_function(depname='zpad', depmod='sporco.linalg')
 def zpad(x, pd, ax):
     """Zero-pad array `x` with `pd = (leading, trailing)` zeros on axis `ax`.
 
@@ -119,7 +116,6 @@ def zpad(x, pd, ax):
 
 
 
-@renamed_function(depname='zdivide', depmod='sporco.linalg')
 def zdivide(x, y):
     """Return `x`/`y`, with 0 instead of NaN where `y` is 0.
 
@@ -141,7 +137,6 @@ def zdivide(x, y):
 
 
 
-@renamed_function(depname='promote16', depmod='sporco.linalg')
 def promote16(u, fn=None, *args, **kwargs):
     r"""Promote ``np.float16`` arguments to ``np.float32`` dtype.
 
@@ -191,7 +186,6 @@ def promote16(u, fn=None, *args, **kwargs):
 
 
 
-@renamed_function(depname='atleast_nd', depmod='sporco.linalg')
 def atleast_nd(n, u):
     """Append axes to an array so that it is ``n`` dimensional.
 
@@ -219,7 +213,6 @@ def atleast_nd(n, u):
 
 
 
-@renamed_function(depname='split', depmod='sporco.linalg')
 def split(u, axis=0):
     """Split an array into a list of arrays on the specified axis.
 

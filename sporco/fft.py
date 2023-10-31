@@ -25,7 +25,6 @@ except ImportError:
 else:
     have_pyfftw = True
 
-from sporco._util import renamed_function
 
 
 __author__ = """Brendt Wohlberg <brendt@ieee.org>"""
@@ -60,7 +59,6 @@ def is_complex_dtype(dtype):
 
 
 
-@renamed_function(depname='complex_dtype', depmod='sporco.linalg')
 def complex_dtype(dtype):
     """Construct the corresponding complex dtype for a given real dtype.
 
@@ -105,7 +103,6 @@ def real_dtype(dtype):
 
 
 
-@renamed_function(depname='pyfftw_byte_aligned', depmod='sporco.linalg')
 def byte_aligned(array, dtype=None, n=None):
     """Construct a byte-aligned array for FFTs.
 
@@ -131,7 +128,6 @@ def byte_aligned(array, dtype=None, n=None):
 
 
 
-@renamed_function(depname='pyfftw_empty_aligned', depmod='sporco.linalg')
 def empty_aligned(shape, dtype, order='C', n=None):
     """Construct an empty byte-aligned array for FFTs.
 
@@ -160,7 +156,6 @@ def empty_aligned(shape, dtype, order='C', n=None):
 
 
 
-@renamed_function(depname='pyfftw_rfftn_empty_aligned', depmod='sporco.linalg')
 def rfftn_empty_aligned(shape, axes, dtype, order='C', n=None):
     """Construct an empty byte-aligned array for real FFTs.
 
@@ -201,7 +196,6 @@ def rfftn_empty_aligned(shape, axes, dtype, order='C', n=None):
 
 
 
-@renamed_function(depname='fftn', depmod='sporco.linalg')
 def fftn(a, s=None, axes=None):
     """Multi-dimensional discrete Fourier transform.
 
@@ -231,7 +225,6 @@ def fftn(a, s=None, axes=None):
 
 
 
-@renamed_function(depname='ifftn', depmod='sporco.linalg')
 def ifftn(a, s=None, axes=None):
     """Multi-dimensional inverse discrete Fourier transform.
 
@@ -261,7 +254,6 @@ def ifftn(a, s=None, axes=None):
 
 
 
-@renamed_function(depname='rfftn', depmod='sporco.linalg')
 def rfftn(a, s=None, axes=None):
     """Multi-dimensional discrete Fourier transform for real input.
 
@@ -291,7 +283,6 @@ def rfftn(a, s=None, axes=None):
 
 
 
-@renamed_function(depname='irfftn', depmod='sporco.linalg')
 def irfftn(a, s, axes=None):
     """Multi-dimensional inverse discrete Fourier transform for real input.
 
@@ -324,7 +315,6 @@ def irfftn(a, s, axes=None):
 
 
 
-@renamed_function(depname='dctii', depmod='sporco.linalg')
 def dctii(x, axes=None):
     """Multi-dimensional DCT-II.
 
@@ -354,7 +344,6 @@ def dctii(x, axes=None):
 
 
 
-@renamed_function(depname='idctii', depmod='sporco.linalg')
 def idctii(x, axes=None):
     """Multi-dimensional inverse DCT-II.
 
@@ -384,7 +373,6 @@ def idctii(x, axes=None):
 
 
 
-@renamed_function(depname='fftconv', depmod='sporco.linalg')
 def fftconv(a, b, axes=None, origin=None):
     """Multi-dimensional convolution via the Discrete Fourier Transform.
 
@@ -430,7 +418,6 @@ def fftconv(a, b, axes=None, origin=None):
 
 
 
-@renamed_function(depname='fl2norm2', depmod='sporco.linalg')
 def fl2norm2(xf, axis=(0, 1)):
     r"""Compute the squared :math:`\ell_2` norm in the DFT domain.
 
@@ -459,7 +446,6 @@ def fl2norm2(xf, axis=(0, 1)):
 
 
 
-@renamed_function(depname='rfl2norm2', depmod='sporco.linalg')
 def rfl2norm2(xf, xs, axis=(0, 1)):
     r"""Compute the squared :math:`\ell_2` norm in the real DFT domain.
 

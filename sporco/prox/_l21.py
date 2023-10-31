@@ -12,7 +12,6 @@ from __future__ import division
 import numpy as np
 
 from ._lp import prox_l1, prox_l2, norm_l2
-from sporco._util import renamed_function
 
 
 __author__ = """Brendt Wohlberg <brendt@ieee.org>"""
@@ -49,7 +48,6 @@ def norm_l21(x, axis=-1):
 
 
 
-@renamed_function(depname='prox_l1l2')
 def prox_sl1l2(v, alpha, beta, axis=None):
     r"""Compute the proximal operator of the sum of :math:`\ell_1` and
     :math:`\ell_2` norms (compound shrinkage/soft thresholding)

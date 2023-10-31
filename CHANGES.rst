@@ -6,7 +6,8 @@ SPORCO Release Notes
 Version 0.2.2   (unreleased)
 ----------------------------
 
-• No changes yet
+• Removed deprecated sporco.fista modules
+• Removed deprecation warning redirects for functions renamed in 0.2.0
 
 
 Version 0.2.1   (2022-02-17)

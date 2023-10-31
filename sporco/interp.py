@@ -16,7 +16,6 @@ import scipy
 import scipy.optimize as sco
 from scipy.interpolate import interp2d, griddata
 
-from sporco._util import renamed_function
 
 
 __author__ = """Brendt Wohlberg <brendt@ieee.org>"""
@@ -102,7 +101,6 @@ else:
 
 
 
-@renamed_function(depname='lstabsdev', depmod='sporco.util')
 def lstabsdev(A, b):
     r"""Least absolute deviations (LAD) linear regression.
 
@@ -149,7 +147,6 @@ def lstabsdev(A, b):
 
 
 
-@renamed_function(depname='lstmaxdev', depmod='sporco.util')
 def lstmaxdev(A, b):
     r"""Least maximum deviation (least maximum error) linear regression.
 
@@ -196,7 +193,6 @@ def lstmaxdev(A, b):
 
 
 
-@renamed_function(depname='lanczos_kernel', depmod='sporco.util')
 def lanczos_kernel(x, a=3):
     r"""Lanczos interpolation kernel.
 
@@ -227,7 +223,6 @@ def lanczos_kernel(x, a=3):
 
 
 
-@renamed_function(depname='interpolation_points', depmod='sporco.util')
 def interpolation_points(N, include_zero=True):
     """Evenly spaced interpolation points.
 
@@ -255,7 +250,6 @@ def interpolation_points(N, include_zero=True):
 
 
 
-@renamed_function(depname='lanczos_filters', depmod='sporco.util')
 def lanczos_filters(sz, a=3, collapse_axes=True):
     """Multi-dimensional Lanczos interpolation filters.
 
