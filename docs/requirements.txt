@@ -1,7 +1,7 @@
 future
 scipy
 matplotlib
-sphinx>=2.2
+sphinx>=5.0.0
 numpydoc
 sphinxcontrib-bibtex
 sphinx_tabs
