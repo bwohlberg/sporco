@@ -1,10 +1,10 @@
 future
 scipy
 matplotlib
-sphinx>=2.2
+sphinx>=5.0.0
 numpydoc
 sphinxcontrib-bibtex
-sphinx_tabs
+sphinx_tabs>=3.4.4
 sphinx_fontawesome
 pygraphviz
 jonga
