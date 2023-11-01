@@ -37,6 +37,7 @@ jobs:
         run: |
           $CONDA/bin/pytest --cov=sporco --cov-report=xml
       - name: Upload coverage to codecov
+        if: matrix.os == 'ubuntu-latest'
         uses: codecov/codecov-action@v2
         with:
           env_vars: OS,PYTHON
