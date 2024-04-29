@@ -27,10 +27,9 @@ jobs:
 
       - name: Install dependencies
         run: |
-          conda config --env --append channels conda-forge
-          conda env update --file requirements.txt --name base
-          conda install pytest-cov
+          conda install -c conda-forge pytest pytest-cov
           python -m pip install --upgrade pip
+          pip install -r requirements.txt
           pip install -e .
       - name: Unit tests
         run: |
