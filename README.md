@@ -1,6 +1,6 @@
 [![Supported Python Versions](https://img.shields.io/pypi/pyversions/sporco.svg)](https://github.com/bwohlberg/sporco)
 [![Package License](https://img.shields.io/github/license/bwohlberg/sporco.svg)](https://github.com/bwohlberg/sporco/blob/master/LICENSE)
-[![Documentation Status](https://readthedocs.org/projects/sporco/badge/?version=latest)](http://sporco.readthedocs.io/en/latest/?badge=latest)\
+[![Documentation Status](https://readthedocs.org/projects/sporco/badge/?version=latest)](http://sporco.readthedocs.io/en/latest/?badge=latest)
 [![Test status](https://github.com/bwohlberg/sporco/actions/workflows/pytest.yml/badge.svg)](https://github.com/bwohlberg/sporco/actions/workflows/pytest.yml)
 [![Test Coverage](https://codecov.io/gh/bwohlberg/sporco/branch/master/graph/badge.svg)](https://codecov.io/gh/bwohlberg/sporco)\
 [![PyPi Release](https://badge.fury.io/py/sporco.svg)](https://badge.fury.io/py/sporco)
@@ -29,8 +29,7 @@ in which case the HTML documentation can be found in the `build/sphinx/html` dir
 An overview of the package design and functionality is also available in
 
 > Brendt Wohlberg, [SPORCO: A Python package for standard and convolutional sparse representations](http://conference.scipy.org/proceedings/scipy2017/brendt_wohlberg.html),
-> in Proceedings of the 15th Python in Science Conference, (Austin, TX, USA), <doi:%6010.25080/shinma-7f4c6e7-001>
-> \<<http://dx.doi.org/10.25080/shinma-7f4c6e7-001>\>, pp. 1--8, Jul 2017
+> in Proceedings of the 15th Python in Science Conference, (Austin, TX, USA), doi:10.25080/shinma-7f4c6e7-001, pp. 1--8, Jul 2017
 
 
 # Usage
