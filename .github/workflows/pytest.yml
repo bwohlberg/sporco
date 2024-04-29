@@ -20,13 +20,13 @@ jobs:
       - uses: actions/checkout@v3
       - uses: conda-incubator/setup-miniconda@v3
         with:
+          python-version: ${{ matrix.python-version }}
           auto-update-conda: true
           activate-environment: test-env
-          python-version: ${{ matrix.python-version }}
+          auto-activate-base: false
       - name: Activate environment
         run: |
-          conda init
-          conda activate test-env
+          source activate test-env
       - name: Display environment details
         run: |
           conda info
