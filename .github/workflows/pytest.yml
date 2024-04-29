@@ -25,6 +25,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Activate environment
         run: |
+          conda init
           conda activate test-env
       - name: Display environment details
         run: |
