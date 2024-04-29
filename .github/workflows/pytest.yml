@@ -10,35 +10,41 @@ on:
 jobs:
   build:
     runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash -el {0}
     strategy:
       fail-fast: false
       matrix:
-        python-version: [3.8, 3.9]
-#       python-version: [3.8]
-#       os: [ubuntu-latest, macOS-latest, windows-latest]
-        os: [ubuntu-latest, macOS-latest]
+        python-version: ["3.9", "3.10"]
+        os: [ubuntu-latest, macOS-latest, windows-latest]
 
     steps:
-      - uses: actions/checkout@v2
-
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v1
+      - uses: actions/checkout@v3
+      - name: Set up conda environment
+        uses: conda-incubator/setup-miniconda@v3
         with:
           python-version: ${{ matrix.python-version }}
-
+          auto-update-conda: true
+          activate-environment: test-env
+          auto-activate-base: false
+      - name: Display environment details
+        run: |
+          conda info
       - name: Install dependencies
         run: |
-          $CONDA/bin/conda config --env --append channels conda-forge
-          $CONDA/bin/conda env update --file requirements.txt --name base
-          $CONDA/bin/conda install pytest-cov
-          $CONDA/bin/python -m pip install --upgrade pip
-          $CONDA/bin/pip install -e .
+          conda install -c conda-forge pytest pytest-cov
+          conda install -c conda-forge pyfftw
+          python -m pip install --upgrade pip
+          pip install setuptools
+          pip install -r requirements.txt
+          pip install -e .
       - name: Unit tests
         run: |
-          $CONDA/bin/pytest --cov=sporco --cov-report=xml
+          pytest --cov=sporco --cov-report xml
       - name: Upload coverage to codecov
         if: matrix.os == 'ubuntu-latest'
-        uses: codecov/codecov-action@v2
+        uses: codecov/codecov-action@v3
         with:
           env_vars: OS,PYTHON
           fail_ci_if_error: false
