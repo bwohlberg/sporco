@@ -29,9 +29,13 @@ if hasattr(co, 'co_posonlyargcount'):
     coattr.append(co.co_posonlyargcount)
 coattr.extend([co.co_kwonlyargcount, co.co_nlocals, co.co_stacksize,
                co.co_flags, _fix_disable.__code__.co_code, co.co_consts,
-               co.co_names, co.co_varnames, co.co_filename, co.co_name,
-               co.co_firstlineno, co.co_lnotab, co.co_freevars,
-               co.co_cellvars])
+               co.co_names, co.co_varnames, co.co_filename, co.co_name])
+if hasattr(co, 'co_qualname'):
+    coattr.append(co.co_qualname)
+coattr.extend([co.co_firstlineno, co.co_lnotab])
+if hasattr(co, 'co_exceptiontable'):
+    coattr.append(co.co_exceptiontable)
+coattr.extend([co.co_freevars, co.co_cellvars])
 sporco.common._fix_nested_class_lookup.__code__ = CodeType(*coattr)
 
 

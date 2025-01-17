@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2019-2021 by Brendt Wohlberg <brendt@ieee.org>
+# Copyright (C) 2019-2025 by Brendt Wohlberg <brendt@ieee.org>
 # All rights reserved. BSD 3-clause License.
 # This file is part of the SPORCO package. Details of the copyright
 # and user license can be found in the 'LICENSE.txt' file distributed
@@ -14,7 +14,7 @@ import warnings
 import numpy as np
 import scipy
 import scipy.optimize as sco
-from scipy.interpolate import interp2d, griddata
+from scipy.interpolate import griddata, RectBivariateSpline
 
 
 
@@ -51,10 +51,11 @@ def bilinear_demosaic(img):
     """
 
     # Interpolate red channel
-    x = range(1, img.shape[1], 2)
-    y = range(1, img.shape[0], 2)
-    fi = interp2d(x, y, img[1::2, 1::2])
-    sr = fi(range(0, img.shape[1]), range(0, img.shape[0]))
+    x = range(1, img.shape[0], 2)
+    y = range(1, img.shape[1], 2)
+    #fi = interp2d(x, y, img[1::2, 1::2])
+    fi = RectBivariateSpline(x, y, img[1::2, 1::2], s=0)
+    sr = fi(range(0, img.shape[0]), range(0, img.shape[1]))
 
     # Interpolate green channel. We can't use `interp2d` here because
     # the green channel isn't arranged in a simple grid pattern. Since
@@ -79,10 +80,11 @@ def bilinear_demosaic(img):
         sg[-1, -1] = (sg[-2, -1] + sg[-1, -2]) / 2.0
 
     # Interpolate blue channel
-    x = range(0, img.shape[1], 2)
-    y = range(0, img.shape[0], 2)
-    fi = interp2d(x, y, img[0::2, 0::2])
-    sb = fi(range(0, img.shape[1]), range(0, img.shape[0]))
+    x = range(0, img.shape[0], 2)
+    y = range(0, img.shape[1], 2)
+    #fi = interp2d(x, y, img[0::2, 0::2])
+    fi = RectBivariateSpline(x, y, img[0::2, 0::2], s=0)
+    sb = fi(range(0, img.shape[0]), range(0, img.shape[1]))
 
     return np.dstack((sr, sg, sb))
 

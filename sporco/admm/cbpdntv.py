@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2016-2019 by Brendt Wohlberg <brendt@ieee.org>
+# Copyright (C) 2016-2025 by Brendt Wohlberg <brendt@ieee.org>
 # All rights reserved. BSD 3-clause License.
 # This file is part of the SPORCO package. Details of the copyright
 # and user license can be found in the 'LICENSE.txt' file distributed
@@ -199,7 +199,7 @@ class ConvBPDNScalarTV(admm.ADMM):
         self.cri = cr.CSC_ConvRepIndexing(D, S, dimK=dimK, dimN=dimN)
 
         # Call parent class __init__
-        Nx = np.product(np.array(self.cri.shpX))
+        Nx = np.prod(np.array(self.cri.shpX))
         yshape = self.cri.shpX + (len(self.cri.axisN)+1,)
         super(ConvBPDNScalarTV, self).__init__(Nx, yshape, yshape,
                                                S.dtype, opt)
@@ -908,7 +908,7 @@ class ConvBPDNRecTV(admm.ADMM):
         self.cri = cr.CSC_ConvRepIndexing(D, S, dimK=dimK, dimN=dimN)
 
         # Call parent class __init__
-        Nx = np.product(np.array(self.cri.shpX))
+        Nx = np.prod(np.array(self.cri.shpX))
         yshape = list(self.cri.shpX)
         yshape[self.cri.axisM] += len(self.cri.axisN) * self.cri.Cd
         super(ConvBPDNRecTV, self).__init__(Nx, yshape, yshape,

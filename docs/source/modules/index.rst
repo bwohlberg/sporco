@@ -119,8 +119,3 @@ API Reference
    sporco.dictlrn.onlinecdl
    sporco.cuda
    sporco.cupy
-   sporco.fista.bpdn
-   sporco.fista.cbpdn
-   sporco.fista.ccmod
-   sporco.fista.fista
-   sporco.fista.ppp

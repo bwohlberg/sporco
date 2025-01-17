@@ -86,7 +86,7 @@ class TestSet01(object):
     def test_08(self):
         x = np.random.randn(9, 8)
         y = interp.bilinear_demosaic(x)
-        assert np.array_equal(x[1::2, 1::2], y[1::2, 1::2, 0])
+        assert np.allclose(x[1::2, 1::2], y[1::2, 1::2, 0])
         assert np.array_equal(x[0::2, 1::2], y[0::2, 1::2, 1])
         assert np.array_equal(x[1::2, 0::2], y[1::2, 0::2, 1])
-        assert np.array_equal(x[0::2, 0::2], y[0::2, 0::2, 2])
+        assert np.allclose(x[0::2, 0::2], y[0::2, 0::2, 2])

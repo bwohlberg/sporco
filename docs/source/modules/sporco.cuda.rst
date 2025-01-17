@@ -43,12 +43,12 @@ The content of the ``sporco.cuda`` namespace is summarised below. For full detai
 Always available
 ~~~~~~~~~~~~~~~~
 
-.. np:attribute:: have_cuda
+.. py:attribute:: have_cuda
 
    A boolean value indicating whether the import of ``sporco_cuda`` succeeded.
 
 
-.. np:function:: device_count()
+.. py:function:: device_count()
 
    Get the number of CUDA GPU devices installed on the host system. Returns 0
    if no devices are installed or if the import of ``sporco_cuda`` failed.
@@ -62,7 +62,7 @@ Always available
 Only available if ``have_cuda`` is `True`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. np:function:: current_device(id=None)
+.. py:function:: current_device(id=None)
 
    Get or set the current CUDA GPU device. The current device is not set
    if `id` is None.
@@ -79,7 +79,7 @@ Only available if ``have_cuda`` is `True`
 
 
 
-.. np:function:: memory_info()
+.. py:function:: memory_info()
 
    Get memory information for the current CUDA GPU device.
 
@@ -92,7 +92,7 @@ Only available if ``have_cuda`` is `True`
 
 
 
-.. np:function:: device_name(int dev=0)
+.. py:function:: device_name(int dev=0)
 
    Get hardware model name for the specified CUDA GPU device.
 
@@ -108,7 +108,7 @@ Only available if ``have_cuda`` is `True`
 
 
 
-.. np:function:: cbpdn(D, S, lmbda, opt, dev=0)
+.. py:function:: cbpdn(D, S, lmbda, opt, dev=0)
 
    A GPU-accelerated version of :class:`.admm.cbpdn.ConvBPDN`. Multiple
    images and multi-channel images in input signal ``S`` are currently not
@@ -136,7 +136,7 @@ Only available if ``have_cuda`` is `True`
 
 
 
-.. np:function:: cbpdngrd(D, S, lmbda, mu, opt, dev=0)
+.. py:function:: cbpdngrd(D, S, lmbda, mu, opt, dev=0)
 
    A GPU-accelerated version of :class:`.admm.cbpdn.ConvBPDNGradReg`.
    Multiple images and multi-channel images in input signal ``S`` are
@@ -166,7 +166,7 @@ Only available if ``have_cuda`` is `True`
 
 
 
-.. np:function:: cbpdnmsk(D, s, w, lmbda, opt, dev=0)
+.. py:function:: cbpdnmsk(D, s, w, lmbda, opt, dev=0)
 
    A GPU-accelerated version of :class:`.admm.cbpdn.AddMaskSim` used
    together with :class:`.admm.cbpdn.ConvBPDN`, providing a spatial
@@ -208,7 +208,7 @@ Only available if ``have_cuda`` is `True`
 
 
 
-.. np:function:: cbpdngrdmsk(D, s, w, lmbda, mu, opt, dev=0)
+.. py:function:: cbpdngrdmsk(D, s, w, lmbda, mu, opt, dev=0)
 
    A GPU-accelerated version of of :class:`.admm.cbpdn.AddMaskSim`
    used together with :class:`.admm.cbpdn.ConvBPDNGradReg`, providing

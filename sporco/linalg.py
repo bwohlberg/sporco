@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2015-2021 by Brendt Wohlberg <brendt@ieee.org>
+# Copyright (C) 2015-2025 by Brendt Wohlberg <brendt@ieee.org>
 # All rights reserved. BSD 3-clause License.
 # This file is part of the SPORCO package. Details of the copyright
 # and user license can be found in the 'LICENSE.txt' file distributed
@@ -512,18 +512,6 @@ def solvemdbi_rsm(ah, rho, b, axisK, dimN=2):
 
 
 
-# Deal with introduction of new atol parameter for scipy.sparse.linalg.cg
-# in SciPy 1.1.0
-_spv = scipy.__version__.split('.')
-if int(_spv[0]) > 1 or (int(_spv[0]) == 1 and int(_spv[1]) >= 1):
-    def _cg_wrapper(A, b, x0=None, tol=1e-5, maxiter=None):
-        return cg(A, b, x0=x0, tol=tol, maxiter=maxiter, atol=0.0)
-else:
-    def _cg_wrapper(A, b, x0=None, tol=1e-5, maxiter=None):
-        return cg(A, b, x0=x0, tol=tol, maxiter=maxiter)
-
-
-
 def solvemdbi_cg(ah, rho, b, axisM, axisK, tol=1e-5, mit=1000, isn=None):
     r"""Solve a multiple diagonal block linear system with a scaled
     identity term using CG.
@@ -587,7 +575,7 @@ def solvemdbi_cg(ah, rho, b, axisM, axisK, tol=1e-5, mit=1000, isn=None):
     AHAop = lambda x: AHop(Aop(x))
     vAHAoprI = lambda x: AHAop(x.reshape(b.shape)).ravel() + rho * x.ravel()
     lop = LinearOperator((b.size, b.size), matvec=vAHAoprI, dtype=b.dtype)
-    vx, cgit = _cg_wrapper(lop, b.ravel(), isn, tol, mit)
+    vx, cgit = cg(lop, b.ravel(), x0=isn, maxiter=mit, rtol=tol)
     return vx.reshape(b.shape), cgit
 
 

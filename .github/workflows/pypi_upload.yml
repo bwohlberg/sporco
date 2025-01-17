@@ -21,7 +21,7 @@ jobs:
       - name: Install Python 3
         uses: actions/setup-python@v4
         with:
-          python-version: 3.8
+          python-version: 3.12
       - name: Install dependencies
         run: |
           $CONDA/bin/conda config --env --append channels conda-forge

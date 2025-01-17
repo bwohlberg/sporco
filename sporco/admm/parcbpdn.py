@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2018 by Erik Skau <ewskau@gmail.com>
-#                       Brendt Wohlberg <brendt@ieee.org>
+# Copyright (C) 2018-2025 by Erik Skau <ewskau@gmail.com>
+#                            Brendt Wohlberg <brendt@ieee.org>
 # All rights reserved. BSD 3-clause License.
 # This file is part of the SPORCO package. Details of the copyright
 # and user license can be found in the 'LICENSE.txt' file distributed
@@ -105,7 +105,7 @@ def mpraw_as_np(shape, dtype):
       Numpy array
     """
 
-    sz = int(np.product(shape))
+    sz = int(np.prod(shape))
     csz = sz * np.dtype(dtype).itemsize
     raw = mp.RawArray('c', csz)
     return np.frombuffer(raw, dtype=dtype, count=sz).reshape(shape)

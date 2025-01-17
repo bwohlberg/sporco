@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2015-2020 by Brendt Wohlberg <brendt@ieee.org>
+# Copyright (C) 2015-2025 by Brendt Wohlberg <brendt@ieee.org>
 # All rights reserved. BSD 3-clause License.
 # This file is part of the SPORCO package. Details of the copyright
 # and user license can be found in the 'LICENSE.txt' file distributed
@@ -235,7 +235,7 @@ class ADMM(common.IterativeSolver):
         self.Nx = Nx
         # Working variable U has the same dimensionality as constant c
         # in the constraint Ax + By = c
-        self.Nc = np.product(np.array(ushape))
+        self.Nc = np.prod(np.array(ushape))
 
         # DataType option overrides data type inferred from __init__
         # parameters of derived class
@@ -862,7 +862,7 @@ class ADMMEqual(ADMM):
 
         if opt is None:
             opt = ADMMEqual.Options()
-        Nx = np.product(np.array(xshape))
+        Nx = np.prod(np.array(xshape))
         super(ADMMEqual, self).__init__(Nx, xshape, xshape, dtype, opt)
 
 
