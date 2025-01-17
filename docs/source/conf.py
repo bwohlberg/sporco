@@ -311,13 +311,14 @@ latex_documents = [
 
 
 # Intersphinx mapping
-intersphinx_mapping = {'https://docs.python.org/3/': None,
-                       'https://numpy.org/doc/stable/': None,
-                       'https://docs.scipy.org/doc/scipy/reference/': None,
-                       'https://matplotlib.org/': None,
-                       'http://hgomersall.github.io/pyFFTW/': None,
-                       'https://docs.cupy.dev/en/stable/': None
-                      }
+intersphinx_mapping = {
+    "python": ("https://docs.python.org/3/", None),
+    "numpy": ("https://numpy.org/doc/stable/", None),
+    "scipy": ("https://docs.scipy.org/doc/scipy/", None),
+    "matplotlib": ("https://matplotlib.org/stable/", None),
+    "pyfftw": ("http://hgomersall.github.io/pyFFTW/", None),
+    "cupy": ("https://docs.cupy.dev/en/stable/", None)
+}
 # Added timeout due to periodic scipy.org down time
 #intersphinx_timeout = 30
 
