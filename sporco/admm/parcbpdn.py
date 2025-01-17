@@ -105,7 +105,7 @@ def mpraw_as_np(shape, dtype):
       Numpy array
     """
 
-    sz = int(np.product(shape))
+    sz = int(np.prod(shape))
     csz = sz * np.dtype(dtype).itemsize
     raw = mp.RawArray('c', csz)
     return np.frombuffer(raw, dtype=dtype, count=sz).reshape(shape)

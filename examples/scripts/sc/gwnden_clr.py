@@ -46,14 +46,14 @@ stpsz = (2, 2, 1)
 blocks = array.extract_blocks(imgn, blksz, stpsz)
 blockmeans = np.mean(blocks, axis=(0, 1))
 blocks -= blockmeans
-blocks = blocks.reshape(np.product(blksz), -1)
+blocks = blocks.reshape(np.prod(blksz), -1)
 
 
 """
 Load dictionary.
 """
 
-D = util.convdicts()['RGB:8x8x3x64'].reshape(np.product(blksz), -1)
+D = util.convdicts()['RGB:8x8x3x64'].reshape(np.prod(blksz), -1)
 
 
 """

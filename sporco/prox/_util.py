@@ -60,7 +60,7 @@ def ndto2d(x, axis=-1):
     # Reshape into a 2D array with the axes specified by the axis
     # parameter flattened into an index along rows, and the remaining
     # axes flattened into an index along the columns
-    xtr = xt.reshape((np.product(xts[0:len(caxis)]), -1))
+    xtr = xt.reshape((np.prod(xts[0:len(caxis)]), -1))
     # Return reshaped array and a tuple containing the information
     # necessary to undo the entire operation
     return xtr, (xts, prm)
