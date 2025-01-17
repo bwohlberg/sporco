@@ -84,25 +84,25 @@ Utility Functions
 Since it is necessary to explicitly convert between `NumPy <http://www.numpy.org/>`__ arrays and `CuPy <https://cupy.chainer.org/>`__ arrays, a number of utility functions in ``sporco.cupy`` support this conversion in a way that behaves correctly independent of the value of ``sporco.cupy.have_cupy``, in that conversion is performed when the value is ``True``, and no conversion is perfomed when it is ``False``.
 
 
-.. np:function:: array_module(*args)
+.. py:function:: array_module(*args)
 
    Get the array module (``numpy`` or ``cupy``) of the array argument. This
    function is an alias for :func:`cupy.get_array_module`.
 
 
-.. np:function:: np2cp(u)
+.. py:function:: np2cp(u)
 
    Convert a ``numpy`` ndarray to a ``cupy`` array. This function is an alias
    for :func:`cupy.asarray`
 
 
-.. np:function:: cp2np(u)
+.. py:function:: cp2np(u)
 
    Convert a ``cupy`` array to a ``numpy`` ndarray. This function is an alias
    for :func:`cupy.asnumpy`
 
 
-.. np:function:: cupy_wrapper(func)
+.. py:function:: cupy_wrapper(func)
 
    A wrapper function that converts ``numpy`` ndarray arguments to ``cupy``
    arrays, and convert any ``cupy`` arrays returned by the wrapped function
@@ -116,14 +116,14 @@ Since it is necessary to explicitly convert between `NumPy <http://www.numpy.org
 Some additional utility functions provide useful functionality when package `GPUtil <https://github.com/anderskm/gputil>`__ is installed, and return fixed default return values when it is not installed:
 
 
-.. np:function:: gpu_info()
+.. py:function:: gpu_info()
 
    Return a list of namedtuples representing attributes of each GPU
    device. Returns an empty list if
    `GPUtil <https://github.com/anderskm/gputil>`_ is not installed.
 
 
-.. np:function:: gpu_load(wproc=0.5, wmem=0.5)
+.. py:function:: gpu_load(wproc=0.5, wmem=0.5)
 
    Return a list of namedtuples representing the current load for
    each GPU device. The processor and memory loads are fractions
@@ -133,21 +133,21 @@ Some additional utility functions provide useful functionality when package `GPU
    `GPUtil <https://github.com/anderskm/gputil>`_ is not installed.
 
 
-.. np:function:: device_by_load(wproc=0.5, wmem=0.5)
+.. py:function:: device_by_load(wproc=0.5, wmem=0.5)
 
    Get a list of GPU device ids ordered by increasing weighted
    average of processor and memory load. Returns an empty list if
    `GPUtil <https://github.com/anderskm/gputil>`_ is not installed.
 
 
-.. np:function:: select_device_by_load(wproc=0.5, wmem=0.5)
+.. py:function:: select_device_by_load(wproc=0.5, wmem=0.5)
 
    Set the current device for cupy as the device with the lowest
    weighted average of processor and memory load. Returns 0 if
    `GPUtil <https://github.com/anderskm/gputil>`_ is not installed.
 
 
-.. np:function:: available_gpu(*args, **kwargs)
+.. py:function:: available_gpu(*args, **kwargs)
 
    Get the device id for an available GPU when multiple GPUs are installed.
    This function is an alias for ``GPUtil.getAvailable``. Returns 0 if
