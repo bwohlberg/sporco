@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2020 by Brendt Wohlberg <brendt@ieee.org>
+# Copyright (C) 2025 by Brendt Wohlberg <brendt@ieee.org>
 #                       Cristina Garcia-Cardona <cgarciac@lanl.gov>
 # All rights reserved. BSD 3-clause License.
 # This file is part of the SPORCO package. Details of the copyright
@@ -145,7 +145,7 @@ class CnstrMOD(pgm.PGM):
         self.Pcn = getPcn(opt['ZeroMean'], opt['NonNegCoef'])
 
         self.Y = self.X.copy()
-        self.Yprv = self.Y.copy() + 1e5
+        self.Yprv = self.Y.copy() + 1e3
 
         if Z is not None:
             self.setcoef(Z)
