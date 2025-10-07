@@ -1,5 +1,6 @@
 future
 scipy
+filetype
 matplotlib
 sphinx>=5.0.0
 numpydoc
