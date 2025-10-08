@@ -4,7 +4,7 @@
 # and user license can be found in the 'LICENSE.txt' file distributed
 # with the package.
 
-"""
+r"""
 Basis Pursuit DeNoising
 =======================
 
@@ -60,7 +60,7 @@ opt = bpdn.BPDN.Options({'Verbose': False, 'MaxMainIter': 500,
                          'RelStopTol': 1e-3, 'AutoRho': {'RsdlTarget': 1.0}})
 
 
-"""
+r"""
 Select regularization parameter $\lambda$ by evaluating the error in recovering the sparse representation over a logarithmicaly spaced grid. (The reference representation is assumed to be known, which is not realistic in a real application.) A function is defined that evalues the BPDN recovery error for a specified $\lambda$, and this function is evaluated in parallel by :func:`sporco.util.grid_search`.
 """
 
@@ -80,7 +80,7 @@ lmbda = sprm[0]
 print('Minimum ℓ1 error: %5.2f at 𝜆 = %.2e' % (sfvl, lmbda))
 
 
-"""
+r"""
 Once the best $\lambda$ has been determined, run BPDN with verbose display of ADMM iteration statistics.
 """
 
@@ -107,7 +107,7 @@ Plot lmbda error curve, functional value, residuals, and rho
 its = b.getitstat()
 fig = plot.figure(figsize=(15, 10))
 plot.subplot(2, 2, 1)
-plot.plot(fvmx, x=lrng, ptyp='semilogx', xlbl='$\lambda$',
+plot.plot(fvmx, x=lrng, ptyp='semilogx', xlbl=r'$\lambda$',
           ylbl='Error', fig=fig)
 plot.subplot(2, 2, 2)
 plot.plot(its.ObjFun, xlbl='Iterations', ylbl='Functional', fig=fig)

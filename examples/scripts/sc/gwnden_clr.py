@@ -5,7 +5,6 @@
 # with the package.
 
 """
-
 Gaussian White Noise Restoration via SC
 =======================================
 
@@ -26,7 +25,7 @@ import sporco.metric as sm
 from sporco.admm import bpdn
 
 
-"""
+r"""
 Load a reference image and corrupt it with Gaussian white noise with $\sigma = 0.1$. (The call to ``numpy.random.seed`` ensures that the pseudo-random noise is reproducible.)
 """
 

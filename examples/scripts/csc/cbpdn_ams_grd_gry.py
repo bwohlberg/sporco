@@ -78,7 +78,7 @@ di[0, 0] = 1
 Di = np.dstack((di, D))
 
 
-"""
+r"""
 Set up weights for the $\ell_1$ norm to disable regularization of the coefficient map corresponding to the impulse filter intended to represent lowpass image components (not to be confused with the AMS impulse filter used to implement spatial masking).
 """
 
@@ -87,7 +87,7 @@ wl1[..., 0] = 0.0
 wl1i = np.concatenate((wl1, np.zeros(wl1.shape[0:-1] + (1,))), axis=-1)
 
 
-"""
+r"""
 When representing lowpass image components using an impulse filter together with an $\ell_2$ norm on the gradient of its coefficient map, we usually want to set the weight array for this norm (specified by the ``GradWeight`` option) to disable regularization of all coefficient maps except for the one corresponding to that impulse filter (not to be confused with the AMS impulse filter used to implement spatial masking). In this case set a non-zero value for the weights of the other coefficient maps size this improves performance in this inpainting problem.
 """
 

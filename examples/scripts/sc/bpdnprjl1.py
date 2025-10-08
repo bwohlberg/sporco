@@ -4,7 +4,7 @@
 # and user license can be found in the 'LICENSE.txt' file distributed
 # with the package.
 
-"""
+r"""
 Lasso Optimisation
 ==================
 
@@ -51,7 +51,7 @@ s0 = D.dot(x0)
 s = s0 + sigma*np.random.randn(N,1)
 
 
-"""
+r"""
 Set :class:`.bpdn.BPDNProjL1` solver class options. The value of $\gamma$ has been manually chosen for good performance.
 """
 

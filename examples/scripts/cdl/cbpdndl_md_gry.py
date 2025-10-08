@@ -53,7 +53,7 @@ W = signal.rndmask(S.shape[0:2] + (1,), frc, dtype=np.float32)
 Sw = W * S
 
 
-"""
+r"""
 $\ell_2$-TV denoising with a spatial mask as a non-linear lowpass filter.
 """
 

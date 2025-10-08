@@ -4,7 +4,7 @@
 # and user license can be found in the 'LICENSE.txt' file distributed
 # with the package.
 
-"""
+r"""
 Single-channel CSC (Constrained Penalty Term)
 =============================================
 

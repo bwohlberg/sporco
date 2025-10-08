@@ -16,7 +16,7 @@ from __future__ import print_function
 from builtins import input
 
 import numpy as np
-from scipy.ndimage.filters import gaussian_filter
+from scipy.ndimage import gaussian_filter
 
 from sporco.admm import rpca
 from sporco import metric

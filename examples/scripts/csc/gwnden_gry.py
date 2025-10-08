@@ -4,7 +4,7 @@
 # and user license can be found in the 'LICENSE.txt' file distributed
 # with the package.
 
-"""
+r"""
 Gaussian White Noise Restoration via CSC
 ========================================
 
@@ -47,7 +47,7 @@ def crop(x, n=8):
     return x[n:-n, n:-n]
 
 
-"""
+r"""
 Load a reference image and corrupt it with Gaussian white noise with $\sigma = 0.1$. (The call to ``numpy.random.seed`` ensures that the pseudo-random noise is reproducible.)
 """
 
@@ -73,7 +73,7 @@ Load dictionary.
 D = util.convdicts()['G:8x8x128']
 
 
-"""
+r"""
 Set solver options. See Section 8 of :cite:`wohlberg-2017-convolutional2` for details of construction of $\ell_1$ weighting matrix $W$.
 """
 

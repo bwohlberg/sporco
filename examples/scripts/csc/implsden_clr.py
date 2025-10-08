@@ -4,7 +4,7 @@
 # and user license can be found in the 'LICENSE.txt' file distributed
 # with the package.
 
-"""
+r"""
 Impulse Noise Restoration via CSC
 =================================
 
@@ -67,7 +67,7 @@ np.fill_diagonal(Di[0, 0], 1.0)
 D = np.concatenate((Di, Di, D0), axis=3)
 
 
-"""
+r"""
 The problem is solved using class :class:`.admm.cbpdn.ConvBPDNGradReg`, which implements the form of CBPDN with an additional gradient regularization term, as defined above. The regularization parameters for the $\ell_1$ and gradient terms are ``lmbda`` and ``mu`` respectively. Setting correct weighting arrays for these regularization terms is critical to obtaining good performance. For the $\ell_1$ norm, the weights on the filters that are intended to represent the impulse noise are tuned to an appropriate value for the impulse noise density (this value sets the relative cost of representing an image feature by one of the impulses or by one of the filters in the learned dictionary), the weights on the filters that are intended to represent low frequency components are set to zero (we only want them penalised by the gradient term), and the weights of the remaining filters are set to zero. For the gradient penalty, all weights are set to zero except for those corresponding to the filters intended to represent low frequency components, which are set to unity.
 """
 
@@ -128,7 +128,7 @@ fig.show()
 
 
 
-"""
+r"""
 The previous method gave good results, but the weight on the filter representing the impulse noise is an additional parameter that has to be tuned. This parameter can be avoided by switching to an $\ell_1$ data fidelity term instead of including dictionary filters to represent the impulse noise, as in the problem :cite:`wohlberg-2016-convolutional2`
 
   $$\mathrm{argmin}_{\{\mathbf{x}_m\}} \;

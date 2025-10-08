@@ -4,7 +4,7 @@
 # and user license can be found in the 'LICENSE.txt' file distributed
 # with the package.
 
-"""
+r"""
 Minimise ℓ1 Norm with ℓ2 Constraint
 ====================================
 
@@ -51,7 +51,7 @@ s0 = D.dot(x0)
 s = s0 + sigma*np.random.randn(N,1)
 
 
-"""
+r"""
 Set :class:`.admm.bpdn.MinL1InL2Ball` solver class options. The value of $\epsilon$ is estimated from the difference between the noisy and reference signals.
 """
 

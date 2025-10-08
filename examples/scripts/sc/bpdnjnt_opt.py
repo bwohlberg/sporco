@@ -4,7 +4,7 @@
 # and user license can be found in the 'LICENSE.txt' file distributed
 # with the package.
 
-"""
+r"""
 Basis Pursuit DeNoising with Joint Sparsity
 ===========================================
 
@@ -63,7 +63,7 @@ opt = bpdn.BPDNJoint.Options({'Verbose': False, 'MaxMainIter': 500,
                               'AutoRho': {'RsdlTarget': 1.0}})
 
 
-"""
+r"""
 Select regularization parameters $\lambda, \mu$ by evaluating the error in recovering the sparse representation over a logarithmicaly spaced grid. (The reference representation is assumed to be known, which is not realistic in a real application.) A function is defined that evalues the BPDN recovery error for a specified $\lambda, \mu$, and this function is evaluated in parallel by :func:`sporco.util.grid_search`.
 """
 
@@ -87,7 +87,7 @@ print('Minimum ℓ1 error: %5.2f at (𝜆,μ) = (%.2e, %.2e)' % (sfvl, lmbda, mu
 
 
 
-"""
+r"""
 Once the best $\lambda, \mu$ have been determined, run :meth:`.bpdn.BPDNJoint.solve` with verbose display of ADMM iteration statistics.
 """
 
@@ -112,14 +112,14 @@ fig.show()
 
 
 """
-Plot lmbda,mu error surface, functional value, residuals, and rho
+Plot lmbda, mu error surface, functional value, residuals, and rho
 """
 
 its = b.getitstat()
 fig = plot.figure(figsize=(15, 10))
 ax = fig.add_subplot(2, 2, 1, projection='3d')
 ax.locator_params(nbins=5, axis='y')
-plot.surf(fvmx, x=np.log10(mrng), y=np.log10(lrng), xlbl='log($\mu$)',
+plot.surf(fvmx, x=np.log10(mrng), y=np.log10(lrng), xlbl=r'log($\mu$)',
           ylbl='log($\lambda$)', zlbl='Error', fig=fig, ax=ax)
 plot.subplot(2, 2, 2)
 plot.plot(its.ObjFun, xlbl='Iterations', ylbl='Functional', fig=fig)
