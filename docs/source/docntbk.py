@@ -500,7 +500,7 @@ def write_notebook_rst(txt, res, fnm, pth):
         # Partial path for current output image
         rpth = os.path.join(extfnm, rnew)
         # In RST text, replace old output name with the new one
-        txt = re.sub('\.\. image:: ' + r, '.. image:: ' + rpth, txt, re.M)
+        txt = re.sub(r'\.\. image:: ' + r, '.. image:: ' + rpth, txt, re.M)
         # Full path of the current output image
         fullrpth = os.path.join(pth, rpth)
         # Write the current output image to disk
