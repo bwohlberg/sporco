@@ -16,17 +16,18 @@ from __future__ import print_function
 from builtins import input, range
 
 import numpy as np
-from scipy.sparse.linalg import LinearOperator
+from scipy.sparse.linalg import LinearOperator, cg
 
 from bm3d import bm3d_rgb
 try:
+    # workaround for colour_demosaicing NumPy 2.0 incompatibility
+    np.float_ = np.float32
     from colour_demosaicing import demosaicing_CFA_Bayer_Menon2007
 except ImportError:
     have_demosaic = False
 else:
     have_demosaic = True
 
-from sporco.linalg import _cg_wrapper
 from sporco.admm.ppp import PPPConsensus
 from sporco.interp import bilinear_demosaic
 from sporco import metric
@@ -107,7 +108,7 @@ def proxf(x, rho, tol=1e-3, maxit=100):
     ATAI = lambda z: ATA(z.reshape(rgbshp)).ravel() + rho * z.ravel()
     lop = LinearOperator((rgbsz, rgbsz), matvec=ATAI, dtype=s.dtype)
     b = AT(sn) + rho * x
-    vx, cgit = _cg_wrapper(lop, b.ravel(), None, tol, maxit)
+    vx, cgit = cg(lop, b.ravel(), None, maxiter=maxit, rtol=tol)
     return vx.reshape(rgbshp)
 
 

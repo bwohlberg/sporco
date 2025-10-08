@@ -31,7 +31,7 @@ reader = imageio.get_reader('imageio:newtonscradle.gif')
 nfrm = reader.get_length()
 frmlst = []
 for i, frm in enumerate(reader):
-    frmlst.append(signal.rgb2gray(frm[..., 0:3].astype(np.float32)/255.0))
+    frmlst.append(signal.rgb2gray(np.array(frm, dtype=np.float32)[..., 0:3]/255.0))
 v = np.stack(frmlst, axis=2)
 
 

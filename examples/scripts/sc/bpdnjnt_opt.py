@@ -120,7 +120,7 @@ fig = plot.figure(figsize=(15, 10))
 ax = fig.add_subplot(2, 2, 1, projection='3d')
 ax.locator_params(nbins=5, axis='y')
 plot.surf(fvmx, x=np.log10(mrng), y=np.log10(lrng), xlbl=r'log($\mu$)',
-          ylbl='log($\lambda$)', zlbl='Error', fig=fig, ax=ax)
+          ylbl=r'log($\lambda$)', zlbl='Error', fig=fig, ax=ax)
 plot.subplot(2, 2, 2)
 plot.plot(its.ObjFun, xlbl='Iterations', ylbl='Functional', fig=fig)
 plot.subplot(2, 2, 3)

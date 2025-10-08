@@ -19,6 +19,8 @@ import numpy as np
 
 from bm3d import bm3d_rgb
 try:
+    # workaround for colour_demosaicing NumPy 2.0 incompatibility
+    np.float_ = np.float32
     from colour_demosaicing import demosaicing_CFA_Bayer_Menon2007
 except ImportError:
     have_demosaic = False
