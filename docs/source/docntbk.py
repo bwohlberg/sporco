@@ -130,6 +130,8 @@ def preprocess_script_string(str):
 
     # Remove header comment
     str = re.sub(r'^(#[^#\n]+\n){5}\n*', r'', str)
+    # Remove r from r""" ... """
+    str = re.sub('^r"""', '"""', str, flags=re.MULTILINE)
     # Insert notebook plotting configuration function
     str = re.sub(r'from sporco import plot', r'from sporco import plot'
                  '\nplot.config_notebook_plotting()',
