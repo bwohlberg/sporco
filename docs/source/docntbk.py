@@ -8,6 +8,7 @@ from __future__ import print_function
 
 import os
 import os.path
+from pathlib import Path
 from glob import glob
 import re
 import pickle
@@ -68,11 +69,14 @@ def fetch_intersphinx_inventory(uri):
 
     # See https://stackoverflow.com/a/30981554
     class MockConfig(object):
+        intersphinx_cache_limit = None
         intersphinx_timeout = None
         tls_verify = False
+        tls_cacerts = None
+        user_agent = None
 
     class MockApp(object):
-        srcdir = ''
+        srcdir = Path('')
         config = MockConfig()
 
         def warn(self, msg):
@@ -500,7 +504,7 @@ def write_notebook_rst(txt, res, fnm, pth):
         # Partial path for current output image
         rpth = os.path.join(extfnm, rnew)
         # In RST text, replace old output name with the new one
-        txt = re.sub('\.\. image:: ' + r, '.. image:: ' + rpth, txt, re.M)
+        txt = re.sub(r'\.\. image:: ' + r, '.. image:: ' + rpth, txt, re.M)
         # Full path of the current output image
         fullrpth = os.path.join(pth, rpth)
         # Write the current output image to disk
