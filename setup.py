@@ -24,7 +24,8 @@ with open(os.path.join(name, '__init__.py')) as f:
         f))).body[0].value.value
 
 packages = ['sporco', 'sporco.prox', 'sporco.admm', 'sporco.pgm',
-            'sporco.dictlrn']
+            'sporco.dictlrn', 'sporco.cuda', 'sporco.data',
+            'sporco.cupy', 'sporco.cupy.pgm', 'sporco.cupy.admm', 'sporco.cupy.dictlrn']
 
 docdirbase = 'share/doc/%s-%s' % (name, version)
 data = [(os.path.join(docdirbase, 'examples/scripts'),
@@ -80,7 +81,6 @@ setup(
     data_files       = data,
     include_package_data = True,
     setup_requires   = ['future'],
-    tests_require    = tests_require,
     install_requires = install_requires,
     extras_require   = {
         'tests': tests_require,
