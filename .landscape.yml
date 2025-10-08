@@ -1,4 +1,0 @@
-pylint:
-  disable:
-    - redefined-builtin
-    - too-many-arguments
