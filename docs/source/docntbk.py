@@ -822,7 +822,7 @@ class CrossReferenceLookup(object):
         self.citeid = {}
         if not hasattr(env, 'bibtex_cache'):
             for cite in env.domaindata['cite']['citations']:
-                self.citenum[cite.key] = cite.label
+                self.citenum[cite.key] = cite.citation_id[2:]
                 self.citeid[cite.key] = cite.citation_id
 
 
