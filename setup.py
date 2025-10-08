@@ -21,7 +21,7 @@ name = 'sporco'
 with open(os.path.join(name, '__init__.py')) as f:
     version = parse(next(filter(
         lambda line: line.startswith('__version__'),
-        f))).body[0].value.s
+        f))).body[0].value.value
 
 packages = ['sporco', 'sporco.prox', 'sporco.admm', 'sporco.pgm',
             'sporco.dictlrn']
