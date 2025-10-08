@@ -8,7 +8,7 @@
 Convolutional Dictionary Learning
 =================================
 
-This example demonstrating the use of :class:`.dictlrn.DictLearn` to construct a dictionary learning algorithm with the flexibility of choosing the sparse coding and dictionary update classes. In this case they are :class:`.cbpdn.ConvBPDNJoint` and :func:`.admm.ccmod.ConvCnstrMOD` respectively, so the resulting dictionary learning algorithm is not equivalent to :class:`.dictlrn.cbpdndl.ConvBPDNDictLearn`. The example uses colour input images and a greyscale dictionary :cite:`wohlberg-2016-convolutional`.
+This example demonstrates the use of :class:`.dictlrn.DictLearn` to construct a dictionary learning algorithm with the flexibility of choosing the sparse coding and dictionary update classes. In this case they are :class:`.cbpdn.ConvBPDNJoint` and :func:`.admm.ccmod.ConvCnstrMOD` respectively, so the resulting dictionary learning algorithm is not equivalent to :class:`.dictlrn.cbpdndl.ConvBPDNDictLearn`. The example uses colour input images and a greyscale dictionary :cite:`wohlberg-2016-convolutional`.
 """
 
 

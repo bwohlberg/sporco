@@ -45,7 +45,7 @@ class ConsensusTest(admm.ADMMConsensus):
     """
 
     def __init__(self, A, s, lmbda, opt=None):
-        """
+        r"""
         Initialise a ConsensusTest object with problem parameters.
 
         Parameters
@@ -142,7 +142,7 @@ class ConsensusTest(admm.ADMMConsensus):
         return sp.prox_l1(X, (self.lmbda/rho))
 
 
-"""
+r"""
 Construct random sparse vector $\mathbf{x}$, random $A_k$` matrices, and vectors $\mathbf{s}_k$ such that $A_k \mathbf{x} = \mathbf{s}_k$.
 """
 

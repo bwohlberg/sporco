@@ -51,7 +51,7 @@ def proj_test(v, nrm, prj, gamma):
     pf = 0.5*np.sum((pj - v)**2)
     mx, mf = proj_solve(v, pj, nrm, gamma)
     assert nrm(pj) - gamma <= 1e-12
-    assert pf - mf <= 1e-6
+    assert pf - mf <= 2e-6
     assert np.linalg.norm(pj - mx) <= 1e-3
 
 

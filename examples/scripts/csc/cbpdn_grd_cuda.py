@@ -48,7 +48,7 @@ di[0, 0] = 1
 D = np.concatenate((di, Db), axis=2)
 
 
-"""
+r"""
 Set up weights for the $\ell_1$ norm to disable regularization of the coefficient map corresponding to the impulse filter.
 """
 
@@ -56,7 +56,7 @@ wl1 = np.ones((1,)*2 + (D.shape[2:]), dtype=np.float32)
 wl1[..., 0] = 0.0
 
 
-"""
+r"""
 Set of weights for the $\ell_2$ norm of the gradient to disable regularization of all coefficient maps except for the one corresponding to the impulse filter.
 """
 

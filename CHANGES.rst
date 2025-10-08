@@ -8,6 +8,8 @@ Version 0.2.2   (unreleased)
 
 • Removed deprecated sporco.fista modules
 • Removed deprecation warning redirects for functions renamed in 0.2.0
+• Resolved a number of deprecation warnings
+• Fixed bugs in a number of example scripts
 
 
 Version 0.2.1   (2022-02-17)

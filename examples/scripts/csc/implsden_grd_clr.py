@@ -4,7 +4,7 @@
 # and user license can be found in the 'LICENSE.txt' file distributed
 # with the package.
 
-"""
+r"""
 Impulse Noise Restoration via CSC
 =================================
 
@@ -70,7 +70,7 @@ np.fill_diagonal(Di[0, 0], 1.0)
 D = np.concatenate((Di, D0), axis=3)
 
 
-"""
+r"""
 The problem is solved using class :class:`.admm.cbpdn.ConvL1L1Grd`, which implements a convolutional sparse coding problem with an $\ell_1$ data fidelity term, an $\ell_1$ regularisation term, and an additional gradient regularization term :cite:`wohlberg-2016-convolutional2`, as defined above. The regularization parameters for the $\ell_1$ and gradient terms are ``lmbda`` and ``mu`` respectively. Setting correct weighting arrays for these regularization terms is critical to obtaining good performance. For the $\ell_1$ norm, the weights on the filters that are intended to represent low frequency components are set to zero (we only want them penalised by the gradient term), and the weights of the remaining filters are set to zero. For the gradient penalty, all weights are set to zero except for those corresponding to the filters intended to represent low frequency components, which are set to unity.
 """
 

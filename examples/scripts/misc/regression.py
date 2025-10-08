@@ -20,7 +20,7 @@ import numpy as np
 from sporco.interp import lstabsdev, lstmaxdev
 from sporco import plot
 
-"""
+r"""
 Generate reference data
 
   $$\mathbf{y}_0 = \left( \begin{array}{cc} \mathbf{x} & \mathbf{1} \end{array} \right) \left( \begin{array}{c} p_0 \\ p_1 \end{array} \right)$$

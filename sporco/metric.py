@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2016-2020 by Brendt Wohlberg <brendt@ieee.org>
+# Copyright (C) 2016-2025 by Brendt Wohlberg <brendt@ieee.org>
 # All rights reserved. BSD 3-clause License.
 # This file is part of the SPORCO package. Details of the copyright
 # and user license can be found in the 'LICENSE.txt' file distributed
@@ -231,7 +231,7 @@ def pamse(vref, vcmp, rescale=True):
     if rescale:
         emap *= (255.0 / vref.max())
     sigma = 0.8
-    herr = ndimage.filters.gaussian_filter(emap, sigma)
+    herr = ndimage.gaussian_filter(emap, sigma)
     score = np.mean(herr**2)
     return score
 

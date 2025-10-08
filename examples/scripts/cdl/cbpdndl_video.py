@@ -34,7 +34,7 @@ reader = imageio.get_reader('imageio:cockatoo.mp4')
 frmlst = []
 for i, frm in enumerate(reader):
     if i >= 250:
-        frm = zoom(signal.rgb2gray(frm.astype(np.float32)/255.0), 0.25)
+        frm = zoom(signal.rgb2gray(np.array(frm, dtype=np.float32)/255.0), 0.25)
         frmlst.append(frm[20:-20, 70:-70])
 vid = np.stack(frmlst, axis=2)
 

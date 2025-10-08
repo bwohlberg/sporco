@@ -4,7 +4,7 @@
 # and user license can be found in the 'LICENSE.txt' file distributed
 # with the package.
 
-"""
+r"""
 Impulse Noise Restoration via CSC
 =================================
 
@@ -88,7 +88,7 @@ pcaB, pcaS, pcaC = pca(S, centre=False)
 B = pcaB[:, 0:20]
 
 
-"""
+r"""
 The problem is solved using class :class:`.admm.pdcsc.ConvProdDictL1L1GrdJoint`, which implements a convolutional sparse coding problem with a product dictionary :cite:`garcia-2018-convolutional2`, an :math:`\ell_1` data fidelity term, an :math:`\ell_1` regularisation term, and an additional gradient regularization term :cite:`wohlberg-2016-convolutional2`, as defined above. The regularization parameters for the $\ell_1$ and gradient terms are ``lmbda`` and ``mu`` respectively. Setting correct weighting arrays for these regularization terms is critical to obtaining good performance. For the $\ell_1$ norm, the weights on the filters that are intended to represent low frequency components are set to zero (we only want them penalised by the gradient term), and the weights of the remaining filters are set to zero. For the gradient penalty, all weights are set to zero except for those corresponding to the filters intended to represent low frequency components, which are set to unity.
 """
 
@@ -96,7 +96,7 @@ lmbda = 4.2e0
 mu = 9.5e0
 
 
-"""
+r"""
 Set up weights for the $\ell_1$ norm to disable regularization of the coefficient map corresponding to the impulse filter.
 """
 
@@ -104,7 +104,7 @@ wl1 = np.ones((1,)*4 + (D.shape[2],), dtype=np.float32)
 wl1[..., 0] = 0.0
 
 
-"""
+r"""
 Set of weights for the $\ell_2$ norm of the gradient to disable regularization of all coefficient maps except for the one corresponding to the impulse filter.
 """
 

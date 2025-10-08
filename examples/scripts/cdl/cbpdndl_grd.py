@@ -8,7 +8,7 @@
 Convolutional Dictionary Learning
 =================================
 
-This example demonstrating the use of :class:`.dictlrn.DictLearn` to construct a dictionary learning algorithm with the flexibility of choosing the sparse coding and dictionary update classes. In this case they are :class:`.cbpdn.ConvBPDNGradReg` and :func:`.admm.ccmod.ConvCnstrMOD` respectively, so the resulting dictionary learning algorithm is not equivalent to :class:`.dictlrn.cbpdndl.ConvBPDNDictLearn`. Sparse coding with a CBPDN variant that includes a gradient regularization term on one of the coefficient maps :cite:`wohlberg-2016-convolutional2` enables CDL without the need for the usual lowpass/highpass filtering as a pre-processing of the training images.
+This example demonstrates the use of :class:`.dictlrn.DictLearn` to construct a dictionary learning algorithm with the flexibility of choosing the sparse coding and dictionary update classes. In this case they are :class:`.cbpdn.ConvBPDNGradReg` and :func:`.admm.ccmod.ConvCnstrMOD` respectively, so the resulting dictionary learning algorithm is not equivalent to :class:`.dictlrn.cbpdndl.ConvBPDNDictLearn`. Sparse coding with a CBPDN variant that includes a gradient regularization term on one of the coefficient maps :cite:`wohlberg-2016-convolutional2` enables CDL without the need for the usual lowpass/highpass filtering as a pre-processing of the training images.
 """
 
 
@@ -53,7 +53,7 @@ Construct object representing problem dimensions.
 cri = cnvrep.CDU_ConvRepIndexing(D0.shape, S)
 
 
-"""
+r"""
 Set up weights for the $\ell_1$ norm to disable regularization of the coefficient map corresponding to the impulse filter.
 """
 
@@ -61,7 +61,7 @@ wl1 = np.ones((1,)*4 + (D0.shape[2:]), dtype=np.float32)
 wl1[..., 0] = 0.0
 
 
-"""
+r"""
 Set of weights for the $\ell_2$ norm of the gradient to disable regularization of all coefficient maps except for the one corresponding to the impulse filter.
 """
 

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2015-2020 by Brendt Wohlberg <brendt@ieee.org>
+# Copyright (C) 2015-2025 by Brendt Wohlberg <brendt@ieee.org>
 # All rights reserved. BSD 3-clause License.
 # This file is part of the SPORCO package. Details of the copyright
 # and user license can be found in the 'LICENSE.txt' file distributed
@@ -14,7 +14,7 @@ from builtins import range, object
 from timeit import default_timer as timer
 import os
 import platform
-import imghdr
+from filetype import is_image
 import io
 import multiprocessing as mp
 import itertools
@@ -27,7 +27,7 @@ else:
     import urllib.error as urlerror
 import numpy as np
 import imageio
-import scipy.ndimage.interpolation as sni
+import scipy.ndimage as sn
 
 from sporco import signal
 
@@ -429,7 +429,7 @@ class ExampleImages(object):
             prnpth = dirpath[len(self.bpth)+1:]
             for f in filenames:
                 fpth = os.path.join(dirpath, f)
-                if imghdr.what(fpth) is not None:
+                if is_image(fpth):
                     gpth = os.path.join(prnpth, f)
                     self.imglst.append(gpth)
                     if prnpth not in self.grpimg:
@@ -550,7 +550,7 @@ class ExampleImages(object):
             pth = os.path.join(self.bpth, group, fname)
 
         try:
-            img = imageio.imread(pth).astype(dtype)
+            img = imageio.v3.imread(pth).astype(dtype)
         except IOError:
             raise IOError('Could not access image %s in group %s' %
                           (fname, group))
@@ -561,9 +561,9 @@ class ExampleImages(object):
             img = img[idxexp]
         if zoom is not None:
             if img.ndim == 2:
-                img = sni.zoom(img, zoom)
+                img = sn.zoom(img, zoom)
             else:
-                img = sni.zoom(img, (zoom,)*2 + (1,)*(img.ndim-2))
+                img = sn.zoom(img, (zoom,)*2 + (1,)*(img.ndim-2))
         if gray:
             img = signal.rgb2gray(img)
 

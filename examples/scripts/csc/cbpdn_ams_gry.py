@@ -69,7 +69,7 @@ mskp = zpad(msk)
 imgwp = spad(imgw)
 
 
-"""
+r"""
 $\ell_2$-TV denoising with a spatial mask as a non-linear lowpass filter. The highpass component is the difference between the test image and the lowpass component, multiplied by the mask for faster convergence of the convolutional sparse coding (see :cite:`wohlberg-2017-convolutional3`).
 """
 

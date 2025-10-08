@@ -8,6 +8,7 @@ from __future__ import print_function
 
 import os
 import os.path
+from pathlib import Path
 from glob import glob
 import re
 import pickle
@@ -68,11 +69,14 @@ def fetch_intersphinx_inventory(uri):
 
     # See https://stackoverflow.com/a/30981554
     class MockConfig(object):
+        intersphinx_cache_limit = None
         intersphinx_timeout = None
         tls_verify = False
+        tls_cacerts = None
+        user_agent = None
 
     class MockApp(object):
-        srcdir = ''
+        srcdir = Path('')
         config = MockConfig()
 
         def warn(self, msg):
@@ -126,6 +130,8 @@ def preprocess_script_string(str):
 
     # Remove header comment
     str = re.sub(r'^(#[^#\n]+\n){5}\n*', r'', str)
+    # Remove r from r""" ... """
+    str = re.sub('^r"""', '"""', str, flags=re.MULTILINE)
     # Insert notebook plotting configuration function
     str = re.sub(r'from sporco import plot', r'from sporco import plot'
                  '\nplot.config_notebook_plotting()',
@@ -500,7 +506,7 @@ def write_notebook_rst(txt, res, fnm, pth):
         # Partial path for current output image
         rpth = os.path.join(extfnm, rnew)
         # In RST text, replace old output name with the new one
-        txt = re.sub('\.\. image:: ' + r, '.. image:: ' + rpth, txt, re.M)
+        txt = re.sub(r'\.\. image:: ' + r, '.. image:: ' + rpth, txt, re.M)
         # Full path of the current output image
         fullrpth = os.path.join(pth, rpth)
         # Write the current output image to disk
@@ -818,7 +824,7 @@ class CrossReferenceLookup(object):
         self.citeid = {}
         if not hasattr(env, 'bibtex_cache'):
             for cite in env.domaindata['cite']['citations']:
-                self.citenum[cite.key] = cite.label
+                self.citenum[cite.key] = cite.citation_id[2:]
                 self.citeid[cite.key] = cite.citation_id
 
 

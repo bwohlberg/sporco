@@ -622,9 +622,9 @@ def imview(img, title=None, copy=True, fltscl=False, intrp='nearest',
         if img.ndim > 2:
             imgd = np.clip(imgd, 0.0, 1.0)
     elif img.dtype == np.uint16:
-        imgd = np.float16(imgd) / np.iinfo(np.uint16).max
+        imgd = np.float32(imgd) / np.iinfo(np.uint16).max
     elif img.dtype == np.int16:
-        imgd = np.float16(imgd) - imgd.min()
+        imgd = np.float32(imgd) - imgd.min()
         imgd /= imgd.max()
 
     if norm is None:
