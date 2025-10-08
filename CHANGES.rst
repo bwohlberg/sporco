@@ -3,7 +3,7 @@ SPORCO Release Notes
 ====================
 
 
-Version 0.2.2   (unreleased)
+Version 0.2.2   (2025-10-08)
 ----------------------------
 
 • Removed deprecated sporco.fista modules
