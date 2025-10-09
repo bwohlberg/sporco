@@ -72,7 +72,7 @@ setup(
                         'Convolutional Sparse Coding', 'Optimization',
                         'ADMM', 'PGM'],
     platforms        = 'Any',
-    license          = 'BSD',
+    license          = 'BSD-3-Clause',
     url              = 'https://github.com/bwohlberg/sporco',
     author           = 'Brendt Wohlberg',
     author_email     = 'brendt@ieee.org',
@@ -90,7 +90,6 @@ setup(
         'gpu': ['cupy', 'gputil', 'wurlitzer'],
         'optional': ['numexpr', 'mpldatacursor']},
     classifiers = [
-    'License :: OSI Approved :: BSD License',
     'Development Status :: 4 - Beta',
     'Intended Audience :: Education',
     'Intended Audience :: Science/Research',
