@@ -1,9 +1,5 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
 """SPORCO package configuration."""
 
-from __future__ import print_function
 from builtins import next
 from builtins import filter
 
@@ -80,7 +76,6 @@ setup(
     package_data     = {'sporco': ['data/*.png', 'data/*.jpg', 'data/*.npz']},
     data_files       = data,
     include_package_data = True,
-    setup_requires   = ['future'],
     install_requires = install_requires,
     extras_require   = {
         'tests': tests_require,
