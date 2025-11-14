@@ -45,7 +45,7 @@ on the Alternating Direction Method of Multipliers (ADMM) or on
 the Fast Iterative Shrinkage-Thresholding Algorithm (PGM).
 """
 
-install_requires = ['future', 'numpy', 'scipy', 'imageio', 'matplotlib']
+install_requires = ['future', 'numpy', 'scipy', 'imageio', 'filetype', 'matplotlib']
 on_rtd = os.environ.get('READTHEDOCS') == 'True'
 if on_rtd:
     print("Building on ReadTheDocs")
